@@ -27,7 +27,6 @@ jobs:
       - name: Build
         run: npm run build
 
-      # app-ads.txt를 dist 루트에 복사
       - name: Ensure app-ads.txt in root
         run: |
           if [ -f dist/app-ads.txt ]; then
@@ -40,8 +39,7 @@ jobs:
             exit 1
           fi
 
-      # dist 내용을 gh-pages 브랜치로 push
       - name: Deploy to gh-pages branch
-        run: npx gh-pages -d dist -u "github-actions-bot <actions@github.com>"
+        run: npx gh-pages -d dist -u "github-actions-bot <actions@github.com>" -r https://x-access-token:${GITHUB_TOKEN}@github.com/jim1286/portfolio.git
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
