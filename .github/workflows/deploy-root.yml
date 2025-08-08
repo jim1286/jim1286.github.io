@@ -1,0 +1,33 @@
+name: Deploy app-ads.txt to root domain
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'public/app-ads.txt'
+  workflow_dispatch:
+
+jobs:
+  deploy-root:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Deploy app-ads.txt to jim1286.github.io
+        run: |
+          # Create temporary directory
+          mkdir temp-root
+          cp public/app-ads.txt temp-root/
+          
+          # Clone or create jim1286.github.io repo
+          cd temp-root
+          git init
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+          git add app-ads.txt
+          git commit -m "Update app-ads.txt"
+          
+          # Push to jim1286.github.io repository
+          git remote add origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/jim1286/jim1286.github.io.git
+          git branch -M main
+          git push -u origin main --force

@@ -6,6 +6,8 @@ on:
 
 permissions:
   contents: write
+  pages: write
+  id-token: write
 
 jobs:
   build-and-deploy:
@@ -41,5 +43,27 @@ jobs:
 
       - name: Deploy to gh-pages branch
         run: npx gh-pages -d dist -u "github-actions-bot <actions@github.com>" -r https://x-access-token:${GITHUB_TOKEN}@github.com/jim1286/portfolio.git
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Deploy app-ads.txt to root domain
+        run: |
+          # Create a temporary directory for root domain files
+          mkdir temp-root
+          cp dist/app-ads.txt temp-root/
+          
+          # Create a simple index.html that redirects to portfolio
+          echo '<!DOCTYPE html><html><head><meta http-equiv="refresh" content="0;url=https://jim1286.github.io/portfolio/"></head><body>Redirecting...</body></html>' > temp-root/index.html
+          
+          # Deploy to jim1286.github.io repository
+          cd temp-root
+          git init
+          git config user.name "github-actions-bot"
+          git config user.email "actions@github.com"
+          git add .
+          git commit -m "Deploy app-ads.txt and redirect"
+          git remote add origin https://x-access-token:${GITHUB_TOKEN}@github.com/jim1286/jim1286.github.io.git
+          git branch -M main
+          git push -f origin main
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
