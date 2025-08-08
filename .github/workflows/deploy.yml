@@ -5,14 +5,10 @@ on:
     branches: [main]
 
 permissions:
-  contents: read
-  pages: write
-  id-token: write
+  contents: write
 
 jobs:
   build-and-deploy:
-    environment:
-      name: github-pages
     runs-on: ubuntu-latest
 
     steps:
@@ -22,8 +18,8 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "18"
-          cache: "npm"
+          node-version: 18
+          cache: npm
 
       - name: Install dependencies
         run: npm ci
@@ -31,20 +27,21 @@ jobs:
       - name: Build
         run: npm run build
 
-      - name: Setup deployment structure
+      # app-ads.txt를 dist 루트에 복사
+      - name: Ensure app-ads.txt in root
         run: |
-          mkdir -p gh-pages/portfolio
-          cp -r dist/* gh-pages/portfolio/
-          cp dist/app-ads.txt gh-pages/app-ads.txt
+          if [ -f dist/app-ads.txt ]; then
+            echo "app-ads.txt found in dist."
+          elif [ -f app-ads.txt ]; then
+            echo "Copying app-ads.txt from project root to dist."
+            cp app-ads.txt dist/
+          else
+            echo "❌ app-ads.txt not found. Please add it to project root or dist."
+            exit 1
+          fi
 
-      - name: Setup Pages
-        uses: actions/configure-pages@v4
-
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: ./gh-pages
-
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
+      # dist 내용을 gh-pages 브랜치로 push
+      - name: Deploy to gh-pages branch
+        run: npx gh-pages -d dist -u "github-actions-bot <actions@github.com>"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
