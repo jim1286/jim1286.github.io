@@ -1397,4 +1397,4 @@ ${e.message}
   background: #fff;
 `,CU=Me(SU)`
   overflow: hidden;
-`,$U=()=>ne.jsxs(ne.Fragment,{children:[ne.jsx(IF,{}),ne.jsx(XF,{}),ne.jsx(oV,{}),ne.jsx(bV,{}),ne.jsx(YV,{})]}),wU=()=>ne.jsx(Gi,{locale:lB,children:ne.jsxs(ok,{theme:uk,children:[ne.jsx(ck,{}),ne.jsx(U_,{basename:"/portfolio",children:ne.jsxs(xU,{children:[ne.jsx(xF,{}),ne.jsx(CU,{children:ne.jsxs(x_,{children:[ne.jsx(Tv,{path:"/",element:ne.jsx($U,{})}),ne.jsx(Tv,{path:"/project/:id",element:ne.jsx(yU,{})})]})}),ne.jsx(aU,{})]})})]})});M3.createRoot(document.getElementById("root")).render(ne.jsx(f.StrictMode,{children:ne.jsx(wU,{})}));
+`,$U=()=>ne.jsxs(ne.Fragment,{children:[ne.jsx(IF,{}),ne.jsx(XF,{}),ne.jsx(oV,{}),ne.jsx(bV,{}),ne.jsx(YV,{})]}),wU=()=>ne.jsx(Gi,{locale:lB,children:ne.jsxs(ok,{theme:uk,children:[ne.jsx(ck,{}),ne.jsx(U_,{children:ne.jsxs(xU,{children:[ne.jsx(xF,{}),ne.jsx(CU,{children:ne.jsxs(x_,{children:[ne.jsx(Tv,{path:"/",element:ne.jsx($U,{})}),ne.jsx(Tv,{path:"/project/:id",element:ne.jsx(yU,{})})]})}),ne.jsx(aU,{})]})})]})});M3.createRoot(document.getElementById("root")).render(ne.jsx(f.StrictMode,{children:ne.jsx(wU,{})}));
