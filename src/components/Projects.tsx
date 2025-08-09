@@ -185,7 +185,7 @@ const projects = [
       "fl_chart",
       "Google Mobile Ads",
     ],
-    icon: <img src="/portfolio/images/yajalal/logo.png" alt="Yajalal 로고" />,
+    icon: <img src="/images/yajalal/logo.png" alt="Yajalal 로고" />,
     bgColor: "linear-gradient(135deg, #FF6B6B 0%, #4ECDC4 100%)",
     liveUrl: "#",
     githubUrl: "#",

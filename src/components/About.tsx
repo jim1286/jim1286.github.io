@@ -197,7 +197,7 @@ const About: React.FC = () => {
           <Col xs={24} lg={12}>
             <ProfileImageContainer>
               <StyledAvatar 
-                src="/portfolio/profile.jpg" 
+                src="/profile.jpg" 
                 alt="황지민 프로필 사진"
               />
             </ProfileImageContainer>

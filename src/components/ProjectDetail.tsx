@@ -262,7 +262,7 @@ const projectsData = {
       "HTTP",
       "JSON Serialization",
     ],
-    icon: <img src="/portfolio/images/yajalal/logo.png" alt="Yajalal 로고" />,
+    icon: <img src="/images/yajalal/logo.png" alt="Yajalal 로고" />,
     bgColor: "linear-gradient(135deg, #FF6B6B 0%, #4ECDC4 100%)",
     features: [
       "실시간 선수 통계 조회 및 상세 정보 제공",
@@ -372,7 +372,7 @@ const ProjectDetail: React.FC = () => {
             <ScreenshotSlider>
               <ScreenshotItem>
                 <ScreenshotImage
-                  src="/portfolio/images/yajalal/01.png"
+                  src="/images/yajalal/01.png"
                   alt="Yajalal 앱 메인 화면"
                   loading="lazy"
                 />
@@ -380,7 +380,7 @@ const ProjectDetail: React.FC = () => {
               </ScreenshotItem>
               <ScreenshotItem>
                 <ScreenshotImage
-                  src="/portfolio/images/yajalal/02.png"
+                  src="/images/yajalal/02.png"
                   alt="선수 통계 화면"
                   loading="lazy"
                 />
@@ -388,7 +388,7 @@ const ProjectDetail: React.FC = () => {
               </ScreenshotItem>
               <ScreenshotItem>
                 <ScreenshotImage
-                  src="/portfolio/images/yajalal/03.png"
+                  src="/images/yajalal/03.png"
                   alt="팀 순위 화면"
                   loading="lazy"
                 />
@@ -396,7 +396,7 @@ const ProjectDetail: React.FC = () => {
               </ScreenshotItem>
               <ScreenshotItem>
                 <ScreenshotImage
-                  src="/portfolio/images/yajalal/04.png"
+                  src="/images/yajalal/04.png"
                   alt="선수 상세 정보"
                   loading="lazy"
                 />
@@ -404,7 +404,7 @@ const ProjectDetail: React.FC = () => {
               </ScreenshotItem>
               <ScreenshotItem>
                 <ScreenshotImage
-                  src="/portfolio/images/yajalal/05.png"
+                  src="/images/yajalal/05.png"
                   alt="통계 차트 뷰"
                   loading="lazy"
                 />
@@ -412,7 +412,7 @@ const ProjectDetail: React.FC = () => {
               </ScreenshotItem>
               <ScreenshotItem>
                 <ScreenshotImage
-                  src="/portfolio/images/yajalal/06.png"
+                  src="/images/yajalal/06.png"
                   alt="경기 일정"
                   loading="lazy"
                 />
@@ -420,7 +420,7 @@ const ProjectDetail: React.FC = () => {
               </ScreenshotItem>
               <ScreenshotItem>
                 <ScreenshotImage
-                  src="/portfolio/images/yajalal/07.png"
+                  src="/images/yajalal/07.png"
                   alt="나만의 팀 구성"
                   loading="lazy"
                 />
@@ -428,7 +428,7 @@ const ProjectDetail: React.FC = () => {
               </ScreenshotItem>
               <ScreenshotItem>
                 <ScreenshotImage
-                  src="/portfolio/images/yajalal/08.png"
+                  src="/images/yajalal/08.png"
                   alt="검색 및 필터"
                   loading="lazy"
                 />
