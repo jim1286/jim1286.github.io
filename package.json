@@ -3,7 +3,7 @@
   "private": true,
   "version": "1.0.0",
   "type": "module",
-  "homepage": "https://jim1286.github.io",
+  "homepage": "https://jim1286.github.io/",
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
