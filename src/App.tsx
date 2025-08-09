@@ -40,7 +40,7 @@ const App: React.FC = () => {
     <ConfigProvider locale={koKR}>
       <ThemeProvider theme={theme}>
         <GlobalStyles />
-        <Router basename="/portfolio">
+        <Router>
           <StyledLayout>
             <Navbar />
             <StyledContent>
