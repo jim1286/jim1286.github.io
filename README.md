@@ -1,101 +1,28 @@
-# 황지민 - 개발자 포트폴리오
+# 황지민 · 공식 개발자 사이트
 
-React + TypeScript + Vite + Styled Components + Ant Design로 제작된 개발자 포트폴리오 웹사이트입니다.
+[jim1286.github.io](https://jim1286.github.io/)에 배포되는 독립 개발자·앱 포트폴리오
+사이트입니다. 앱 스토어의 개발자/마케팅 웹사이트와 앱별 개인정보처리방침·계정 삭제·지원
+문서의 공식 진입점으로 사용합니다.
 
-## 🚀 기술 스택
+## 공개 정보의 기준
 
-- **Frontend**: React 19, TypeScript
-- **Styling**: Styled Components, Ant Design
-- **Build Tool**: Vite
-- **배포**: GitHub Pages
+- 앱 identity와 저장소: `app-portfolio/portfolio.json`
+- 버전, 스토어 상태와 URL: App Release Hub의 release profile 및 store binding
+- 앱 설명: 각 앱 저장소의 최신 README
+- 개인정보처리방침과 지원 문서: `hjm-app-policies.jimin1286.chatgpt.site`
 
-## 📋 주요 기능
+정책 본문은 이 저장소에 복제하지 않습니다. 이 사이트는 정책 사이트의 앱별 공식 문서로
+연결하며, 정책의 개정과 배포는 App Release Hub가 관리합니다.
 
-- 반응형 디자인
-- 스무스 스크롤 네비게이션
-- 모던한 UI/UX 디자인
-- 인터랙티브 애니메이션
-- 다크/라이트 테마 지원 준비
-- 모바일 친화적 인터페이스
-
-## 🛠️ 개발 환경 설정
-
-### 필요 사항
-- Node.js 18+ 
-- npm 또는 yarn
-
-### 설치 및 실행
+## 개발
 
 ```bash
-# 의존성 설치
-npm install
-
-# 개발 서버 실행
+npm ci
 npm run dev
-
-# 빌드
+npm run lint
 npm run build
-
-# 프리뷰
-npm run preview
-
-# GitHub Pages 배포
-npm run deploy
 ```
 
-## 📁 프로젝트 구조
+## 배포
 
-```
-src/
-├── components/          # React 컴포넌트
-│   ├── Navbar.tsx      # 네비게이션 바
-│   ├── Hero.tsx        # 메인 히어로 섹션
-│   ├── About.tsx       # 소개 섹션
-│   ├── Skills.tsx      # 기술 스택 섹션
-│   ├── Projects.tsx    # 프로젝트 섹션
-│   ├── Contact.tsx     # 연락처 섹션
-│   └── Footer.tsx      # 푸터
-├── styles/             # 스타일 관련 파일
-│   ├── theme.ts        # 테마 설정
-│   └── GlobalStyles.ts # 글로벌 스타일
-├── types/              # TypeScript 타입 정의
-└── App.tsx            # 메인 앱 컴포넌트
-```
-
-## 🎨 커스터마이징
-
-### 개인 정보 수정
-- `src/components/` 폴더의 각 컴포넌트에서 개인 정보를 수정할 수 있습니다.
-- 연락처, 프로젝트 정보, 기술 스택 등을 본인에 맞게 변경하세요.
-
-### 테마 수정
-- `src/styles/theme.ts`에서 색상, 폰트, 간격 등을 수정할 수 있습니다.
-
-### 이메일 기능 설정 (선택사항)
-
-현재는 기본적으로 mailto 링크를 사용하여 사용자의 이메일 클라이언트를 엽니다.
-
-**EmailJS를 사용한 직접 이메일 전송:**
-
-1. [EmailJS](https://www.emailjs.com/) 계정 생성
-2. Service, Template, Public Key 설정
-3. `src/services/emailService.ts`에서 설정값 변경:
-   ```typescript
-   const EMAILJS_SERVICE_ID = 'your_service_id';
-   const EMAILJS_TEMPLATE_ID = 'your_template_id'; 
-   const EMAILJS_PUBLIC_KEY = 'your_public_key';
-   ```
-4. `src/components/Contact.tsx`에서 EmailMethod 변경:
-   ```typescript
-   await sendEmailWithMethod(emailData, EmailMethod.EMAILJS);
-   ```
-
-## 📞 연락처
-
-- **이메일**: jimin1286@gmail.com
-- **GitHub**: [GitHub 프로필 링크]
-- **LinkedIn**: [LinkedIn 프로필 링크]
-
----
-
-Made by 황지민
+`main` 브랜치를 push한 뒤 `npm run deploy`로 빌드 결과를 `gh-pages` 브랜치에 배포합니다.
