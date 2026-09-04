@@ -6,11 +6,13 @@
   "homepage": "https://jim1286.github.io/",
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build",
+    "build": "pnpm run policy:check && tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
     "predeploy": "pnpm run build",
-    "deploy": "pnpm run build && gh-pages -d dist"
+    "deploy": "pnpm run build && gh-pages -d dist",
+    "policy:sync": "node scripts/sync-policy-links.mjs",
+    "policy:check": "node scripts/sync-policy-links.mjs --check"
   },
   "dependencies": {
     "@ant-design/icons": "^6.0.0",

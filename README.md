@@ -33,3 +33,9 @@ pnpm run build
   (exact Node, 단일 pnpm). 이 저장소는 그동안 Node·패키지 매니저를 아무 곳에도 고정하지 않았다.
 - `pnpm-lock.yaml`은 `pnpm import`로 기존 `package-lock.json`에서 생성 후 npm lockfile 삭제.
   `scripts.predeploy`/`deploy`의 `npm run`은 `pnpm run`으로 변경.
+
+## 정책 URL 원천
+
+개인정보처리방침·지원·계정삭제 링크는 App Release Hub의 `config/portfolio.json`에서 생성한다.
+`pnpm run policy:sync`가 `src/policyLinks.generated.ts`를 다시 만들고, `build`는 `policy:check`로 원천과의 불일치를 막는다.
+Hub 체크아웃이 없는 환경(GitHub Actions 등)에서는 커밋된 생성 파일을 그대로 사용한다.

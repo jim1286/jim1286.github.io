@@ -1,3 +1,5 @@
+// 정책 URL은 Hub config에서 생성한 policyLinks.generated.ts가 단일 원천이다(손으로 복사하지 않음).
+import { policyUrl } from './policyLinks.generated';
 export type PortfolioApp = {
   id: string;
   index: string;
@@ -92,7 +94,6 @@ type LegalDocument = {
   deletionUrl?: string;
 };
 
-const policyOrigin = 'https://hjm-app-policies.jimin1286.chatgpt.site';
 
 export const legalDocuments: LegalDocument[] = [
   {
@@ -100,24 +101,24 @@ export const legalDocuments: LegalDocument[] = [
     index: '01',
     name: '야잘알 · Yajalal',
     note: 'KBO 정보 및 AI 분석 앱',
-    privacyUrl: `${policyOrigin}/privacy/yajalal`,
-    supportUrl: `${policyOrigin}/support/yajalal`,
+    privacyUrl: policyUrl('yajalal', 'privacyPolicy'),
+    supportUrl: policyUrl('yajalal', 'support'),
   },
   {
     id: 'choose-window',
     index: '02',
     name: '창가 선택 · Choose Window',
     note: '햇빛 회피 좌석 추천 앱',
-    privacyUrl: `${policyOrigin}/privacy/choose-window`,
-    supportUrl: `${policyOrigin}/support/choose-window`,
+    privacyUrl: policyUrl('choose-window', 'privacyPolicy'),
+    supportUrl: policyUrl('choose-window', 'support'),
   },
   {
     id: 'burntok',
     index: '03',
     name: '번뚝 · BurnTok',
     note: 'AI 앱 창작 커뮤니티',
-    privacyUrl: `${policyOrigin}/privacy/burntok`,
-    deletionUrl: `${policyOrigin}/privacy/burntok/delete-account`,
-    supportUrl: `${policyOrigin}/support/burntok`,
+    privacyUrl: policyUrl('burntok', 'privacyPolicy'),
+    deletionUrl: policyUrl('burntok', 'accountDeletion'),
+    supportUrl: policyUrl('burntok', 'support'),
   },
 ];
