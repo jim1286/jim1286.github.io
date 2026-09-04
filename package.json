@@ -9,8 +9,8 @@
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "predeploy": "npm run build",
-    "deploy": "npm run build && gh-pages -d dist"
+    "predeploy": "pnpm run build",
+    "deploy": "pnpm run build && gh-pages -d dist"
   },
   "dependencies": {
     "@ant-design/icons": "^6.0.0",
@@ -30,5 +30,9 @@
     "typescript": "~5.8.3",
     "typescript-eslint": "^8.35.1",
     "vite": "^7.0.4"
-  }
+  },
+  "engines": {
+    "node": "24.20.0"
+  },
+  "packageManager": "pnpm@11.24.0"
 }

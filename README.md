@@ -17,12 +17,19 @@
 ## 개발
 
 ```bash
-npm ci
-npm run dev
-npm run lint
-npm run build
+pnpm install --frozen-lockfile
+pnpm run dev
+pnpm run lint
+pnpm run build
 ```
 
 ## 배포
 
-`main` 브랜치를 push한 뒤 `npm run deploy`로 빌드 결과를 `gh-pages` 브랜치에 배포합니다.
+`main` 브랜치를 push한 뒤 `pnpm run deploy`로 빌드 결과를 `gh-pages` 브랜치에 배포합니다.
+
+## 2026-09-04 toolchain 변경 근거
+
+- `.nvmrc`(24.20.0), `package.json#engines.node`, `packageManager` pnpm@11.24.0: 포트폴리오 baseline
+  (exact Node, 단일 pnpm). 이 저장소는 그동안 Node·패키지 매니저를 아무 곳에도 고정하지 않았다.
+- `pnpm-lock.yaml`은 `pnpm import`로 기존 `package-lock.json`에서 생성 후 npm lockfile 삭제.
+  `scripts.predeploy`/`deploy`의 `npm run`은 `pnpm run`으로 변경.

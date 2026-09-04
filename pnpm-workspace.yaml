@@ -1,0 +1,8 @@
+# 단일 패키지 저장소. pnpm 11은 allowBuilds를 이 파일에서만 읽는다.
+packages:
+  - '.'
+
+# pnpm 11은 의존성 postinstall을 기본 차단한다. esbuild는 postinstall로 플랫폼 바이너리를
+# 내려받아야 vite build가 동작한다.
+allowBuilds:
+  esbuild: true
