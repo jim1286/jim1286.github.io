@@ -633,7 +633,11 @@ async function verifyServerRuntime(runtime, manifest) {
 }
 
 function stripCodeComments(source) {
-  return source.replace(/\/\*[\s\S]*?\*\//g, '').replace(/(^|[^:])\/\/.*$/gm, '$1');
+  // 블록 주석을 빈 문자열로 바꾸면 줄 수가 줄어 보고하는 행 번호가 원본과 어긋난다.
+  // 같은 수의 줄바꿈으로 바꿔 위치를 유지한다.
+  return source
+    .replace(/\/\*[\s\S]*?\*\//g, (comment) => comment.replace(/[^\n]/g, ''))
+    .replace(/(^|[^:])\/\/.*$/gm, '$1');
 }
 
 function sanitizeJavaScriptStructure(source) {
@@ -1005,9 +1009,22 @@ async function verifyFrontendSources(contract, catalogMaturity) {
         }
       }
       const rawPattern = /#[0-9A-Fa-f]{3,8}\b|\b(?:rgb|rgba|hsl|hsla|oklch|lab|lch|color)\s*\(|(?:^|[^0-9])(?:[0-9]*\.[0-9]+)(?:px|rem|em|pt)\b|\b(?:gap|rowGap|columnGap|padding|margin|borderRadius|fontSize|lineHeight|letterSpacing)\s*[:=]\s*(?:-?(?:[0-9]+(?:\.[0-9]+)?|\.[0-9]+)(?:px|rem|em|pt|%)?|['"]-?(?:[0-9]+(?:\.[0-9]+)?|\.[0-9]+)(?:px|rem|em|pt|%)?['"])|\b(?:padding|margin|font-size|line-height|letter-spacing|row-gap|column-gap|border-radius)\s*:\s*-?(?:[0-9]+(?:\.[0-9]+)?|\.[0-9]+)(?:px|rem|em|pt|%)?\b|\b(?:color|backgroundColor)\s*[:=]\s*['"](?:red|blue|green|black|white|gray|grey|transparent)['"]|\b(?:color|background-color)\s*:\s*(?:red|blue|green|black|white|gray|grey|transparent)\b|\b(?:bg|text|border)-(?:red|blue|green|black|white|gray|grey|amber|indigo|violet|pink|rose)-[1-9][0-9]{1,2}\b|\b(?:(?:space-[xy])|p|px|py|pt|pr|pb|pl|m|mx|my|mt|mr|mb|ml|gap)-[0-9]+(?:\.[0-9]+)?\b|var\(\s*--(?!hjm-)[A-Za-z0-9_-]+/i;
+      const rawPatternAll = new RegExp(rawPattern.source, 'gi');
       for (const { path, rawSource } of reachableSources) {
         if (/(?:^|\/)(?:test|tests|__tests__)\//.test(path)) continue;
-        if (rawPattern.test(rawSource)) add(relative(appRoot, path), 'raw color/spacing/radius/type value found outside HJM semantic contracts');
+        rawPatternAll.lastIndex = 0;
+        const hits = [];
+        for (let match = rawPatternAll.exec(rawSource); match !== null; match = rawPatternAll.exec(rawSource)) {
+          const line = rawSource.slice(0, match.index).split('\n').length;
+          hits.push(line + ':' + match[0].replace(/\s+/g, ' ').trim());
+          if (match[0].length === 0) rawPatternAll.lastIndex += 1;
+        }
+        // 파일 이름만 알려주면 어디를 고칠지 알 수 없다. 처음 몇 곳과 전체 건수를 함께 준다.
+        if (hits.length > 0) {
+          const shown = hits.slice(0, 5).join(', ');
+          add(relative(appRoot, path), 'raw color/spacing/radius/type value found outside HJM semantic contracts ('
+            + hits.length + ' occurrence(s) at ' + shown + (hits.length > 5 ? ', ...' : '') + ')');
+        }
       }
     }
 }
