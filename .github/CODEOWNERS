@@ -1,0 +1,17 @@
+/.github/workflows/quality-gate.yml @example-org/app-standard-owners
+/.github/CODEOWNERS @example-org/app-standard-owners
+/.github/dependabot.yml @example-org/app-standard-owners
+/app.contract.json @example-org/app-standard-owners
+/package.json @example-org/app-standard-owners
+/.npmrc @example-org/app-standard-owners
+/pnpm-lock.yaml @example-org/app-standard-owners
+/pnpm-workspace.yaml @example-org/app-standard-owners
+/packages/**/package.json @example-org/app-standard-owners
+/apps/mobile/package.json @example-org/app-standard-owners
+/apps/web/package.json @example-org/app-standard-owners
+/apps/server/package.json @example-org/app-standard-owners
+/tools/** @example-org/app-standard-owners
+/docs/app-profile.json @example-org/app-standard-owners
+/docs/app-contract.schema.json @example-org/app-standard-owners
+/docs/hjm-catalog.snapshot.json @example-org/app-standard-owners
+/.github/workflows/app-standard.yml @example-org/app-standard-owners

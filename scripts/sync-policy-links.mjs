@@ -1,46 +1,82 @@
 #!/usr/bin/env node
-// 정책·지원·계정삭제 URL의 단일 원천은 App Release Hub의 config/portfolio.json(policySite.origin + paths 템플릿)과
-// config/apps/<id>/policy.json(방침이 존재하는 앱)이다. 이 사이트는 그 값을 손으로 복사하지 않고 여기서 생성한다
-// (포트폴리오 설계 Phase 3: 공유값의 사본을 두 곳에서 손으로 관리하지 않는다).
-// Hub 체크아웃은 메타 저장소 배치(../../control-plane/app-release-hub)에서만 존재하므로, 없으면 커밋된 생성 파일을 그대로 쓴다.
+// Hub owns public policy URLs. Source verification and standalone snapshot verification
+// are separate operations; a missing Hub can never pass the source check.
+import { createHash } from 'node:crypto';
 import { existsSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
-import { dirname, join, resolve } from 'node:path';
+import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const here = dirname(fileURLToPath(import.meta.url));
-const output = resolve(here, '../src/policyLinks.generated.ts');
-const hubConfig = process.env.HUB_CONFIG_DIR ?? resolve(here, '../../../control-plane/app-release-hub/config');
-const check = process.argv.includes('--check');
+const keys = ['privacyPolicy', 'accountDeletion', 'support'];
+const hash = (projection) => createHash('sha256').update(JSON.stringify(projection)).digest('hex');
 
-if (!existsSync(join(hubConfig, 'portfolio.json'))) {
-  console.log(`hub config not found at ${hubConfig}; keeping committed src/policyLinks.generated.ts`);
-  process.exit(0);
-}
-const portfolio = JSON.parse(readFileSync(join(hubConfig, 'portfolio.json'), 'utf8'));
-const appsWithPolicy = readdirSync(join(hubConfig, 'apps'), { withFileTypes: true })
-  .filter((entry) => entry.isDirectory() && existsSync(join(hubConfig, 'apps', entry.name, 'policy.json')))
-  .map((entry) => entry.name)
-  .sort();
-const rendered = `// 생성 파일 — 손으로 고치지 말고 \`pnpm run policy:sync\`를 실행한다.
-// 원천: app-release-hub/config/portfolio.json(policySite)과 config/apps/<id>/policy.json 존재 여부.
-export const policyOrigin = ${JSON.stringify(portfolio.policySite.origin)};
-export const policyPaths = ${JSON.stringify(portfolio.policySite.paths, null, 2)} as const;
-export const appsWithPolicy = ${JSON.stringify(appsWithPolicy)} as const;
-export type PolicyAppId = (typeof appsWithPolicy)[number];
-export function policyUrl(appId: PolicyAppId, kind: keyof typeof policyPaths): string {
-  return \`\${policyOrigin}\${policyPaths[kind].replace('{id}', appId)}\`;
-}
-`;
-const current = existsSync(output) ? readFileSync(output, 'utf8') : null;
-if (check) {
-  if (current !== rendered) {
-    console.error('src/policyLinks.generated.ts is out of date with the Hub config; run pnpm run policy:sync');
-    process.exit(1);
+function validateProjection(value) {
+  if (!value || typeof value !== 'object') throw new Error('policy projection is missing');
+  const origin = new URL(value.origin);
+  if (origin.protocol !== 'https:' || origin.origin !== value.origin)
+    throw new Error('policy origin must be an HTTPS origin without a path');
+  if (!value.paths || Object.keys(value.paths).sort().join() !== [...keys].sort().join())
+    throw new Error('policy paths must declare privacyPolicy, accountDeletion and support');
+  for (const key of keys) {
+    const template = value.paths[key];
+    if (typeof template !== 'string' || !template.startsWith('/') || template.startsWith('//') ||
+        template.split('{id}').length !== 2 || /[?#\\]/.test(template) || template.split('/').includes('..'))
+      throw new Error(`invalid policy path: ${key}`);
   }
-  console.log('policy links in sync with hub config');
-} else if (current !== rendered) {
-  writeFileSync(output, rendered);
-  console.log(`wrote ${output}`);
-} else {
-  console.log('policy links already in sync');
+  if (!Array.isArray(value.apps) || !value.apps.length || value.apps.some((id) => !/^[a-z][a-z0-9-]*$/.test(id)) ||
+      value.apps.join() !== [...new Set(value.apps)].sort().join())
+    throw new Error('policy app IDs must be unique, sorted identifiers');
+  return { origin: value.origin, paths: Object.fromEntries(keys.map((key) => [key, value.paths[key]])), apps: value.apps };
+}
+
+function readHub(hubConfig) {
+  const source = resolve(hubConfig, 'portfolio.json');
+  if (!existsSync(source)) throw new Error('Hub source unavailable: source verification was NOT performed. Supply HUB_CONFIG_DIR; standalone builds use policy:check:snapshot.');
+  const portfolio = JSON.parse(readFileSync(source, 'utf8'));
+  const appsRoot = resolve(hubConfig, 'apps');
+  const apps = readdirSync(appsRoot, { withFileTypes: true })
+    .filter((entry) => entry.isDirectory() && existsSync(resolve(appsRoot, entry.name, 'policy.json')))
+    .map((entry) => entry.name).sort();
+  return validateProjection({ origin: portfolio.policySite.origin, paths: portfolio.policySite.paths, apps });
+}
+
+function render(projection) {
+  return `// Generated from the public Hub projection. Run pnpm policy:sync; do not edit.\nexport const policyOrigin = ${JSON.stringify(projection.origin)};\nexport const policyPaths = ${JSON.stringify(projection.paths, null, 2)} as const;\nexport const appsWithPolicy = ${JSON.stringify(projection.apps)} as const;\nexport type PolicyAppId = (typeof appsWithPolicy)[number];\nexport function policyUrl(appId: PolicyAppId, kind: keyof typeof policyPaths): string {\n  return \`\${policyOrigin}\${policyPaths[kind].replace('{id}', appId)}\`;\n}\n`;
+}
+
+export function synchronizePolicies({ mode, hubConfig, output, snapshotFile }) {
+  if (!['sync', 'source', 'snapshot'].includes(mode)) throw new Error('invalid policy verification mode');
+  const projection = mode === 'snapshot' ? null : readHub(hubConfig);
+  if (mode === 'sync') {
+    const snapshot = { schemaVersion: 1, source: 'app-release-hub', sourceDigest: hash(projection), projection };
+    writeFileSync(snapshotFile, JSON.stringify(snapshot, null, 2) + '\n');
+    writeFileSync(output, render(projection));
+    return 'source-synchronized';
+  }
+  const snapshot = JSON.parse(readFileSync(snapshotFile, 'utf8'));
+  const cached = validateProjection(snapshot.projection);
+  if (snapshot.schemaVersion !== 1 || snapshot.source !== 'app-release-hub' || snapshot.sourceDigest !== hash(cached))
+    throw new Error('invalid policy source snapshot or digest');
+  if (projection && hash(projection) !== snapshot.sourceDigest)
+    throw new Error('policy snapshot differs from Hub source; run pnpm policy:sync');
+  if (readFileSync(output, 'utf8') !== render(cached))
+    throw new Error('generated policy links differ from the snapshot; run pnpm policy:sync');
+  return mode === 'source' ? 'source-verified' : 'snapshot-verified (Hub freshness NOT checked)';
+}
+
+if (import.meta.main) {
+  try {
+    const args = process.argv.slice(2);
+    if (args.length > 1 || args.some((arg) => !['--check', '--check-snapshot'].includes(arg)))
+      throw new Error('usage: sync-policy-links.mjs [--check|--check-snapshot]');
+    console.log(synchronizePolicies({
+      mode: args.includes('--check') ? 'source' : args.includes('--check-snapshot') ? 'snapshot' : 'sync',
+      hubConfig: process.env.HUB_CONFIG_DIR ?? resolve(here, '../../../control-plane/app-release-hub/config'),
+      output: resolve(here, '../src/policyLinks.generated.ts'),
+      snapshotFile: resolve(here, '../docs/policy-source.snapshot.json'),
+    }));
+  } catch (error) {
+    console.error(error.message);
+    process.exitCode = 1;
+  }
 }

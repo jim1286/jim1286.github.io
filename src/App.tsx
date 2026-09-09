@@ -1,8 +1,11 @@
 import type { ReactNode } from 'react';
+import { HjmProvider } from '@hjmds/react/provider';
+import { Container, Stack, Text } from '@hjmds/react/layout';
+import { Icon } from '@hjmds/react/display';
+import '@hjmds/react/styles.css';
 import {
   AndroidFilled,
   AppleFilled,
-  ArrowRightOutlined,
   ArrowUpOutlined,
   ExportOutlined,
   GithubOutlined,
@@ -23,9 +26,10 @@ function ExternalLink({ href, className, children }: { href: string; className?:
   );
 }
 
-function App() {
+export default function App() {
   return (
-    <div className="site-shell">
+    <HjmProvider theme="system">
+    <Container className="site-shell" size="full" gutter="none">
       <a className="skip-link" href="#main">본문 바로가기</a>
 
       <header className="site-header">
@@ -50,10 +54,10 @@ function App() {
               야구 기록부터 햇빛을 피하는 좌석, 오프라인 비행 정보까지.<br />
               작지만 분명한 문제를 발견하고 직접 설계하고 출시합니다.
             </p>
-            <div className="hero-actions">
-              <a className="button button-primary" href="#apps">앱 둘러보기 <ArrowRightOutlined /></a>
+            <Stack className="hero-actions" axis="inline" gap="sm" wrap>
+              <a className="button button-primary" href="#apps">앱 둘러보기 <Icon name="chevronEnd" decorative /></a>
               <ExternalLink className="button button-secondary" href={githubProfile}><GithubOutlined /> GitHub</ExternalLink>
-            </div>
+            </Stack>
           </div>
 
           <aside className="hero-panel" aria-label="포트폴리오 현황">
@@ -140,11 +144,10 @@ function App() {
 
       <footer>
         <a className="brand footer-brand" href="#top"><span className="brand-mark">HJ</span><span>Hwang Jimin</span></a>
-        <p>© 2026 Hwang Jimin. All rights reserved.</p>
+        <Text as="p" variant="caption" tone="inverse">© 2026 Hwang Jimin. All rights reserved.</Text>
         <a href="#top" aria-label="맨 위로">TOP <ArrowUpOutlined /></a>
       </footer>
-    </div>
+    </Container>
+    </HjmProvider>
   );
 }
-
-export default App;

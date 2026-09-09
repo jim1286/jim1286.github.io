@@ -11,6 +11,12 @@ importers:
       '@ant-design/icons':
         specifier: ^6.0.0
         version: 6.3.2(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
+      '@hjmds/design-contracts':
+        specifier: 0.9.1
+        version: 0.9.1
+      '@hjmds/react':
+        specifier: 0.9.1
+        version: 0.9.1(@hjmds/design-contracts@0.9.1)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
       react:
         specifier: ^19.1.0
         version: 19.2.8
@@ -29,7 +35,7 @@ importers:
         version: 19.2.5(@types/react@19.2.18)
       '@vitejs/plugin-react':
         specifier: ^4.6.0
-        version: 4.7.0(supports-color@7.2.0)(vite@7.3.6)
+        version: 4.7.0(supports-color@7.2.0)(vite@7.3.6(yaml@2.8.2))
       eslint:
         specifier: ^9.30.1
         version: 9.39.5(supports-color@7.2.0)
@@ -53,7 +59,10 @@ importers:
         version: 8.68.0(eslint@9.39.5(supports-color@7.2.0))(supports-color@7.2.0)(typescript@5.8.3)
       vite:
         specifier: ^7.0.4
-        version: 7.3.6
+        version: 7.3.6(yaml@2.8.2)
+      yaml:
+        specifier: 2.8.2
+        version: 2.8.2
 
 packages:
 
@@ -350,6 +359,17 @@ packages:
   '@eslint/plugin-kit@0.4.1':
     resolution: {integrity: sha512-43/qtrDUokr7LJqoF2c3+RInu/t4zfrpYdoSDfYyhg52rwLV6TnOvdG4fXm7IkSB3wErkcmJS9iEhjVtOSEjjA==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
+
+  '@hjmds/design-contracts@0.9.1':
+    resolution: {integrity: sha512-0fKFgtHCBzWL8ubw1PUyyT0XjIfoztm2x1sPqtNPBFLbRjdcPBMSrvT8Ple4My45vMyj0h+3GrZ5Zexiaq2PSw==}
+    engines: {node: '>=20'}
+
+  '@hjmds/react@0.9.1':
+    resolution: {integrity: sha512-0mdmekQdzvzYBz7yz7gp6Xs6UUtu3Uin7kwY46+/VOwSdGj68UDXiGoPAaAbrZk/PZHuEePTomAi6KrZtZVg+w==}
+    peerDependencies:
+      '@hjmds/design-contracts': '>=0.9.0 <0.10.0'
+      react: '>=19.0.0'
+      react-dom: '>=19.0.0'
 
   '@humanfs/core@0.19.2':
     resolution: {integrity: sha512-UhXNm+CFMWcbChXywFwkmhqjs3PRCmcSa/hfBgLIb7oQ5HNb1wS0icWsGtSAUNgefHeI+eBrA8I1fxmbHsGdvA==}
@@ -1302,6 +1322,11 @@ packages:
   yallist@3.1.1:
     resolution: {integrity: sha512-a4UGQaWPH59mOXUYnAG2ewncQS4i4F43Tv3JoAM+s2VDAmS9NsK8GpDMLrCHPksFT7h3K6TOoUNn2pb7RoXx4g==}
 
+  yaml@2.8.2:
+    resolution: {integrity: sha512-mplynKqc1C2hTVYxd0PU2xQAc22TI1vShAYGksCCfxbn/dFwnHTNi1bvYsBTkhdUNtGIf5xNOg938rrSSYvS9A==}
+    engines: {node: '>= 14.6'}
+    hasBin: true
+
   yocto-queue@0.1.0:
     resolution: {integrity: sha512-rVksvsnNCdJ/ohGc6xgPwyN8eheCxsiLM8mxuE/t/mOVqJewPuO1miLpTHQiRgTKCLexL4MeAFVagts7HmNZ2Q==}
     engines: {node: '>=10'}
@@ -1561,6 +1586,14 @@ snapshots:
       '@eslint/core': 0.17.0
       levn: 0.4.1
 
+  '@hjmds/design-contracts@0.9.1': {}
+
+  '@hjmds/react@0.9.1(@hjmds/design-contracts@0.9.1)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)':
+    dependencies:
+      '@hjmds/design-contracts': 0.9.1
+      react: 19.2.8
+      react-dom: 19.2.8(react@19.2.8)
+
   '@humanfs/core@0.19.2':
     dependencies:
       '@humanfs/types': 0.15.0
@@ -1819,7 +1852,7 @@ snapshots:
       '@typescript-eslint/types': 8.68.0
       eslint-visitor-keys: 5.0.1
 
-  '@vitejs/plugin-react@4.7.0(supports-color@7.2.0)(vite@7.3.6)':
+  '@vitejs/plugin-react@4.7.0(supports-color@7.2.0)(vite@7.3.6(yaml@2.8.2))':
     dependencies:
       '@babel/core': 7.29.7(supports-color@7.2.0)
       '@babel/plugin-transform-react-jsx-self': 7.29.7(@babel/core@7.29.7(supports-color@7.2.0))
@@ -1827,7 +1860,7 @@ snapshots:
       '@rolldown/pluginutils': 1.0.0-beta.27
       '@types/babel__core': 7.20.5
       react-refresh: 0.17.0
-      vite: 7.3.6
+      vite: 7.3.6(yaml@2.8.2)
     transitivePeerDependencies:
       - supports-color
 
@@ -2425,7 +2458,7 @@ snapshots:
     dependencies:
       punycode: 2.3.1
 
-  vite@7.3.6:
+  vite@7.3.6(yaml@2.8.2):
     dependencies:
       esbuild: 0.28.2
       fdir: 6.5.0(picomatch@4.0.7)
@@ -2435,6 +2468,7 @@ snapshots:
       tinyglobby: 0.2.17
     optionalDependencies:
       fsevents: 2.3.3
+      yaml: 2.8.2
 
   which@2.0.2:
     dependencies:
@@ -2443,5 +2477,7 @@ snapshots:
   word-wrap@1.2.5: {}
 
   yallist@3.1.1: {}
+
+  yaml@2.8.2: {}
 
   yocto-queue@0.1.0: {}

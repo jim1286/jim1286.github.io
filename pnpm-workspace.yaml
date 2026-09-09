@@ -6,3 +6,7 @@ packages:
 # 내려받아야 vite build가 동작한다.
 allowBuilds:
   esbuild: true
+
+minimumReleaseAgeExclude:
+  - '@hjmds/design-contracts@0.9.1'
+  - '@hjmds/react@0.9.1'

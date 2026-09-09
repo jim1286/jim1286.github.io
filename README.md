@@ -19,13 +19,13 @@
 ```bash
 pnpm install --frozen-lockfile
 pnpm run dev
-pnpm run lint
-pnpm run build
+pnpm check
 ```
 
 ## 배포
 
-`main` 브랜치를 push한 뒤 `pnpm run deploy`로 빌드 결과를 `gh-pages` 브랜치에 배포합니다.
+`pnpm run deploy`는 Hub 원본 비교와 전체 검사를 통과한 뒤 빌드 결과를 `gh-pages`에 게시합니다.
+공개 배포는 [릴리스 지침](docs/RELEASE.md)을 따릅니다.
 
 ## 2026-09-04 toolchain 변경 근거
 
@@ -37,5 +37,18 @@ pnpm run build
 ## 정책 URL 원천
 
 개인정보처리방침·지원·계정삭제 링크는 App Release Hub의 `config/portfolio.json`에서 생성한다.
-`pnpm run policy:sync`가 `src/policyLinks.generated.ts`를 다시 만들고, `build`는 `policy:check`로 원천과의 불일치를 막는다.
-Hub 체크아웃이 없는 환경(GitHub Actions 등)에서는 커밋된 생성 파일을 그대로 사용한다.
+`pnpm run policy:sync`가 `src/policyLinks.generated.ts`를 다시 만들고, `policy:check`는 Hub 원본과 비교하며 Hub가 없으면 실패합니다.
+독립 CI와 `build`의 `policy:check:snapshot`은 공개 snapshot과 생성물의 일치만 검증하고,
+Hub 최신 상태를 확인한 것으로 표시하지 않습니다.
+
+## 개발·설계 문서
+
+[제품](docs/PRODUCT.md) · [아키텍처](docs/ARCHITECTURE.md) · [디자인](docs/DESIGN.md) ·
+[릴리스](docs/RELEASE.md). 이 앱은 공통 v1 심사 대상이며, 실제 계약 이관은 완료했고 구현 준수·운영 evidence는 별도 검증 대상입니다.
+
+## 공통 개발 계약
+
+`app.contract.json`이 실제 runtime·lockfile·검사 명령과 acceptance/evidence를 연결한다.
+`pnpm install --frozen-lockfile` 후 `pnpm standard:check`로 모든 선언된 runtime의 lint/typecheck/test/build를 실행한다.
+Flutter SDK는 runtime의 `.fvmrc`를 따른다. 기존 제품 CI는 유지하며 공통 피드백 CI를 추가한다.
+계약 작성 상태는 governance-scaffold이며 구현·실기기·외부 required gate 완료를 뜻하지 않는다.

@@ -1,0 +1,102 @@
+{
+  "snapshotKind": "local-source-copy-with-frozen-install",
+  "app": "portfolio-site",
+  "files": [
+    {
+      "path": "app.contract.json",
+      "sha256": "0561435fe1b5601ad920b41b76602c79be8d8307d6d5be2728285cef5a5196bb"
+    },
+    {
+      "path": "eslint.config.js",
+      "sha256": "7a39f6bf29b2b84a243df3330c218b9688114594081bd1280a32ffaa4766d023"
+    },
+    {
+      "path": "package.json",
+      "sha256": "bd5981a2913b15225aaa1acc384f54a361615a0491bcfd038db5c279ef69e7e1"
+    },
+    {
+      "path": "pnpm-lock.yaml",
+      "sha256": "236a28b43843838e8b1398db00cc54eb18520fd5a52a069d8cac925eccd2cb04"
+    },
+    {
+      "path": "pnpm-workspace.yaml",
+      "sha256": "f58d6c0bf1bf921374d69118e0a21060347ef1816322c92a4f2557edb5539c3e"
+    },
+    {
+      "path": "scripts/check-doc-links.mjs",
+      "sha256": "9ffc870aafd483fdc9fce01b748c477ed656ca9a5b51264ea987ba64513de0dd"
+    },
+    {
+      "path": "scripts/sync-policy-links.mjs",
+      "sha256": "af98f79b684a20aebfbb6ade7db775723c022002e099d05b1e2a1b8a343e0329"
+    },
+    {
+      "path": "scripts/sync-policy-links.test.mjs",
+      "sha256": "972e927f2b084618ef881a12137f5e7da67b7325f98cdc15ece992518f68e7d5"
+    },
+    {
+      "path": "src/App.tsx",
+      "sha256": "012a1948fc34af6f8ed9cafeaed5f01f36cba363d8657d54906f29461087e24e"
+    },
+    {
+      "path": "src/main.tsx",
+      "sha256": "db5f69651f3b3bcb45a9892329eedee433ec186db30f4f3a4d57ba713f8d0f0a"
+    },
+    {
+      "path": "src/policyLinks.generated.ts",
+      "sha256": "252fb481bf8e8c5d45e0c57656681399caa6c36a188556d9e1e833d0959460be"
+    },
+    {
+      "path": "src/siteData.ts",
+      "sha256": "cbbecb0f0dfd75d6b2461a6568ff79fde117860f042bc50e05cbc96b52ee1a31"
+    },
+    {
+      "path": "src/vite-env.d.ts",
+      "sha256": "65996936fbb042915f7b74a200fcdde7e410f32a669b1ab9597cfaa4b0faddb5"
+    },
+    {
+      "path": "tools/app-standard-core.mjs",
+      "sha256": "a3531fdeb0fe6d2b27b94f4a7c306083496d7676a96c191cd613686300b49851"
+    },
+    {
+      "path": "tools/check-app-contract.mjs",
+      "sha256": "524a462a40858108c8bd44c00499b7d33620fc162c49890b951bfd7ddc80e9e8"
+    },
+    {
+      "path": "tools/check-design-contract.mjs",
+      "sha256": "524a462a40858108c8bd44c00499b7d33620fc162c49890b951bfd7ddc80e9e8"
+    },
+    {
+      "path": "tools/check-doc-links.mjs",
+      "sha256": "b919c2ba3789486d05c50579b194cfc7567cbf8c1f99c80dac529dc8d14fda59"
+    },
+    {
+      "path": "tools/json-schema-validator.mjs",
+      "sha256": "d54e4bc906ce60a4f51b0d1e7131b2c684252ba963b62446aebd0a0f2a3eab62"
+    },
+    {
+      "path": "tools/run-quality.mjs",
+      "sha256": "382f7e4975eb4a83b1057b494242a7a86c648c0f7c7a21a0ed90ddf3177eabb0"
+    },
+    {
+      "path": "tools/runtime-bindings.mjs",
+      "sha256": "4526ef1d1ef55352b8142762e238add1dc0130fcddec1aeb9e920b662ec844c6"
+    },
+    {
+      "path": "tsconfig.app.json",
+      "sha256": "7852d040a820ba680aae219f3cfe771e7ad33bb26e9d1578e3ee21c70fad5acc"
+    },
+    {
+      "path": "tsconfig.json",
+      "sha256": "770b4140bbb581e2dfd9ea9946ffc9c75a1d86ba7d2db5f77c83e37cbdf9d808"
+    },
+    {
+      "path": "tsconfig.node.json",
+      "sha256": "dbece770acebd1448ab84fbdae194dc23670ee2e91ebcb1b534cace99cd0bea6"
+    },
+    {
+      "path": "vite.config.ts",
+      "sha256": "8793993e9eebc4b52b6be78f75d9f53d2c77ba71395efaa6d8007399c9fe85a9"
+    }
+  ]
+}

@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "source": "app-release-hub",
+  "sourceDigest": "b5d0c2b1a9a680aacbea1259187299b8c6afaf470641d368c43723a41bc3c06f",
+  "projection": {
+    "origin": "https://hjm-app-policies.jimin1286.chatgpt.site",
+    "paths": {
+      "privacyPolicy": "/privacy/{id}",
+      "accountDeletion": "/privacy/{id}/delete-account",
+      "support": "/support/{id}"
+    },
+    "apps": [
+      "burntok",
+      "choose-window",
+      "spint",
+      "taground",
+      "unairplane",
+      "yajalal"
+    ]
+  }
+}

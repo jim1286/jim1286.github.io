@@ -1,0 +1,32 @@
+[
+  {
+    "width": 320,
+    "colorScheme": "light",
+    "status": "passed"
+  },
+  {
+    "width": 320,
+    "colorScheme": "dark",
+    "status": "passed"
+  },
+  {
+    "width": 390,
+    "colorScheme": "light",
+    "status": "passed"
+  },
+  {
+    "width": 390,
+    "colorScheme": "dark",
+    "status": "passed"
+  },
+  {
+    "width": 1440,
+    "colorScheme": "light",
+    "status": "passed"
+  },
+  {
+    "width": 1440,
+    "colorScheme": "dark",
+    "status": "passed"
+  }
+]

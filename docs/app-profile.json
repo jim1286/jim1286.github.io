@@ -1,0 +1,615 @@
+{
+  "$id": "hjm.app-profile/portfolio-default-v1",
+  "profileVersion": 1,
+  "id": "portfolio-default-v1",
+  "standardVersion": "1.0.0",
+  "status": "active",
+  "contractPath": "app.contract.json",
+  "schemaPath": "docs/app-contract.schema.json",
+  "fieldSemantics": "All fields are normative and hash-pinned by check-standard-assets except human-readable summary and rationale fields, which are informational explanations of the adjacent machine rule.",
+  "conformanceStages": {
+    "governance-scaffold": "draft governance (any product lifecycle except archived); schema, canonical documents, evidence plans, vendored validators, and CI projection are complete, while runtime implementation gates are not yet claimed. The product may be incubating or active in portfolio.json: lifecycle is product state, not a conformance claim",
+    "implementation-conformant": "active governance; all governance checks plus runtime manifests, exact production HJM dependencies, frozen lockfile, canonical HJM Provider theme preference/raw-token guard, verified evidence, and a configured external merge authority pass; unavailable while ci.trustModel.bootstrapStatus is unconfigured",
+    "rehearsal": "not a stage: check-app --target-stage implementation-conformant on a draft-governance app runs the active gate, splits findings into actionable vs blockedByPortfolioAuthority, and reports implementationReady; it never sets stage"
+  },
+  "templateSources": {
+    "product": "docs/templates/PRODUCT.md",
+    "architecture": "docs/templates/ARCHITECTURE.md",
+    "design": "docs/templates/DESIGN.md",
+    "release": "docs/templates/RELEASE.md",
+    "adr": "docs/templates/ADR.md"
+  },
+  "requiredDocumentMetadata": [
+    "schema",
+    "document",
+    "app_id",
+    "display_name",
+    "status",
+    "owner",
+    "reviewed",
+    "version"
+  ],
+  "requiredDocuments": {
+    "product": "docs/PRODUCT.md",
+    "architecture": "docs/ARCHITECTURE.md",
+    "design": "docs/DESIGN.md",
+    "release": "docs/RELEASE.md",
+    "decisionsDir": "docs/decisions"
+  },
+  "runtimePolicy": {
+    "minimumRuntimeCount": 1,
+    "uniqueKinds": true,
+    "allowed": [
+      {
+        "kind": "mobile",
+        "framework": "expo",
+        "frameworkPackage": "expo",
+        "version": "57.0.18",
+        "sourceUrl": "https://registry.npmjs.org/expo/latest",
+        "checkedAt": "2026-08-31",
+        "initializer": {
+          "package": "create-expo-app",
+          "version": "4.0.0",
+          "sourceUrl": "https://registry.npmjs.org/create-expo-app/4.0.0",
+          "tarballUrl": "https://registry.npmjs.org/create-expo-app/-/create-expo-app-4.0.0.tgz",
+          "integrity": "sha512-bZX0CuE6ZdJWKZUtJRnZYt6t1tbU6o/tHjffhZTJnpR2no+GncxQ2Okvc4+AyCBMx4Za2G85szrbAicgo4Qz9w==",
+          "templatePackage": "expo-template-default",
+          "templateVersion": "57.0.19",
+          "templateSourceUrl": "https://registry.npmjs.org/expo-template-default/57.0.19",
+          "templateTarballUrl": "https://registry.npmjs.org/expo-template-default/-/expo-template-default-57.0.19.tgz",
+          "templateIntegrity": "sha512-tDAkCVZoAXK070ogL39xwwYBjw5ghgDduKhOHdYR69RClzYVqz/V0xILWzRLukkNPKSj2GMU5lD47xQmf08oiw==",
+          "checkedAt": "2026-08-31"
+        }
+      },
+      {
+        "kind": "web",
+        "framework": "nextjs",
+        "frameworkPackage": "next",
+        "version": "16.3.3",
+        "sourceUrl": "https://nextjs.org/blog/august-2026-security-release",
+        "checkedAt": "2026-08-31",
+        "initializer": {
+          "package": "create-next-app",
+          "version": "16.3.3",
+          "sourceUrl": "https://registry.npmjs.org/create-next-app/16.3.3",
+          "tarballUrl": "https://registry.npmjs.org/create-next-app/-/create-next-app-16.3.3.tgz",
+          "integrity": "sha512-xpcb/SW/NsOgGoLGiA5Zh5n0Psol4AAtM3TTgyMAX5a3/5jdKKwlLcp8HKVWVv4wo6/Mk0mtfp7tNy3jbv2cmw==",
+          "checkedAt": "2026-08-31"
+        }
+      },
+      {
+        "kind": "server",
+        "framework": "nestjs",
+        "frameworkPackage": "@nestjs/core",
+        "version": "12.0.1",
+        "moduleFormat": "esm",
+        "sourceUrl": "https://registry.npmjs.org/@nestjs%2Fcore/latest",
+        "checkedAt": "2026-08-31",
+        "initializer": {
+          "package": "@nestjs/cli",
+          "version": "12.0.0",
+          "sourceUrl": "https://registry.npmjs.org/@nestjs%2Fcli/12.0.0",
+          "tarballUrl": "https://registry.npmjs.org/@nestjs/cli/-/cli-12.0.0.tgz",
+          "integrity": "sha512-DxgGUKA4gj92lU2lF23Mlvm6y7AQBKEBuanNKNcmHeP6Cn3yqPZxN0LqyaJys25JCqO1bN8KgE3LICrvYlB93g==",
+          "checkedAt": "2026-08-31"
+        },
+        "serverConformance": {
+          "packageType": "module",
+          "tsconfig": {
+            "module": "NodeNext",
+            "moduleResolution": "NodeNext"
+          },
+          "lint": {
+            "package": "eslint",
+            "version": "9.39.5",
+            "sourceUrl": "https://registry.npmjs.org/eslint/9.39.5",
+            "checkedAt": "2026-09-04",
+            "rationale": "Keep one cross-runtime lint contract instead of accepting the Nest CLI oxlint default; ESLint 9.x because the Expo/Next presets depend on eslint-plugin-react, which does not support ESLint 10 yet."
+          },
+          "test": {
+            "package": "vitest",
+            "version": "4.1.11",
+            "sourceUrl": "https://registry.npmjs.org/vitest/latest",
+            "checkedAt": "2026-08-31"
+          },
+          "e2e": {
+            "package": "supertest",
+            "version": "7.2.2",
+            "sourceUrl": "https://registry.npmjs.org/supertest/latest",
+            "checkedAt": "2026-08-31"
+          }
+        }
+      }
+    ],
+    "reviewPolicy": {
+      "cadence": "monthly-and-immediate-on-critical-security-advisory",
+      "knownVulnerableAction": "block-new-app-generation-until-profile-and-standard-update"
+    },
+    "existingRuntimeBindings": {
+      "model": "runtime-bindings-v1",
+      "purpose": "existing-product-contract-adoption",
+      "frameworks": [
+        "expo",
+        "nextjs",
+        "vite",
+        "nestjs",
+        "node",
+        "flutter"
+      ],
+      "uniqueIdsAndRoots": true,
+      "requiredChecks": [
+        "lint",
+        "typecheck",
+        "test",
+        "build"
+      ],
+      "lockfileResolution": "exact-importer-with-registry-integrity",
+      "nativeDesign": "recorded-hjm-train-with-dart-adapter-sources-and-foundation-evidence",
+      "stages": "same-acceptance-evidence-and-central-authority-as-scaffold",
+      "baseline": "portfolio-baseline-and-expiring-declared-exemptions-remain-required"
+    }
+  },
+  "toolchain": {
+    "packageManager": "pnpm",
+    "packageManagerVersion": "11.24.0",
+    "nodeVersion": "24.20.0",
+    "sourceProvenance": {
+      "packageManager": {
+        "sourceUrl": "https://registry.npmjs.org/pnpm/latest",
+        "checkedAt": "2026-08-31"
+      },
+      "node": {
+        "sourceUrl": "https://nodejs.org/dist/latest-v24.x/",
+        "checkedAt": "2026-08-31"
+      }
+    },
+    "exactVersions": true,
+    "requiredScripts": [
+      "dev",
+      "lint",
+      "format",
+      "format:check",
+      "typecheck",
+      "test",
+      "test:e2e",
+      "build",
+      "i18n:check",
+      "design:check",
+      "contract:check",
+      "docs:check",
+      "check"
+    ],
+    "conditionalScripts": {
+      "mobile": "dev:mobile",
+      "web": "dev:web",
+      "server": "dev:server"
+    },
+    "staticAnalysis": {
+      "checkedAt": "2026-09-04",
+      "linter": "eslint",
+      "formatter": "prettier",
+      "shared": [
+        {
+          "package": "eslint",
+          "version": "9.39.5",
+          "sourceUrl": "https://registry.npmjs.org/eslint/9.39.5",
+          "tarballUrl": "https://registry.npmjs.org/eslint/-/eslint-9.39.5.tgz",
+          "integrity": "sha512-DgZS62aPLXKlnxILS/AYCoRvHaZeXceIzlXPkkGGzJWSow1aEk0lbTlxUSlyjC8jcaKxAdOnTDz+o1JFSBsyjw=="
+        },
+        {
+          "package": "typescript-eslint",
+          "version": "8.69.0",
+          "sourceUrl": "https://registry.npmjs.org/typescript-eslint/8.69.0",
+          "tarballUrl": "https://registry.npmjs.org/typescript-eslint/-/typescript-eslint-8.69.0.tgz",
+          "integrity": "sha512-B3MltX0VqjUBNEe3b3sSuiRbfa6XrfHFtBiPamjT5AsW/dfq+y+bc0wyuS9DxAS1LyzCxRp2+rxzpLUvqM2BvA=="
+        },
+        {
+          "package": "prettier",
+          "version": "3.9.6",
+          "sourceUrl": "https://registry.npmjs.org/prettier/3.9.6",
+          "tarballUrl": "https://registry.npmjs.org/prettier/-/prettier-3.9.6.tgz",
+          "integrity": "sha512-OpN0zzVdiaiAhxpuuj5efpIS4sY9j7bY6uR5mnj5yPzGkdkjNKSJeUThPb60Jw29QuAZgA4o+/iB49kFiaBX6g=="
+        },
+        {
+          "package": "eslint-config-prettier",
+          "version": "10.1.8",
+          "sourceUrl": "https://registry.npmjs.org/eslint-config-prettier/10.1.8",
+          "tarballUrl": "https://registry.npmjs.org/eslint-config-prettier/-/eslint-config-prettier-10.1.8.tgz",
+          "integrity": "sha512-82GZUjRS0p/jganf6q1rEO25VSoHH0hKPCTrgillPjdI/3bgBhAE1QzHrHTizjpRvy6pGAvKjDJtk2pF9NDq8w=="
+        }
+      ],
+      "presets": {
+        "mobile": {
+          "package": "eslint-config-expo",
+          "version": "57.0.2",
+          "entry": "eslint-config-expo/flat.js",
+          "sourceUrl": "https://registry.npmjs.org/eslint-config-expo/57.0.2",
+          "tarballUrl": "https://registry.npmjs.org/eslint-config-expo/-/eslint-config-expo-57.0.2.tgz",
+          "integrity": "sha512-dOWkx+MWclLVnYpPPBzas4sfnPaAjk+fe/dbvJSzbWtHUR4fGGaTT/lTcOpxqhwRIlTKKBUYGKude0tcTBsZHg=="
+        },
+        "web": {
+          "package": "eslint-config-next",
+          "version": "16.3.3",
+          "entry": "eslint-config-next/core-web-vitals",
+          "sourceUrl": "https://registry.npmjs.org/eslint-config-next/16.3.3",
+          "tarballUrl": "https://registry.npmjs.org/eslint-config-next/-/eslint-config-next-16.3.3.tgz",
+          "integrity": "sha512-teqtsR26tnlfXFHfVLTM/4tzEzU8DMu6GS1sddZzhfGzgd2f2ofbgDUcsk6cssSCzX6Tk6fmWifJcdANSdPJrw=="
+        }
+      },
+      "canonicalFiles": [
+        ".editorconfig",
+        "prettier.config.mjs",
+        ".prettierignore",
+        "eslint.config.mjs",
+        "tools/eslint.base.mjs"
+      ],
+      "runtimeConfig": "each runtime root has eslint.config.mjs that imports hjmRuntimeConfig from tools/eslint.base.mjs and, for mobile/web, the pinned preset entry",
+      "rationale": "One lint/format contract across Expo, Next.js and NestJS: ESLint owns rules, Prettier owns formatting (eslint-config-prettier disables overlaps), framework presets add runtime-specific rules, and the base config encodes HJM import and shared-package dependency boundaries. ESLint stays on the 9.x line because eslint-plugin-react (required by both eslint-config-expo and eslint-config-next) supports ESLint <=9.7+ only; moving to ESLint 10 needs a standard revision once that plugin ships ESLint 10 support."
+    }
+  },
+  "ci": {
+    "workflowPath": ".github/workflows/quality-gate.yml",
+    "triggers": [
+      "pull_request",
+      "push:main"
+    ],
+    "requiredSteps": [
+      "corepack enable",
+      "pnpm install --frozen-lockfile",
+      "pnpm check"
+    ],
+    "actions": {
+      "checkout": {
+        "version": "6.0.2",
+        "sha": "de0fac2e4500dabe0009e67214ff5f5447ce83dd",
+        "persistCredentials": false
+      },
+      "setupNode": {
+        "version": "7.0.0",
+        "sha": "820762786026740c76f36085b0efc47a31fe5020"
+      },
+      "updatePolicy": {
+        "cadence": "monthly-and-immediate-on-critical-security-advisory",
+        "automation": "dependabot-or-renovate",
+        "organizationPolicy": "full-length-sha-only"
+      }
+    },
+    "trustModel": {
+      "bootstrapStatus": "unconfigured-no-merge-eligibility",
+      "centralVerifierRepository": null,
+      "codeownerTeam": null,
+      "centralVerifierWorkflowPath": ".github/workflows/app-standard-required.yml",
+      "requiredCheck": "app-standard-required",
+      "centralVerifierExecution": "organization-ruleset-pull-request-and-merge-group-three-fresh-hosted-jobs",
+      "bootstrapApprovedCommit": "0000000000000000000000000000000000000000",
+      "requiredCentralSteps": [
+        "trusted-static-precheck-fresh-runner",
+        "isolated-untrusted-registry-check-corepack-enable-frozen-install-canonical-pnpm-check",
+        "trusted-final-static-recheck-fresh-runner",
+        "event-head-and-approved-standard-sha-reverified-in-each-trusted-job"
+      ],
+      "untrustedQualityIsolation": {
+        "separateHostedRunner": true,
+        "sharesWorkspaceOrArtifactsWithTrustedJobs": false,
+        "trustedFinalJobExecutesAppCode": false
+      },
+      "publicationPrerequisites": [
+        "approve-an-actual-organization-required-workflow-or-verified-github-app-authority-in-a-profile-revision",
+        "publish-central-authority-and-record-the-real-repository",
+        "create-or-transfer-app-repository-into-the-approved-ownership-boundary",
+        "grant-the-recorded-codeowner-team-visible-write-access-when-using-an-organization-ruleset",
+        "install-and-verify-the-approved-external-required-gate",
+        "revise-profile-with-reviewed-nonzero-verifier-commit"
+      ],
+      "localWorkflowRole": "feedback-and-accidental-drift-detection-only",
+      "authoritativeMergeGate": "external-required-workflow-at-immutable-commit",
+      "eligibilitySource": "central-verifier-only",
+      "unverifiedExternalSettingsAction": "not-merge-eligible",
+      "requiredGeneratedFiles": [
+        ".github/CODEOWNERS",
+        ".github/dependabot.yml",
+        ".npmrc"
+      ],
+      "registryPolicy": {
+        "canonicalConfigPath": ".npmrc",
+        "defaultRegistry": "https://registry.npmjs.org/",
+        "hjmScopeRegistry": "https://registry.npmjs.org/",
+        "nestedConfigsForbidden": true,
+        "centralUserConfigRequired": true
+      },
+      "protectedPathsSource": "governance.mergePolicy.protectedPaths",
+      "runtimeManifestProtection": "each-declared-runtime-root/package.json",
+      "workspaceManifestProtectionRequired": true,
+      "sharedPackageManifestProtection": "packages/**/package.json",
+      "repositoryPolicyEvidenceRequiredBeforeActive": true,
+      "repositoryPolicyLiveVerification": {
+        "performedBy": "configured-external-authority",
+        "repositoryOwnedEvidenceIsNotAuthority": true,
+        "requiredComparisons": [
+          "repository-and-head-sha",
+          "ruleset-or-branch-protection-no-bypass-state",
+          "codeowner-team-write-access-and-visibility",
+          "required-workflow-source-and-approved-ref",
+          "required-check-result",
+          "live-api-response-digest-vs-evidence"
+        ]
+      }
+    }
+  },
+  "designSystem": {
+    "applicabilityPolicy": {
+      "frontendRuntimeKinds": [
+        "mobile",
+        "web"
+      ],
+      "frontendValue": "frontend",
+      "serverOnlyValue": "not_applicable",
+      "serverOnlyRationaleRequired": true,
+      "serverOnlyHjmDependenciesForbidden": true
+    },
+    "contractsPackage": "@hjmds/design-contracts",
+    "rendererByRuntime": {
+      "mobile": "@hjmds/react-native",
+      "web": "@hjmds/react"
+    },
+    "versionPolicy": "exact-and-aligned",
+    "adoptionPolicy": "stable-default",
+    "catalog": {
+      "releaseSource": "docs/profiles/hjm-release.json",
+      "snapshotSource": "docs/profiles/hjm-catalog.snapshot.json",
+      "generatedPath": "docs/hjm-catalog.snapshot.json"
+    },
+    "companionPolicy": {
+      "id": "hjm-consumer-policy",
+      "version": "1.2.0",
+      "status": "informational-next-release-pending",
+      "discoveryUrl": "https://github.com/jim1286/hjm-design-system/blob/main/packages/design-contracts/docs/consumer-policy.md",
+      "authority": false
+    },
+    "requiredFoundations": [
+      {
+        "componentId": "design-system-provider",
+        "maturity": "beta",
+        "rationaleId": "HJM-FOUNDATION-CORE-001",
+        "rationale": "Frontend roots require the HJM environment provider; the pinned catalog still marks it beta, so app adapter evidence is gated by lifecycle.",
+        "evidenceGate": "planned-in-draft-verified-before-active"
+      },
+      {
+        "componentId": "text",
+        "maturity": "beta",
+        "rationaleId": "HJM-FOUNDATION-CORE-001",
+        "rationale": "Semantic typography is required to avoid raw product type scales while the pinned catalog entry remains beta.",
+        "evidenceGate": "planned-in-draft-verified-before-active"
+      },
+      {
+        "componentId": "icon",
+        "maturity": "beta",
+        "rationaleId": "HJM-FOUNDATION-CORE-001",
+        "rationale": "Accessible icon semantics are part of the minimum cross-platform foundation while the pinned catalog entry remains beta.",
+        "evidenceGate": "planned-in-draft-verified-before-active"
+      },
+      {
+        "componentId": "stack",
+        "maturity": "beta",
+        "rationaleId": "HJM-FOUNDATION-CORE-001",
+        "rationale": "Semantic spacing composition is required to prevent raw spacing drift while the pinned catalog entry remains beta.",
+        "evidenceGate": "planned-in-draft-verified-before-active"
+      },
+      {
+        "componentId": "container",
+        "maturity": "beta",
+        "rationaleId": "HJM-FOUNDATION-CORE-001",
+        "rationale": "Content width and page gutter semantics are part of the minimum foundation while the pinned catalog entry remains beta.",
+        "evidenceGate": "planned-in-draft-verified-before-active"
+      }
+    ],
+    "optionalBetaAdoptionRequiredFields": [
+      "componentId",
+      "adrPath",
+      "evidenceIds"
+    ],
+    "optionalBetaRuntimeRestrictions": {
+      "bottom-cta": [
+        "mobile"
+      ],
+      "top-bar": [
+        "mobile"
+      ],
+      "tooltip": [
+        "web"
+      ],
+      "visually-hidden": [
+        "web"
+      ]
+    },
+    "forbiddenNewMaturities": [
+      "planned",
+      "deprecated"
+    ]
+  },
+  "i18n": {
+    "requiredFromFirstUserCopy": true,
+    "localeFormat": "BCP-47",
+    "selectionPrecedence": [
+      "user",
+      "account",
+      "device-or-browser",
+      "product-default"
+    ],
+    "legalCopySeparated": true
+  },
+  "release": {
+    "releaseHubByRuntime": {
+      "mobile": "required",
+      "web-only": "not_applicable",
+      "server-only": "not_applicable"
+    },
+    "notApplicableRequiresRationale": true,
+    "mobileRequiredTargets": [
+      "app-store",
+      "google-play"
+    ]
+  },
+  "acceptance": {
+    "requiredCategories": [
+      "product",
+      "architecture",
+      "design",
+      "i18n",
+      "security",
+      "quality",
+      "release"
+    ],
+    "passedRequiresEvidence": true,
+    "activeRequiresPassedEvidencePerCategory": true,
+    "waiversDoNotSatisfyAcceptance": true,
+    "verifiedEvidenceRequiresCapturedAt": true,
+    "verifiedEvidenceRequiresDigest": true,
+    "verifiedEvidenceRequiresNonPlaceholderTypeRecord": true,
+    "evidenceLocations": "repository-local records under docs/evidence/: one regular file, or one directory whose index.md is the narrative and whose digest is the sorted sha256 manifest of every file",
+    "crossReferencesMustResolve": true,
+    "evidenceTrustBoundary": {
+      "repositoryDigestProves": "byte-integrity-only",
+      "doesNotProve": "factual-authenticity-of-the-observation",
+      "activeVerifiedRequires": [
+        "subject-head-or-artifact-digest",
+        "producer-or-verification-authority",
+        "human-approval-or-external-attestation-when-applicable"
+      ],
+      "repositoryPolicyLiveReverifiedByCentralGate": true
+    }
+  },
+  "waiverPolicy": {
+    "allowedRuleLevels": [
+      "default"
+    ],
+    "forbiddenRuleLevels": [
+      "required"
+    ],
+    "approvalRequiredBeforeUse": true,
+    "maximumDurationDays": 30,
+    "ownerMustDifferFromApprover": true,
+    "requiredFields": [
+      "ruleId",
+      "adrPath",
+      "reason",
+      "risk",
+      "mitigations",
+      "owner",
+      "approver",
+      "createdAt",
+      "expiresAt",
+      "status"
+    ]
+  },
+  "rules": [
+    {
+      "id": "APP-IDENTITY-001",
+      "level": "required",
+      "summary": "앱은 영구 canonical kebab-case ID와 독립 Git 저장소를 사용한다.",
+      "enforcement": "schema-and-conformance"
+    },
+    {
+      "id": "APP-RUNTIME-001",
+      "level": "required",
+      "summary": "새 runtime은 Expo, Next.js 또는 NestJS의 kind-framework 조합만 사용한다.",
+      "enforcement": "schema"
+    },
+    {
+      "id": "APP-DOCS-001",
+      "level": "required",
+      "summary": "PRODUCT, ARCHITECTURE, DESIGN, RELEASE와 decisions 디렉터리를 canonical 위치에 둔다.",
+      "enforcement": "schema-and-conformance"
+    },
+    {
+      "id": "APP-TOOLCHAIN-001",
+      "level": "required",
+      "summary": "pnpm과 Node를 exact version으로 고정하고 canonical scripts를 제공한다.",
+      "enforcement": "schema-and-conformance"
+    },
+    {
+      "id": "APP-DESIGN-001",
+      "level": "required",
+      "summary": "Frontend는 HJM contracts와 runtime renderer를 동일 exact version으로 사용하고, server-only는 근거 있는 not_applicable과 HJM dependency 부재를 강제한다.",
+      "enforcement": "schema-and-conformance"
+    },
+    {
+      "id": "APP-I18N-001",
+      "level": "required",
+      "summary": "첫 사용자 문구부터 공용 catalog와 canonical locale 정책을 사용한다.",
+      "enforcement": "schema-and-conformance"
+    },
+    {
+      "id": "APP-EVIDENCE-001",
+      "level": "required",
+      "summary": "active 앱은 각 필수 acceptance category에 별도 passed criterion과 검증된 evidence를 가지며, ADR이나 waiver는 acceptance를 대체하지 않는다.",
+      "enforcement": "schema-and-conformance"
+    },
+    {
+      "id": "APP-RELEASE-001",
+      "level": "required",
+      "summary": "모바일은 Release Hub를 사용하고 Web/Server-only의 비적용에는 근거를 기록한다.",
+      "enforcement": "schema-and-conformance"
+    },
+    {
+      "id": "APP-SERVER-ADAPTER-001",
+      "level": "default",
+      "summary": "새 NestJS HTTP adapter는 Fastify를 기본으로 선택한다.",
+      "enforcement": "review"
+    },
+    {
+      "id": "APP-FRONTEND-TEST-001",
+      "level": "default",
+      "summary": "새 frontend와 순수 package의 unit/component runner는 Vitest를 기본으로 사용한다.",
+      "enforcement": "review"
+    },
+    {
+      "id": "APP-DESIGN-EVIDENCE-001",
+      "level": "default",
+      "summary": "공용 primitive와 복잡한 상태는 Storybook 또는 동등한 showcase evidence로 검증한다.",
+      "enforcement": "review"
+    },
+    {
+      "id": "APP-LIFECYCLE-001",
+      "level": "required",
+      "summary": "portfolio.json과 app.contract.json의 lifecycle은 같은 검토 변경에서 함께 바뀐다(doctor가 불일치를 차단). lifecycle은 제품 상태이고 conformance 주장은 governance.status가 소유하므로 lifecycle이 release를 막거나 conformance를 부여하지 않는다.",
+      "enforcement": "conformance-and-review"
+    },
+    {
+      "id": "APP-REGISTRY-001",
+      "level": "required",
+      "summary": "루트 .npmrc가 registry와 @hjmds:registry를 npmjs.org로 고정하고 중첩 .npmrc·registry override·Git/URL/path/tarball 의존성을 두지 않는다.",
+      "enforcement": "schema-and-conformance"
+    },
+    {
+      "id": "APP-DOCS-002",
+      "level": "required",
+      "summary": "canonical 문서의 Acceptance/Evidence 표는 contract 투영이며 sync-docs로만 갱신하고, docs/design/은 비규범 작업 문서로 검사 대상이 아니다.",
+      "enforcement": "conformance"
+    },
+    {
+      "id": "APP-EVIDENCE-002",
+      "level": "required",
+      "summary": "evidence record는 regular file 하나 또는 index.md를 가진 디렉터리 하나이며 digest는 digest-evidence 출력과 같아야 한다.",
+      "enforcement": "conformance"
+    },
+    {
+      "id": "APP-SECURITY-001",
+      "level": "required",
+      "summary": "저장소 생성 직후 install-local-git-guards.sh, 첫 release 전과 active 전환 전 audit-sensitive-files.sh를 실행하고 후보가 없어야 한다.",
+      "enforcement": "review"
+    },
+    {
+      "id": "APP-QA-001",
+      "level": "default",
+      "summary": "tools/qa는 생성된 README의 최소 adapter 세트(exploreqa.toml, provider, boot, personas, lanes, run.sh)를 채운다.",
+      "enforcement": "review"
+    },
+    {
+      "id": "APP-STATIC-001",
+      "level": "required",
+      "summary": "전 runtime이 profile toolchain.staticAnalysis의 exact ESLint·typescript-eslint·Prettier·eslint-config-prettier와 runtime preset을 쓰고, canonical .editorconfig·prettier.config.mjs·.prettierignore·eslint.config.mjs·tools/eslint.base.mjs를 byte 그대로 두며 runtime eslint.config.mjs는 base를 import한다.",
+      "enforcement": "schema-and-conformance"
+    }
+  ]
+}
