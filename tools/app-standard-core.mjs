@@ -1506,9 +1506,14 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: app-feedback-${contract.app.id}-\${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   quality:
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     defaults:
       run:
         working-directory: ${contract.app.id}
@@ -4555,7 +4560,7 @@ export async function checkStandardAssets({ workspaceRoot = defaultWorkspaceRoot
       || !centralWorkflow.includes('merge_group:')
       || !centralWorkflow.includes('workflow_call:')
       || !centralWorkflow.includes('app-standard-required:')
-      || !centralWorkflow.includes('APPROVED_STANDARD_COMMIT: 0000000000000000000000000000000000000000')
+      || !centralWorkflow.includes('APPROVED_STANDARD_COMMIT: "0000000000000000000000000000000000000000"')
       || !centralWorkflow.includes('verify-central-pin.mjs')
       || !centralWorkflow.includes('pnpm install --frozen-lockfile')
       || !centralWorkflow.includes('run: pnpm check')
