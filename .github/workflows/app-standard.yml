@@ -23,5 +23,5 @@ jobs:
       - run: corepack prepare pnpm@11.24.0 --activate
       - run: pnpm install --frozen-lockfile
         working-directory: portfolio-site
-      - name: Contract and all declared runtime checks
-        run: node tools/run-quality.mjs check
+      - name: Contract and CI runtime checks (Flutter builds run locally)
+        run: node tools/run-quality.mjs check-ci

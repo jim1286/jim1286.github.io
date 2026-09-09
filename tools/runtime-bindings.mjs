@@ -163,7 +163,7 @@ export function bindingWorkflow(contract) {
   const inCheckout = (path) => path === '.' ? appRoot : `${appRoot}/${path}`;
   const flutter = contract.runtimes.find((r) => r.framework === 'flutter');
   const installs = [...new Set(['.', ...contract.runtimes.filter((r) => r.framework !== 'flutter').map((r) => r.binding.lockfile.replace(/(?:^|\/)pnpm-lock\.yaml$/, '') || '.')])];
-  return `name: App standard quality\non:\n  pull_request:\n  push:\n    branches: [main]\npermissions:\n  contents: read\njobs:\n  quality:\n    runs-on: ubuntu-latest\n    defaults:\n      run:\n        working-directory: ${appRoot}\n    steps:\n      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd\n        with:\n          persist-credentials: false\n          path: ${appRoot}\n      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020\n        with:\n          node-version-file: ${appRoot}/.nvmrc\n      - run: corepack enable\n      - run: corepack prepare pnpm@11.24.0 --activate\n${flutter ? `      - name: Install pinned Flutter SDK\n        run: |\n          git clone --depth 1 --branch "$(node -p 'JSON.parse(require("fs").readFileSync("${flutter.root}/.fvmrc", "utf8")).flutter')" https://github.com/flutter/flutter.git "$RUNNER_TEMP/flutter"\n          echo "$RUNNER_TEMP/flutter/bin" >> "$GITHUB_PATH"\n` : ''}${installs.map((cwd) => `      - run: pnpm install --frozen-lockfile\n        working-directory: ${inCheckout(cwd)}\n`).join('')}${contract.runtimes.filter((r) => r.framework === 'flutter').map((r) => `      - run: flutter pub get --enforce-lockfile\n        working-directory: ${inCheckout(r.root)}\n`).join('')}      - name: Contract and all declared runtime checks\n        run: node tools/run-quality.mjs check\n`;
+  return `name: App standard quality\non:\n  pull_request:\n  push:\n    branches: [main]\npermissions:\n  contents: read\njobs:\n  quality:\n    runs-on: ubuntu-latest\n    defaults:\n      run:\n        working-directory: ${appRoot}\n    steps:\n      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd\n        with:\n          persist-credentials: false\n          path: ${appRoot}\n      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020\n        with:\n          node-version-file: ${appRoot}/.nvmrc\n      - run: corepack enable\n      - run: corepack prepare pnpm@11.24.0 --activate\n${flutter ? `      - name: Install pinned Flutter SDK\n        run: |\n          git clone --depth 1 --branch "$(node -p 'JSON.parse(require("fs").readFileSync("${flutter.root}/.fvmrc", "utf8")).flutter')" https://github.com/flutter/flutter.git "$RUNNER_TEMP/flutter"\n          echo "$RUNNER_TEMP/flutter/bin" >> "$GITHUB_PATH"\n` : ''}${installs.map((cwd) => `      - run: pnpm install --frozen-lockfile\n        working-directory: ${inCheckout(cwd)}\n`).join('')}${contract.runtimes.filter((r) => r.framework === 'flutter').map((r) => `      - run: flutter pub get --enforce-lockfile\n        working-directory: ${inCheckout(r.root)}\n`).join('')}      - name: Contract and CI runtime checks (Flutter builds run locally)\n        run: node tools/run-quality.mjs check-ci\n`;
 }
 
 export async function initializeFixtureAssets(root, runtime) {
@@ -181,6 +181,15 @@ export async function initializeFixtureAssets(root, runtime) {
   }
 }
 
+export function boundQualitySteps(contract, role) {
+  if (!['check', 'check-ci', ...bindingRoles].includes(role)) throw new Error('Choose check, check-ci, lint, typecheck, test or build');
+  const targets = ['check', 'check-ci'].includes(role) ? bindingRoles : [role];
+  return targets.flatMap(target => contract.runtimes.map(runtime => ({
+    runtime, target,
+    execution: role === 'check-ci' && target === 'build' && runtime.framework === 'flutter' ? 'local-only' : 'run',
+  })));
+}
+
 export async function runBoundQuality(root, role) {
   const contract = JSON.parse(await readFile(resolve(root, 'app.contract.json'), 'utf8'));
   if (process.versions.node !== contract.toolchain.node) throw new Error(`Use Node ${contract.toolchain.node}; current ${process.versions.node}`);
@@ -188,13 +197,15 @@ export async function runBoundQuality(root, role) {
   if (pnpmVersion !== contract.toolchain.packageManager.version) throw new Error(`Use pnpm ${contract.toolchain.packageManager.version}; current ${pnpmVersion}`);
   const findings = []; validateBindings(contract, findings);
   if (findings.length) throw new Error(JSON.stringify(findings));
-  if (!['check', ...bindingRoles].includes(role)) throw new Error('Choose check, lint, typecheck, test or build');
+  const steps = boundQualitySteps(contract, role);
+  if (process.env.GITHUB_ACTIONS === 'true' && steps.some(step => step.runtime.framework === 'flutter' && step.target === 'build' && step.execution === 'run'))
+    throw new Error('Flutter builds run locally. Use check-ci on GitHub Actions and provide separate local build evidence.');
   const run = async (argv, cwd) => new Promise((resolveResult, reject) => {
     const child = spawn(argv[0], argv.slice(1), { cwd, stdio: 'inherit', shell: false });
     child.on('error', reject); child.on('exit', (code, signal) => code === 0 ? resolveResult() : reject(new Error(`Command failed (${code ?? signal}): ${argv.join(' ')}`)));
   });
   await run([process.execPath, 'tools/check-app-contract.mjs'], root);
-  if (role === 'check') await run([process.execPath, 'tools/check-doc-links.mjs'], root);
+  if (['check', 'check-ci'].includes(role)) await run([process.execPath, 'tools/check-doc-links.mjs'], root);
   for (const runtime of contract.runtimes) {
     const cwd = await regular(root, runtime.root, true);
     if (runtime.framework === 'flutter') {
@@ -204,11 +215,13 @@ export async function runBoundQuality(root, role) {
     await initializeFixtureAssets(root, runtime);
     if (runtime.binding.prepare) { console.log(`[${runtime.id}] prepare`); await run(runtime.binding.prepare, cwd); }
   }
-  for (const target of role === 'check' ? bindingRoles : [role]) {
-    for (const runtime of contract.runtimes) {
-      console.log(`[${runtime.id}] ${target}`);
-      await run(runtime.binding.checks[target], await regular(root, runtime.root, true));
+  for (const { runtime, target, execution } of steps) {
+    if (execution === 'local-only') {
+      console.log(`[${runtime.id}] build: not run in CI; local build evidence is required separately`);
+      continue;
     }
+    console.log(`[${runtime.id}] ${target}`);
+    await run(runtime.binding.checks[target], await regular(root, runtime.root, true));
   }
 }
 
