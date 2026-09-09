@@ -1495,7 +1495,7 @@ function makeRuntimeEslintSnippet(runtime) {
     + "export default hjmRuntimeConfig({ kind: 'server', rootDir: import.meta.dirname });\n";
 }
 
-function makeQualityGateWorkflow() {
+function makeQualityGateWorkflow(contract) {
   return `name: App feedback quality gate (not merge authority)
 
 on:
@@ -1509,6 +1509,9 @@ permissions:
 jobs:
   quality:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ${contract.app.id}
     services:
       postgres:
         image: postgres:17
@@ -1533,14 +1536,15 @@ jobs:
       DEVICE_TOKEN_SIGNING_KEY: public-ci-test-signing-key-at-least-32
       LETTER_ENCRYPTION_KEY: AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=
       NPM_CONFIG_REGISTRY: https://registry.npmjs.org/
-      NPM_CONFIG_USERCONFIG: \${{ github.workspace }}/.npmrc
+      NPM_CONFIG_USERCONFIG: \${{ github.workspace }}/${contract.app.id}/.npmrc
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
           persist-credentials: false
+          path: ${contract.app.id}
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
-          node-version-file: .nvmrc
+          node-version-file: ${contract.app.id}/.nvmrc
       - name: Enable pinned package manager
         run: corepack enable
       - name: Verify canonical npm registries
@@ -2938,7 +2942,7 @@ async function buildScaffoldFiles(contract) {
   const files = new Map([
     ['.github/CODEOWNERS', makeCodeowners(contract)],
     ['.github/dependabot.yml', makeDependabotConfig()],
-    ['.github/workflows/quality-gate.yml', makeQualityGateWorkflow()],
+    ['.github/workflows/quality-gate.yml', makeQualityGateWorkflow(contract)],
     ['.gitignore', 'node_modules/\n.next/\ndist/\nbuild/\n.expo/\ncoverage/\n.env\n.env.*\n!.env.example\n.DS_Store\n'],
     ['.npmrc', canonicalNpmrcSource],
     ['.nvmrc', `${contract.toolchain.node}\n`],
@@ -3735,7 +3739,7 @@ export function standardProjectionSources(contract) {
     ['tools/check-doc-links.mjs', readFileSync(resolve(scriptDirectory, 'check-doc-links.mjs'), 'utf8')],
     ['tools/check-design-contract.mjs', makeLocalDesignChecker()],
     ['tools/json-schema-validator.mjs', readFileSync(resolve(scriptDirectory, 'json-schema-validator.mjs'), 'utf8')],
-    ['.github/workflows/quality-gate.yml', makeQualityGateWorkflow()],
+    ['.github/workflows/quality-gate.yml', makeQualityGateWorkflow(contract)],
   ]);
 }
 
@@ -4021,7 +4025,7 @@ export async function checkAppConformance(appRoot, { now = new Date(), targetSta
     addFinding(findings, 'NODE_VERSION_MISMATCH', '.nvmrc', '.nvmrc must exactly match contract.toolchain.node.');
   }
   const qualityWorkflow = fileSources.get('.github/workflows/quality-gate.yml');
-  if (qualityWorkflow && qualityWorkflow !== (bound(contract) ? bindingWorkflow(contract) : makeQualityGateWorkflow())) {
+  if (qualityWorkflow && qualityWorkflow !== (bound(contract) ? bindingWorkflow(contract) : makeQualityGateWorkflow(contract))) {
     addFinding(findings, 'QUALITY_WORKFLOW_NONCANONICAL', '.github/workflows/quality-gate.yml', 'Quality workflow must exactly match the generated v1 workflow; comments or alternate no-op steps cannot satisfy this gate.');
   }
   for (const [key, path] of Object.entries(canonicalDocuments)) {

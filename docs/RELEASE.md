@@ -34,8 +34,8 @@ pnpm run preview
 
 ## CI와 공개 배포
 
-[quality.yml](../.github/workflows/quality.yml)은 PR/main에서 frozen install과 `pnpm check`를
-실행한다. private Hub 접근을 가정하지 않으며 snapshot 검증이라는 범위를 출력한다.
+[app-standard.yml](../.github/workflows/app-standard.yml)은 PR/main에서 frozen install과
+공통 계약·문서 검사, 제품 lint·타입·테스트·빌드를 실행한다. 중복되던 `quality.yml`은 제거했다. private Hub 접근을 가정하지 않으며 snapshot 검증이라는 범위를 출력한다.
 배포 명령은 추가로 Hub 원본 검사를 요구한다. workflow는 자동 배포하지 않는다.
 
 빌드 산출물은 `dist/`다. 공개 게시 후 개발자/앱/정책 링크를 확인한다. 문제가 있으면
