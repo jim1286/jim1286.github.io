@@ -917,6 +917,8 @@ async function verifyFrontendSources(contract, catalogMaturity) {
           add(runtime.root, 'required foundation ' + symbol + ' must be imported from the declared renderer and rendered in the canonical exported root return tree');
         }
       }
+      // HJM이 HjmCompositionStyleProp으로 좁힌 slot style prop. 시각 키는 타입에서 막힌다.
+      const compositionStyleProps = new Set(['layoutStyle', 'headerStyle', 'copyStyle', 'actionStyle', 'contentStyle']);
       for (const { path, source } of reachableSources) {
         const importedHjmSymbols = new Map();
         const namespaceImports = new Set();
@@ -995,7 +997,10 @@ async function verifyFrontendSources(contract, catalogMaturity) {
               add(relative(appRoot, path), 'HJM component ' + localSymbol + ' uses a spread prop; explicit props are required so prohibited style-like props cannot be hidden');
             }
             for (const prop of tag.attrs.matchAll(/\b([A-Za-z][A-Za-z0-9]*Style|style)\s*=/g)) {
-              if (prop[1] !== 'layoutStyle') add(relative(appRoot, path), 'HJM component ' + localSymbol + ' uses prohibited legacy style-like prop "' + prop[1] + '"; only layoutStyle is allowed');
+              // HJM 0.9.3부터 아래 slot prop들은 타입이 HjmCompositionStyleProp으로 좁혀져
+              // 배치 키만 받는다. 규칙의 목적은 recipe 소유 외형을 slot으로 숨기는 것을
+              // 막는 것이므로, 타입이 이미 막는 slot은 금지 대상이 아니다.
+              if (!compositionStyleProps.has(prop[1])) add(relative(appRoot, path), 'HJM component ' + localSymbol + ' uses prohibited legacy style-like prop "' + prop[1] + '"; only layoutStyle or a composition-typed slot style is allowed');
             }
           }
         };
