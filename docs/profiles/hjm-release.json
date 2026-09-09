@@ -1,0 +1,36 @@
+{
+  "schemaVersion": 1,
+  "version": "0.9.1",
+  "packages": {
+    "@hjmds/design-contracts": {
+      "version": "0.9.1",
+      "metadataUrl": "https://registry.npmjs.org/%40hjmds%2Fdesign-contracts/0.9.1",
+      "tarballUrl": "https://registry.npmjs.org/@hjmds/design-contracts/-/design-contracts-0.9.1.tgz",
+      "integrity": "sha512-0fKFgtHCBzWL8ubw1PUyyT0XjIfoztm2x1sPqtNPBFLbRjdcPBMSrvT8Ple4My45vMyj0h+3GrZ5Zexiaq2PSw=="
+    },
+    "@hjmds/react": {
+      "version": "0.9.1",
+      "metadataUrl": "https://registry.npmjs.org/%40hjmds%2Freact/0.9.1",
+      "tarballUrl": "https://registry.npmjs.org/@hjmds/react/-/react-0.9.1.tgz",
+      "integrity": "sha512-0mdmekQdzvzYBz7yz7gp6Xs6UUtu3Uin7kwY46+/VOwSdGj68UDXiGoPAaAbrZk/PZHuEePTomAi6KrZtZVg+w=="
+    },
+    "@hjmds/react-native": {
+      "version": "0.9.1",
+      "metadataUrl": "https://registry.npmjs.org/%40hjmds%2Freact-native/0.9.1",
+      "tarballUrl": "https://registry.npmjs.org/@hjmds/react-native/-/react-native-0.9.1.tgz",
+      "integrity": "sha512-ZY+C0hIfw1Ive03iVbpJDYHyzzzGMUmdePVZ2WR7SqlUSQXNOj4M7I4ue6+AYJEA+T/Q4/JD41jSj0dhJkTkvQ=="
+    }
+  },
+  "source": {
+    "repository": "https://github.com/jim1286/hjm-design-system.git",
+    "tag": "v0.9.1",
+    "commit": "c8353ef946d4c79e52ff25b150b8431e2adc13f7",
+    "sourcePath": "packages/design-contracts/dist/catalog.js",
+    "contentSha256": "2ef1fb26ff2706d61fb6d3638754e4fe67de3c88b1f142233147a878d56dd2ee"
+  },
+  "catalog": {
+    "snapshotSource": "docs/profiles/hjm-catalog.snapshot.json",
+    "generatedPath": "docs/hjm-catalog.snapshot.json",
+    "sha256": "09f750f350aa277414c498ee1a44bb0ab3a5d061ae1dec98f165d91b3cc60f49"
+  }
+}

@@ -1,0 +1,442 @@
+{
+  "$schema": "./docs/app-contract.schema.json",
+  "contractVersion": 1,
+  "profile": "portfolio-default-v1",
+  "app": {
+    "id": "portfolio-site",
+    "displayName": "Portfolio Site",
+    "lifecycle": "active",
+    "repository": {
+      "remoteName": "origin",
+      "url": "https://github.com/jim1286/jim1286.github.io.git"
+    }
+  },
+  "governance": {
+    "status": "draft",
+    "owner": "jimin",
+    "reviewedAt": "2026-09-09",
+    "documentVersion": "1.0.0",
+    "mergePolicy": {
+      "authority": "external-required-workflow",
+      "status": "planned",
+      "centralVerifier": {
+        "repository": "https://github.com/example-org/app-standard-authority",
+        "workflowPath": ".github/workflows/app-standard-required.yml",
+        "commit": "0000000000000000000000000000000000000000",
+        "requiredCheck": "app-standard-required",
+        "branch": "main"
+      },
+      "codeownerTeam": "@example-org/app-standard-owners",
+      "protectedPaths": [
+        ".github/workflows/quality-gate.yml",
+        ".github/CODEOWNERS",
+        ".github/dependabot.yml",
+        "app.contract.json",
+        "package.json",
+        ".npmrc",
+        "pnpm-lock.yaml",
+        "pnpm-workspace.yaml",
+        "packages/**/package.json",
+        "apps/mobile/package.json",
+        "apps/web/package.json",
+        "apps/server/package.json",
+        "tools",
+        "docs/app-profile.json",
+        "docs/app-contract.schema.json",
+        "docs/hjm-catalog.snapshot.json",
+        ".github/workflows/app-standard.yml"
+      ],
+      "repositoryPolicyEvidenceId": "EV-006",
+      "eligibilitySource": "central-verifier-only"
+    }
+  },
+  "runtimes": [
+    {
+      "id": "web",
+      "kind": "web",
+      "framework": "vite",
+      "frameworkVersion": "7.3.6",
+      "root": ".",
+      "binding": {
+        "manifest": "package.json",
+        "lockfile": "pnpm-lock.yaml",
+        "entryPoints": [
+          "src/main.tsx"
+        ],
+        "frameworkSpecifier": "^7.0.4",
+        "checks": {
+          "lint": [
+            "pnpm",
+            "run",
+            "lint"
+          ],
+          "typecheck": [
+            "pnpm",
+            "run",
+            "typecheck"
+          ],
+          "test": [
+            "pnpm",
+            "run",
+            "test"
+          ],
+          "build": [
+            "pnpm",
+            "run",
+            "build"
+          ]
+        },
+        "evidenceIds": [
+          "EV-020"
+        ]
+      }
+    }
+  ],
+  "documents": {
+    "product": "docs/PRODUCT.md",
+    "architecture": "docs/ARCHITECTURE.md",
+    "design": "docs/DESIGN.md",
+    "release": "docs/RELEASE.md",
+    "decisionsDir": "docs/decisions"
+  },
+  "toolchain": {
+    "packageManager": {
+      "name": "pnpm",
+      "version": "11.24.0"
+    },
+    "node": "24.20.0",
+    "scripts": {
+      "standard:lint": "node tools/run-quality.mjs lint",
+      "standard:typecheck": "node tools/run-quality.mjs typecheck",
+      "standard:test": "node tools/run-quality.mjs test",
+      "standard:build": "node tools/run-quality.mjs build",
+      "standard:check": "node tools/run-quality.mjs check",
+      "contract:check": "node tools/check-app-contract.mjs",
+      "design:check": "node tools/check-design-contract.mjs",
+      "docs:check": "node tools/check-doc-links.mjs"
+    }
+  },
+  "designSystem": {
+    "applicability": "frontend",
+    "rationale": null,
+    "contracts": {
+      "package": "@hjmds/design-contracts",
+      "version": "0.9.1"
+    },
+    "renderers": [
+      {
+        "kind": "web",
+        "package": "@hjmds/react",
+        "version": "0.9.1"
+      }
+    ],
+    "versionPolicy": "exact-and-aligned",
+    "adoptionPolicy": "stable-default",
+    "catalog": {
+      "train": "0.9.1",
+      "snapshotPath": "docs/hjm-catalog.snapshot.json",
+      "sha256": "09f750f350aa277414c498ee1a44bb0ab3a5d061ae1dec98f165d91b3cc60f49"
+    },
+    "companionPolicy": {
+      "id": "hjm-consumer-policy",
+      "version": "1.2.0",
+      "status": "informational-next-release-pending",
+      "discoveryUrl": "https://github.com/jim1286/hjm-design-system/blob/main/packages/design-contracts/docs/consumer-policy.md"
+    },
+    "requiredFoundations": [
+      {
+        "componentId": "design-system-provider",
+        "maturity": "beta",
+        "rationaleId": "HJM-FOUNDATION-CORE-001",
+        "evidenceGate": "planned-in-draft-verified-before-active",
+        "evidenceIds": [
+          "EV-008"
+        ]
+      },
+      {
+        "componentId": "text",
+        "maturity": "beta",
+        "rationaleId": "HJM-FOUNDATION-CORE-001",
+        "evidenceGate": "planned-in-draft-verified-before-active",
+        "evidenceIds": [
+          "EV-009"
+        ]
+      },
+      {
+        "componentId": "icon",
+        "maturity": "beta",
+        "rationaleId": "HJM-FOUNDATION-CORE-001",
+        "evidenceGate": "planned-in-draft-verified-before-active",
+        "evidenceIds": [
+          "EV-010"
+        ]
+      },
+      {
+        "componentId": "stack",
+        "maturity": "beta",
+        "rationaleId": "HJM-FOUNDATION-CORE-001",
+        "evidenceGate": "planned-in-draft-verified-before-active",
+        "evidenceIds": [
+          "EV-011"
+        ]
+      },
+      {
+        "componentId": "container",
+        "maturity": "beta",
+        "rationaleId": "HJM-FOUNDATION-CORE-001",
+        "evidenceGate": "planned-in-draft-verified-before-active",
+        "evidenceIds": [
+          "EV-012"
+        ]
+      }
+    ],
+    "optionalBetaAdoptions": []
+  },
+  "i18n": {
+    "sourceLocale": "ko-KR",
+    "supportedLocales": [
+      "ko-KR"
+    ],
+    "defaultLocale": "ko-KR",
+    "fallbackChain": [
+      "ko-KR"
+    ],
+    "selectionPrecedence": [
+      "user",
+      "account",
+      "device-or-browser",
+      "product-default"
+    ],
+    "catalogRoot": "src",
+    "legalCopyRoot": null,
+    "timeZonePolicy": "UTC로 교환하고 사용자가 확정한 time zone으로 표시한다.",
+    "currencyPolicy": "거래 또는 계정에 명시된 통화를 사용하고 locale로 추측하지 않는다."
+  },
+  "release": {
+    "targets": [
+      "web"
+    ],
+    "releaseHub": "not_applicable",
+    "rationale": "웹 제품이며 모바일 스토어 target이 없다. 제품 CI에서 빌드·배포한다."
+  },
+  "acceptance": {
+    "criteria": [
+      {
+        "id": "PROD-001",
+        "category": "product",
+        "statement": "Portfolio Site의 PRODUCT에 기록된 핵심 사용자 여정을 완료하고 결과를 확인한다.",
+        "verification": "대표 persona 5명의 moderated usability test",
+        "status": "pending",
+        "evidenceIds": [
+          "EV-001"
+        ]
+      },
+      {
+        "id": "ARCH-001",
+        "category": "architecture",
+        "statement": "runtime에서 순수 domain package 방향으로만 의존한다.",
+        "verification": "dependency boundary test와 architecture review",
+        "status": "pending",
+        "evidenceIds": [
+          "EV-002"
+        ]
+      },
+      {
+        "id": "DESIGN-001",
+        "category": "design",
+        "statement": "Portfolio Site의 실제 frontend에서 기본·오류·빈 상태와 접근성, HJM foundation 의미 계약을 검증한다.",
+        "verification": "light/dark와 큰 글자를 포함한 parity review",
+        "status": "pending",
+        "evidenceIds": [
+          "EV-003",
+          "EV-008",
+          "EV-009",
+          "EV-010",
+          "EV-011",
+          "EV-012"
+        ]
+      },
+      {
+        "id": "I18N-001",
+        "category": "i18n",
+        "statement": "모든 사용자 문구가 catalog에 있고 locale별 key와 placeholder가 일치한다.",
+        "verification": "실제 문구 source의 지원 locale·fallback·긴 문구 화면 검토",
+        "status": "pending",
+        "evidenceIds": [
+          "EV-004"
+        ]
+      },
+      {
+        "id": "SECURITY-001",
+        "category": "security",
+        "statement": "secret과 개인정보가 client bundle, 저장소, log와 release evidence에 포함되지 않는다.",
+        "verification": "secret scan, bundle inspection과 redaction test",
+        "status": "pending",
+        "evidenceIds": [
+          "EV-005"
+        ]
+      },
+      {
+        "id": "QUALITY-001",
+        "category": "quality",
+        "statement": "고정된 toolchain과 frozen lockfile에서 canonical check가 통과한다.",
+        "verification": "pnpm standard:check 및 기존 제품 CI 결과와 runtime별 evidence 검토",
+        "status": "pending",
+        "evidenceIds": [
+          "EV-006",
+          "EV-020"
+        ]
+      },
+      {
+        "id": "RELEASE-001",
+        "category": "release",
+        "statement": "source와 artifact digest가 고정된 preview build에서 핵심 smoke를 통과한다.",
+        "verification": "제품 RELEASE의 실제 배포 경로에서 build/source와 smoke evidence 확인",
+        "status": "pending",
+        "evidenceIds": [
+          "EV-007"
+        ]
+      }
+    ],
+    "evidence": [
+      {
+        "id": "EV-001",
+        "criterionIds": [
+          "PROD-001"
+        ],
+        "type": "report",
+        "location": "docs/evidence/planned/product-usability.md",
+        "status": "planned",
+        "owner": "jimin"
+      },
+      {
+        "id": "EV-002",
+        "criterionIds": [
+          "ARCH-001"
+        ],
+        "type": "automated-test",
+        "location": "docs/evidence/planned/dependency-boundaries.md",
+        "status": "planned",
+        "owner": "jimin"
+      },
+      {
+        "id": "EV-003",
+        "criterionIds": [
+          "DESIGN-001"
+        ],
+        "type": "review",
+        "location": "docs/evidence/planned/design-parity.md",
+        "status": "planned",
+        "owner": "jimin"
+      },
+      {
+        "id": "EV-004",
+        "criterionIds": [
+          "I18N-001"
+        ],
+        "type": "automated-test",
+        "location": "docs/evidence/planned/i18n-check.md",
+        "status": "planned",
+        "owner": "jimin"
+      },
+      {
+        "id": "EV-005",
+        "criterionIds": [
+          "SECURITY-001"
+        ],
+        "type": "report",
+        "location": "docs/evidence/planned/security-review.md",
+        "status": "planned",
+        "owner": "jimin"
+      },
+      {
+        "id": "EV-006",
+        "criterionIds": [
+          "QUALITY-001"
+        ],
+        "type": "repository-policy",
+        "location": "docs/evidence/planned/repository-policy.md",
+        "status": "planned",
+        "owner": "jimin",
+        "note": "Replace this plan with a repository-policy record of protected paths, CODEOWNERS, branch rules, head SHA and the immutable external required workflow. Its repository-local digest proves byte integrity only; the configured central gate must live-reverify the settings before merge eligibility."
+      },
+      {
+        "id": "EV-007",
+        "criterionIds": [
+          "RELEASE-001"
+        ],
+        "type": "build-log",
+        "location": "docs/evidence/planned/release-smoke.md",
+        "status": "planned",
+        "owner": "jimin"
+      },
+      {
+        "id": "EV-008",
+        "criterionIds": [
+          "DESIGN-001"
+        ],
+        "type": "automated-test",
+        "location": "docs/evidence/planned/design-system-provider-boundary.md",
+        "status": "planned",
+        "owner": "jimin",
+        "note": "Replace this generated plan with a non-placeholder, type-specific record before setting capturedAt, digest, and status to verified; relabeling the plan is insufficient."
+      },
+      {
+        "id": "EV-009",
+        "criterionIds": [
+          "DESIGN-001"
+        ],
+        "type": "automated-test",
+        "location": "docs/evidence/planned/text-foundation.md",
+        "status": "planned",
+        "owner": "jimin"
+      },
+      {
+        "id": "EV-010",
+        "criterionIds": [
+          "DESIGN-001"
+        ],
+        "type": "automated-test",
+        "location": "docs/evidence/planned/icon-foundation.md",
+        "status": "planned",
+        "owner": "jimin"
+      },
+      {
+        "id": "EV-011",
+        "criterionIds": [
+          "DESIGN-001"
+        ],
+        "type": "automated-test",
+        "location": "docs/evidence/planned/stack-foundation.md",
+        "status": "planned",
+        "owner": "jimin"
+      },
+      {
+        "id": "EV-012",
+        "criterionIds": [
+          "DESIGN-001"
+        ],
+        "type": "automated-test",
+        "location": "docs/evidence/planned/container-foundation.md",
+        "status": "planned",
+        "owner": "jimin"
+      },
+      {
+        "id": "EV-020",
+        "criterionIds": [
+          "QUALITY-001"
+        ],
+        "type": "automated-test",
+        "location": "docs/evidence/verified/runtime-web.md",
+        "status": "verified",
+        "owner": "jimin",
+        "capturedAt": "2026-09-09T07:32:31.790268Z",
+        "digest": "sha256:f83c8018e649694844273c004d40396a6ed02987d124ae7581a92d618939dec3"
+      }
+    ]
+  },
+  "waivers": [],
+  "execution": {
+    "model": "runtime-bindings-v1"
+  }
+}

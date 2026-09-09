@@ -1,0 +1,31 @@
+name: App standard quality
+on:
+  pull_request:
+  push:
+    branches: [main]
+permissions:
+  contents: read
+concurrency:
+  group: app-standard-portfolio-site-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    defaults:
+      run:
+        working-directory: portfolio-site
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          persist-credentials: false
+          path: portfolio-site
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020
+        with:
+          node-version-file: portfolio-site/.nvmrc
+      - run: corepack enable
+      - run: corepack prepare pnpm@11.24.0 --activate
+      - run: pnpm install --frozen-lockfile
+        working-directory: portfolio-site
+      - name: Contract and CI runtime checks (Flutter builds run locally)
+        run: node tools/run-quality.mjs check-ci
