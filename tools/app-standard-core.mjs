@@ -1512,7 +1512,19 @@ concurrency:
 
 jobs:
   quality:
-    runs-on: ubuntu-latest
+    # 기본은 hosted다. 저장소 변수 CI_RUNNER를 self-hosted 러너 라벨로 설정한
+    # 저장소만 그쪽으로 간다 — 변수를 비워 두면 오늘과 동일하게 동작한다.
+    #
+    # 켜기 전에 그 러너의 여유 메모리와 이 게이트의 빌드 피크를 재고 비교한다.
+    # 2026-09-10 실측: Next 빌드 피크 2358MB. 운영 컨테이너가 상주하는 VPS는
+    # available이 2100~2600MB라 헤드룸이 없거나 음수였다. OOM이 나면 커널이
+    # badness score로 대상을 고르므로 빌드가 아니라 운영 컨테이너가 죽을 수 있다.
+    # CI 비용을 아끼려고 운영 가용성을 거는 교환은 성립하지 않는다.
+    #
+    # 이 게이트는 서비스 컨테이너를 쓰므로 Docker가 있는 Linux 러너여야 한다.
+    # public 저장소에는 절대 설정하지 않는다 — 포크 PR이 그 머신에서 코드를
+    # 실행한다. public은 hosted가 무료라 설정할 이유도 없다.
+    runs-on: \${{ vars.CI_RUNNER || 'ubuntu-latest' }}
     timeout-minutes: 30
     defaults:
       run:
