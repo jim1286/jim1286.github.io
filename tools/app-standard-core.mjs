@@ -52,7 +52,7 @@ const execFileAsync = promisify(execFile);
 
 const contractVersion = 1;
 const standardVersion = '1.0.0';
-const canonicalProfileSha256 = '3441dd6202c5fe2d214669d18d34c4854ec129f3879beea5c02a555e28fb3836';
+const canonicalProfileSha256 = '2674f79f64a80909a953fb04eb2a397b22b16f8c92b8820e46c56a45af9b765e';
 const approvedCentralVerifierCommit = '0000000000000000000000000000000000000000';
 const idPattern = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 const semverIdentifier = '(?:(?:0|[1-9]\\d*)|(?:\\d*[A-Za-z-][0-9A-Za-z-]*))';
@@ -1118,6 +1118,56 @@ function validateWaivers(waivers, findings, now = new Date()) {
 }
 
 /** Validate app-contract v1 with precise, dependency-free findings. */
+// 배포는 계약이 선언한 경로·게이트·준비 판정을 저장소 파일에서 다시 읽어 대조한다.
+// 선언만으로 통과시키지 않는 이유: 이 블록의 값은 모두 다른 파일에도 존재하고,
+// 둘이 어긋나면 배포가 조용히 잘못된 commit·주소를 향한다(docs/deployment/VPS_PROVISIONING.md VP-06).
+function validateDeployment(deployment, findings) {
+  if (deployment === undefined) return;
+  if (!assertObject(deployment, 'contract.deployment', findings)) return;
+  assertKeys(deployment, new Set(['model', 'target', 'release', 'readiness', 'runnerHost']), 'contract.deployment', findings);
+  if (deployment.model !== 'single-vps-v1') {
+    addFinding(findings, 'DEPLOYMENT_MODEL_UNSUPPORTED', 'contract.deployment.model', 'deployment.model must equal "single-vps-v1".');
+  }
+  const target = isPlainObject(deployment.target) ? deployment.target : undefined;
+  const release = isPlainObject(deployment.release) ? deployment.release : undefined;
+  // 운영 호스트에서 이미지를 빌드하면 OOM killer가 빌드가 아니라 방금 배포한 운영
+  // 컨테이너를 고를 수 있다(VP-07). 그래도 하겠다면 ADR과 실측 여유가 있어야 한다.
+  const onTargetHost = Boolean(target && release && hasText(target.hostId) && release.imageBuildHostId === target.hostId);
+  const buildEvidenceKeys = ['imageBuildDecisionAdrPath', 'imageBuildPeakMb', 'imageBuildAvailableMb'];
+  if (onTargetHost) {
+    for (const key of buildEvidenceKeys) {
+      if (release[key] === undefined) {
+        addFinding(findings, 'DEPLOYMENT_BUILD_ON_TARGET_HOST', `contract.deployment.release.${key}`, `Building the image on the deployment target host requires ${key}: the decision record and the measured build peak against the host's available memory.`);
+      }
+    }
+    // burntok 실측이 이 비율의 근거다. Next.js 빌드 2358MB 대 여유 2615MB(1.11배)에서는
+    // 스왑이 있어도 badness score가 운영 컨테이너를 고를 수 있어 hosted로 되돌렸다.
+    // diairy 서버 빌드는 816MB 대 2249MB(2.75배)라 같은 호스트에서 안전하다.
+    const peak = release.imageBuildPeakMb;
+    const available = release.imageBuildAvailableMb;
+    if (Number.isInteger(peak) && Number.isInteger(available)) {
+      if (peak < 1 || available < 1) {
+        addFinding(findings, 'DEPLOYMENT_BUILD_MEASUREMENT_INVALID', 'contract.deployment.release.imageBuildPeakMb', 'The build peak and available memory must be positive measured megabytes.');
+      } else if (available < peak * 1.5) {
+        addFinding(findings, 'DEPLOYMENT_BUILD_HEADROOM_INSUFFICIENT', 'contract.deployment.release.imageBuildAvailableMb', `Building on the deployment target needs at least 1.5x headroom; ${available}MB available against a ${peak}MB peak is ${(available / peak).toFixed(2)}x.`);
+      }
+    }
+  } else if (release) {
+    for (const key of buildEvidenceKeys) {
+      if (release[key] !== undefined) {
+        addFinding(findings, 'DEPLOYMENT_BUILD_EVIDENCE_UNUSED', `contract.deployment.release.${key}`, `${key} only applies when the image builds on the deployment target host.`);
+      }
+    }
+  }
+  const ports = Array.isArray(deployment.runnerHost?.servicePorts) ? deployment.runnerHost.servicePorts : [];
+  for (const [index, port] of ports.entries()) {
+    // 1024 미만은 러너가 root가 아니면 바인딩되지 않고, 러너 포트는 컨테이너가 잡는 공개 포트다.
+    if (!Number.isInteger(port) || port < 1024 || port > 65535) {
+      addFinding(findings, 'DEPLOYMENT_SERVICE_PORT_INVALID', `contract.deployment.runnerHost.servicePorts[${index}]`, 'CI service ports must be integers in 1024-65535.');
+    }
+  }
+}
+
 export function validateAppContract(contract, { now = new Date(), targetStage } = {}) {
   const implementationGate = resolveImplementationGate(contract, targetStage);
   const findings = [...validateWithJsonSchema(contract, canonicalSchema).findings];
@@ -1125,6 +1175,7 @@ export function validateAppContract(contract, { now = new Date(), targetStage } 
   const topLevelKeys = [
     '$schema',
     'execution',
+    'deployment',
     'contractVersion',
     'profile',
     'app',
@@ -1220,6 +1271,7 @@ export function validateAppContract(contract, { now = new Date(), targetStage } 
   );
   validateI18n(contract.i18n, findings);
   validateRelease(contract.release, contract.runtimes, findings);
+  validateDeployment(contract.deployment, findings);
   validateWaivers(contract.waivers, findings, now);
   validateAcceptance(contract.acceptance, contract.waivers, findings);
   if (implementationGate) {
@@ -1555,7 +1607,7 @@ jobs:
       NPM_CONFIG_REGISTRY: https://registry.npmjs.org/
       NPM_CONFIG_USERCONFIG: \${{ github.workspace }}/${contract.app.id}/.npmrc
     steps:
-      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
           path: ${contract.app.id}
@@ -3858,6 +3910,111 @@ export async function syncStandardProjections(appRoot, { write = false } = {}) {
   };
 }
 
+// 계약의 deployment 블록을 저장소 파일에서 다시 읽어 대조한다. 여기서 잡는 건
+// 전부 diairy·burntok 배포에서 실제로 겪었거나 겪을 수 있었던 어긋남이다.
+async function checkDeploymentContract(appRoot, contract, findings) {
+  const deployment = contract.deployment;
+  if (!isPlainObject(deployment)) return;
+  const declaredPaths = [
+    deployment.target?.edgeConfigPath,
+    deployment.target?.composePath,
+    deployment.target?.deployScriptPath,
+    deployment.target?.bootstrapScriptPath,
+    deployment.release?.workflow,
+    deployment.release?.gateWorkflow,
+  ].filter(hasText);
+  const sources = new Map();
+  for (const relativePath of new Set(declaredPaths)) {
+    const source = await checkRequiredFile(appRoot, relativePath, findings);
+    if (source !== null) sources.set(relativePath, source);
+  }
+  const deployWorkflow = sources.get(deployment.release?.workflow);
+  const gateWorkflow = sources.get(deployment.release?.gateWorkflow);
+  const workflowPath = deployment.release?.workflow;
+  if (gateWorkflow && deployWorkflow) {
+    // GitHub은 workflow_run을 **워크플로 이름 문자열**로 연결한다. 파일 경로가 아니다.
+    // 게이트의 name:을 바꾸면 배포가 실패하지 않고 조용히 트리거되지 않는다.
+    const gateName = gateWorkflow.match(/^name:[ \t]*(\S.*?)[ \t]*$/m)?.[1];
+    const subscription = deployWorkflow.match(/workflows:[ \t]*\[([^\]]*)\]/)?.[1] ?? '';
+    const subscribed = [...subscription.matchAll(/'([^']*)'|"([^"]*)"/g)].map((match) => match[1] ?? match[2]);
+    if (!hasText(gateName)) {
+      addFinding(findings, 'DEPLOYMENT_GATE_NAME_UNREADABLE', deployment.release.gateWorkflow, 'The declared gate workflow must start a top-level name: line that workflow_run can subscribe to.');
+    } else if (!subscribed.includes(gateName)) {
+      addFinding(findings, 'DEPLOYMENT_GATE_SUBSCRIPTION_MISMATCH', workflowPath, `The deployment workflow must subscribe to workflow_run workflows: ['${gateName}'], the current name: of ${deployment.release.gateWorkflow}.`);
+    }
+  }
+  if (!deployWorkflow) return;
+  // workflow_run의 GITHUB_SHA는 기본 브랜치 tip이다. 검사받은 commit은 head_sha뿐이다.
+  if (!deployWorkflow.includes('github.event.workflow_run.head_sha')) {
+    addFinding(findings, 'DEPLOYMENT_SHA_PROVENANCE_MISSING', workflowPath, 'The deployment workflow must resolve the release from github.event.workflow_run.head_sha; GITHUB_SHA is the default-branch tip, not the checked commit.');
+  }
+  if (!/workflow_run\.conclusion[ \t]*==[ \t]*'success'/.test(deployWorkflow)) {
+    addFinding(findings, 'DEPLOYMENT_GATE_CONCLUSION_UNCHECKED', workflowPath, "The deployment workflow must require github.event.workflow_run.conclusion == 'success'; completed also fires on failure and cancellation.");
+  }
+  // 이미지 신원과 전송 무결성. 이게 없으면 어떤 바이트가 운영에 올라갔는지 사후에 모른다.
+  if (!/image inspect/.test(deployWorkflow) || !deployWorkflow.includes('{{.Id}}')) {
+    addFinding(findings, 'DEPLOYMENT_IMAGE_ID_UNRECORDED', workflowPath, 'The deployment workflow must record the built image ID (docker image inspect --format \'{{.Id}}\').');
+  }
+  if (!/sha256sum/.test(deployWorkflow)) {
+    addFinding(findings, 'DEPLOYMENT_ARCHIVE_DIGEST_MISSING', workflowPath, 'The deployment workflow must record a sha256 digest of the transferred image archive.');
+  }
+  if (!deployWorkflow.includes('StrictHostKeyChecking=yes') || !deployWorkflow.includes('UserKnownHostsFile')) {
+    addFinding(findings, 'DEPLOYMENT_HOST_KEY_UNPINNED', workflowPath, 'The deployment workflow must pin the server host key (StrictHostKeyChecking=yes with an explicit UserKnownHostsFile).');
+  }
+  // servicePorts는 선언이 아니라 게이트 워크플로의 실제 service container 매핑에서 다시 읽는다.
+  // 선언만 믿으면 러너 호스트를 공유하는 앱들의 충돌 검사가 거짓 값으로 통과한다.
+  if (gateWorkflow && isPlainObject(deployment.runnerHost)) {
+    // GitHub Actions service containers publish host ports in either the flow form
+    // (ports: ['5432:5432']) or a block sequence (ports:\n  - 5433:5432). Read both.
+    const boundPorts = [...gateWorkflow.matchAll(/^[ \t]*ports:[ \t]*(?:\[([^\]\r\n]*)\][ \t]*)?$((?:\r?\n[ \t]*-[ \t]*[^\r\n]+)*)/gm)]
+      .flatMap((match) => [...`${match[1] ?? ''}\n${match[2] ?? ''}`.matchAll(/(\d{1,5}):\d{1,5}/g)])
+      .map((match) => Number(match[1]));
+    const declared = Array.isArray(deployment.runnerHost.servicePorts) ? deployment.runnerHost.servicePorts : [];
+    const sorted = (ports) => [...new Set(ports)].sort((left, right) => left - right);
+    if (JSON.stringify(sorted(declared)) !== JSON.stringify(sorted(boundPorts))) {
+      addFinding(findings, 'DEPLOYMENT_SERVICE_PORTS_DRIFT', 'contract.deployment.runnerHost.servicePorts', `runnerHost.servicePorts must list the host ports ${deployment.release.gateWorkflow} really publishes: ${JSON.stringify(sorted(boundPorts))}.`);
+    }
+  }
+  // imageBuildHostId도 선언이 아니라 배포 워크플로의 runs-on에서 파생한다. 이 값을 믿고
+  // 넘기면 "운영 호스트에서 빌드하지 않는다"는 규격이 문서상으로만 지켜진다.
+  if (hasText(deployment.release?.imageBuildDecisionAdrPath)) {
+    const adrPath = deployment.release.imageBuildDecisionAdrPath;
+    const adr = await checkRequiredFile(appRoot, adrPath, findings);
+    // 계약의 숫자와 결정 기록이 갈라지면 어느 쪽이 실측인지 알 수 없다.
+    for (const [key, value] of [['imageBuildPeakMb', deployment.release.imageBuildPeakMb], ['imageBuildAvailableMb', deployment.release.imageBuildAvailableMb]]) {
+      if (adr !== null && Number.isInteger(value) && !new RegExp(`(?<![0-9])${value}(?![0-9])`).test(adr)) {
+        addFinding(findings, 'DEPLOYMENT_BUILD_ADR_MEASUREMENT_MISSING', adrPath, `${adrPath} must state the measured ${key} value ${value} that app.contract.json declares.`);
+      }
+    }
+  }
+  const runsOn = deployWorkflow.match(/^[ \t]*runs-on:[ \t]*(.+?)[ \t]*$/m)?.[1];
+  if (hasText(runsOn) && isPlainObject(deployment.release)) {
+    let buildHost;
+    if (runsOn.includes('${{')) buildHost = null;
+    else if (/(?:^|[[,\s])self-hosted(?:$|[\],\s])/.test(runsOn)) {
+      // self-hosted 러너는 라벨 목록이고 마지막 라벨이 그 머신을 고른다.
+      const labels = runsOn.replace(/^\[|\]$/g, '').split(',').map((label) => label.trim().replace(/^['"]|['"]$/g, ''));
+      buildHost = labels.filter((label) => !['self-hosted', 'Linux', 'macOS', 'Windows', 'X64', 'ARM64', 'ARM'].includes(label)).at(-1) ?? null;
+    } else buildHost = 'github-hosted';
+    if (buildHost === null) {
+      addFinding(findings, 'DEPLOYMENT_BUILD_HOST_UNRESOLVED', workflowPath, 'The deployment workflow runs-on must be a literal runner or label list so the image build host is auditable from the repository.');
+    } else if (deployment.release.imageBuildHostId !== buildHost) {
+      addFinding(findings, 'DEPLOYMENT_BUILD_HOST_DRIFT', 'contract.deployment.release.imageBuildHostId', `imageBuildHostId must equal the host ${workflowPath} really builds on: "${buildHost}".`);
+    }
+  }
+  const readiness = isPlainObject(deployment.readiness) ? deployment.readiness : undefined;
+  if (!readiness) return;
+  if (hasText(readiness.url) && !deployWorkflow.includes(readiness.url)) {
+    addFinding(findings, 'DEPLOYMENT_READINESS_URL_UNVERIFIED', 'contract.deployment.readiness.url', `The deployment workflow must request the declared readiness URL ${readiness.url} after deploying.`);
+  }
+  // 의존 서비스가 죽어도 200이 나올 수 있다. 본문 단정까지 있어야 실제 readiness다.
+  for (const [index, assertion] of (Array.isArray(readiness.bodyAssertions) ? readiness.bodyAssertions : []).entries()) {
+    if (typeof assertion === 'string' && !deployWorkflow.includes(assertion)) {
+      addFinding(findings, 'DEPLOYMENT_READINESS_ASSERTION_MISSING', `contract.deployment.readiness.bodyAssertions[${index}]`, `The deployment workflow must assert ${JSON.stringify(assertion)} on the readiness body; a 200 status alone can hide a dead dependency.`);
+    }
+  }
+}
+
 export async function checkAppConformance(appRoot, { now = new Date(), targetStage } = {}) {
   const absoluteRoot = resolve(appRoot);
   const findings = [];
@@ -4155,6 +4312,7 @@ export async function checkAppConformance(appRoot, { now = new Date(), targetSta
       }
     }
   }
+  await checkDeploymentContract(absoluteRoot, contract, findings);
   const resolvedTargetStage = implementationGate ? 'implementation-conformant' : 'governance-scaffold';
   const sourceChecker = bound(contract) ? 'tools/check-hjm-source.mjs' : 'tools/check-design-contract.mjs';
   if (implementationGate
@@ -4398,8 +4556,8 @@ export async function checkStandardAssets({ workspaceRoot = defaultWorkspaceRoot
   }
   const expectedActionsPolicy = {
     checkout: {
-      version: '6.0.2',
-      sha: 'de0fac2e4500dabe0009e67214ff5f5447ce83dd',
+      version: '7.0.1',
+      sha: '3d3c42e5aac5ba805825da76410c181273ba90b1',
       persistCredentials: false,
     },
     setupNode: {
@@ -4584,7 +4742,7 @@ export async function checkStandardAssets({ workspaceRoot = defaultWorkspaceRoot
       ['.github/workflows/portfolio-meta.yml', metaWorkflow],
       ['.github/workflows/app-standard-required.yml', centralWorkflow],
     ]) {
-      if (!source.includes('actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2')
+      if (!source.includes('actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1')
         || !source.includes('persist-credentials: false')
         || !source.includes('actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0')) {
         addFinding(findings, 'STANDARD_ACTION_PIN_INVALID', path, 'Root workflows must pin checkout/setup-node by reviewed full SHA and disable checkout credential persistence.');

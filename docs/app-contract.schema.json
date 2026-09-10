@@ -93,6 +93,9 @@
           "const": "runtime-bindings-v1"
         }
       }
+    },
+    "deployment": {
+      "$ref": "#/$defs/deployment"
     }
   },
   "allOf": [
@@ -2242,6 +2245,137 @@
           }
         }
       }
+    },
+    "deployment": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "model",
+        "target",
+        "release",
+        "readiness"
+      ],
+      "properties": {
+        "model": {
+          "const": "single-vps-v1"
+        },
+        "target": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "hostId",
+            "edgeConfigPath",
+            "composePath",
+            "deployScriptPath"
+          ],
+          "properties": {
+            "hostId": {
+              "type": "string",
+              "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+              "maxLength": 63
+            },
+            "edgeConfigPath": {
+              "$ref": "#/$defs/relativePath"
+            },
+            "composePath": {
+              "$ref": "#/$defs/relativePath"
+            },
+            "deployScriptPath": {
+              "$ref": "#/$defs/relativePath"
+            },
+            "bootstrapScriptPath": {
+              "$ref": "#/$defs/relativePath"
+            }
+          }
+        },
+        "release": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "workflow",
+            "gateWorkflow",
+            "imageBuildHostId"
+          ],
+          "properties": {
+            "workflow": {
+              "$ref": "#/$defs/workflowPath"
+            },
+            "gateWorkflow": {
+              "$ref": "#/$defs/workflowPath"
+            },
+            "imageBuildHostId": {
+              "type": "string",
+              "pattern": "^(?:github-hosted|[a-z0-9]+(?:-[a-z0-9]+)*)$",
+              "maxLength": 63
+            },
+            "imageBuildDecisionAdrPath": {
+              "type": "string",
+              "pattern": "^docs/decisions/ADR-(?!0000)[0-9]{4}-[a-z0-9]+(?:-[a-z0-9]+)*\\.md$"
+            },
+            "imageBuildPeakMb": {
+              "type": "integer"
+            },
+            "imageBuildAvailableMb": {
+              "type": "integer"
+            }
+          }
+        },
+        "readiness": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "url",
+            "bodyAssertions"
+          ],
+          "properties": {
+            "url": {
+              "type": "string",
+              "pattern": "^https://[a-z0-9.-]+(?:/[A-Za-z0-9._~/-]*)?$",
+              "maxLength": 300
+            },
+            "bodyAssertions": {
+              "type": "array",
+              "minItems": 1,
+              "maxItems": 12,
+              "uniqueItems": true,
+              "items": {
+                "type": "string",
+                "minLength": 3,
+                "maxLength": 200,
+                "pattern": "^[^\\r\\n]+$"
+              }
+            }
+          }
+        },
+        "runnerHost": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "id",
+            "servicePorts"
+          ],
+          "properties": {
+            "id": {
+              "type": "string",
+              "pattern": "^(?:github-hosted|[a-z0-9]+(?:-[a-z0-9]+)*)$",
+              "maxLength": 63
+            },
+            "servicePorts": {
+              "type": "array",
+              "maxItems": 16,
+              "uniqueItems": true,
+              "items": {
+                "type": "integer"
+              }
+            }
+          }
+        }
+      }
+    },
+    "workflowPath": {
+      "type": "string",
+      "maxLength": 240,
+      "pattern": "^\\.github/workflows/[A-Za-z0-9][A-Za-z0-9._-]*\\.yml$"
     }
   }
 }
