@@ -10,7 +10,11 @@ concurrency:
   cancel-in-progress: true
 jobs:
   quality:
-    runs-on: ubuntu-latest
+    # 기본은 hosted. 저장소 변수 CI_RUNNER를 설정한 저장소만 self-hosted로 간다.
+    # 비워 두면 오늘과 동일하다. 켜기 전에 러너 여유 메모리와 이 게이트의 빌드
+    # 피크를 비교한다(2026-09-10 실측 Next 피크 2358MB). public 저장소에는
+    # 설정하지 않는다 - 포크 PR이 그 머신에서 코드를 실행한다.
+    runs-on: ${{ vars.CI_RUNNER || 'ubuntu-latest' }}
     timeout-minutes: 30
     defaults:
       run:
