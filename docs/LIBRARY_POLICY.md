@@ -38,3 +38,28 @@ API 요청의 모든 입력, 계정 격리, persistence race, 실기기 동작�
 Flutter 제품의 루트 package.json은 이 검사 도구만 설치하며 실제 앱은 pubspec.yaml 계약을 유지한다.
 
 HJM contracts와 React renderer는 공통 UI 계약 및 foundation 적용을 위해 exact 버전으로 채택한다. 기존 화면의 foundation 이관·시각 evidence는 별도 pending 기준으로 추적하며 설치만으로 디자인 준수를 주장하지 않는다.
+
+## eslint-plugin-react-refresh 0.4 → 0.5 계열 검토 — 2026-09-10
+
+중앙 등록부의 lane을 `registry:0.4`에서 `registry:0.5`로 옮겼다. 0.x 계열의 minor는
+semver 관례상 breaking이므로 상위 계열 진입은 아래 항목을 실제로 확인한 뒤에만 한다.
+
+0.5.0 릴리스 노트가 밝힌 breaking 항목과 이 저장소의 상태:
+
+| 항목 | 이 저장소 |
+| --- | --- |
+| ESM 전용, legacy config 제거(flat config만) | `eslint.config.js`가 이미 flat config다 |
+| ESLint 9 이상 | `eslint@^9.30.1` |
+| Node 20 이상 | 포트폴리오 baseline Node 24.20.0 |
+| `configs`/`plugin` 하위 export 구조 | 설정이 `reactRefresh.configs.vite`를 그대로 쓴다 |
+| `customHOCs` → `extraHOCs` 개명 | 이 저장소는 두 옵션을 모두 쓰지 않는다 |
+| HOC 판정이 엄격해져 추가 HOC 선언이 필요할 수 있음 | 아래 실행 결과로 확인 |
+
+로컬 실행 결과(0.5.6 설치 후 `pnpm run check`): `eslint .` 무경고 통과, `tsc -b`·`vite build`
+통과. 마지막 항목은 이 실행이 근거이며, 새 HOC를 도입할 때 다시 확인해야 한다.
+
+같은 커밋에서 함께 올린 devDependency는 각각 선언된 lane 안이다 — `globals` 17
+(`registry:17`), `typescript-eslint` 8 (`registry:8`). Dependabot PR 3개를 각각
+머지하면 lockfile이 서로 충돌하고 게이트가 3회 도는 대신, 한 커밋으로 합쳐 1회만 돌렸다.
+
+이 기록은 정적 정책 검토와 로컬 lint/build 결과의 범위다. 실기기·브라우저 동작 검증은 아니다.
