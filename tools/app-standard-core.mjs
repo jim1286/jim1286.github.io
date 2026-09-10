@@ -1121,6 +1121,31 @@ function validateWaivers(waivers, findings, now = new Date()) {
 // 배포는 계약이 선언한 경로·게이트·준비 판정을 저장소 파일에서 다시 읽어 대조한다.
 // 선언만으로 통과시키지 않는 이유: 이 블록의 값은 모두 다른 파일에도 존재하고,
 // 둘이 어긋나면 배포가 조용히 잘못된 commit·주소를 향한다(docs/deployment/VPS_PROVISIONING.md VP-06).
+// qualityGate는 파생 포트가 다른 앱과 겹쳤을 때만 쓰는 탈출구다.
+function validateQualityGate(contract, findings) {
+  const qualityGate = contract?.qualityGate;
+  if (qualityGate === undefined) return;
+  if (bound(contract)) {
+    // runtime-bindings 게이트는 service container를 띄우지 않는다.
+    addFinding(findings, 'QUALITY_GATE_PORTS_UNUSED', 'contract.qualityGate', 'A runtime-bindings gate starts no service containers, so qualityGate.servicePorts has no effect.');
+    return;
+  }
+  if (!assertObject(qualityGate, 'contract.qualityGate', findings)) return;
+  assertKeys(qualityGate, new Set(['servicePorts']), 'contract.qualityGate', findings);
+  if (!assertObject(qualityGate.servicePorts, 'contract.qualityGate.servicePorts', findings)) return;
+  assertKeys(qualityGate.servicePorts, new Set(['postgres', 'redis']), 'contract.qualityGate.servicePorts', findings);
+  const { postgres, redis } = qualityGate.servicePorts;
+  for (const [key, port] of [['postgres', postgres], ['redis', redis]]) {
+    // 1024 미만은 러너가 root가 아니면 바인딩되지 않고, 32768 이상은 커널의 ephemeral 범위와 겹친다.
+    if (!Number.isInteger(port) || port < 1024 || port > 32767) {
+      addFinding(findings, 'QUALITY_GATE_PORT_INVALID', `contract.qualityGate.servicePorts.${key}`, 'An explicit gate service port must be an integer in 1024-32767, below the kernel ephemeral range.');
+    }
+  }
+  if (Number.isInteger(postgres) && postgres === redis) {
+    addFinding(findings, 'QUALITY_GATE_PORT_DUPLICATE', 'contract.qualityGate.servicePorts', 'The postgres and redis host ports must differ.');
+  }
+}
+
 function validateDeployment(deployment, findings) {
   if (deployment === undefined) return;
   if (!assertObject(deployment, 'contract.deployment', findings)) return;
@@ -1176,6 +1201,7 @@ export function validateAppContract(contract, { now = new Date(), targetStage } 
     '$schema',
     'execution',
     'deployment',
+    'qualityGate',
     'contractVersion',
     'profile',
     'app',
@@ -1271,6 +1297,7 @@ export function validateAppContract(contract, { now = new Date(), targetStage } 
   );
   validateI18n(contract.i18n, findings);
   validateRelease(contract.release, contract.runtimes, findings);
+  validateQualityGate(contract, findings);
   validateDeployment(contract.deployment, findings);
   validateWaivers(contract.waivers, findings, now);
   validateAcceptance(contract.acceptance, contract.waivers, findings);
@@ -1547,7 +1574,35 @@ function makeRuntimeEslintSnippet(runtime) {
     + "export default hjmRuntimeConfig({ kind: 'server', rootDir: import.meta.dirname });\n";
 }
 
+// 게이트의 service container가 잡는 **호스트** 포트를 앱 ID에서 파생한다.
+// 왜 고정값이 아닌가: 한 self-hosted 호스트에 여러 저장소의 러너를 두면 고정 포트가
+// 충돌한다(2026-09-10 실측: "Bind for 0.0.0.0:5432 failed: port is already allocated").
+// hosted는 job마다 VM이 따로여서 없던 문제다. 표준 소유 게이트가 5432/6379를 박아 두면
+// 그 조합의 앱들은 동시에 돌 수 없고 **앱이 비켜갈 방법이 없다.**
+//
+// Postgres는 항상 짝수, Redis는 그 다음 홀수를 받는다. 그래서 한 앱의 Redis 포트가
+// 다른 앱의 Postgres 포트와 같아지는 일은 구조적으로 일어나지 않는다. 남는 위험은
+// 두 앱 ID가 같은 버킷으로 해시되는 경우뿐이고, 그건 중앙 교차 검사가 잡는다
+// (QUALITY_GATE_SERVICE_PORT_COLLISION). 그때는 앱이 contract.qualityGate로 직접
+// 지정해 비켜간다 — 규격에 막혀 손을 못 쓰는 상태를 남기지 않는다.
+//
+// 범위 20000~29999는 Linux 기본 ephemeral 범위(32768~60999) 아래이므로 커널이
+// 임의로 잡은 포트와 겹치지 않는다. 컨테이너 안의 포트는 5432/6379 그대로여서
+// health-cmd와 이미지 기본값은 바뀌지 않는다.
+const qualityGateServicePortBase = 20000;
+const qualityGateServicePortBuckets = 5000;
+
+export function qualityGateServicePorts(contract) {
+  const declared = contract?.qualityGate?.servicePorts;
+  if (isPlainObject(declared)) return { postgres: declared.postgres, redis: declared.redis };
+  const digest = createHash('sha256').update(`hjm.quality-gate.service-ports/1:${contract?.app?.id ?? ''}`).digest();
+  const bucket = digest.readUInt32BE(0) % qualityGateServicePortBuckets;
+  const postgres = qualityGateServicePortBase + bucket * 2;
+  return { postgres, redis: postgres + 1 };
+}
+
 function makeQualityGateWorkflow(contract) {
+  const ports = qualityGateServicePorts(contract);
   return `name: App feedback quality gate (not merge authority)
 
 on:
@@ -1588,20 +1643,20 @@ jobs:
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: postgres
           POSTGRES_DB: app_test
-        ports: ['5432:5432']
+        ports: ['${ports.postgres}:5432']
         options: >-
           --health-cmd "pg_isready -U postgres -d app_test"
           --health-interval 5s --health-timeout 5s --health-retries 12
       redis:
         image: redis:7
-        ports: ['6379:6379']
+        ports: ['${ports.redis}:6379']
         options: >-
           --health-cmd "redis-cli ping"
           --health-interval 5s --health-timeout 5s --health-retries 12
     env:
       # Public ephemeral CI fixtures; never production credentials.
-      DATABASE_URL: postgresql://postgres:postgres@127.0.0.1:5432/app_test
-      REDIS_URL: redis://127.0.0.1:6379/10
+      DATABASE_URL: postgresql://postgres:postgres@127.0.0.1:${ports.postgres}/app_test
+      REDIS_URL: redis://127.0.0.1:${ports.redis}/10
       DEVICE_TOKEN_SIGNING_KEY: public-ci-test-signing-key-at-least-32
       LETTER_ENCRYPTION_KEY: AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=
       NPM_CONFIG_REGISTRY: https://registry.npmjs.org/

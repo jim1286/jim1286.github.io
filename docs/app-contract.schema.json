@@ -96,6 +96,9 @@
     },
     "deployment": {
       "$ref": "#/$defs/deployment"
+    },
+    "qualityGate": {
+      "$ref": "#/$defs/qualityGate"
     }
   },
   "allOf": [
@@ -2376,6 +2379,31 @@
       "type": "string",
       "maxLength": 240,
       "pattern": "^\\.github/workflows/[A-Za-z0-9][A-Za-z0-9._-]*\\.yml$"
+    },
+    "qualityGate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "servicePorts"
+      ],
+      "properties": {
+        "servicePorts": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "postgres",
+            "redis"
+          ],
+          "properties": {
+            "postgres": {
+              "type": "integer"
+            },
+            "redis": {
+              "type": "integer"
+            }
+          }
+        }
+      }
     }
   }
 }
