@@ -6,7 +6,7 @@
   "status": "active",
   "contractPath": "app.contract.json",
   "schemaPath": "docs/app-contract.schema.json",
-  "fieldSemantics": "All fields are normative and hash-pinned by check-standard-assets except human-readable summary and rationale fields, which are informational explanations of the adjacent machine rule.",
+  "fieldSemantics": "All fields are normative and hash-pinned by check-standard-assets except human-readable summary and rationale fields, which are informational explanations of the adjacent machine rule. Every version this profile records is a reviewed floor inside its own major train: a consumer must stay on that major and be at or above the value, declared either exactly or through a ~/^ range that cannot leave the train. Exact equality is required only where an external system keys on the literal string, and integrity/tarball fields always describe the one artifact that was reviewed.",
   "conformanceStages": {
     "governance-scaffold": "draft governance (any product lifecycle except archived); schema, canonical documents, evidence plans, vendored validators, and CI projection are complete, while runtime implementation gates are not yet claimed. The product may be incubating or active in portfolio.json: lifecycle is product state, not a conformance claim",
     "implementation-conformant": "active governance; all governance checks plus runtime manifests, exact production HJM dependencies, frozen lockfile, canonical HJM Provider theme preference/raw-token guard, verified evidence, and a configured external merge authority pass; unavailable while ci.trustModel.bootstrapStatus is unconfigured",
@@ -39,6 +39,7 @@
   "runtimePolicy": {
     "minimumRuntimeCount": 1,
     "uniqueKinds": true,
+    "versionPolicy": "reviewed-floor-in-major-train",
     "allowed": [
       {
         "kind": "mobile",
@@ -122,7 +123,7 @@
       }
     ],
     "reviewPolicy": {
-      "cadence": "monthly-and-immediate-on-critical-security-advisory",
+      "cadence": "quarterly-and-immediate-on-critical-security-advisory",
       "knownVulnerableAction": "block-new-app-generation-until-profile-and-standard-update"
     },
     "existingRuntimeBindings": {
@@ -163,7 +164,7 @@
         "checkedAt": "2026-08-31"
       }
     },
-    "exactVersions": true,
+    "versionPolicy": "reviewed-floor-in-major-train",
     "requiredScripts": [
       "dev",
       "lint",
@@ -524,7 +525,7 @@
     {
       "id": "APP-TOOLCHAIN-001",
       "level": "required",
-      "summary": "pnpm과 Node를 exact version으로 고정하고 canonical scripts를 제공한다.",
+      "summary": "pnpm과 Node를 profile이 기록한 major train 안에서 검토 하한 이상으로 선언하고 canonical scripts를 제공한다.",
       "enforcement": "schema-and-conformance"
     },
     {
@@ -608,7 +609,7 @@
     {
       "id": "APP-STATIC-001",
       "level": "required",
-      "summary": "전 runtime이 profile toolchain.staticAnalysis의 exact ESLint·typescript-eslint·Prettier·eslint-config-prettier와 runtime preset을 쓰고, canonical .editorconfig·prettier.config.mjs·.prettierignore·eslint.config.mjs·tools/eslint.base.mjs를 byte 그대로 두며 runtime eslint.config.mjs는 base를 import한다.",
+      "summary": "전 runtime이 profile toolchain.staticAnalysis의 ESLint·typescript-eslint·Prettier·eslint-config-prettier와 runtime preset을 각 train의 검토 하한 이상으로 쓰고, canonical .editorconfig·prettier.config.mjs·.prettierignore·eslint.config.mjs·tools/eslint.base.mjs를 byte 그대로 두며 runtime eslint.config.mjs는 base를 import한다.",
       "enforcement": "schema-and-conformance"
     }
   ]

@@ -26,6 +26,7 @@ import { promisify } from 'node:util';
 import { checkDocLinks } from './check-doc-links.mjs';
 import { bound, bindingScripts, validateBindings, checkBindings, bindingWorkflow } from './runtime-bindings.mjs';
 import { auditJsonSchema, validateWithJsonSchema } from './json-schema-validator.mjs';
+import { resolvedVersionViolation, trainLabel, trainViolation } from './version-train.mjs';
 
 const scriptDirectory = dirname(fileURLToPath(import.meta.url));
 const defaultWorkspaceRoot = resolve(scriptDirectory, '..');
@@ -52,7 +53,7 @@ const execFileAsync = promisify(execFile);
 
 const contractVersion = 1;
 const standardVersion = '1.0.0';
-const canonicalProfileSha256 = '2674f79f64a80909a953fb04eb2a397b22b16f8c92b8820e46c56a45af9b765e';
+const canonicalProfileSha256 = '8f948d14c8f0baba5b6ff7f9594c3ce1ad8f7de495a6e357b069279003298451';
 const approvedCentralVerifierCommit = '0000000000000000000000000000000000000000';
 const idPattern = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 const semverIdentifier = '(?:(?:0|[1-9]\\d*)|(?:\\d*[A-Za-z-][0-9A-Za-z-]*))';
@@ -201,11 +202,25 @@ const runtimeFrameworks = {
   web: 'nextjs',
   server: 'nestjs',
 };
-const runtimeFrameworkVersions = {
-  mobile: '57.0.18',
-  web: '16.3.3',
-  server: '12.0.1',
+// Reviewed floors, not equality targets: a runtime satisfies the standard by staying
+// on the same major and at or above these versions. See scripts/version-train.mjs.
+// The checker keeps its own copy instead of reading the app's vendored profile, which
+// an app could edit to lower its own floor. Exported so one test can hold this copy,
+// the central profile and portfolio.baseline.json to the same numbers: raising a floor
+// is an edit here plus the profile, and the test fails if either is missed.
+export const reviewedVersionFloors = {
+  runtimeFramework: {
+    mobile: '57.0.18',
+    web: '16.3.3',
+    server: '12.0.1',
+  },
+  node: '24.20.0',
+  packageManager: '11.24.0',
+  serverTooling: { eslint: '9.39.5', vitest: '4.1.11', supertest: '7.2.2' },
 };
+const runtimeFrameworkFloors = reviewedVersionFloors.runtimeFramework;
+const nodeFloor = reviewedVersionFloors.node;
+const packageManagerFloor = reviewedVersionFloors.packageManager;
 const requiredProtectedPaths = [
   '.github/workflows/quality-gate.yml',
   '.github/CODEOWNERS',
@@ -537,12 +552,14 @@ function validateRuntime(runtime, index, findings, seenKinds, seenRoots) {
         `${runtime.kind} runtime must use ${runtimeFrameworks[runtime.kind]} under HJM-APP-STANDARD v1.`,
       );
     }
-    if (runtime.frameworkVersion !== runtimeFrameworkVersions[runtime.kind]) {
+    const frameworkFloor = runtimeFrameworkFloors[runtime.kind];
+    const frameworkViolation = trainViolation(runtime.frameworkVersion, frameworkFloor);
+    if (frameworkViolation) {
       addFinding(
         findings,
         'RUNTIME_FRAMEWORK_VERSION_INVALID',
         `${path}.frameworkVersion`,
-        `${runtime.kind} frameworkVersion must equal the portfolio-default-v1 exact train ${runtimeFrameworkVersions[runtime.kind]}.`,
+        `${runtime.kind} frameworkVersion "${runtime.frameworkVersion}" ${frameworkViolation} (portfolio-default-v1 train ${trainLabel(frameworkFloor)}).`,
       );
     }
     if (runtime.kind === 'server' && runtime.moduleFormat !== 'esm') {
@@ -589,12 +606,16 @@ function validateToolchain(toolchain, runtimes, appId, findings) {
     if (toolchain.packageManager.name !== 'pnpm') {
       addFinding(findings, 'PACKAGE_MANAGER_INVALID', 'contract.toolchain.packageManager.name', 'New products must use pnpm.');
     }
-    if (toolchain.packageManager.version !== '11.24.0') {
-      addFinding(findings, 'PACKAGE_MANAGER_VERSION_INVALID', 'contract.toolchain.packageManager.version', 'portfolio-default-v1 requires pnpm exact version 11.24.0.');
+    // corepack resolves one concrete version, so the contract records a version
+    // rather than a range; the train decides which versions are acceptable.
+    const pnpmViolation = resolvedVersionViolation(toolchain.packageManager.version, packageManagerFloor);
+    if (pnpmViolation) {
+      addFinding(findings, 'PACKAGE_MANAGER_VERSION_INVALID', 'contract.toolchain.packageManager.version', `pnpm "${toolchain.packageManager.version}" ${pnpmViolation}.`);
     }
   }
-  if (toolchain.node !== '24.20.0') {
-    addFinding(findings, 'NODE_VERSION_INVALID', 'contract.toolchain.node', 'portfolio-default-v1 requires Node exact version 24.20.0.');
+  const nodeViolation = resolvedVersionViolation(toolchain.node, nodeFloor);
+  if (nodeViolation) {
+    addFinding(findings, 'NODE_VERSION_INVALID', 'contract.toolchain.node', `Node "${toolchain.node}" ${nodeViolation}.`);
   }
   if (assertObject(toolchain.scripts, 'contract.toolchain.scripts', findings)) {
     const expectedScripts = expectedToolchainScripts(appId, runtimes);
@@ -1706,17 +1727,17 @@ function makeCodeowners(contract) {
 
 function makeRuntimeReadme(contract, runtime) {
   const serverPolicy = runtime.kind === 'server'
-    ? `\nNestJS v1 is fixed to ESM (moduleFormat esm, package type module, TypeScript NodeNext) with the ESLint/Vitest/Supertest versions pinned in docs/app-profile.json serverConformance. The Nest CLI oxlint/Jest alternative is not conformant.\n`
+    ? `\nNestJS v1 is fixed to ESM (moduleFormat esm, package type module, TypeScript NodeNext) with the ESLint/Vitest/Supertest floors recorded in docs/app-profile.json serverConformance. The Nest CLI oxlint/Jest alternative is not conformant.\n`
     : '';
   const preset = staticAnalysisPolicy.presets[runtime.kind];
   const sharedList = staticAnalysisPolicy.shared.map((entry) => entry.package + '@' + entry.version).join(', ');
   return `# ${contract.app.displayName} ${runtime.kind} runtime\n\n`
     + `Framework: ${runtime.framework} ${runtime.frameworkVersion}\n\n`
-    + `Initialize this directory only with the exact initializer recorded by docs/app-profile.json, then verify the framework production dependency and frozen lockfile before running the repository conformance check.\n`
+    + `Initialize this directory only with the exact initializer recorded by docs/app-profile.json, then verify the framework production dependency and frozen lockfile before running the repository conformance check. The recorded framework version is the reviewed floor of its major train: stay on that major, at or above it.\n`
     + serverPolicy
     + `\n## Lint and format contract\n\n`
-    + `Replace the initializer's lint setup with the portfolio contract. Shared devDependencies live at the workspace root (${sharedList})`
-    + (preset ? `; this runtime adds ${preset.package}@${preset.version} as an exact devDependency.` : '.')
+    + `Replace the initializer's lint setup with the portfolio contract. Shared devDependencies live at the workspace root, at or above the reviewed floors (${sharedList})`
+    + (preset ? `; this runtime adds ${preset.package} at or above ${preset.version} inside the same major.` : '.')
     + ` The \`lint\` script must be \`eslint .\`. Create \`eslint.config.mjs\` here with exactly:\n\n\`\`\`js\n${makeRuntimeEslintSnippet(runtime)}\`\`\`\n\n`
     + `Formatting is owned by the root \`prettier.config.mjs\` (\`pnpm format\` / \`pnpm format:check\`); do not add a runtime-level Prettier or Biome configuration.\n`;
 }
@@ -1816,6 +1837,7 @@ import { access, readFile, readdir } from 'node:fs/promises';
 import { createHash } from 'node:crypto';
 import { dirname, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { resolvedVersionViolation, trainLabel, trainViolation } from './version-train.mjs';
 
 const appRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const findings = [];
@@ -1824,7 +1846,11 @@ const add = (path, message) => findings.push({ path, message });
 const ignoredDirectories = new Set(['.git', '.next', '.expo', 'build', 'coverage', 'dist', 'dist-standard', 'storybook-static', 'node_modules']);
 const runtimeBindings = ${runtimeBindings};
 const frameworkPackages = { mobile: 'expo', web: 'next', server: '@nestjs/core' };
-const serverTooling = { eslint: '9.39.5', vitest: '4.1.11', supertest: '7.2.2' };
+// Reviewed floors inside their own major trains, like every other version the
+// standard records; the lockfile still resolves one version per install. Baked in at
+// generation time from the central constant so the projection cannot drift from it.
+const runtimeFrameworkFloors = ${JSON.stringify(reviewedVersionFloors.runtimeFramework)};
+const serverTooling = ${JSON.stringify(reviewedVersionFloors.serverTooling)};
 
 async function collectPackageFiles(directory) {
   for (const entry of await readdir(directory, { withFileTypes: true })) {
@@ -2341,20 +2367,43 @@ function parsePnpmLock(source) {
   return { importers, packages, snapshots, duplicateRecords: new Set() };
 }
 
-function verifyLockedDependency(lock, importerRoot, name, version) {
+// A pnpm importer version is one resolved version plus zero or more balanced peer
+// suffixes, e.g. "57.0.21(react@19.2.0)". Split it instead of pattern-building from
+// the expected string so the same parse serves exact and train requirements.
+const LOCK_VERSION = /^([^()\\s]+)((?:\\([^()\\r\\n]+\\))*)$/;
+
+/**
+ * Verify one dependency in the frozen lockfile.
+ * mode 'exact' requires the literal version (design-system releases, where the
+ * release record is the authority). mode 'train' requires the specifier and the
+ * resolved version to sit in the recorded floor's major train.
+ */
+function verifyLockedDependency(lock, importerRoot, name, requirement, { mode = 'exact' } = {}) {
   const importer = lock.importers.get(importerRoot);
   if (!importer) {
     add('pnpm-lock.yaml#importers.' + importerRoot, 'runtime importer is missing from the frozen lockfile');
     return;
   }
   const dependency = importer.dependencies.get(name);
-  const resolvedVersion = dependency?.version;
-  const normalizedVersion = typeof resolvedVersion === 'string'
-    && new RegExp('^' + version.replaceAll('.', '\\\\.') + '(?:\\\\([^\\\\r\\\\n()]+\\\\))*$').test(dependency.version);
-  if (dependency?.specifier !== version || !normalizedVersion) {
-    add('pnpm-lock.yaml#importers.' + importerRoot + '.dependencies.' + name, 'specifier must equal exact ' + version + ' and the resolved version may only add balanced pnpm peer suffixes');
+  const parsedVersion = typeof dependency?.version === 'string' ? LOCK_VERSION.exec(dependency.version) : null;
+  const version = parsedVersion?.[1] ?? null;
+  const specifierViolation = mode === 'train'
+    ? trainViolation(dependency?.specifier, requirement)
+    : (dependency?.specifier === requirement ? null : 'must equal exact ' + requirement);
+  const resolvedViolation = version === null
+    ? 'must be one resolved version with balanced pnpm peer suffixes only'
+    : (mode === 'train'
+      ? resolvedVersionViolation(version, requirement)
+      : (version === requirement ? null : 'must equal exact ' + requirement));
+  if (specifierViolation || resolvedViolation) {
+    const expectation = mode === 'train' ? 'the ' + trainLabel(requirement) + ' train' : 'exact ' + requirement;
+    add('pnpm-lock.yaml#importers.' + importerRoot + '.dependencies.' + name,
+      'specifier and resolved version must both satisfy ' + expectation
+      + (specifierViolation ? '; specifier "' + dependency?.specifier + '" ' + specifierViolation : '')
+      + (resolvedViolation ? '; resolved "' + dependency?.version + '" ' + resolvedViolation : ''));
   }
-  if (!normalizedVersion) return;
+  if (version === null || resolvedViolation) return;
+  const resolvedVersion = dependency.version;
 
   const baseKey = name + '@' + version;
   const exactKey = name + '@' + resolvedVersion;
@@ -2418,9 +2467,10 @@ async function verifyServerRuntime(runtime, manifest) {
   if (runtime.kind !== 'server') return;
   if (runtime.moduleFormat !== 'esm') add('contract.runtimes.server.moduleFormat', 'NestJS runtime must declare moduleFormat esm');
   if (manifest.type !== 'module') add(runtime.root + '/package.json.type', 'NestJS v1 runtime must set package type to module');
-  for (const [name, version] of Object.entries(serverTooling)) {
-    if (manifest.devDependencies?.[name] !== version) {
-      add(runtime.root + '/package.json.devDependencies.' + name, 'NestJS v1 runtime requires exact ' + name + '@' + version);
+  for (const [name, floor] of Object.entries(serverTooling)) {
+    const violation = trainViolation(manifest.devDependencies?.[name], floor);
+    if (violation) {
+      add(runtime.root + '/package.json.devDependencies.' + name, 'NestJS v1 runtime devDependency ' + name + ' "' + manifest.devDependencies?.[name] + '" ' + violation);
     }
   }
   if (!/^eslint(?:\\s|$)/.test(String(manifest.scripts?.lint || '').trim())) {
@@ -2885,8 +2935,11 @@ if (contract && runtimeBindings) {
           continue;
         }
         const frameworkPackage = frameworkPackages[runtime.kind];
-        if (!frameworkPackage || manifest.dependencies?.[frameworkPackage] !== runtime.frameworkVersion) {
-          add(runtime.root + '/package.json.dependencies.' + frameworkPackage, 'implementation-conformant runtime must directly install its framework at contract exact version ' + runtime.frameworkVersion);
+        const frameworkViolation = frameworkPackage
+          ? trainViolation(manifest.dependencies?.[frameworkPackage], runtimeFrameworkFloors[runtime.kind])
+          : 'has no framework package for this runtime kind';
+        if (frameworkViolation) {
+          add(runtime.root + '/package.json.dependencies.' + frameworkPackage, 'implementation-conformant runtime must directly install its framework inside the ' + trainLabel(runtimeFrameworkFloors[runtime.kind]) + ' train; "' + manifest.dependencies?.[frameworkPackage] + '" ' + frameworkViolation);
         }
         await verifyServerRuntime(runtime, manifest);
         for (const scriptName of ['dev', 'lint', 'typecheck', 'test', 'test:e2e', 'build']) {
@@ -2896,9 +2949,9 @@ if (contract && runtimeBindings) {
       try {
         const lock = parsePnpmLock(await readFile(resolve(appRoot, 'pnpm-lock.yaml'), 'utf8'));
         for (const runtime of contract.runtimes || []) {
-          verifyLockedDependency(lock, runtime.root, frameworkPackages[runtime.kind], runtime.frameworkVersion);
+          verifyLockedDependency(lock, runtime.root, frameworkPackages[runtime.kind], runtimeFrameworkFloors[runtime.kind], { mode: 'train' });
           if (runtime.kind === 'server') {
-            for (const [name, version] of Object.entries(serverTooling)) verifyLockedDependency(lock, runtime.root, name, version);
+            for (const [name, floor] of Object.entries(serverTooling)) verifyLockedDependency(lock, runtime.root, name, floor, { mode: 'train' });
           }
         }
       } catch (error) {
@@ -2961,9 +3014,9 @@ if (contract && runtimeBindings) {
     const lock = parsePnpmLock(lockSource);
     for (const runtime of contract.runtimes || []) {
       const frameworkPackage = frameworkPackages[runtime.kind];
-      if (activeGate && frameworkPackage) verifyLockedDependency(lock, runtime.root, frameworkPackage, runtime.frameworkVersion);
+      if (activeGate && frameworkPackage) verifyLockedDependency(lock, runtime.root, frameworkPackage, runtimeFrameworkFloors[runtime.kind], { mode: 'train' });
       if (activeGate && runtime.kind === 'server') {
-        for (const [name, version] of Object.entries(serverTooling)) verifyLockedDependency(lock, runtime.root, name, version);
+        for (const [name, floor] of Object.entries(serverTooling)) verifyLockedDependency(lock, runtime.root, name, floor, { mode: 'train' });
       }
     }
     for (const runtime of frontendRuntimes) {
@@ -3019,8 +3072,11 @@ if (contract && runtimeBindings) {
         continue;
       }
       const frameworkPackage = frameworkPackages[runtime.kind];
-      if (!frameworkPackage || manifest.dependencies?.[frameworkPackage] !== runtime.frameworkVersion) {
-        add(runtime.root + '/package.json.dependencies.' + frameworkPackage, 'implementation-conformant runtime must directly install its framework at contract exact version ' + runtime.frameworkVersion);
+      const frameworkViolation = frameworkPackage
+        ? trainViolation(manifest.dependencies?.[frameworkPackage], runtimeFrameworkFloors[runtime.kind])
+        : 'has no framework package for this runtime kind';
+      if (frameworkViolation) {
+        add(runtime.root + '/package.json.dependencies.' + frameworkPackage, 'implementation-conformant runtime must directly install its framework inside the ' + trainLabel(runtimeFrameworkFloors[runtime.kind]) + ' train; "' + manifest.dependencies?.[frameworkPackage] + '" ' + frameworkViolation);
       }
       await verifyServerRuntime(runtime, manifest);
       for (const scriptName of ['dev', 'lint', 'typecheck', 'test', 'test:e2e', 'build']) {
@@ -3112,6 +3168,7 @@ async function buildScaffoldFiles(contract) {
     [contract.documents.release, bindDocumentEvidence(projectDocumentTables(substituteTemplate(release, values), contract, 'release'), contract, 'release')],
     [`${contract.documents.decisionsDir}/ADR-0000-template.md`, renderedAdr],
     ['tools/runtime-bindings.mjs', readFileSync(resolve(scriptDirectory, 'runtime-bindings.mjs'), 'utf8')],
+    ['tools/version-train.mjs', readFileSync(resolve(scriptDirectory, 'version-train.mjs'), 'utf8')],
     ['tools/app-standard-core.mjs', appStandardCore],
     ['tools/check-app-contract.mjs', makeLocalContractChecker()],
     ['tools/check-doc-links.mjs', docLinksCore],
@@ -3594,8 +3651,9 @@ async function checkStaticAnalysisContract(appRoot, contract, implementationGate
   const rootManifest = await readManifest('package.json');
   for (const entry of staticAnalysisPolicy.shared) {
     const declared = rootManifest?.devDependencies?.[entry.package];
-    if (declared !== entry.version) {
-      addFinding(findings, 'STATIC_ANALYSIS_DEPENDENCY_MISMATCH', `package.json.devDependencies.${entry.package}`, `Workspace root must declare ${entry.package}@${entry.version} as an exact devDependency (profile toolchain.staticAnalysis).`);
+    const violation = trainViolation(declared, entry.version);
+    if (violation) {
+      addFinding(findings, 'STATIC_ANALYSIS_DEPENDENCY_MISMATCH', `package.json.devDependencies.${entry.package}`, `Workspace root devDependency ${entry.package} "${declared}" ${violation} (profile toolchain.staticAnalysis records ${entry.version} as the reviewed floor).`);
     }
   }
   for (const runtime of Array.isArray(contract.runtimes) ? contract.runtimes : []) {
@@ -3616,8 +3674,9 @@ async function checkStaticAnalysisContract(appRoot, contract, implementationGate
       if (configSource !== null && !configSource.includes(`'${preset.package}/`)) {
         addFinding(findings, 'STATIC_ANALYSIS_PRESET_UNUSED', configPath, `${configPath} must load the ${preset.package} preset (${preset.entry}).`);
       }
-      if (runtimeManifest && runtimeManifest.devDependencies?.[preset.package] !== preset.version) {
-        addFinding(findings, 'STATIC_ANALYSIS_PRESET_MISMATCH', `${runtime.root}/package.json.devDependencies.${preset.package}`, `${runtime.kind} runtime must declare ${preset.package}@${preset.version} exactly.`);
+      const presetViolation = runtimeManifest ? trainViolation(runtimeManifest.devDependencies?.[preset.package], preset.version) : null;
+      if (presetViolation) {
+        addFinding(findings, 'STATIC_ANALYSIS_PRESET_MISMATCH', `${runtime.root}/package.json.devDependencies.${preset.package}`, `${runtime.kind} runtime preset ${preset.package} "${runtimeManifest.devDependencies?.[preset.package]}" ${presetViolation} (reviewed floor ${preset.version}).`);
       }
     }
     if (runtimeManifest && !/^eslint(?:\s|$)/.test(String(runtimeManifest.scripts?.lint || '').trim())) {
@@ -3852,6 +3911,7 @@ function bindingProjectionSources(contract) {
     [canonicalCatalogRelativePath, canonicalCatalogSource],
     [canonicalReleaseRelativePath, canonicalReleaseSource],
     ['tools/runtime-bindings.mjs', readFileSync(resolve(scriptDirectory, 'runtime-bindings.mjs'), 'utf8')],
+    ['tools/version-train.mjs', readFileSync(resolve(scriptDirectory, 'version-train.mjs'), 'utf8')],
     ['tools/run-quality.mjs', `#!/usr/bin/env node\nimport { runBoundQuality } from './runtime-bindings.mjs';\nimport { resolve } from 'node:path';\ntry { await runBoundQuality(resolve(import.meta.dirname, '..'), process.argv[2] ?? 'check'); }\ncatch (error) { console.error(error.message); process.exitCode = 1; }\n`],
     ['tools/app-standard-core.mjs', core],
     ['tools/check-app-contract.mjs', makeLocalContractChecker()],
@@ -3880,6 +3940,7 @@ export function standardProjectionSources(contract) {
     [canonicalCatalogRelativePath, canonicalCatalogSource],
     [canonicalReleaseRelativePath, canonicalReleaseSource],
     ['tools/runtime-bindings.mjs', readFileSync(resolve(scriptDirectory, 'runtime-bindings.mjs'), 'utf8')],
+    ['tools/version-train.mjs', readFileSync(resolve(scriptDirectory, 'version-train.mjs'), 'utf8')],
     ['tools/app-standard-core.mjs', readFileSync(fileURLToPath(import.meta.url), 'utf8')],
     ['tools/check-app-contract.mjs', makeLocalContractChecker()],
     ['tools/check-doc-links.mjs', readFileSync(resolve(scriptDirectory, 'check-doc-links.mjs'), 'utf8')],
@@ -3922,7 +3983,7 @@ export async function syncStandardProjections(appRoot, { write = false } = {}) {
   const findings = [];
   // Only explicitly introduced central projections may be created during migration.
   // Missing older scaffold files still require repair, and symlinks are rejected.
-  const mayCreate = new Set([canonicalReleaseRelativePath, canonicalCatalogRelativePath, 'tools/runtime-bindings.mjs', 'tools/check-hjm-source.mjs']);
+  const mayCreate = new Set([canonicalReleaseRelativePath, canonicalCatalogRelativePath, 'tools/runtime-bindings.mjs', 'tools/version-train.mjs', 'tools/check-hjm-source.mjs']);
   const readProjection = async (path) => await assertSyncPath(absoluteRoot, path, { allowMissing: mayCreate.has(path) })
     ? readRegularTextFile(resolve(absoluteRoot, path), path) : null;
   for (const [path, expected] of standardProjectionSources(contract)) {
@@ -4136,6 +4197,7 @@ export async function checkAppConformance(appRoot, { now = new Date(), targetSta
     `${canonicalDocuments.decisionsDir}/ADR-0000-template.md`,
     'tools/app-standard-core.mjs',
     'tools/runtime-bindings.mjs',
+    'tools/version-train.mjs',
     'tools/check-app-contract.mjs',
     'tools/check-doc-links.mjs',
     'tools/check-design-contract.mjs',
@@ -4421,7 +4483,15 @@ export async function verifyInitializerProvenance({
   const profile = JSON.parse(await readFile(profilePath, 'utf8'));
   const findings = [];
   const checked = [];
-  const staleAfterDays = 31;
+  // The window follows the profile's own declared cadence instead of a constant, so
+  // relaxing or tightening the review is one edit in the profile. Provenance records
+  // which artifact was reviewed; it is not a security floor, and re-checking it
+  // monthly only produced a portfolio-wide refresh that blocked new app creation.
+  // An unrecognized or missing cadence falls back to the strictest window rather than
+  // the most permissive one, so dropping the field cannot silently widen the review.
+  const reviewWindowDays = { weekly: 8, monthly: 31, quarterly: 92, biannual: 184, annual: 366 };
+  const cadence = profile.runtimePolicy?.reviewPolicy?.cadence ?? '';
+  const staleAfterDays = reviewWindowDays[cadence.split('-')[0]] ?? Math.min(...Object.values(reviewWindowDays));
   const runtimes = (profile.runtimePolicy?.allowed || []).filter((runtime) => !kinds || kinds.includes(runtime.kind));
   const staticAnalysis = profile.toolchain?.staticAnalysis;
   const includeStaticAnalysis = staticAnalysis && (!kinds || kinds.includes('static-analysis'));
@@ -4429,10 +4499,10 @@ export async function verifyInitializerProvenance({
     addFinding(findings, 'INITIALIZER_KIND_UNKNOWN', 'profile.runtimePolicy.allowed', `No profile runtime matches ${JSON.stringify(kinds)}; use mobile, web, server or static-analysis.`);
   }
   if (includeStaticAnalysis) {
-    // The lint/format packages share the initializer freshness policy: re-check monthly.
+    // The lint/format packages share the initializer freshness policy and window.
     const staticCheckedAt = new Date(`${staticAnalysis.checkedAt}T00:00:00Z`);
     if (Number.isNaN(staticCheckedAt.getTime()) || (now - staticCheckedAt) / 86_400_000 > staleAfterDays) {
-      addFinding(findings, 'INITIALIZER_PROVENANCE_STALE', 'profile.toolchain.staticAnalysis.checkedAt', `Static analysis provenance was last checked ${staticAnalysis.checkedAt}; the profile requires a monthly re-check.`);
+      addFinding(findings, 'INITIALIZER_PROVENANCE_STALE', 'profile.toolchain.staticAnalysis.checkedAt', `Static analysis provenance was last checked ${staticAnalysis.checkedAt}; the profile's ${cadence} review window is ${staleAfterDays} days.`);
     }
     const entries = [...(staticAnalysis.shared || []), ...Object.values(staticAnalysis.presets || {})];
     for (const entry of entries) {
@@ -4471,7 +4541,7 @@ export async function verifyInitializerProvenance({
     const path = `profile.runtimePolicy.allowed[${runtime.kind}].initializer`;
     const checkedAt = new Date(`${initializer.checkedAt}T00:00:00Z`);
     if (Number.isNaN(checkedAt.getTime()) || (now - checkedAt) / 86_400_000 > staleAfterDays) {
-      addFinding(findings, 'INITIALIZER_PROVENANCE_STALE', `${path}.checkedAt`, `Initializer provenance for ${runtime.kind} was last checked ${initializer.checkedAt}; the profile requires a monthly re-check.`);
+      addFinding(findings, 'INITIALIZER_PROVENANCE_STALE', `${path}.checkedAt`, `Initializer provenance for ${runtime.kind} was last checked ${initializer.checkedAt}; the profile's ${cadence} review window is ${staleAfterDays} days.`);
     }
     for (const subject of subjects) {
       let observed;
@@ -4593,7 +4663,7 @@ export async function checkStandardAssets({ workspaceRoot = defaultWorkspaceRoot
     },
   ];
   const expectedRuntimeReview = {
-    cadence: 'monthly-and-immediate-on-critical-security-advisory',
+    cadence: 'quarterly-and-immediate-on-critical-security-advisory',
     knownVulnerableAction: 'block-new-app-generation-until-profile-and-standard-update',
   };
   if (JSON.stringify(parsed.profile?.runtimePolicy?.allowed) !== JSON.stringify(expectedRuntimeProfile)

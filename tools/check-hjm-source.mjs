@@ -4,6 +4,7 @@ import { access, readFile, readdir } from 'node:fs/promises';
 import { createHash } from 'node:crypto';
 import { dirname, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { resolvedVersionViolation, trainLabel, trainViolation } from './version-train.mjs';
 
 const appRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const findings = [];
@@ -12,7 +13,11 @@ const add = (path, message) => findings.push({ path, message });
 const ignoredDirectories = new Set(['.git', '.next', '.expo', 'build', 'coverage', 'dist', 'dist-standard', 'storybook-static', 'node_modules']);
 const runtimeBindings = true;
 const frameworkPackages = { mobile: 'expo', web: 'next', server: '@nestjs/core' };
-const serverTooling = { eslint: '9.39.5', vitest: '4.1.11', supertest: '7.2.2' };
+// Reviewed floors inside their own major trains, like every other version the
+// standard records; the lockfile still resolves one version per install. Baked in at
+// generation time from the central constant so the projection cannot drift from it.
+const runtimeFrameworkFloors = {"mobile":"57.0.18","web":"16.3.3","server":"12.0.1"};
+const serverTooling = {"eslint":"9.39.5","vitest":"4.1.11","supertest":"7.2.2"};
 
 async function collectPackageFiles(directory) {
   for (const entry of await readdir(directory, { withFileTypes: true })) {
@@ -529,20 +534,43 @@ function parsePnpmLock(source) {
   return { importers, packages, snapshots, duplicateRecords: new Set() };
 }
 
-function verifyLockedDependency(lock, importerRoot, name, version) {
+// A pnpm importer version is one resolved version plus zero or more balanced peer
+// suffixes, e.g. "57.0.21(react@19.2.0)". Split it instead of pattern-building from
+// the expected string so the same parse serves exact and train requirements.
+const LOCK_VERSION = /^([^()\s]+)((?:\([^()\r\n]+\))*)$/;
+
+/**
+ * Verify one dependency in the frozen lockfile.
+ * mode 'exact' requires the literal version (design-system releases, where the
+ * release record is the authority). mode 'train' requires the specifier and the
+ * resolved version to sit in the recorded floor's major train.
+ */
+function verifyLockedDependency(lock, importerRoot, name, requirement, { mode = 'exact' } = {}) {
   const importer = lock.importers.get(importerRoot);
   if (!importer) {
     add('pnpm-lock.yaml#importers.' + importerRoot, 'runtime importer is missing from the frozen lockfile');
     return;
   }
   const dependency = importer.dependencies.get(name);
-  const resolvedVersion = dependency?.version;
-  const normalizedVersion = typeof resolvedVersion === 'string'
-    && new RegExp('^' + version.replaceAll('.', '\\.') + '(?:\\([^\\r\\n()]+\\))*$').test(dependency.version);
-  if (dependency?.specifier !== version || !normalizedVersion) {
-    add('pnpm-lock.yaml#importers.' + importerRoot + '.dependencies.' + name, 'specifier must equal exact ' + version + ' and the resolved version may only add balanced pnpm peer suffixes');
+  const parsedVersion = typeof dependency?.version === 'string' ? LOCK_VERSION.exec(dependency.version) : null;
+  const version = parsedVersion?.[1] ?? null;
+  const specifierViolation = mode === 'train'
+    ? trainViolation(dependency?.specifier, requirement)
+    : (dependency?.specifier === requirement ? null : 'must equal exact ' + requirement);
+  const resolvedViolation = version === null
+    ? 'must be one resolved version with balanced pnpm peer suffixes only'
+    : (mode === 'train'
+      ? resolvedVersionViolation(version, requirement)
+      : (version === requirement ? null : 'must equal exact ' + requirement));
+  if (specifierViolation || resolvedViolation) {
+    const expectation = mode === 'train' ? 'the ' + trainLabel(requirement) + ' train' : 'exact ' + requirement;
+    add('pnpm-lock.yaml#importers.' + importerRoot + '.dependencies.' + name,
+      'specifier and resolved version must both satisfy ' + expectation
+      + (specifierViolation ? '; specifier "' + dependency?.specifier + '" ' + specifierViolation : '')
+      + (resolvedViolation ? '; resolved "' + dependency?.version + '" ' + resolvedViolation : ''));
   }
-  if (!normalizedVersion) return;
+  if (version === null || resolvedViolation) return;
+  const resolvedVersion = dependency.version;
 
   const baseKey = name + '@' + version;
   const exactKey = name + '@' + resolvedVersion;
@@ -606,9 +634,10 @@ async function verifyServerRuntime(runtime, manifest) {
   if (runtime.kind !== 'server') return;
   if (runtime.moduleFormat !== 'esm') add('contract.runtimes.server.moduleFormat', 'NestJS runtime must declare moduleFormat esm');
   if (manifest.type !== 'module') add(runtime.root + '/package.json.type', 'NestJS v1 runtime must set package type to module');
-  for (const [name, version] of Object.entries(serverTooling)) {
-    if (manifest.devDependencies?.[name] !== version) {
-      add(runtime.root + '/package.json.devDependencies.' + name, 'NestJS v1 runtime requires exact ' + name + '@' + version);
+  for (const [name, floor] of Object.entries(serverTooling)) {
+    const violation = trainViolation(manifest.devDependencies?.[name], floor);
+    if (violation) {
+      add(runtime.root + '/package.json.devDependencies.' + name, 'NestJS v1 runtime devDependency ' + name + ' "' + manifest.devDependencies?.[name] + '" ' + violation);
     }
   }
   if (!/^eslint(?:\s|$)/.test(String(manifest.scripts?.lint || '').trim())) {
@@ -1073,8 +1102,11 @@ if (contract && runtimeBindings) {
           continue;
         }
         const frameworkPackage = frameworkPackages[runtime.kind];
-        if (!frameworkPackage || manifest.dependencies?.[frameworkPackage] !== runtime.frameworkVersion) {
-          add(runtime.root + '/package.json.dependencies.' + frameworkPackage, 'implementation-conformant runtime must directly install its framework at contract exact version ' + runtime.frameworkVersion);
+        const frameworkViolation = frameworkPackage
+          ? trainViolation(manifest.dependencies?.[frameworkPackage], runtimeFrameworkFloors[runtime.kind])
+          : 'has no framework package for this runtime kind';
+        if (frameworkViolation) {
+          add(runtime.root + '/package.json.dependencies.' + frameworkPackage, 'implementation-conformant runtime must directly install its framework inside the ' + trainLabel(runtimeFrameworkFloors[runtime.kind]) + ' train; "' + manifest.dependencies?.[frameworkPackage] + '" ' + frameworkViolation);
         }
         await verifyServerRuntime(runtime, manifest);
         for (const scriptName of ['dev', 'lint', 'typecheck', 'test', 'test:e2e', 'build']) {
@@ -1084,9 +1116,9 @@ if (contract && runtimeBindings) {
       try {
         const lock = parsePnpmLock(await readFile(resolve(appRoot, 'pnpm-lock.yaml'), 'utf8'));
         for (const runtime of contract.runtimes || []) {
-          verifyLockedDependency(lock, runtime.root, frameworkPackages[runtime.kind], runtime.frameworkVersion);
+          verifyLockedDependency(lock, runtime.root, frameworkPackages[runtime.kind], runtimeFrameworkFloors[runtime.kind], { mode: 'train' });
           if (runtime.kind === 'server') {
-            for (const [name, version] of Object.entries(serverTooling)) verifyLockedDependency(lock, runtime.root, name, version);
+            for (const [name, floor] of Object.entries(serverTooling)) verifyLockedDependency(lock, runtime.root, name, floor, { mode: 'train' });
           }
         }
       } catch (error) {
@@ -1149,9 +1181,9 @@ if (contract && runtimeBindings) {
     const lock = parsePnpmLock(lockSource);
     for (const runtime of contract.runtimes || []) {
       const frameworkPackage = frameworkPackages[runtime.kind];
-      if (activeGate && frameworkPackage) verifyLockedDependency(lock, runtime.root, frameworkPackage, runtime.frameworkVersion);
+      if (activeGate && frameworkPackage) verifyLockedDependency(lock, runtime.root, frameworkPackage, runtimeFrameworkFloors[runtime.kind], { mode: 'train' });
       if (activeGate && runtime.kind === 'server') {
-        for (const [name, version] of Object.entries(serverTooling)) verifyLockedDependency(lock, runtime.root, name, version);
+        for (const [name, floor] of Object.entries(serverTooling)) verifyLockedDependency(lock, runtime.root, name, floor, { mode: 'train' });
       }
     }
     for (const runtime of frontendRuntimes) {
@@ -1207,8 +1239,11 @@ if (contract && runtimeBindings) {
         continue;
       }
       const frameworkPackage = frameworkPackages[runtime.kind];
-      if (!frameworkPackage || manifest.dependencies?.[frameworkPackage] !== runtime.frameworkVersion) {
-        add(runtime.root + '/package.json.dependencies.' + frameworkPackage, 'implementation-conformant runtime must directly install its framework at contract exact version ' + runtime.frameworkVersion);
+      const frameworkViolation = frameworkPackage
+        ? trainViolation(manifest.dependencies?.[frameworkPackage], runtimeFrameworkFloors[runtime.kind])
+        : 'has no framework package for this runtime kind';
+      if (frameworkViolation) {
+        add(runtime.root + '/package.json.dependencies.' + frameworkPackage, 'implementation-conformant runtime must directly install its framework inside the ' + trainLabel(runtimeFrameworkFloors[runtime.kind]) + ' train; "' + manifest.dependencies?.[frameworkPackage] + '" ' + frameworkViolation);
       }
       await verifyServerRuntime(runtime, manifest);
       for (const scriptName of ['dev', 'lint', 'typecheck', 'test', 'test:e2e', 'build']) {

@@ -32,7 +32,7 @@
     },
     "profile": {
       "const": "portfolio-default-v1",
-      "description": "Portfolio profile that supplies the exact trains and policies; only portfolio-default-v1 exists."
+      "description": "Portfolio profile that supplies the reviewed version trains and policies; only portfolio-default-v1 exists."
     },
     "app": {
       "$ref": "#/$defs/app",
@@ -49,7 +49,7 @@
       "items": {
         "$ref": "#/$defs/runtime"
       },
-      "description": "Only the runtimes that exist. Each pins the profile framework train exactly; new kinds require a standard revision."
+      "description": "Only the runtimes that exist. Each declares a version inside the profile framework train; new kinds require a standard revision."
     },
     "documents": {
       "$ref": "#/$defs/documents",
@@ -1543,7 +1543,7 @@
           ]
         },
         "frameworkVersion": {
-          "$ref": "#/$defs/exactVersion"
+          "$ref": "#/$defs/trainSpecifier"
         },
         "moduleFormat": {
           "const": "esm"
@@ -1577,7 +1577,7 @@
                 "const": "expo"
               },
               "frameworkVersion": {
-                "const": "57.0.18"
+                "$ref": "#/$defs/trainSpecifier57"
               },
               "root": {
                 "const": "apps/mobile"
@@ -1609,7 +1609,7 @@
                 "const": "nextjs"
               },
               "frameworkVersion": {
-                "const": "16.3.3"
+                "$ref": "#/$defs/trainSpecifier16"
               },
               "root": {
                 "const": "apps/web"
@@ -1639,7 +1639,7 @@
                 "const": "nestjs"
               },
               "frameworkVersion": {
-                "const": "12.0.1"
+                "$ref": "#/$defs/trainSpecifier12"
               },
               "moduleFormat": {
                 "const": "esm"
@@ -1673,12 +1673,12 @@
               "const": "pnpm"
             },
             "version": {
-              "const": "11.24.0"
+              "$ref": "#/$defs/trainSpecifier11"
             }
           }
         },
         "node": {
-          "const": "24.20.0"
+          "$ref": "#/$defs/trainSpecifier24"
         },
         "scripts": {
           "type": "object",
@@ -1789,7 +1789,7 @@
           ]
         },
         "frameworkVersion": {
-          "$ref": "#/$defs/exactVersion"
+          "$ref": "#/$defs/trainSpecifier"
         },
         "root": {
           "type": "string",
@@ -1952,12 +1952,12 @@
               "const": "pnpm"
             },
             "version": {
-              "const": "11.24.0"
+              "$ref": "#/$defs/trainSpecifier11"
             }
           }
         },
         "node": {
-          "const": "24.20.0"
+          "$ref": "#/$defs/trainSpecifier24"
         },
         "scripts": {
           "type": "object",
@@ -2404,6 +2404,36 @@
           }
         }
       }
+    },
+    "trainSpecifier57": {
+      "type": "string",
+      "description": "Exact version or ~/^ range inside the 57.x train; the reviewed floor is enforced by the standard checker.",
+      "pattern": "^[~^]?57\\.(?:0|[1-9][0-9]*)\\.(?:0|[1-9][0-9]*)$"
+    },
+    "trainSpecifier16": {
+      "type": "string",
+      "description": "Exact version or ~/^ range inside the 16.x train; the reviewed floor is enforced by the standard checker.",
+      "pattern": "^[~^]?16\\.(?:0|[1-9][0-9]*)\\.(?:0|[1-9][0-9]*)$"
+    },
+    "trainSpecifier12": {
+      "type": "string",
+      "description": "Exact version or ~/^ range inside the 12.x train; the reviewed floor is enforced by the standard checker.",
+      "pattern": "^[~^]?12\\.(?:0|[1-9][0-9]*)\\.(?:0|[1-9][0-9]*)$"
+    },
+    "trainSpecifier24": {
+      "type": "string",
+      "description": "Exact version or ~/^ range inside the 24.x train; the reviewed floor is enforced by the standard checker.",
+      "pattern": "^[~^]?24\\.(?:0|[1-9][0-9]*)\\.(?:0|[1-9][0-9]*)$"
+    },
+    "trainSpecifier11": {
+      "type": "string",
+      "description": "Exact version or ~/^ range inside the 11.x train; the reviewed floor is enforced by the standard checker.",
+      "pattern": "^[~^]?11\\.(?:0|[1-9][0-9]*)\\.(?:0|[1-9][0-9]*)$"
+    },
+    "trainSpecifier": {
+      "type": "string",
+      "description": "Exact version or ~/^ range bounded by one major train. Which train, and the reviewed floor inside it, are enforced by the standard checker (scripts/version-train.mjs).",
+      "pattern": "^[~^]?(?:0|[1-9][0-9]*)\\.(?:0|[1-9][0-9]*)\\.(?:0|[1-9][0-9]*)$"
     }
   }
 }
