@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 
+import { spawn } from 'node:child_process';
 import { lstat, readFile, readdir } from 'node:fs/promises';
 import { dirname, extname, isAbsolute, relative, resolve, sep } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
@@ -21,6 +22,43 @@ const ignoredDirectories = new Set([
   'outputs',
   'reports',
 ]);
+
+/**
+ * Generated artifacts are not documentation. The ignored-directory list above
+ * only catches names we thought of: a consuming app failed this check on
+ * `tools/qa/exploreqa_reports/.../triage.md`, a QA run's output that the app's
+ * own `.gitignore` excludes. CI never saw it because a fresh checkout has no
+ * such file, so the failure only ever reached the person running it locally.
+ *
+ * Asking Git is the rule the repository already states. Untracked files stay in
+ * scope — Markdown written before its first commit must still be checked — and
+ * only paths the repository declares ignored drop out. `git check-ignore` exits
+ * 1 when nothing matched, which is not an error here; when Git is unavailable or
+ * the root is not a repository the walk is used unchanged, because skipping
+ * files silently would be worse than checking a generated one.
+ *
+ * The paths go in over stdin rather than as arguments: this walk returns
+ * thousands of files in the portfolio root and an argument list that long hits
+ * the platform limit.
+ */
+function ignoredByGit(rootPath, files) {
+  if (files.length === 0) return Promise.resolve(new Set());
+  return new Promise((resolveIgnored) => {
+    const child = spawn('git', ['-C', rootPath, 'check-ignore', '--stdin', '-z'], {
+      stdio: ['pipe', 'pipe', 'ignore'],
+    });
+    let out = '';
+    child.stdout.setEncoding('utf8');
+    child.stdout.on('data', (chunk) => { out += chunk; });
+    child.on('error', () => resolveIgnored(new Set()));
+    child.on('close', (code) => {
+      if (code !== 0 && code !== 1) return resolveIgnored(new Set());
+      resolveIgnored(new Set(out.split('\0').filter(Boolean).map((path) => resolve(rootPath, path))));
+    });
+    child.stdin.on('error', () => undefined);
+    child.stdin.end(files.map((file) => `${file}\0`).join(''));
+  });
+}
 
 function finding(code, path, message) {
   return { code, path, message };
@@ -344,7 +382,9 @@ export async function checkDocLinks({ rootPath = defaultRoot } = {}) {
   const absoluteRoot = resolve(rootPath);
   const findings = [];
   const { portfolioMode, roots: independentRoots } = await loadIndependentRoots(absoluteRoot);
-  const files = await collectMarkdownFiles(absoluteRoot, { portfolioMode });
+  const walked = await collectMarkdownFiles(absoluteRoot, { portfolioMode });
+  const ignored = await ignoredByGit(absoluteRoot, walked);
+  const files = walked.filter((file) => !ignored.has(file));
   const anchorCache = new Map();
 
   for (const filePath of files) {
