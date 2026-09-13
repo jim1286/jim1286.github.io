@@ -12,11 +12,11 @@ importers:
         specifier: ^6.3.4
         version: 6.3.4(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
       '@hjmds/design-contracts':
-        specifier: 0.9.10
-        version: 0.9.10
+        specifier: 0.9.12
+        version: 0.9.12
       '@hjmds/react':
-        specifier: 0.9.10
-        version: 0.9.10(@hjmds/design-contracts@0.9.10)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
+        specifier: 0.9.12
+        version: 0.9.12(@hjmds/design-contracts@0.9.12)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
       react:
         specifier: ^19.1.0
         version: 19.2.8
@@ -360,12 +360,12 @@ packages:
     resolution: {integrity: sha512-43/qtrDUokr7LJqoF2c3+RInu/t4zfrpYdoSDfYyhg52rwLV6TnOvdG4fXm7IkSB3wErkcmJS9iEhjVtOSEjjA==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
 
-  '@hjmds/design-contracts@0.9.10':
-    resolution: {integrity: sha512-ubwcXhhInbWT6LOTgsAn16peXVoFHCYXKTzDwoHFzJAP8dnK7LlgiiNOm2t2eT7gzWXZMhUADtTUZ2yRmAfnFw==}
+  '@hjmds/design-contracts@0.9.12':
+    resolution: {integrity: sha512-fVYBTzFzHzrFtP7p8kGs901NX08szMBwzqmoIyYCmi0ytyRJ8a/oVLvF8HQsEA49S9X6cgG/OH47EZE/yMGQyQ==}
     engines: {node: '>=20'}
 
-  '@hjmds/react@0.9.10':
-    resolution: {integrity: sha512-Hm9neoXCAPC5BRflaAQPMECMgMJoVeJZqV9I1Ev0WmkYpoccfYNIWNPTz+iXyT5pQxM4P5v6EDucuJhD2m9fqQ==}
+  '@hjmds/react@0.9.12':
+    resolution: {integrity: sha512-ITm2QK4cmU8VGNYcOK0uiXMpVDU0gL08HkBPhxipMPfiTnzE6w+80F5isWMVXmJqQ92dq5VOMWbgdu1Q/dtaRA==}
     peerDependencies:
       '@hjmds/design-contracts': '>=0.9.0 <0.10.0'
       react: '>=19.0.0'
@@ -1586,11 +1586,11 @@ snapshots:
       '@eslint/core': 0.17.0
       levn: 0.4.1
 
-  '@hjmds/design-contracts@0.9.10': {}
+  '@hjmds/design-contracts@0.9.12': {}
 
-  '@hjmds/react@0.9.10(@hjmds/design-contracts@0.9.10)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)':
+  '@hjmds/react@0.9.12(@hjmds/design-contracts@0.9.12)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)':
     dependencies:
-      '@hjmds/design-contracts': 0.9.10
+      '@hjmds/design-contracts': 0.9.12
       react: 19.2.8
       react-dom: 19.2.8(react@19.2.8)
 
