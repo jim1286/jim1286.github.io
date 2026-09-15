@@ -12,11 +12,11 @@ importers:
         specifier: ^6.3.4
         version: 6.3.4(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
       '@hjmds/design-contracts':
-        specifier: 1.0.2
-        version: 1.0.2
+        specifier: 1.1.0
+        version: 1.1.0
       '@hjmds/react':
-        specifier: 1.0.2
-        version: 1.0.2(@hjmds/design-contracts@1.0.2)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
+        specifier: 1.1.0
+        version: 1.1.0(@hjmds/design-contracts@1.1.0)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
       react:
         specifier: ^19.1.0
         version: 19.2.8
@@ -360,14 +360,14 @@ packages:
     resolution: {integrity: sha512-43/qtrDUokr7LJqoF2c3+RInu/t4zfrpYdoSDfYyhg52rwLV6TnOvdG4fXm7IkSB3wErkcmJS9iEhjVtOSEjjA==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
 
-  '@hjmds/design-contracts@1.0.2':
-    resolution: {integrity: sha512-lGo1U08wN6n3ojFiLQmyCJn4f17vWwM/en1kvA33zEzwzfr5WzAGgnvFxl3BCzoPfOHf4oqPjPsLCacz9XkTrw==}
+  '@hjmds/design-contracts@1.1.0':
+    resolution: {integrity: sha512-+A1ugamqzpl58c6+ZjFrC+QpjxeT3PuCFwJicg5VkZXH3CjQrrfc6HDVo4N/rvgBSJ30I5EHPBrS9QGPlpBx8Q==}
     engines: {node: '>=20'}
 
-  '@hjmds/react@1.0.2':
-    resolution: {integrity: sha512-KOq8X9OcV0/gm5AOvW5Qzr8lcBmx1qeHiBfV1Kx1xFkiKBfk7dQyUjEJA5MDpJOBasGD1oEC4q0ZT6Pl6k/NmA==}
+  '@hjmds/react@1.1.0':
+    resolution: {integrity: sha512-LeOoqndqcaJUK72RPtEbQ2OJfTvkWdba1erW0xAk5IUZCsxbSJ89biAH/IHTyFUwsi86e7B31qsBJgYjGSMnfg==}
     peerDependencies:
-      '@hjmds/design-contracts': '>=1.0.0 <1.1.0'
+      '@hjmds/design-contracts': '>=1.1.0 <1.2.0'
       react: '>=19.0.0'
       react-dom: '>=19.0.0'
 
@@ -1586,11 +1586,11 @@ snapshots:
       '@eslint/core': 0.17.0
       levn: 0.4.1
 
-  '@hjmds/design-contracts@1.0.2': {}
+  '@hjmds/design-contracts@1.1.0': {}
 
-  '@hjmds/react@1.0.2(@hjmds/design-contracts@1.0.2)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)':
+  '@hjmds/react@1.1.0(@hjmds/design-contracts@1.1.0)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)':
     dependencies:
-      '@hjmds/design-contracts': 1.0.2
+      '@hjmds/design-contracts': 1.1.0
       react: 19.2.8
       react-dom: 19.2.8(react@19.2.8)
 

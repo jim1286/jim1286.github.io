@@ -30,8 +30,8 @@
     "@ant-design/icons": "^6.3.4",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
-    "@hjmds/design-contracts": "1.0.2",
-    "@hjmds/react": "1.0.2"
+    "@hjmds/design-contracts": "1.1.0",
+    "@hjmds/react": "1.1.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.30.1",
