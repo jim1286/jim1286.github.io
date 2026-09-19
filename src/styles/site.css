@@ -35,7 +35,9 @@ button, a { -webkit-tap-highlight-color: transparent; }
 }
 .skip-link:focus { top: 16px; }
 
-.site-shell { overflow: hidden; }
+/* 브랜드 표면은 제품 palette가 소유한다. Provider의 시스템 테마 배경을
+   그대로 물려받으면 밝은 카드와 본문 영역에 다크 기본색이 섞인다. */
+.site-shell { overflow: hidden; background: var(--paper); color: var(--ink); }
 .site-header {
   position: absolute;
   z-index: 10;
@@ -70,8 +72,10 @@ button, a { -webkit-tap-highlight-color: transparent; }
 .header-contact { justify-self: end; display: flex; align-items: center; gap: 7px; font-family: var(--mono); font-size: 12px; }
 
 .hero {
-  min-height: 790px;
-  padding: 170px clamp(24px, 7vw, 120px) 90px;
+  /* 2026-09-15: 현황 카드보다 큰 고정 여백이 다음 제품 목록을 밀어냈다.
+     섹션 간격을 줄이고 콘텐츠 높이는 열어 두어 큰 글자가 잘리지 않게 한다. */
+  min-height: 680px;
+  padding: 140px clamp(24px, 7vw, 120px) 64px;
   display: grid;
   grid-template-columns: minmax(0, 1.2fr) minmax(320px, .65fr);
   align-items: center;
@@ -98,23 +102,29 @@ button, a { -webkit-tap-highlight-color: transparent; }
   font-weight: 900;
 }
 .hero h1 em { color: var(--lime); font-style: normal; }
-.hero-description { margin: 34px 0 0; color: #c5d1cb; font-size: clamp(15px, 1.5vw, 18px); line-height: 1.85; }
-.hero-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 38px; }
+.hero-description { margin: 24px 0 0; color: #c5d1cb; font-size: clamp(15px, 1.5vw, 18px); line-height: 1.85; }
+.hero-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 28px; }
 .button {
-  min-height: 52px;
-  padding: 0 21px;
+  min-height: 48px;
+  padding: 12px 18px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 11px;
+  gap: 8px;
   border: 1px solid rgba(255,255,255,.3);
+  border-radius: 8px;
   font-size: 14px;
   font-weight: 800;
+  line-height: 1.4;
   transition: transform .2s ease, background .2s ease;
 }
 .button:hover { transform: translateY(-2px); }
 .button-primary { background: var(--lime); border-color: var(--lime); color: var(--forest-dark); }
 .button-secondary:hover { background: rgba(255,255,255,.08); }
+/* 이 제품 CTA는 자체 배경색을 쓰므로 아이콘도 버튼 글자색을 따른다.
+   HJM 기본 secondary tone은 시스템 다크 모드에서 lime 위 밝은색이 되었다. */
+.button .button-icon { color: inherit; flex-shrink: 0; }
+.button:focus-visible { outline: 3px solid currentColor; outline-offset: 4px; }
 
 .hero-panel {
   position: relative;
@@ -135,8 +145,8 @@ button, a { -webkit-tap-highlight-color: transparent; }
 .panel-footer { margin: 12px -28px -28px; padding: 17px 28px; display: flex; gap: 8px; background: var(--lime); color: var(--forest-dark); }
 .panel-footer span { padding: 6px 9px; border: 1px solid rgba(11,36,26,.3); font-family: var(--mono); font-size: 10px; }
 
-.section { padding: 120px clamp(24px, 7vw, 120px); }
-.section-heading { margin-bottom: 60px; display: grid; grid-template-columns: 1fr 1fr; align-items: end; gap: 40px; }
+.section { padding: 80px clamp(24px, 7vw, 120px); }
+.section-heading { margin-bottom: 36px; display: grid; grid-template-columns: 1fr 1fr; align-items: end; gap: 28px; }
 .section-heading > p { margin: 0; justify-self: end; color: var(--muted); line-height: 1.75; }
 .section-index { margin: 0 0 16px; color: var(--orange); }
 .section h2 { margin: 0; font-size: clamp(48px, 6vw, 82px); line-height: 1; letter-spacing: -.065em; }
@@ -144,7 +154,9 @@ button, a { -webkit-tap-highlight-color: transparent; }
 .app-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); border-top: 1px solid var(--line); border-left: 1px solid var(--line); }
 .app-card {
   position: relative;
-  min-height: 510px;
+  /* 소개 길이가 다른 카드에 510~540px 최소 높이를 강제하지 않는다.
+     같은 행 정렬은 grid stretch와 app-links의 auto margin이 맡는다. */
+  min-height: 0;
   padding: clamp(26px, 4vw, 48px);
   display: flex;
   flex-direction: column;
@@ -160,11 +172,11 @@ button, a { -webkit-tap-highlight-color: transparent; }
 .status { padding: 8px 10px; font-family: var(--mono); font-size: 9px; letter-spacing: .06em; white-space: nowrap; }
 .status-live { background: var(--forest); color: var(--lime); }
 .status-development { border: 1px solid var(--line); color: var(--muted); }
-.app-number { margin: 36px 0 12px; color: var(--muted); }
+.app-number { margin: 24px 0 12px; color: var(--muted); }
 .app-card h3 { margin: 0; font-size: clamp(30px, 3vw, 44px); letter-spacing: -.05em; }
 .app-card h3 small { margin-left: 12px; color: var(--muted); font-family: var(--mono); font-size: 12px; font-weight: 400; letter-spacing: 0; }
-.app-description { max-width: 570px; margin: 19px 0 24px; color: var(--muted); line-height: 1.75; }
-.tag-list { margin: 0 0 30px; padding: 0; display: flex; flex-wrap: wrap; gap: 7px; list-style: none; }
+.app-description { max-width: 570px; margin: 16px 0 20px; color: var(--muted); line-height: 1.75; }
+.tag-list { margin: 0 0 20px; padding: 0; display: flex; flex-wrap: wrap; gap: 7px; list-style: none; }
 .tag-list li { padding: 7px 9px; background: rgba(18,41,31,.07); font-family: var(--mono); font-size: 10px; }
 .app-links { margin-top: auto; padding-top: 20px; display: flex; flex-wrap: wrap; gap: 15px 24px; border-top: 1px solid var(--line); }
 .app-links a { display: inline-flex; align-items: center; gap: 7px; font-family: var(--mono); font-size: 11px; font-weight: 500; }
@@ -173,7 +185,7 @@ button, a { -webkit-tap-highlight-color: transparent; }
 .legal-section { color: white; background: var(--forest-dark); }
 .section-heading.light > p { color: #9aaba2; }
 .legal-list { border-top: 1px solid rgba(255,255,255,.18); }
-.legal-row { padding: 30px 0; display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 30px; border-bottom: 1px solid rgba(255,255,255,.18); }
+.legal-row { padding: 24px 0; display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 24px; border-bottom: 1px solid rgba(255,255,255,.18); }
 .legal-identity { display: flex; align-items: center; gap: 24px; }
 .legal-identity > span { display: grid; place-items: center; flex: 0 0 44px; height: 44px; border: 1px solid rgba(255,255,255,.24); color: var(--lime); font-family: var(--mono); font-size: 11px; }
 .legal-identity h3 { margin: 0 0 6px; font-size: 19px; }
@@ -209,11 +221,10 @@ footer > a:last-child { justify-self: end; display: flex; align-items: center; g
 @media (max-width: 980px) {
   .site-header { grid-template-columns: 1fr auto; }
   .site-header nav { display: none; }
-  .hero { grid-template-columns: 1fr; padding-top: 150px; }
+  .hero { grid-template-columns: 1fr; padding-top: 130px; }
   .hero-panel { max-width: none; justify-self: stretch; }
   .section-heading { grid-template-columns: 1fr; }
   .section-heading > p { justify-self: start; }
-  .app-card { min-height: 540px; }
   .legal-row { grid-template-columns: 1fr; }
   .legal-links { justify-content: flex-start; padding-left: 68px; }
   .developer-section { grid-template-columns: .8fr 1.2fr; gap: 48px; }
@@ -222,16 +233,16 @@ footer > a:last-child { justify-self: end; display: flex; align-items: center; g
 @media (max-width: 700px) {
   .site-header { min-height: 74px; padding-inline: 20px; }
   .site-header .brand > span:last-child { display: none; }
-  .hero { min-height: auto; padding: 130px 20px 68px; }
+  .hero { min-height: auto; padding: 112px 20px 48px; }
   .hero h1 { font-size: clamp(48px, 15vw, 70px); }
   .hero-description br { display: none; }
   .hero-panel { padding: 22px; }
   .panel-footer { margin: 12px -22px -22px; padding-inline: 22px; }
-  .section { padding: 82px 20px; }
-  .section-heading { margin-bottom: 40px; }
+  .section { padding: 56px 20px; }
+  .section-heading { margin-bottom: 28px; }
   .section h2 { font-size: 52px; }
   .app-grid { grid-template-columns: 1fr; }
-  .app-card { min-height: 480px; padding: 28px 24px; }
+  .app-card { padding: 24px; }
   .status { white-space: normal; text-align: right; }
   .app-card h3 small { display: block; margin: 8px 0 0; }
   .legal-identity { align-items: flex-start; gap: 14px; }

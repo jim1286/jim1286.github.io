@@ -12,7 +12,7 @@ import {
   MailOutlined,
   SafetyCertificateOutlined,
 } from '@ant-design/icons';
-import { apps, legalDocuments } from './siteData';
+import { apps, legalDocuments, portfolioSummary } from './siteData';
 import './styles/site.css';
 
 const developerEmail = 'jimin1286@gmail.com';
@@ -55,17 +55,17 @@ export default function App() {
               작지만 분명한 문제를 발견하고 직접 설계하고 출시합니다.
             </p>
             <Stack className="hero-actions" axis="inline" gap="sm" wrap>
-              <a className="button button-primary" href="#apps">앱 둘러보기 <Icon name="chevronEnd" decorative /></a>
+              <a className="button button-primary" href="#apps">앱 둘러보기 <Icon className="button-icon" name="chevronEnd" decorative /></a>
               <ExternalLink className="button button-secondary" href={githubProfile}><GithubOutlined /> GitHub</ExternalLink>
             </Stack>
           </div>
 
           <aside className="hero-panel" aria-label="포트폴리오 현황">
             <p className="panel-label">PORTFOLIO / 2026</p>
-            <div className="metric"><strong>05</strong><span>관리 중인 앱</span></div>
-            <div className="metric"><strong>02</strong><span>스토어 공개 앱</span></div>
-            <div className="metric"><strong>02</strong><span>지원 플랫폼</span></div>
-            <div className="panel-footer"><span>iOS</span><span>Android</span><span>Web</span></div>
+            <div className="metric"><strong>{String(portfolioSummary.appCount).padStart(2, '0')}</strong><span>소개 중인 앱</span></div>
+            <div className="metric"><strong>{String(portfolioSummary.storeLinkedAppCount).padStart(2, '0')}</strong><span>스토어 링크가 있는 앱</span></div>
+            <div className="metric"><strong>{String(portfolioSummary.storePlatforms.length).padStart(2, '0')}</strong><span>스토어 연결 플랫폼</span></div>
+            <div className="panel-footer">{portfolioSummary.storePlatforms.map((platform) => <span key={platform}>{platform}</span>)}</div>
           </aside>
         </section>
 

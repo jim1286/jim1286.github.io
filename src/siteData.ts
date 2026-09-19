@@ -84,6 +84,17 @@ export const apps: PortfolioApp[] = [
   },
 ];
 
+// 앱 카드와 다른 숫자를 수동 관리하면 소개 목록 변경 뒤 현황이 어긋난다.
+// URL 존재만으로 실제 출시를 증명할 수 없으므로 이 집계는 연결된 스토어만 센다.
+export const portfolioSummary = {
+  appCount: apps.length,
+  storeLinkedAppCount: apps.filter((app) => app.iosUrl || app.androidUrl).length,
+  storePlatforms: [
+    ...(apps.some((app) => app.iosUrl) ? ['iOS'] : []),
+    ...(apps.some((app) => app.androidUrl) ? ['Android'] : []),
+  ],
+};
+
 type LegalDocument = {
   id: string;
   index: string;
