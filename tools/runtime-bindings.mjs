@@ -163,7 +163,14 @@ export function bindingWorkflow(contract) {
   const inCheckout = (path) => path === '.' ? appRoot : `${appRoot}/${path}`;
   const flutter = contract.runtimes.find((r) => r.framework === 'flutter');
   const installs = [...new Set(['.', ...contract.runtimes.filter((r) => r.framework !== 'flutter').map((r) => r.binding.lockfile.replace(/(?:^|\/)pnpm-lock\.yaml$/, '') || '.')])];
-  return `name: App standard quality\non:\n  pull_request:\n  push:\n    branches: [main]\npermissions:\n  contents: read\nconcurrency:\n  group: app-standard-${appRoot}-\${{ github.ref }}\n  cancel-in-progress: true\njobs:\n  quality:\n    # 기본은 hosted. 저장소 변수 CI_RUNNER를 설정한 저장소만 self-hosted로 간다.\n    # 비워 두면 오늘과 동일하다. 켜기 전에 러너 여유 메모리와 이 게이트의 빌드\n    # 피크를 비교한다(2026-09-10 실측 Next 피크 2358MB). public 저장소에는\n    # 설정하지 않는다 - 포크 PR이 그 머신에서 코드를 실행한다.\n    runs-on: \${{ vars.CI_RUNNER || 'ubuntu-latest' }}\n    timeout-minutes: 30\n    defaults:\n      run:\n        working-directory: ${appRoot}\n    steps:\n      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1\n        with:\n          persist-credentials: false\n          path: ${appRoot}\n      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020\n        with:\n          node-version-file: ${appRoot}/.nvmrc\n      - run: corepack enable\n      - run: corepack prepare pnpm@11.24.0 --activate\n${flutter ? `      - name: Install pinned Flutter SDK\n        run: |\n          git clone --depth 1 --branch "$(node -p 'JSON.parse(require("fs").readFileSync("${flutter.root}/.fvmrc", "utf8")).flutter')" https://github.com/flutter/flutter.git "$RUNNER_TEMP/flutter"\n          echo "$RUNNER_TEMP/flutter/bin" >> "$GITHUB_PATH"\n` : ''}${installs.map((cwd) => `      - run: pnpm install --frozen-lockfile\n        working-directory: ${inCheckout(cwd)}\n`).join('')}${contract.runtimes.filter((r) => r.framework === 'flutter').map((r) => `      - run: flutter pub get --enforce-lockfile\n        working-directory: ${inCheckout(r.root)}\n`).join('')}      - name: Contract and CI runtime checks (Flutter builds run locally)\n        run: node tools/run-quality.mjs check-ci\n`;
+  return `name: App standard quality\non:\n  pull_request:\n  push:\n    branches: [main]\npermissions:\n  contents: read\nconcurrency:\n  group: app-standard-${appRoot}-\${{ github.ref }}\n  cancel-in-progress: true\njobs:\n  quality:\n    # 기본은 hosted. 저장소 변수 CI_RUNNER를 설정한 저장소만 self-hosted로 간다.\n    # 비워 두면 오늘과 동일하다. 켜기 전에 러너 여유 메모리와 이 게이트의 빌드\n    # 피크를 비교한다(2026-09-10 실측 Next 피크 2358MB). public 저장소에는\n    # 설정하지 않는다 - 포크 PR이 그 머신에서 코드를 실행한다.\n    runs-on: \${{ vars.CI_RUNNER || 'ubuntu-latest' }}\n    timeout-minutes: 30\n    defaults:\n      run:\n        working-directory: ${appRoot}\n    steps:\n      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1\n        with:\n          persist-credentials: false\n          path: ${appRoot}\n      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020\n        with:\n          node-version-file: ${appRoot}/.nvmrc\n      - run: corepack enable\n      - run: corepack prepare pnpm@11.24.0 --activate\n${flutter ? `      # Hosted runners are ephemeral, so keep their Actions SDK cache. Local
+      # runners retain Flutter in RUNNER_TOOL_CACHE; cloning into RUNNER_TEMP
+      # discarded that copy after every job and cost several minutes per run.
+      - uses: subosito/flutter-action@1a449444c387b1966244ae4d4f8c696479add0b2
+        with:
+          flutter-version: ${flutter.frameworkVersion}
+          channel: stable
+          cache: \${{ runner.environment != 'self-hosted' }}\n` : ''}${installs.map((cwd) => `      - run: pnpm install --frozen-lockfile\n        working-directory: ${inCheckout(cwd)}\n`).join('')}${contract.runtimes.filter((r) => r.framework === 'flutter').map((r) => `      - run: flutter pub get --enforce-lockfile\n        working-directory: ${inCheckout(r.root)}\n`).join('')}      - name: Contract and CI runtime checks (Flutter builds run locally)\n        run: node tools/run-quality.mjs check-ci\n`;
 }
 
 export async function initializeFixtureAssets(root, runtime) {
@@ -215,13 +222,27 @@ export async function runBoundQuality(root, role) {
     await initializeFixtureAssets(root, runtime);
     if (runtime.binding.prepare) { console.log(`[${runtime.id}] prepare`); await run(runtime.binding.prepare, cwd); }
   }
+  const completedFlutterAnalyses = new Set();
   for (const { runtime, target, execution } of steps) {
     if (execution === 'local-only') {
       console.log(`[${runtime.id}] build: not run in CI; local build evidence is required separately`);
       continue;
     }
+    const cwd = await regular(root, runtime.root, true);
+    const argv = runtime.binding.checks[target];
+    // Flutter maps both lint and typecheck to the same `flutter analyze` command.
+    // Running that exact command twice adds minutes but cannot add check coverage.
+    if (runtime.framework === 'flutter' && ['lint', 'typecheck'].includes(target)
+      && argv[0] === 'flutter' && argv[1] === 'analyze') {
+      const key = JSON.stringify([cwd, argv]);
+      if (completedFlutterAnalyses.has(key)) {
+        console.log(`[${runtime.id}] ${target}: same Flutter analyze command already ran`);
+        continue;
+      }
+      completedFlutterAnalyses.add(key);
+    }
     console.log(`[${runtime.id}] ${target}`);
-    await run(runtime.binding.checks[target], await regular(root, runtime.root, true));
+    await run(argv, cwd);
   }
 }
 
