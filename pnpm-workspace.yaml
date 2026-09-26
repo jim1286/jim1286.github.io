@@ -18,8 +18,8 @@ minimumReleaseAgeStrict: true
 # "직접 게시한 이 버전만 건너뛴다"는 규칙이 한눈에 안 읽힌다. 이력은 git 로그가 갖는다.
 minimumReleaseAgeExcludePrune: true
 
-# HJM 1.4.0: 직접 게시한 태그·tarball integrity 검증 후 이 버전만 허용한다.
+# HJM 1.6.0: 직접 게시한 태그·npm dist.integrity를 중앙 hjm-release.json과 대조한 뒤 이 버전만 허용한다.
 # 다음 train 설치 시 prune한다. 광범위한 namespace 예외는 새 외부 릴리스도 통과시켜 사용하지 않는다.
 minimumReleaseAgeExclude:
-  - '@hjmds/design-contracts@1.5.0'
-  - '@hjmds/react@1.5.0'
+  - '@hjmds/design-contracts@1.6.0'
+  - '@hjmds/react@1.6.0'

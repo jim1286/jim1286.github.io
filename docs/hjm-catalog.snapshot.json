@@ -1,10 +1,10 @@
 {
-  "$id": "hjm.catalog-snapshot/1.5.0",
-  "designSystemVersion": "1.5.0",
+  "$id": "hjm.catalog-snapshot/1.6.0",
+  "designSystemVersion": "1.6.0",
   "source": {
     "repository": "https://github.com/jim1286/hjm-design-system.git",
-    "tag": "v1.5.0",
-    "commit": "e8da5536f07f9623709caec069de82fe2d176b46",
+    "tag": "v1.6.0",
+    "commit": "56d91318dc9cb08448bc764c527756c3b5f58db3",
     "sourcePath": "packages/design-contracts/dist/catalog.js",
     "contentSha256": "8ba483a961d353f2a0fb59e58303b7b8782fa8a37cd6b71d1a01b9c7c26ebc9d"
   },
