@@ -1,12 +1,12 @@
-:root {
-  --paper: #f4f2ea;
-  --ink: #12291f;
-  --forest: #173e2e;
+.portfolio-theme {
+  --paper: var(--hjm-color-bg);
+  --ink: var(--hjm-color-text);
+  --forest: var(--hjm-color-primary);
   --forest-dark: #0b241a;
   --lime: #c8ff47;
   --orange: #ff6b35;
-  --muted: #65736b;
-  --line: rgba(18, 41, 31, 0.18);
+  --muted: var(--hjm-color-text-muted);
+  --line: var(--hjm-color-border);
   --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
   --sans: Pretendard, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   color: var(--ink);
@@ -18,7 +18,7 @@
 
 * { box-sizing: border-box; }
 html { scroll-behavior: smooth; }
-body { margin: 0; min-width: 320px; background: var(--paper); color: var(--ink); }
+body { margin: 0; min-width: 320px; }
 a { color: inherit; text-decoration: none; }
 img { display: block; max-width: 100%; }
 button, a { -webkit-tap-highlight-color: transparent; }
@@ -38,6 +38,9 @@ button, a { -webkit-tap-highlight-color: transparent; }
 /* 브랜드 표면은 제품 palette가 소유한다. Provider의 시스템 테마 배경을
    그대로 물려받으면 밝은 카드와 본문 영역에 다크 기본색이 섞인다. */
 .site-shell { overflow: hidden; background: var(--paper); color: var(--ink); }
+/* Inverted editorial sections own their semantic foreground too; otherwise a
+   neutral HJM link inherits the paper surface's dark ink on a forest background. */
+.hero, .legal-section { --hjm-color-text: var(--paper); --hjm-color-text-body: var(--paper); }
 .site-header {
   position: absolute;
   z-index: 10;

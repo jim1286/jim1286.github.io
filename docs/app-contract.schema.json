@@ -893,7 +893,7 @@
         },
         "requiredFoundations": {
           "type": "array",
-          "minItems": 5,
+          "minItems": 0,
           "maxItems": 5,
           "uniqueItems": true,
           "items": {
@@ -936,73 +936,7 @@
               }
             }
           },
-          "allOf": [
-            {
-              "contains": {
-                "type": "object",
-                "properties": {
-                  "componentId": {
-                    "const": "design-system-provider"
-                  }
-                },
-                "required": [
-                  "componentId"
-                ]
-              }
-            },
-            {
-              "contains": {
-                "type": "object",
-                "properties": {
-                  "componentId": {
-                    "const": "text"
-                  }
-                },
-                "required": [
-                  "componentId"
-                ]
-              }
-            },
-            {
-              "contains": {
-                "type": "object",
-                "properties": {
-                  "componentId": {
-                    "const": "icon"
-                  }
-                },
-                "required": [
-                  "componentId"
-                ]
-              }
-            },
-            {
-              "contains": {
-                "type": "object",
-                "properties": {
-                  "componentId": {
-                    "const": "stack"
-                  }
-                },
-                "required": [
-                  "componentId"
-                ]
-              }
-            },
-            {
-              "contains": {
-                "type": "object",
-                "properties": {
-                  "componentId": {
-                    "const": "container"
-                  }
-                },
-                "required": [
-                  "componentId"
-                ]
-              }
-            }
-          ]
+          "description": "Bridge for foundations the pinned HJM catalog still marks beta (HJM consumer-policy §2.1). The checker requires exactly those; HJM 1.5.0 promoted all five, so a 1.5 pin requires []."
         },
         "optionalBetaAdoptions": {
           "type": "array",
@@ -2104,7 +2038,7 @@
         },
         "requiredFoundations": {
           "type": "array",
-          "minItems": 5,
+          "minItems": 0,
           "maxItems": 5,
           "uniqueItems": true,
           "items": {
@@ -2147,73 +2081,7 @@
               }
             }
           },
-          "allOf": [
-            {
-              "contains": {
-                "type": "object",
-                "properties": {
-                  "componentId": {
-                    "const": "design-system-provider"
-                  }
-                },
-                "required": [
-                  "componentId"
-                ]
-              }
-            },
-            {
-              "contains": {
-                "type": "object",
-                "properties": {
-                  "componentId": {
-                    "const": "text"
-                  }
-                },
-                "required": [
-                  "componentId"
-                ]
-              }
-            },
-            {
-              "contains": {
-                "type": "object",
-                "properties": {
-                  "componentId": {
-                    "const": "icon"
-                  }
-                },
-                "required": [
-                  "componentId"
-                ]
-              }
-            },
-            {
-              "contains": {
-                "type": "object",
-                "properties": {
-                  "componentId": {
-                    "const": "stack"
-                  }
-                },
-                "required": [
-                  "componentId"
-                ]
-              }
-            },
-            {
-              "contains": {
-                "type": "object",
-                "properties": {
-                  "componentId": {
-                    "const": "container"
-                  }
-                },
-                "required": [
-                  "componentId"
-                ]
-              }
-            }
-          ]
+          "description": "Bridge for foundations the pinned HJM catalog still marks beta (HJM consumer-policy §2.1). The checker requires exactly those; HJM 1.5.0 promoted all five, so a 1.5 pin requires []."
         },
         "optionalBetaAdoptions": {
           "type": "array",

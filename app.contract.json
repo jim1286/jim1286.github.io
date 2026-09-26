@@ -121,21 +121,21 @@
     "rationale": null,
     "contracts": {
       "package": "@hjmds/design-contracts",
-      "version": "1.2.0"
+      "version": "1.5.0"
     },
     "renderers": [
       {
         "kind": "web",
         "package": "@hjmds/react",
-        "version": "1.2.0"
+        "version": "1.5.0"
       }
     ],
     "versionPolicy": "exact-and-aligned",
     "adoptionPolicy": "stable-default",
     "catalog": {
-      "train": "1.2.0",
+      "train": "1.5.0",
       "snapshotPath": "docs/hjm-catalog.snapshot.json",
-      "sha256": "73b5e5e1ce7599717ff84feb4e336fc698ee262d9d8f0e2443e39a13649a430b"
+      "sha256": "0ed4cd97782d3d0794c031040e44ba21c3b3cd4de4c8274fc1286a76a485fe9f"
     },
     "companionPolicy": {
       "id": "hjm-consumer-policy",
@@ -143,54 +143,16 @@
       "status": "informational-next-release-pending",
       "discoveryUrl": "https://github.com/jim1286/hjm-design-system/blob/main/packages/design-contracts/docs/consumer-policy.md"
     },
-    "requiredFoundations": [
+    "requiredFoundations": [],
+    "optionalBetaAdoptions": [
       {
-        "componentId": "design-system-provider",
-        "maturity": "beta",
-        "rationaleId": "HJM-FOUNDATION-CORE-001",
-        "evidenceGate": "planned-in-draft-verified-before-active",
+        "componentId": "link",
+        "adrPath": "docs/decisions/ADR-1400-hjm-link.md",
         "evidenceIds": [
-          "EV-008"
-        ]
-      },
-      {
-        "componentId": "text",
-        "maturity": "beta",
-        "rationaleId": "HJM-FOUNDATION-CORE-001",
-        "evidenceGate": "planned-in-draft-verified-before-active",
-        "evidenceIds": [
-          "EV-009"
-        ]
-      },
-      {
-        "componentId": "icon",
-        "maturity": "beta",
-        "rationaleId": "HJM-FOUNDATION-CORE-001",
-        "evidenceGate": "planned-in-draft-verified-before-active",
-        "evidenceIds": [
-          "EV-010"
-        ]
-      },
-      {
-        "componentId": "stack",
-        "maturity": "beta",
-        "rationaleId": "HJM-FOUNDATION-CORE-001",
-        "evidenceGate": "planned-in-draft-verified-before-active",
-        "evidenceIds": [
-          "EV-011"
-        ]
-      },
-      {
-        "componentId": "container",
-        "maturity": "beta",
-        "rationaleId": "HJM-FOUNDATION-CORE-001",
-        "evidenceGate": "planned-in-draft-verified-before-active",
-        "evidenceIds": [
-          "EV-012"
+          "EV-1400"
         ]
       }
-    ],
-    "optionalBetaAdoptions": []
+    ]
   },
   "i18n": {
     "sourceLocale": "ko-KR",
@@ -253,7 +215,8 @@
           "EV-009",
           "EV-010",
           "EV-011",
-          "EV-012"
+          "EV-012",
+          "EV-1400"
         ]
       },
       {
@@ -432,6 +395,16 @@
         "owner": "jimin",
         "capturedAt": "2026-09-09T07:32:31.790268Z",
         "digest": "sha256:f83c8018e649694844273c004d40396a6ed02987d124ae7581a92d618939dec3"
+      },
+      {
+        "id": "EV-1400",
+        "criterionIds": [
+          "DESIGN-001"
+        ],
+        "type": "automated-test",
+        "location": "docs/evidence/planned/hjm-1-4-link.md",
+        "status": "planned",
+        "owner": "jimin"
       }
     ]
   },

@@ -27,6 +27,7 @@ import { checkDocLinks } from './check-doc-links.mjs';
 import { bound, bindingScripts, validateBindings, checkBindings, bindingWorkflow } from './runtime-bindings.mjs';
 import { auditJsonSchema, validateWithJsonSchema } from './json-schema-validator.mjs';
 import { resolvedVersionViolation, trainLabel, trainViolation } from './version-train.mjs';
+import { analyzeHjmSource } from './hjm-source-analysis.mjs';
 
 const scriptDirectory = dirname(fileURLToPath(import.meta.url));
 const defaultWorkspaceRoot = resolve(scriptDirectory, '..');
@@ -53,7 +54,7 @@ const execFileAsync = promisify(execFile);
 
 const contractVersion = 1;
 const standardVersion = '1.0.0';
-const canonicalProfileSha256 = '8f948d14c8f0baba5b6ff7f9594c3ce1ad8f7de495a6e357b069279003298451';
+const canonicalProfileSha256 = '0c8c82543a270bfdae52ebd705eacb68c08e3f22d7cd5670eb535626d82b2637';
 const approvedCentralVerifierCommit = '0000000000000000000000000000000000000000';
 const idPattern = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 const semverIdentifier = '(?:(?:0|[1-9]\\d*)|(?:\\d*[A-Za-z-][0-9A-Za-z-]*))';
@@ -731,7 +732,12 @@ function validateDesignSystem(designSystem, runtimes, acceptance, app, governanc
     });
   };
 
-  const requiredFoundationIds = ['design-system-provider', 'text', 'icon', 'stack', 'container'];
+  // The bridge (HJM consumer-policy §2.1) covers foundations only while the pinned
+  // catalog marks them beta. HJM 1.5.0 promoted all five to stable, so a pinned
+  // 1.5 snapshot requires none; an app that keeps a promoted entry is told to drop
+  // it instead of being silently accepted. Older pinned snapshots keep the gate.
+  const bridgeFoundationCandidates = ['design-system-provider', 'text', 'icon', 'stack', 'container'];
+  const requiredFoundationIds = bridgeFoundationCandidates.filter((id) => catalogMaturity.get(id) === 'beta');
   const seenFoundations = new Set();
   const foundationEvidenceOwners = new Map();
   if (!Array.isArray(designSystem.requiredFoundations)) {
@@ -741,7 +747,9 @@ function validateDesignSystem(designSystem, runtimes, acceptance, app, governanc
       const path = `contract.designSystem.requiredFoundations[${index}]`;
       if (!assertObject(foundation, path, findings)) return;
       assertKeys(foundation, new Set(['componentId', 'maturity', 'rationaleId', 'evidenceGate', 'evidenceIds']), path, findings);
-      if (!requiredFoundationIds.includes(foundation.componentId)) {
+      if (bridgeFoundationCandidates.includes(foundation.componentId) && !requiredFoundationIds.includes(foundation.componentId)) {
+        addFinding(findings, 'FOUNDATION_PROMOTED', `${path}.componentId`, `Foundation "${foundation.componentId}" is ${catalogMaturity.get(foundation.componentId) ?? 'absent'} in the pinned HJM catalog snapshot; remove it from requiredFoundations (the bridge ends at promotion).`);
+      } else if (!requiredFoundationIds.includes(foundation.componentId)) {
         addFinding(findings, 'FOUNDATION_COMPONENT_INVALID', `${path}.componentId`, `Unknown required foundation "${String(foundation.componentId)}".`);
       } else if (seenFoundations.has(foundation.componentId)) {
         addFinding(findings, 'FOUNDATION_COMPONENT_DUPLICATE', `${path}.componentId`, `Required foundation "${foundation.componentId}" is duplicated.`);
@@ -1835,6 +1843,7 @@ function makeLocalDesignChecker({ runtimeBindings = false } = {}) {
 
 import { access, readFile, readdir } from 'node:fs/promises';
 import { createHash } from 'node:crypto';
+import { createRequire } from 'node:module';
 import { dirname, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { resolvedVersionViolation, trainLabel, trainViolation } from './version-train.mjs';
@@ -2598,8 +2607,11 @@ function reachableRuntimeSources(runtime, runtimeRoot, codeSources) {
   return walkReachable(runtimeRoot, runtimeEntrySources(runtime, runtimeRoot, codeSources), codeSources);
 }
 
-function providerBoundarySources(runtime, runtimeRoot, codeSources) {
-  if (runtimeBindings) return walkReachable(runtimeRoot, codeSources.filter(({ path }) => runtime.binding.entryPoints.some((entry) => resolve(runtimeRoot, entry) === path)), codeSources);
+function providerBoundarySources(runtime, runtimeRoot, codeSources, rootsOnly = false) {
+  if (runtimeBindings) {
+    const entries = codeSources.filter(({ path }) => runtime.binding.entryPoints.some((entry) => resolve(runtimeRoot, entry) === path));
+    return rootsOnly ? entries : walkReachable(runtimeRoot, entries, codeSources);
+  }
   const relativeName = (path) => relative(runtimeRoot, path).replaceAll('\\\\', '/');
   const boundaryPattern = runtime.kind === 'web'
     ? /^(?:src\\/)?app\\/layout\\.(?:js|jsx|ts|tsx)$/
@@ -2621,7 +2633,7 @@ function providerBoundarySources(runtime, runtimeRoot, codeSources) {
     add(runtime.root, 'active frontend runtime requires a root provider boundary in Next app/layout, Expo app/_layout, or the test-only src/app fallback');
     return [];
   }
-  return walkReachable(runtimeRoot, entries, codeSources);
+  return rootsOnly ? entries : walkReachable(runtimeRoot, entries, codeSources);
 }
 
 function findBalancedBlockEnd(source, openIndex) {
@@ -2730,6 +2742,27 @@ function hasDirectRenderedJsxTag(expression, symbol) {
   return false;
 }
 
+${analyzeHjmSource.toString()}
+
+function sourceAnalysis(runtime, runtimeRoot, codeSources, rendererPackage, providerSymbol) {
+  let ts;
+  try { ts = createRequire(resolve(runtimeRoot, 'package.json'))('typescript'); }
+  catch { return null; } // Before dependency installation the stricter textual gate still applies.
+  const configPath = ts.findConfigFile(runtimeRoot, ts.sys.fileExists);
+  const config = configPath ? ts.readConfigFile(configPath, ts.sys.readFile).config : {};
+  const parsed = ts.parseJsonConfigFileContent(config, ts.sys, runtimeRoot);
+  const program = ts.createProgram(codeSources.filter(({ path }) => /\\.[cm]?[jt]sx?$/.test(path)).map(({ path }) => path), {
+    ...parsed.options, noEmit: true, allowJs: true, skipLibCheck: true,
+  });
+  const sourceByPath = new Map(codeSources.map((file) => [file.path, file]));
+  return analyzeHjmSource(ts, {
+    program, files: codeSources, rendererPackage, providerSymbol,
+    boundaryEntries: providerBoundarySources(runtime, runtimeRoot, codeSources, true).map(({ path }) => path),
+    routeEntries: runtimeEntrySources(runtime, runtimeRoot, codeSources).map(({ path }) => path),
+    resolveImport: (from, specifier) => resolveLocalSource(runtimeRoot, from, specifier, sourceByPath),
+  });
+}
+
 async function verifyFrontendSources(contract, catalogMaturity) {
     for (const runtime of contract.runtimes || []) {
       if (!['mobile', 'web'].includes(runtime.kind) || runtime.framework === 'flutter') continue;
@@ -2741,11 +2774,13 @@ async function verifyFrontendSources(contract, catalogMaturity) {
         path,
         source: sanitizeJavaScriptStructure(source),
         rawSource: stripCodeComments(source),
+        originalSource: source,
       }));
       const reachableSources = reachableRuntimeSources(runtime, runtimeRoot, codeSources);
       const boundarySources = providerBoundarySources(runtime, runtimeRoot, codeSources);
       const providerSymbol = runtime.kind === 'web' ? 'HjmProvider' : 'HjmNativeProvider';
       const rendererPackage = runtime.kind === 'web' ? '@hjmds/react' : '@hjmds/react-native';
+      const analysis = sourceAnalysis(runtime, runtimeRoot, codeSources, rendererPackage, providerSymbol);
       const rendererReExport = new RegExp('\\\\bexport\\\\s+(?:\\\\*|\\\\{[^}]*\\\\})\\\\s+from\\\\s*[\\\'"]' + rendererPackage + '(?:/[^\\\'"]+)?[\\\'"]');
       const dynamicRendererImport = new RegExp('\\\\bimport\\\\s*\\\\(\\\\s*[\\\'"]' + rendererPackage + '(?:/[^\\\'"]+)?[\\\'"]');
       const rendererLiteral = new RegExp('[\\\'"]' + rendererPackage + '(?:/[^\\\'"]+)?[\\\'"]');
@@ -2766,14 +2801,14 @@ async function verifyFrontendSources(contract, catalogMaturity) {
         if (rendererLiteral.test(rawSource.replace(namedRendererImport, '').replace(typeRendererImport, '').replace(styleRendererImport, ''))) add(relative(appRoot, path), 'HJM renderer references outside direct static named imports are prohibited');
       }
       const providerImport = new RegExp('(?:^|\\\\n)\\\\s*import\\\\s*\\\\{[^}]*\\\\b' + providerSymbol + '\\\\b[^}]*\\\\}\\\\s*from\\\\s*[\\\'\"]' + rendererPackage + '(?:/[^\\\'\"]+)?[\\\'\"]', 'm');
-      if (!boundarySources.some(({ source, rawSource }) => providerImport.test(source)
+      if (analysis ? !analysis.providerFound : !boundarySources.some(({ source, rawSource }) => providerImport.test(source)
         && exportedRootReturnExpressions(source, rawSource).some((expression) => returnedTreeHasProvider(expression, providerSymbol)))) {
-        add(runtime.root, 'active frontend runtime must directly import ' + providerSymbol + ' and render theme="system" inside the canonical exported root boundary; dead helper JSX does not satisfy this gate');
+        add(runtime.root, 'active frontend runtime must render ' + providerSymbol + ' through the canonical exported root boundary; dead helper JSX does not satisfy this gate');
       }
       const requiredSymbols = ['Text', 'Icon', 'Stack', 'Container'];
       for (const symbol of requiredSymbols) {
         const symbolImport = new RegExp('(?:^|\\\\n)\\\\s*import\\\\s*\\\\{[^}]*\\\\b' + symbol + '\\\\b[^}]*\\\\}\\\\s*from\\\\s*[\\\'\"]' + rendererPackage + '(?:/[^\\\'\"]+)?[\\\'\"]', 'm');
-        if (!boundarySources.some(({ source, rawSource }) => symbolImport.test(source)
+        if (analysis ? !analysis.renderedFoundations.has(symbol) : !boundarySources.some(({ source, rawSource }) => symbolImport.test(source)
           && exportedRootReturnExpressions(source, rawSource)
             .some((expression) => hasDirectRenderedJsxTag(expression, symbol)))) {
           add(runtime.root, 'required foundation ' + symbol + ' must be imported from the declared renderer and rendered in the canonical exported root return tree');
@@ -2855,10 +2890,10 @@ async function verifyFrontendSources(contract, catalogMaturity) {
             }
           }
           for (const tag of renderedTags) {
-            if (/\\{\\s*\\.\\.\\./.test(tag.attrs)) {
+            if (tag.unsafeSpread ?? /\\{\\s*\\.\\.\\./.test(tag.attrs)) {
               add(relative(appRoot, path), 'HJM component ' + localSymbol + ' uses a spread prop; explicit props are required so prohibited style-like props cannot be hidden');
             }
-            for (const prop of tag.attrs.matchAll(/\\b([A-Za-z][A-Za-z0-9]*Style|style)\\s*=/g)) {
+            for (const prop of (tag.props ? tag.props.filter((name) => /(?:Style|^style)$/.test(name)).map((name) => [name, name]) : tag.attrs.matchAll(/\\b([A-Za-z][A-Za-z0-9]*Style|style)\\s*=/g))) {
               // HJM 0.9.3부터 아래 slot prop들은 타입이 HjmCompositionStyleProp으로 좁혀져
               // 배치 키만 받는다. 규칙의 목적은 recipe 소유 외형을 slot으로 숨기는 것을
               // 막는 것이므로, 타입이 이미 막는 slot은 금지 대상이 아니다.
@@ -2868,7 +2903,7 @@ async function verifyFrontendSources(contract, catalogMaturity) {
         };
         for (const [localSymbol, exportedSymbol] of importedHjmSymbols) {
           const openingTag = new RegExp('<' + localSymbol + '\\\\b([^>]*)>', 'g');
-          inspectRenderedTags(localSymbol, exportedSymbol, [...source.matchAll(openingTag)].map((match) => ({ attrs: match[1] })));
+          inspectRenderedTags(localSymbol, exportedSymbol, analysis ? (analysis.tags.get(path) || []).filter((tag) => tag.name === localSymbol) : [...source.matchAll(openingTag)].map((match) => ({ attrs: match[1] })));
         }
         for (const namespace of namespaceImports) {
           const namespaceTag = new RegExp('<' + namespace + '\\\\.([A-Za-z_$][A-Za-z0-9_$]*)\\\\b([^>]*)>', 'g');
@@ -2877,7 +2912,12 @@ async function verifyFrontendSources(contract, catalogMaturity) {
       }
       const rawPattern = /#[0-9A-Fa-f]{3,8}\\b|\\b(?:rgb|rgba|hsl|hsla|oklch|lab|lch|color)\\s*\\(|(?:^|[^0-9])(?:[0-9]*\\.[0-9]+)(?:px|rem|em|pt)\\b|\\b(?:gap|rowGap|columnGap|padding|margin|borderRadius|fontSize|lineHeight|letterSpacing)\\s*[:=]\\s*(?:-?(?:[0-9]+(?:\\.[0-9]+)?|\\.[0-9]+)(?:px|rem|em|pt|%)?|['"]-?(?:[0-9]+(?:\\.[0-9]+)?|\\.[0-9]+)(?:px|rem|em|pt|%)?['"])|\\b(?:padding|margin|font-size|line-height|letter-spacing|row-gap|column-gap|border-radius)\\s*:\\s*-?(?:[0-9]+(?:\\.[0-9]+)?|\\.[0-9]+)(?:px|rem|em|pt|%)?\\b|\\b(?:color|backgroundColor)\\s*[:=]\\s*['"](?:red|blue|green|black|white|gray|grey|transparent)['"]|\\b(?:color|background-color)\\s*:\\s*(?:red|blue|green|black|white|gray|grey|transparent)\\b|\\b(?:bg|text|border)-(?:red|blue|green|black|white|gray|grey|amber|indigo|violet|pink|rose)-[1-9][0-9]{1,2}\\b|\\b(?:(?:space-[xy])|p|px|py|pt|pr|pb|pl|m|mx|my|mt|mr|mb|ml|gap)-[0-9]+(?:\\.[0-9]+)?\\b|var\\(\\s*--(?!hjm-)[A-Za-z0-9_-]+/i;
       const rawPatternAll = new RegExp(rawPattern.source, 'gi');
-      for (const { path, rawSource } of reachableSources) {
+      for (const { path, rawSource: raw, originalSource } of reachableSources) {
+        let inspected = originalSource;
+        for (const [start, end] of [...(analysis?.paletteRanges.get(path) || [])].reverse()) {
+          inspected = inspected.slice(0, start) + inspected.slice(start, end).replace(/[^\\n]/g, ' ') + inspected.slice(end);
+        }
+        const rawSource = analysis ? stripCodeComments(inspected) : raw;
         if (/(?:^|\\/)(?:test|tests|__tests__)\\//.test(path)) continue;
         rawPatternAll.lastIndex = 0;
         const hits = [];
@@ -3169,6 +3209,7 @@ async function buildScaffoldFiles(contract) {
     [`${contract.documents.decisionsDir}/ADR-0000-template.md`, renderedAdr],
     ['tools/runtime-bindings.mjs', readFileSync(resolve(scriptDirectory, 'runtime-bindings.mjs'), 'utf8')],
     ['tools/version-train.mjs', readFileSync(resolve(scriptDirectory, 'version-train.mjs'), 'utf8')],
+    ['tools/hjm-source-analysis.mjs', readFileSync(resolve(scriptDirectory, 'hjm-source-analysis.mjs'), 'utf8')],
     ['tools/app-standard-core.mjs', appStandardCore],
     ['tools/check-app-contract.mjs', makeLocalContractChecker()],
     ['tools/check-doc-links.mjs', docLinksCore],
@@ -3912,6 +3953,7 @@ function bindingProjectionSources(contract) {
     [canonicalReleaseRelativePath, canonicalReleaseSource],
     ['tools/runtime-bindings.mjs', readFileSync(resolve(scriptDirectory, 'runtime-bindings.mjs'), 'utf8')],
     ['tools/version-train.mjs', readFileSync(resolve(scriptDirectory, 'version-train.mjs'), 'utf8')],
+    ['tools/hjm-source-analysis.mjs', readFileSync(resolve(scriptDirectory, 'hjm-source-analysis.mjs'), 'utf8')],
     ['tools/run-quality.mjs', `#!/usr/bin/env node\nimport { runBoundQuality } from './runtime-bindings.mjs';\nimport { resolve } from 'node:path';\ntry { await runBoundQuality(resolve(import.meta.dirname, '..'), process.argv[2] ?? 'check'); }\ncatch (error) { console.error(error.message); process.exitCode = 1; }\n`],
     ['tools/app-standard-core.mjs', core],
     ['tools/check-app-contract.mjs', makeLocalContractChecker()],
@@ -3941,6 +3983,7 @@ export function standardProjectionSources(contract) {
     [canonicalReleaseRelativePath, canonicalReleaseSource],
     ['tools/runtime-bindings.mjs', readFileSync(resolve(scriptDirectory, 'runtime-bindings.mjs'), 'utf8')],
     ['tools/version-train.mjs', readFileSync(resolve(scriptDirectory, 'version-train.mjs'), 'utf8')],
+    ['tools/hjm-source-analysis.mjs', readFileSync(resolve(scriptDirectory, 'hjm-source-analysis.mjs'), 'utf8')],
     ['tools/app-standard-core.mjs', readFileSync(fileURLToPath(import.meta.url), 'utf8')],
     ['tools/check-app-contract.mjs', makeLocalContractChecker()],
     ['tools/check-doc-links.mjs', readFileSync(resolve(scriptDirectory, 'check-doc-links.mjs'), 'utf8')],
@@ -3983,7 +4026,7 @@ export async function syncStandardProjections(appRoot, { write = false } = {}) {
   const findings = [];
   // Only explicitly introduced central projections may be created during migration.
   // Missing older scaffold files still require repair, and symlinks are rejected.
-  const mayCreate = new Set([canonicalReleaseRelativePath, canonicalCatalogRelativePath, 'tools/runtime-bindings.mjs', 'tools/version-train.mjs', 'tools/check-hjm-source.mjs']);
+  const mayCreate = new Set([canonicalReleaseRelativePath, canonicalCatalogRelativePath, 'tools/runtime-bindings.mjs', 'tools/version-train.mjs', 'tools/hjm-source-analysis.mjs', 'tools/check-hjm-source.mjs']);
   const readProjection = async (path) => await assertSyncPath(absoluteRoot, path, { allowMissing: mayCreate.has(path) })
     ? readRegularTextFile(resolve(absoluteRoot, path), path) : null;
   for (const [path, expected] of standardProjectionSources(contract)) {
@@ -4198,6 +4241,7 @@ export async function checkAppConformance(appRoot, { now = new Date(), targetSta
     'tools/app-standard-core.mjs',
     'tools/runtime-bindings.mjs',
     'tools/version-train.mjs',
+    'tools/hjm-source-analysis.mjs',
     'tools/check-app-contract.mjs',
     'tools/check-doc-links.mjs',
     'tools/check-design-contract.mjs',

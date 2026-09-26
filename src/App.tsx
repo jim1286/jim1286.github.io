@@ -1,5 +1,7 @@
 import type { ReactNode } from 'react';
 import { HjmProvider } from '@hjmds/react/provider';
+import { Link } from '@hjmds/react/actions';
+import { BrandProvider } from './BrandProvider';
 import { Container, Stack, Text } from '@hjmds/react/layout';
 import { Icon } from '@hjmds/react/display';
 import '@hjmds/react/styles.css';
@@ -20,15 +22,16 @@ const githubProfile = 'https://github.com/jim1286';
 
 function ExternalLink({ href, className, children }: { href: string; className?: string; children: ReactNode }) {
   return (
-    <a href={href} className={className} target="_blank" rel="noreferrer">
+    <Link href={href} className={className} target="_blank" rel="noreferrer" tone="neutral">
       {children}
-    </a>
+    </Link>
   );
 }
 
 export default function App() {
   return (
-    <HjmProvider theme="system">
+    <HjmProvider theme="system" host="contents">
+    <BrandProvider>
     <Container className="site-shell" size="full" gutter="none">
       <a className="skip-link" href="#main">본문 바로가기</a>
 
@@ -148,6 +151,7 @@ export default function App() {
         <a href="#top" aria-label="맨 위로">TOP <ArrowUpOutlined /></a>
       </footer>
     </Container>
+    </BrandProvider>
     </HjmProvider>
   );
 }

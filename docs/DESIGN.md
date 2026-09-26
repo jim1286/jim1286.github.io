@@ -32,7 +32,7 @@ version: "1.0.0"
 
 | ID | 기준 | 검증 방법 | 상태 | Evidence ID |
 | --- | --- | --- | --- | --- |
-| DESIGN-001 | Portfolio Site의 실제 frontend에서 기본·오류·빈 상태와 접근성, HJM foundation 의미 계약을 검증한다. | light/dark와 큰 글자를 포함한 parity review | pending | EV-003, EV-008, EV-009, EV-010, EV-011, EV-012 |
+| DESIGN-001 | Portfolio Site의 실제 frontend에서 기본·오류·빈 상태와 접근성, HJM foundation 의미 계약을 검증한다. | light/dark와 큰 글자를 포함한 parity review | pending | EV-003, EV-008, EV-009, EV-010, EV-011, EV-012, EV-1400 |
 
 ## 91. Evidence registry
 
@@ -44,6 +44,7 @@ version: "1.0.0"
 | EV-010 | DESIGN-001 | automated-test | docs/evidence/planned/icon-foundation.md | — | — | planned | jimin |
 | EV-011 | DESIGN-001 | automated-test | docs/evidence/planned/stack-foundation.md | — | — | planned | jimin |
 | EV-012 | DESIGN-001 | automated-test | docs/evidence/planned/container-foundation.md | — | — | planned | jimin |
+| EV-1400 | DESIGN-001 | automated-test | docs/evidence/planned/hjm-1-4-link.md | — | — | planned | jimin |
 
 <!-- hjm-contract-evidence
 {
@@ -61,7 +62,8 @@ version: "1.0.0"
         "EV-009",
         "EV-010",
         "EV-011",
-        "EV-012"
+        "EV-012",
+        "EV-1400"
       ]
     }
   ],
@@ -124,6 +126,16 @@ version: "1.0.0"
       ],
       "type": "automated-test",
       "location": "docs/evidence/planned/container-foundation.md",
+      "status": "planned",
+      "owner": "jimin"
+    },
+    {
+      "id": "EV-1400",
+      "criterionIds": [
+        "DESIGN-001"
+      ],
+      "type": "automated-test",
+      "location": "docs/evidence/planned/hjm-1-4-link.md",
       "status": "planned",
       "owner": "jimin"
     }

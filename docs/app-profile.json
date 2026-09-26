@@ -367,43 +367,7 @@
       "discoveryUrl": "https://github.com/jim1286/hjm-design-system/blob/main/packages/design-contracts/docs/consumer-policy.md",
       "authority": false
     },
-    "requiredFoundations": [
-      {
-        "componentId": "design-system-provider",
-        "maturity": "beta",
-        "rationaleId": "HJM-FOUNDATION-CORE-001",
-        "rationale": "Frontend roots require the HJM environment provider; the pinned catalog still marks it beta, so app adapter evidence is gated by lifecycle.",
-        "evidenceGate": "planned-in-draft-verified-before-active"
-      },
-      {
-        "componentId": "text",
-        "maturity": "beta",
-        "rationaleId": "HJM-FOUNDATION-CORE-001",
-        "rationale": "Semantic typography is required to avoid raw product type scales while the pinned catalog entry remains beta.",
-        "evidenceGate": "planned-in-draft-verified-before-active"
-      },
-      {
-        "componentId": "icon",
-        "maturity": "beta",
-        "rationaleId": "HJM-FOUNDATION-CORE-001",
-        "rationale": "Accessible icon semantics are part of the minimum cross-platform foundation while the pinned catalog entry remains beta.",
-        "evidenceGate": "planned-in-draft-verified-before-active"
-      },
-      {
-        "componentId": "stack",
-        "maturity": "beta",
-        "rationaleId": "HJM-FOUNDATION-CORE-001",
-        "rationale": "Semantic spacing composition is required to prevent raw spacing drift while the pinned catalog entry remains beta.",
-        "evidenceGate": "planned-in-draft-verified-before-active"
-      },
-      {
-        "componentId": "container",
-        "maturity": "beta",
-        "rationaleId": "HJM-FOUNDATION-CORE-001",
-        "rationale": "Content width and page gutter semantics are part of the minimum foundation while the pinned catalog entry remains beta.",
-        "evidenceGate": "planned-in-draft-verified-before-active"
-      }
-    ],
+    "requiredFoundations": [],
     "optionalBetaAdoptionRequiredFields": [
       "componentId",
       "adrPath",
