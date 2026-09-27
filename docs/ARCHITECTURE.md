@@ -42,8 +42,8 @@ projection 무결성 비교에 사용하며 외부 승인·진위 보증은 아�
 
 ## 91. Evidence registry
 
-| ID | 타입 | 위치 | 상태 | 소유자 | 캡처 시각 | digest |
-| --- | --- | --- | --- | --- | --- | --- |
+| ID | 기준 | 타입 | 위치 | 캡처 시각 | digest | 상태 | 소유자 |
+| --- | --- | --- | --- | --- | --- | --- | --- |
 | EV-002 | ARCH-001 | automated-test | docs/evidence/planned/dependency-boundaries.md | — | — | planned | jimin |
 
 <!-- hjm-contract-evidence

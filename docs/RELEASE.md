@@ -56,8 +56,8 @@ pnpm run preview
 
 ## 91. Evidence registry
 
-| ID | 타입 | 위치 | 상태 | 소유자 | 캡처 시각 | digest |
-| --- | --- | --- | --- | --- | --- | --- |
+| ID | 기준 | 타입 | 위치 | 캡처 시각 | digest | 상태 | 소유자 |
+| --- | --- | --- | --- | --- | --- | --- | --- |
 | EV-007 | RELEASE-001 | build-log | docs/evidence/planned/release-smoke.md | — | — | planned | jimin |
 
 <!-- hjm-contract-evidence
