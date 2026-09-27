@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react';
+import { useEffect, type ReactNode } from 'react';
 import { HjmProvider } from '@hjmds/react/provider';
 import { Link } from '@hjmds/react/actions';
 import { BrandProvider } from './BrandProvider';
@@ -19,16 +19,22 @@ import './styles/site.css';
 
 const developerEmail = 'jimin1286@gmail.com';
 const githubProfile = 'https://github.com/jim1286';
+const posliApps = apps.filter((app) => app.socialHook && app.statusTone === 'live');
 
-function ExternalLink({ href, className, children }: { href: string; className?: string; children: ReactNode }) {
+function ExternalLink({ href, className, ariaLabel, children }: { href: string; className?: string; ariaLabel?: string; children: ReactNode }) {
   return (
-    <Link href={href} className={className} target="_blank" rel="noreferrer" tone="neutral">
+    <Link href={href} className={className} aria-label={ariaLabel} target="_blank" rel="noreferrer" tone="neutral">
       {children}
     </Link>
   );
 }
 
 export default function App() {
+  // The social bio opens /#posli before React mounts; scroll again after the anchor exists.
+  useEffect(() => {
+    if (window.location.hash === '#posli') document.getElementById('posli')?.scrollIntoView({ behavior: 'instant' });
+  }, []);
+
   return (
     <HjmProvider theme="system" host="contents">
     <BrandProvider>
@@ -41,6 +47,7 @@ export default function App() {
           <span>Hwang Jimin</span>
         </a>
         <nav aria-label="주요 메뉴">
+          <a href="#posli">포슬이의 앱</a>
           <a href="#apps">Apps</a>
           <a href="#legal">Support &amp; Privacy</a>
           <a href="#developer">Developer</a>
@@ -72,6 +79,34 @@ export default function App() {
           </aside>
         </section>
 
+        <section className="section posli-section" id="posli" aria-labelledby="posli-title">
+          <div className="posli-intro">
+            <img src="/posli-avatar.png" alt="작은 앱 카드를 품에 안은 포슬이" className="posli-avatar" />
+            <div>
+              <p className="section-index">POSLI / APP CARDS</p>
+              <h2 id="posli-title">포슬이가 꺼낸<br />앱 카드 🥔</h2>
+              <p>엉뚱한 궁금증 하나가 작은 앱이 됐어. 궁금한 카드를 골라봐!</p>
+            </div>
+          </div>
+          <div className="posli-grid">
+            {posliApps.map((app) => (
+              <article className="posli-card" key={app.id}>
+                <img src={app.icon} alt="" className="posli-app-icon" />
+                <div className="posli-card-body">
+                  <h3>{app.name}</h3>
+                  <p>{app.socialHook}</p>
+                </div>
+                <div className="posli-card-links" aria-label={`${app.name} 열기`}>
+                  {app.webUrl && <ExternalLink href={app.webUrl} ariaLabel={`${app.name} 웹에서 열기`}>웹에서 열기 <ExportOutlined /></ExternalLink>}
+                  {app.iosUrl && <ExternalLink href={app.iosUrl} ariaLabel={`${app.name} iOS 앱 열기`}>iOS <AppleFilled /></ExternalLink>}
+                  {app.androidUrl && <ExternalLink href={app.androidUrl} ariaLabel={`${app.name} Android 앱 열기`}>Android <AndroidFilled /></ExternalLink>}
+                </div>
+              </article>
+            ))}
+          </div>
+          <p className="posli-note">공개 페이지를 확인한 연결만 표시했어. 영상 속 그림은 앱 화면과 다를 수 있어.</p>
+        </section>
+
         <section className="section apps-section" id="apps">
           <div className="section-heading">
             <div><p className="section-index">01 / APPS</p><h2>만든 앱</h2></div>
@@ -92,6 +127,7 @@ export default function App() {
                   {app.tags.map((tag) => <li key={tag}>{tag}</li>)}
                 </ul>
                 <div className="app-links">
+                  {app.webUrl && <ExternalLink href={app.webUrl}><ExportOutlined /> Web</ExternalLink>}
                   {app.iosUrl && <ExternalLink href={app.iosUrl}><AppleFilled /> App Store</ExternalLink>}
                   {app.androidUrl && <ExternalLink href={app.androidUrl}><AndroidFilled /> Google Play</ExternalLink>}
                   <ExternalLink href={app.githubUrl}><GithubOutlined /> Source</ExternalLink>

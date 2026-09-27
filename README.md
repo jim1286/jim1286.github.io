@@ -46,6 +46,8 @@ Hub 최신 상태를 확인한 것으로 표시하지 않습니다.
 [제품](docs/PRODUCT.md) · [아키텍처](docs/ARCHITECTURE.md) · [디자인](docs/DESIGN.md) ·
 [릴리스](docs/RELEASE.md). 이 앱은 공통 v1 심사 대상이며, 실제 계약 이관은 완료했고 구현 준수·운영 evidence는 별도 검증 대상입니다.
 
+소셜 브랜드에서 앱으로 이어지는 포슬이 앱 카드 진입점은 [`/#posli`](https://jim1286.github.io/#posli)입니다. 공개 배포 전에는 이 주소가 아직 새 화면을 가리키지 않으며, 제품 범위와 검증 기준은 [제품 문서](docs/PRODUCT.md#포슬이-소셜-진입점)에 기록합니다.
+
 ## 공통 개발 계약
 
 `app.contract.json`이 실제 runtime·lockfile·검사 명령과 acceptance/evidence를 연결한다.
