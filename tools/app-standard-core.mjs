@@ -50,6 +50,18 @@ const canonicalCatalog = JSON.parse(canonicalCatalogSource);
 const canonicalCatalogSha256 = createHash('sha256').update(canonicalCatalogSource).digest('hex');
 const expectedCatalogSha256 = canonicalRelease.catalog.sha256;
 const catalogMaturity = new Map(canonicalCatalog.components.map(({ id, status }) => [id, status]));
+// consumer-policy.md ships inside @hjmds/design-contracts (export "./consumer-policy.md"),
+// so the citable policy version is the one the pinned release published, recorded by
+// sync-design-system.mjs. A hardcoded '1.2.0' fell behind HJM 1.5's policy 1.3.0
+// unnoticed (2026-09-27 audit §5). sync-standard does not rewrite app contracts; when a
+// release bumps the policy, list the previous version here only until every app contract
+// is bumped by hand. 2026-09-27: all eight contracts moved to 1.3.0, so '1.2.0' was
+// removed. An empty list keeps an old citation failing instead of passing silently.
+const legacyCompanionPolicyVersions = [];
+const acceptedCompanionPolicyVersions = new Set([
+  ...(canonicalRelease.consumerPolicy ? [canonicalRelease.consumerPolicy.version] : []),
+  ...legacyCompanionPolicyVersions,
+]);
 const execFileAsync = promisify(execFile);
 
 const contractVersion = 1;
@@ -311,7 +323,13 @@ function assertDesignReleaseRecord(release) {
     || release.catalog?.snapshotSource !== 'docs/profiles/hjm-catalog.snapshot.json'
     || release.catalog?.generatedPath !== 'docs/hjm-catalog.snapshot.json'
     || !/^[a-f0-9]{64}$/.test(release.catalog?.sha256)
-    || Object.keys(release.packages ?? {}).sort().join() !== [...packageNames].sort().join()) {
+    || Object.keys(release.packages ?? {}).sort().join() !== [...packageNames].sort().join()
+    // Optional: releases before the policy export, and records imported before
+    // 2026-09-27, carry no consumerPolicy and fall back to the legacy accepted set.
+    || (release.consumerPolicy !== undefined && (Object.keys(release.consumerPolicy).sort().join() !== 'contentSha256,sourcePath,version'
+      || !/^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$/.test(release.consumerPolicy.version)
+      || release.consumerPolicy.sourcePath !== 'packages/design-contracts/docs/consumer-policy.md'
+      || !/^[a-f0-9]{64}$/.test(release.consumerPolicy.contentSha256)))) {
     throw new Error('Invalid central HJM release record; import a published release with sync-design-system.mjs.');
   }
   for (const name of packageNames) {
@@ -692,10 +710,10 @@ function validateDesignSystem(designSystem, runtimes, acceptance, app, governanc
     const policyPath = 'contract.designSystem.companionPolicy';
     assertKeys(designSystem.companionPolicy, new Set(['id', 'version', 'status', 'discoveryUrl']), policyPath, findings);
     if (designSystem.companionPolicy.id !== 'hjm-consumer-policy'
-      || designSystem.companionPolicy.version !== '1.2.0'
+      || !acceptedCompanionPolicyVersions.has(designSystem.companionPolicy.version)
       || designSystem.companionPolicy.status !== 'informational-next-release-pending'
       || designSystem.companionPolicy.discoveryUrl !== 'https://github.com/jim1286/hjm-design-system/blob/main/packages/design-contracts/docs/consumer-policy.md') {
-      addFinding(findings, 'COMPANION_POLICY_INVALID', policyPath, 'companionPolicy is informational only and must identify the repo-local HJM policy pending a future release artifact.');
+      addFinding(findings, 'COMPANION_POLICY_INVALID', policyPath, `companionPolicy is informational only and must identify the HJM consumer policy at a version published with the pinned release (${[...acceptedCompanionPolicyVersions].join(', ')}).`);
     }
   }
   const declaredEvidence = new Map(
@@ -1838,6 +1856,22 @@ if (result.mode === 'rehearsal') {
 `;
 }
 
+// One symbol-to-catalog mapping serves both directions: the generated checker's
+// "imported beta must be declared" gate and the central "declared beta must be
+// imported" check. The catalog snapshot keeps only IDs (its SHA is pinned in every
+// app contract), so export names cannot come from there without re-pinning apps.
+function componentIdFromSymbol(symbol) {
+  if (symbol === 'HjmProvider' || symbol === 'HjmNativeProvider') return 'design-system-provider';
+  // The native renderer exports TextField for the catalog's shared Field recipe.
+  if (symbol === 'TextField') return 'field';
+  if (symbol === 'TabPanel') return 'tabs';
+  if (symbol === 'ToastProvider' || symbol === 'ToastRegion') return 'toast';
+  return symbol
+    .replace(/([a-z0-9])([A-Z])/g, '$1-$2')
+    .replace(/([A-Z])([A-Z][a-z])/g, '$1-$2')
+    .toLowerCase();
+}
+
 function makeLocalDesignChecker({ runtimeBindings = false } = {}) {
   return `#!/usr/bin/env node
 
@@ -2452,17 +2486,7 @@ function verifyLockedDependency(lock, importerRoot, name, requirement, { mode = 
   }
 }
 
-function componentIdFromSymbol(symbol) {
-  if (symbol === 'HjmProvider' || symbol === 'HjmNativeProvider') return 'design-system-provider';
-  // The native renderer exports TextField for the catalog's shared Field recipe.
-  if (symbol === 'TextField') return 'field';
-  if (symbol === 'TabPanel') return 'tabs';
-  if (symbol === 'ToastProvider' || symbol === 'ToastRegion') return 'toast';
-  return symbol
-    .replace(/([a-z0-9])([A-Z])/g, '$1-$2')
-    .replace(/([A-Z])([A-Z][a-z])/g, '$1-$2')
-    .toLowerCase();
-}
+${componentIdFromSymbol.toString()}
 
 function isNoopScript(command) {
   if (typeof command !== 'string' || !command.trim()) return true;
@@ -4174,6 +4198,114 @@ async function checkDeploymentContract(appRoot, contract, findings) {
   }
 }
 
+// Declaration honesty: an optionalBetaAdoptions entry claims shipped use of a beta,
+// with an ADR and evidence behind it. Nothing compared that claim with the code, so
+// diairy's select and unairplane's divider stayed declared with no live use (2026-09-27
+// audit §5). This runs at every stage because a false claim is false in draft too; the
+// renderer gate in the generated checker only runs at implementation-conformant.
+// Textual on purpose: the portable core must run before dependencies are installed, so
+// it cannot rely on the app's TypeScript. A use counts when a non-type import from an
+// HJM renderer is referenced outside the import, and not only inside a top-level
+// declaration that nothing else references (one-hop dead-wrapper check; the case
+// that hid unairplane's AppDivider). Deeper dead chains are left to the source gate.
+const betaUsageIgnoredDirectories = new Set(['.git', '.next', '.expo', '.turbo', 'build', 'coverage', 'dist', 'dist-standard', 'storybook-static', 'node_modules', 'ios', 'android', 'Pods', 'web-build']);
+const betaUsageExcludedFile = /(?:^|\/)(?:test|tests|__tests__|__mocks__|e2e|stories|showcase)\/|\.(?:test|spec|stories|story)\.[cm]?[jt]sx?$|(?:^|\/)[^/]*showcase[^/]*$/i;
+
+async function collectBetaUsageSources(directory, relativeTo, files = []) {
+  let entries;
+  try { entries = await readdir(directory, { withFileTypes: true }); } catch { return files; }
+  for (const entry of entries) {
+    if (entry.isSymbolicLink()) continue;
+    const path = join(directory, entry.name);
+    if (entry.isDirectory()) {
+      if (!betaUsageIgnoredDirectories.has(entry.name)) await collectBetaUsageSources(path, relativeTo, files);
+    } else if (entry.isFile() && /\.[cm]?[jt]sx?$/.test(entry.name) && !/\.d\.[cm]?ts$/.test(entry.name)
+      && !betaUsageExcludedFile.test(relative(relativeTo, path).split(sep).join('/'))) {
+      files.push(path);
+    }
+  }
+  return files;
+}
+
+function blankComments(source) {
+  const blank = (text) => text.replace(/[^\n]/g, ' ');
+  return source
+    .replace(/\/\*[\s\S]*?\*\//g, blank)
+    .replace(/(^|[^:\\])(\/\/[^\n]*)/g, (_match, prefix, comment) => prefix + blank(comment));
+}
+
+export function declaredBetaUsage(files) {
+  const escape = (name) => name.replace(/\$/g, '\\$');
+  const wordPattern = (name, flags = 'g') => new RegExp(`(?<![\\w$.])${escape(name)}(?![\\w$])`, flags);
+  const parsed = files.map(({ path, source }) => {
+    let body = blankComments(source);
+    const locals = [];
+    const importPattern = /\bimport\s+(type\s+)?\{([^}]*)\}\s*from\s*['"]@hjmds\/react(?:-native)?(?:\/[^'"]*)?['"]\s*;?/g;
+    for (const match of body.matchAll(importPattern)) {
+      body = body.slice(0, match.index) + match[0].replace(/[^\n]/g, ' ') + body.slice(match.index + match[0].length);
+      if (match[1]) continue;
+      for (const specifier of match[2].split(',')) {
+        const text = specifier.trim();
+        if (!text || /^type\s/.test(text)) continue;
+        const [exported, local] = text.split(/\s+as\s+/).map((part) => part.trim());
+        // Hooks name their component (useToast -> toast); other lowercase helpers map to no catalog ID.
+        const symbol = /^use[A-Z]/.test(exported) ? exported.slice(3) : exported;
+        if (/^[A-Z]/.test(symbol)) locals.push({ local: local || exported, componentId: componentIdFromSymbol(symbol) });
+      }
+    }
+    const declarations = [...body.matchAll(/^(export\s+(default\s+)?)?(?:async\s+)?(?:function\*?|const|let|var|class)\s+([A-Za-z_$][\w$]*)/gm)]
+      .map((match) => ({ start: match.index, name: match[3], isDefault: Boolean(match[2]) }));
+    declarations.forEach((declaration, index) => { declaration.end = declarations[index + 1]?.start ?? body.length; });
+    return { path, body, locals, declarations };
+  });
+  const referencedOutside = (name, owner, declaration) => parsed.some((file) => [...file.body.matchAll(wordPattern(name))]
+    .some((match) => file !== owner || match.index < declaration.start || match.index >= declaration.end));
+  const used = new Map();
+  for (const file of parsed) {
+    for (const { local, componentId } of file.locals) {
+      if (used.has(componentId)) continue;
+      for (const match of file.body.matchAll(wordPattern(local))) {
+        const declaration = file.declarations.find(({ start, end }) => match.index >= start && match.index < end);
+        if (!declaration || declaration.isDefault || declaration.name === local
+          || referencedOutside(declaration.name, file, declaration)) {
+          used.set(componentId, file.path);
+          break;
+        }
+      }
+    }
+  }
+  return used;
+}
+
+async function checkDeclaredBetaUsage(appRoot, contract, findings) {
+  const designSystem = contract.designSystem;
+  // Flutter adapters render no @hjmds package; their Dart sources are bound separately.
+  if (designSystem?.applicability !== 'frontend' || !Array.isArray(designSystem.optionalBetaAdoptions)) return;
+  const declared = designSystem.optionalBetaAdoptions
+    .map((adoption, index) => ({ componentId: adoption?.componentId, index }))
+    .filter(({ componentId }) => typeof componentId === 'string');
+  if (declared.length === 0) return;
+  const roots = (Array.isArray(contract.runtimes) ? contract.runtimes : [])
+    .filter((runtime) => ['mobile', 'web'].includes(runtime?.kind) && runtime.framework !== 'flutter' && validRelativePath(runtime.root))
+    .map((runtime) => resolve(appRoot, runtime.root))
+    .filter((root) => isInside(appRoot, root));
+  if (roots.length === 0) return;
+  const paths = new Set();
+  for (const root of roots) for (const path of await collectBetaUsageSources(root, root)) paths.add(path);
+  // A fresh scaffold may declare its planned betas before the runtime initializer
+  // has produced any source; there is no code yet for the claim to contradict.
+  if (paths.size === 0) return;
+  const files = [];
+  for (const path of paths) files.push({ path, source: await readFile(path, 'utf8') });
+  const used = declaredBetaUsage(files);
+  for (const { componentId, index } of declared) {
+    if (!used.has(componentId)) {
+      addFinding(findings, 'OPTIONAL_BETA_ADOPTION_UNUSED', `contract.designSystem.optionalBetaAdoptions[${index}].componentId`,
+        `Optional beta "${componentId}" is declared but no non-test source under the frontend runtime roots imports it from an HJM renderer and uses it; remove the declaration with its ADR and evidence, or ship the use.`);
+    }
+  }
+}
+
 export async function checkAppConformance(appRoot, { now = new Date(), targetStage } = {}) {
   const absoluteRoot = resolve(appRoot);
   const findings = [];
@@ -4474,6 +4606,7 @@ export async function checkAppConformance(appRoot, { now = new Date(), targetSta
     }
   }
   await checkDeploymentContract(absoluteRoot, contract, findings);
+  await checkDeclaredBetaUsage(absoluteRoot, contract, findings);
   const resolvedTargetStage = implementationGate ? 'implementation-conformant' : 'governance-scaffold';
   const sourceChecker = bound(contract) ? 'tools/check-hjm-source.mjs' : 'tools/check-design-contract.mjs';
   if (implementationGate

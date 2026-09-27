@@ -36,8 +36,8 @@ version: "1.0.0"
 
 ## 91. Evidence registry
 
-| ID | 타입 | 위치 | 상태 | 소유자 | 캡처 시각 | digest |
-| --- | --- | --- | --- | --- | --- | --- |
+| ID | 기준 | 타입 | 위치 | 캡처 시각 | digest | 상태 | 소유자 |
+| --- | --- | --- | --- | --- | --- | --- | --- |
 | EV-003 | DESIGN-001 | review | docs/evidence/planned/design-parity.md | — | — | planned | jimin |
 | EV-008 | DESIGN-001 | automated-test | docs/evidence/planned/design-system-provider-boundary.md | — | — | planned | jimin |
 | EV-009 | DESIGN-001 | automated-test | docs/evidence/planned/text-foundation.md | — | — | planned | jimin |

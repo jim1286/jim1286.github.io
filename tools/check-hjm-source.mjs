@@ -910,6 +910,7 @@ function analyzeHjmSource(ts, { program, files, boundaryEntries, routeEntries, r
   const reexports = new Map();
   const tags = new Map();
   const paletteRanges = new Map();
+  const paletteValues = [];
   const compositionProps = new Set(['layoutStyle', 'headerStyle', 'copyStyle', 'actionStyle', 'contentStyle']);
   const legacy = (name) => /(?:Style|^style)$/.test(name) && !compositionProps.has(name);
   const unwrap = (node) => {
@@ -999,10 +1000,23 @@ function analyzeHjmSource(ts, { program, files, boundaryEntries, routeEntries, r
         if (imported?.exported === 'resolveDesignSystemProviderValue' && imported.target.startsWith('@hjmds/design-contracts')) {
           const options = node.arguments[1];
           if (options && ts.isObjectLiteralExpression(options)) for (const property of options.properties) {
-            if (ts.isPropertyAssignment(property) && property.name.getText(source) === 'brandPalette' && ts.isObjectLiteralExpression(property.initializer)) {
-              ranges.push([property.initializer.getStart(), property.initializer.end]);
-            }
+            if (property.name?.getText(source) !== 'brandPalette') continue;
+            if (ts.isPropertyAssignment(property)) paletteValues.push({ path, node: property.initializer });
+            else if (ts.isShorthandPropertyAssignment(property)) paletteValues.push({ path, node: property.name });
           }
+        }
+      }
+      // HJM 1.5 made the provider prop the supported palette path
+      // (brand-boundary.md); before this the prop's values were reported as raw
+      // colours while the equivalent resolver call was accepted (2026-09-27 audit §5).
+      // Only this runtime's provider counts, so a look-alike prop on another tag
+      // does not excuse its values.
+      if (ts.isJsxAttribute(node) && node.name.getText(source) === 'brandPalette'
+        && node.initializer && ts.isJsxExpression(node.initializer) && node.initializer.expression) {
+        const opening = node.parent.parent;
+        const imported = fileImports.get(opening.tagName.getText(source));
+        if (imported && isRenderer(imported.target) && imported.exported === providerSymbol) {
+          paletteValues.push({ path, node: node.initializer.expression });
         }
       }
       ts.forEachChild(node, visit);
@@ -1035,6 +1049,47 @@ function analyzeHjmSource(ts, { program, files, boundaryEntries, routeEntries, r
     if (!target) return null;
     return resolveDefinition(target, imported.exported === 'default' ? defaults.get(target) ?? 'default' : imported.exported, seen);
   };
+  // A palette is usually declared once as a const and passed by name, or split into
+  // light/dark members of that const. Follow identifiers and member reads to the
+  // object literal that holds the values, across local imports. Calls and anything
+  // unresolved stay inspected: an excuse must be provable from the source.
+  const paletteTarget = (path, node, seen = new Set()) => {
+    while (node && (ts.isParenthesizedExpression(node) || ts.isNonNullExpression(node) || ts.isAsExpression(node)
+      || (ts.isSatisfiesExpression?.(node) ?? false) || ts.isTypeAssertionExpression(node))) node = node.expression;
+    if (!node) return null;
+    if (ts.isObjectLiteralExpression(node)) return { path, node };
+    if (ts.isIdentifier(node)) {
+      const definition = resolveDefinition(path, node.text, seen);
+      return definition ? paletteTarget(definition.path, definition.node, seen) : null;
+    }
+    if (ts.isPropertyAccessExpression(node)) {
+      const owner = paletteTarget(path, node.expression, seen);
+      const member = owner?.node.properties.find((property) => property.name?.getText() === node.name.text);
+      if (member && ts.isPropertyAssignment(member)) return paletteTarget(owner.path, member.initializer, seen);
+      if (member && ts.isShorthandPropertyAssignment(member)) return paletteTarget(owner.path, member.name, seen);
+    }
+    return null;
+  };
+  const markPalette = (path, node, seen = new Set()) => {
+    const target = paletteTarget(path, node);
+    if (!target) return;
+    const id = key(target.path, target.node.pos);
+    if (seen.has(id)) return;
+    seen.add(id);
+    paletteRanges.get(target.path)?.push([target.node.getStart(), target.node.end]);
+    // Members that point at another declaration (light: PALETTE.day) keep their
+    // values in that declaration, which needs its own range. Nested literals are
+    // already inside this range; only their references are followed.
+    const follow = (literal) => {
+      for (const property of literal.properties) {
+        if (ts.isPropertyAssignment(property) && ts.isObjectLiteralExpression(property.initializer)) follow(property.initializer);
+        else if (ts.isPropertyAssignment(property)) markPalette(target.path, property.initializer, seen);
+        else if (ts.isShorthandPropertyAssignment(property)) markPalette(target.path, property.name, seen);
+      }
+    };
+    follow(target.node);
+  };
+  for (const { path, node } of paletteValues) markPalette(path, node);
   const returnExpressions = (fn) => {
     const body = callable(fn)?.body;
     if (!body) return [];

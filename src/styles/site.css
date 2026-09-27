@@ -8,6 +8,9 @@
   --muted: var(--hjm-color-text-muted);
   --line: var(--hjm-color-border);
   --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  /* Pretendard는 웹폰트로 싣지 않는다 — 방문자 기기에 설치돼 있을 때만 쓰이고, 대부분은 뒤의
+     시스템 글꼴(Apple SD Gothic Neo·Segoe UI 등)로 그려진다. 이것이 의도다: 정적 한 페이지에
+     폰트 요청·용량·FOUT를 더하는 대안(@font-face·CDN)은 버렸다(2026-09-27 점검, 네트워크 폰트 없음 유지). */
   --sans: Pretendard, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   color: var(--ink);
   background: var(--paper);
@@ -34,6 +37,16 @@ button, a { -webkit-tap-highlight-color: transparent; }
   font-weight: 800;
 }
 .skip-link:focus { top: 16px; }
+
+/* HJM Link를 쓰지 않는 원시 <a>(브랜드·내비·mailto·연락 띠·TOP)에도 키보드 포커스 링을 그린다.
+   2026-09-27 점검 전에는 .button 말고는 포커스 표시가 없었다. 두께·간격은 HJM 포커스 토큰을 따르고,
+   색만 currentColor다 — 링 색 토큰 --hjm-color-focus는 contentBrand(#173e2e)라 같은 색의 forest 헤더·
+   footer 위에서 보이지 않는다. 글자색은 이미 각 배경과 대비를 맞춘 값이다. 원시 <a>를 HJM Link로
+   바꾸는 대안은 링크 색·정렬이 달라져 브랜드 CSS를 다시 칠해야 해서 버렸다. */
+.portfolio-theme a:not(.hjm-link):not(.button):focus-visible {
+  outline: var(--hjm-focus-width) solid currentColor;
+  outline-offset: var(--hjm-focus-offset);
+}
 
 /* 브랜드 표면은 제품 palette가 소유한다. Provider의 시스템 테마 배경을
    그대로 물려받으면 밝은 카드와 본문 영역에 다크 기본색이 섞인다. */

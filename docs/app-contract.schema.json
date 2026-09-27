@@ -881,7 +881,8 @@
               "const": "hjm-consumer-policy"
             },
             "version": {
-              "const": "1.2.0"
+              "type": "string",
+              "pattern": "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)$"
             },
             "status": {
               "const": "informational-next-release-pending"
@@ -2026,7 +2027,8 @@
               "const": "hjm-consumer-policy"
             },
             "version": {
-              "const": "1.2.0"
+              "type": "string",
+              "pattern": "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)$"
             },
             "status": {
               "const": "informational-next-release-pending"
