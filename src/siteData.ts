@@ -34,7 +34,7 @@ export const apps: PortfolioApp[] = [
     githubUrl: 'https://github.com/jim1286/yajalal',
     iosUrl: 'https://apps.apple.com/kr/app/%EC%95%BC%EC%9E%98%EC%95%8C/id6749580205?uo=4',
     androidUrl: 'https://play.google.com/store/apps/details?id=dev.hjm.yajalal&hl=ko',
-    socialHook: '타율 하나만 보면 선수 이야기를 다 알 수 있을까?',
+    socialHook: '타율·출루율·OPS를 나란히 살펴볼 수 있어.',
     featured: true,
   },
   {
@@ -50,7 +50,7 @@ export const apps: PortfolioApp[] = [
     githubUrl: 'https://github.com/jim1286/choose_window',
     iosUrl: 'https://apps.apple.com/kr/app/%EC%84%A0%ED%83%9D%EC%9D%98%EC%B0%BD/id6759096524?uo=4',
     androidUrl: 'https://play.google.com/store/apps/details?id=dev.hjm.choosewindow&hl=ko',
-    socialHook: '같은 길도 출발 시간이 달라지면 햇빛 드는 쪽이 달라질까?',
+    socialHook: '경로와 출발 시각으로 좌우 창가의 햇빛을 예상해.',
   },
   {
     id: 'burntok',
@@ -65,7 +65,7 @@ export const apps: PortfolioApp[] = [
     githubUrl: 'https://github.com/jim1286/BurnTok',
     webUrl: 'https://burntok.jmstudioapps.com/',
     iosUrl: 'https://apps.apple.com/kr/app/id6810606625',
-    socialHook: '오늘만 쓸 작은 앱이 떠올랐다면?',
+    socialHook: '떠오른 작은 앱을 만들고, 써보고, 고쳐볼 수 있어.',
   },
   {
     id: 'taground',
@@ -91,7 +91,7 @@ export const apps: PortfolioApp[] = [
     tags: ['Expo', 'React Native', 'Offline'],
     githubUrl: 'https://github.com/jim1286/unairplane',
     iosUrl: 'https://apps.apple.com/kr/app/id6806942992',
-    socialHook: '비행기 모드에선 지금 어디쯤인지 어떻게 알지?',
+    socialHook: '저장한 일정으로 비행 구간을 오프라인에서 추정해.',
   },
 ];
 

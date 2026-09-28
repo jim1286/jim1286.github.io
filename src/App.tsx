@@ -85,7 +85,7 @@ export default function App() {
             <div>
               <p className="section-index">POSLI / APP CARDS</p>
               <h2 id="posli-title">포슬이가 꺼낸<br />앱 카드 🥔</h2>
-              <p>엉뚱한 궁금증 하나가 작은 앱이 됐어. 궁금한 카드를 골라봐!</p>
+              <p>포슬이가 만든 앱들이야. 지금 필요한 카드를 골라봐.</p>
             </div>
           </div>
           <div className="posli-grid">
@@ -104,7 +104,6 @@ export default function App() {
               </article>
             ))}
           </div>
-          <p className="posli-note">공개 페이지를 확인한 연결만 표시했어. 영상 속 그림은 앱 화면과 다를 수 있어.</p>
         </section>
 
         <section className="section apps-section" id="apps">
