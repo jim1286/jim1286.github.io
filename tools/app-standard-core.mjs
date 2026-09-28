@@ -1648,42 +1648,63 @@ export function qualityGateServicePorts(contract) {
   return { postgres, redis: postgres + 1 };
 }
 
+// unbound 게이트는 루트 `pnpm check` 체인 하나를 job 셋으로 나눠 병렬로 돌린다.
+// 왜 나눴나: 한 step짜리 `pnpm check`가 다에리에서 588초였고(2026-09-28 run 36425258275:
+// lint 38s·format 16s·typecheck 43s·test 110s·test:e2e 242s·build 135s·나머지 검사 4s),
+// 어느 명령이 느린지 step 시간으로 보이지 않았으며, 같은 러너의 통합 스위트가 그 뒤에서 7분 넘게
+// 기다렸다(2026-09-29). 설치는 13초라 job마다 반복해도 비용이 작다.
+//
+// 왜 셋인가(명령마다 job 하나가 아닌가):
+// - services는 한 job에만 둔다. 호스트 포트가 앱마다 하나로 파생되므로(qualityGateServicePorts)
+//   services job이 둘이면 러너를 늘린 순간 같은 VM에서 서로 "port is already allocated"로 죽는다.
+//   DEPLOYMENT_SERVICE_PORTS_DRIFT도 게이트가 여는 포트를 한 쌍으로 읽는다. test와 test:e2e가
+//   같은 job에 남는 이유다.
+// - typecheck는 테스트 job 맨 앞에 둔다. 체인에서 typecheck가 test보다 먼저 돌며 남기던 부산물
+//   (`prisma generate` 결과)을 spint 서버 unit test가 읽는다(생성 client는 gitignore). 순서를
+//   job 안에서 보존하면 앱별 지식 없이 기존 전제를 지킨다.
+// - linux-vm은 VM 전체 동시 실행이 2슬롯이다(docs/CI_RUNNERS.md "VM 안 동시 실행"). job이 많을수록
+//   설치를 반복하며 다른 저장소의 슬롯을 더 오래 잡으므로, 가장 긴 test job 옆에 나머지 둘이
+//   한 줄로 들어가는 크기로 맞췄다.
+// 각 job 안의 명령 순서는 `check` 체인 순서를 따른다. 로컬 `pnpm check`는 그대로 정본이다.
+export const qualityGateJobs = [
+  {
+    id: 'static',
+    name: 'Lint, format, and contract checks',
+    services: false,
+    browsers: false,
+    steps: [
+      ['Lint', 'lint'],
+      ['Check formatting', 'format:check'],
+      ['Check i18n messages', 'i18n:check'],
+      ['Check design contract', 'design:check'],
+      ['Check app contract', 'contract:check'],
+      ['Check documentation links', 'docs:check'],
+    ],
+  },
+  {
+    id: 'test',
+    name: 'Typecheck and tests',
+    services: true,
+    browsers: true,
+    steps: [
+      ['Typecheck', 'typecheck'],
+      ['Unit tests', 'test'],
+      ['End-to-end tests', 'test:e2e'],
+    ],
+  },
+  {
+    id: 'build',
+    name: 'Build',
+    services: false,
+    browsers: false,
+    steps: [['Build', 'build']],
+  },
+];
+
 function makeQualityGateWorkflow(contract) {
   const ports = qualityGateServicePorts(contract);
-  return `name: App feedback quality gate (not merge authority)
-
-on:
-  pull_request:
-  push:
-    branches: [main]
-
-permissions:
-  contents: read
-
-concurrency:
-  group: app-feedback-${contract.app.id}-\${{ github.ref }}
-  cancel-in-progress: true
-
-jobs:
-  quality:
-    # 기본은 hosted다. 저장소 변수 CI_RUNNER를 self-hosted 러너 라벨로 설정한
-    # 저장소만 그쪽으로 간다 — 변수를 비워 두면 오늘과 동일하게 동작한다.
-    #
-    # 켜기 전에 그 러너의 여유 메모리와 이 게이트의 빌드 피크를 재고 비교한다.
-    # 2026-09-10 실측: Next 빌드 피크 2358MB. 운영 컨테이너가 상주하는 VPS는
-    # available이 2100~2600MB라 헤드룸이 없거나 음수였다. OOM이 나면 커널이
-    # badness score로 대상을 고르므로 빌드가 아니라 운영 컨테이너가 죽을 수 있다.
-    # CI 비용을 아끼려고 운영 가용성을 거는 교환은 성립하지 않는다.
-    #
-    # 이 게이트는 서비스 컨테이너를 쓰므로 Docker가 있는 Linux 러너여야 한다.
-    # public 저장소에는 절대 설정하지 않는다 — 포크 PR이 그 머신에서 코드를
-    # 실행한다. public은 hosted가 무료라 설정할 이유도 없다.
-    runs-on: \${{ vars.CI_RUNNER || 'ubuntu-latest' }}
-    timeout-minutes: 30
-    defaults:
-      run:
-        working-directory: ${contract.app.id}
-    services:
+  const appId = contract.app.id;
+  const services = `    services:
       postgres:
         image: postgres:17
         env:
@@ -1700,22 +1721,22 @@ jobs:
         options: >-
           --health-cmd "redis-cli ping"
           --health-interval 5s --health-timeout 5s --health-retries 12
-    env:
-      # Public ephemeral CI fixtures; never production credentials.
-      DATABASE_URL: postgresql://postgres:postgres@127.0.0.1:${ports.postgres}/app_test
-      REDIS_URL: redis://127.0.0.1:${ports.redis}/10
-      DEVICE_TOKEN_SIGNING_KEY: public-ci-test-signing-key-at-least-32
-      LETTER_ENCRYPTION_KEY: AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=
-      NPM_CONFIG_REGISTRY: https://registry.npmjs.org/
-      NPM_CONFIG_USERCONFIG: \${{ github.workspace }}/${contract.app.id}/.npmrc
-    steps:
+`;
+  const job = ({ id, name, services: withServices, browsers, steps }) => `  ${id}:
+    name: ${name}
+    runs-on: \${{ vars.CI_RUNNER || 'ubuntu-latest' }}
+    timeout-minutes: 30
+    defaults:
+      run:
+        working-directory: ${appId}
+${withServices ? services : ''}    steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
-          path: ${contract.app.id}
+          path: ${appId}
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
-          node-version-file: ${contract.app.id}/.nvmrc
+          node-version-file: ${appId}/.nvmrc
       - name: Enable pinned package manager
         run: corepack enable
       - name: Verify canonical npm registries
@@ -1725,11 +1746,53 @@ jobs:
           test "$(pnpm config get '@hjmds:registry')" = "https://registry.npmjs.org/"
       - name: Install frozen dependencies
         run: pnpm install --frozen-lockfile
-      - name: Prepare declared browser test runtimes
+${browsers ? `      - name: Prepare declared browser test runtimes
         run: pnpm --recursive --if-present browser:install
-      - name: Run canonical app gate
-        run: pnpm check
-`;
+` : ''}${steps.map(([label, script]) => `      - name: ${label}
+        run: pnpm ${script}
+`).join('')}`;
+  return `name: App feedback quality gate (not merge authority)
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: app-feedback-${appId}-\${{ github.ref }}
+  cancel-in-progress: true
+
+# 모든 job이 한 job이던 때와 같은 환경을 본다. 빌드·정적 검사가 이 값을 읽어도 전과 같게
+# 동작하게 하려는 것이고, URL이 가리키는 컨테이너는 test job만 띄운다.
+env:
+  # Public ephemeral CI fixtures; never production credentials.
+  DATABASE_URL: postgresql://postgres:postgres@127.0.0.1:${ports.postgres}/app_test
+  REDIS_URL: redis://127.0.0.1:${ports.redis}/10
+  DEVICE_TOKEN_SIGNING_KEY: public-ci-test-signing-key-at-least-32
+  LETTER_ENCRYPTION_KEY: AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=
+  NPM_CONFIG_REGISTRY: https://registry.npmjs.org/
+  NPM_CONFIG_USERCONFIG: \${{ github.workspace }}/${appId}/.npmrc
+
+# 기본은 hosted다. 저장소 변수 CI_RUNNER를 self-hosted 러너 라벨로 설정한
+# 저장소만 그쪽으로 간다 — 변수를 비워 두면 오늘과 동일하게 동작한다.
+#
+# 켜기 전에 그 러너의 여유 메모리와 이 게이트의 빌드 피크를 재고 비교한다.
+# 2026-09-10 실측: Next 빌드 피크 2358MB. 운영 컨테이너가 상주하는 VPS는
+# available이 2100~2600MB라 헤드룸이 없거나 음수였다. OOM이 나면 커널이
+# badness score로 대상을 고르므로 빌드가 아니라 운영 컨테이너가 죽을 수 있다.
+# CI 비용을 아끼려고 운영 가용성을 거는 교환은 성립하지 않는다.
+#
+# test job은 서비스 컨테이너를 쓰므로 Docker가 있는 Linux 러너여야 한다.
+# public 저장소에는 절대 설정하지 않는다 — 포크 PR이 그 머신에서 코드를
+# 실행한다. public은 hosted가 무료라 설정할 이유도 없다.
+#
+# 세 job은 서로 기다리지 않는다(needs 없음). 병렬 효과는 그 저장소 러너 수와 VM 슬롯에
+# 달려 있다. 앞의 중앙 생성기 주석(scripts/app-standard.mjs qualityGateJobs)에 분할 근거가 있다.
+jobs:
+${qualityGateJobs.map(job).join('\n')}`;
 }
 
 function makeDependabotConfig() {
