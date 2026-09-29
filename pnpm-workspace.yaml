@@ -19,8 +19,8 @@ minimumReleaseAgeStrict: true
 minimumReleaseAgeExcludePrune: true
 
 # HJM 1.7.0: 직접 게시한 태그·npm dist.integrity를 중앙 hjm-release.json과 대조한 뒤 이 버전만 허용한다.
-# 1.6.0 줄은 lock이 아직 쥔 옛 버전이라 설치 동안만 둔다(minimumReleaseAgeExcludePrune이 지운다).
-# 다음 train 설치 시 prune한다. 광범위한 namespace 예외는 새 외부 릴리스도 통과시켜 사용하지 않는다.
+# HJM 1.8.0: published train integrity verified by central release import; exact exemptions only.
+# Remove automatically once the release ages past pnpm policy; do not exempt the namespace.
 minimumReleaseAgeExclude:
-  - '@hjmds/design-contracts@1.7.0'
-  - '@hjmds/react@1.7.0'
+  - '@hjmds/design-contracts@1.8.0'
+  - '@hjmds/react@1.8.0'

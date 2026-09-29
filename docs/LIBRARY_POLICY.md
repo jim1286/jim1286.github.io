@@ -63,3 +63,7 @@ semver 관례상 breaking이므로 상위 계열 진입은 아래 항목을 실�
 머지하면 lockfile이 서로 충돌하고 게이트가 3회 도는 대신, 한 커밋으로 합쳐 1회만 돌렸다.
 
 이 기록은 정적 정책 검토와 로컬 lint/build 결과의 범위다. 실기기·브라우저 동작 검증은 아니다.
+
+## HJM 1.8.0 adoption (2026-09-29)
+
+The published exact 1.8.0 train and central integrity-verified catalog replace 1.7.0. Stable promotions remove obsolete optional-beta declarations; historical ADRs remain evidence, not current beta requirements. Tooltip remains Web-only. Exact pnpm release-age exemptions permit this verified release without a namespace-wide exception; normal expiry/pruning remains enabled. Consumer build/type/test results are recorded separately from upstream showcase and device evidence.
