@@ -67,3 +67,7 @@ semver 관례상 breaking이므로 상위 계열 진입은 아래 항목을 실�
 ## HJM 1.8.0 adoption (2026-09-29)
 
 The published exact 1.8.0 train and central integrity-verified catalog replace 1.7.0. Stable promotions remove obsolete optional-beta declarations; historical ADRs remain evidence, not current beta requirements. Tooltip remains Web-only. Exact pnpm release-age exemptions permit this verified release without a namespace-wide exception; normal expiry/pruning remains enabled. Consumer build/type/test results are recorded separately from upstream showcase and device evidence.
+
+## HJM 1.9.0 adoption (2026-09-30)
+
+게시된 정확한 1.9.0 train과 중앙 무결성 검증 카탈로그(`0cc5c55a…`)가 1.8.0을 대체한다. 1.9.0은 전수 동작 감사(Web 103·Native 83)에서 나온 결함 수정과 선택형 interaction adapter·Liquid Toast의 stable 승격이다. 이 앱은 새 선택형 subpath를 쓰지 않으므로 의존성 추가는 없다 — 쓰게 되면 해당 adapter의 peer를 이 문서에 따로 등록한다. pnpm 냉각 예외는 1.8.0과 같은 이유로 정확한 버전만 둔다. 소비 앱의 build·type·test 결과는 upstream showcase·기기 증거와 따로 기록한다.

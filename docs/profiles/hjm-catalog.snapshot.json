@@ -1,15 +1,16 @@
 {
-  "$id": "hjm.catalog-snapshot/1.8.0",
-  "designSystemVersion": "1.8.0",
+  "$id": "hjm.catalog-snapshot/1.9.0",
+  "designSystemVersion": "1.9.0",
   "source": {
     "repository": "https://github.com/jim1286/hjm-design-system.git",
-    "tag": "v1.8.0",
-    "commit": "2cf21b32b4806eec107888e2274a2085494e6f64",
+    "tag": "v1.9.0",
+    "commit": "d05d61ac1cf69a719c434abad54078e7620fccd5",
     "sourcePath": "packages/design-contracts/dist/catalog.js",
-    "contentSha256": "13cda4f6cb1d1ba795a4a517200d1fc37dde1d12513ec500dc0d48869f97d751"
+    "contentSha256": "ab7aebf49f3cde918bf5f0d4daac45fd092c1b709d6270bbf9ebe138146e70b9"
   },
   "components": [
     { "id": "accordion", "status": "stable" },
+    { "id": "affix", "status": "stable" },
     { "id": "agreement", "status": "stable" },
     { "id": "alert-dialog", "status": "stable" },
     { "id": "anchor", "status": "stable" },
@@ -31,6 +32,7 @@
     { "id": "checkbox-group", "status": "stable" },
     { "id": "chip", "status": "stable" },
     { "id": "collapsible", "status": "stable" },
+    { "id": "color-picker", "status": "stable" },
     { "id": "combobox", "status": "stable" },
     { "id": "command-palette", "status": "stable" },
     { "id": "container", "status": "stable" },
@@ -108,6 +110,7 @@
     { "id": "tree", "status": "stable" },
     { "id": "upload-item", "status": "stable" },
     { "id": "virtual-list", "status": "stable" },
-    { "id": "visually-hidden", "status": "stable" }
+    { "id": "visually-hidden", "status": "stable" },
+    { "id": "watermark", "status": "stable" }
   ]
 }
