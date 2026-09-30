@@ -71,3 +71,7 @@ The published exact 1.8.0 train and central integrity-verified catalog replace 1
 ## HJM 1.9.0 adoption (2026-09-30)
 
 게시된 정확한 1.9.0 train과 중앙 무결성 검증 카탈로그(`0cc5c55a…`)가 1.8.0을 대체한다. 1.9.0은 전수 동작 감사(Web 103·Native 83)에서 나온 결함 수정과 선택형 interaction adapter·Liquid Toast의 stable 승격이다. 이 앱은 새 선택형 subpath를 쓰지 않으므로 의존성 추가는 없다 — 쓰게 되면 해당 adapter의 peer를 이 문서에 따로 등록한다. pnpm 냉각 예외는 1.8.0과 같은 이유로 정확한 버전만 둔다. 소비 앱의 build·type·test 결과는 upstream showcase·기기 증거와 따로 기록한다.
+
+## HJM 1.10.0 adoption (2026-09-30)
+
+게시된 정확한 1.10.0 train과 중앙 카탈로그(`f1cc7dba…`)가 1.9.0을 대체한다. 1.10.0은 Toast 시각 개선(tone badge·pill action, HJM #44)이며 `toastRecipe` 가산 필드뿐이라 이 앱의 코드 변경은 없다. 냉각 예외는 정확한 1.10.0만 둔다.

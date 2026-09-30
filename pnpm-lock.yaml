@@ -12,11 +12,11 @@ importers:
         specifier: ^6.3.4
         version: 6.3.4(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
       '@hjmds/design-contracts':
-        specifier: 1.9.0
-        version: 1.9.0
+        specifier: 1.10.0
+        version: 1.10.0
       '@hjmds/react':
-        specifier: 1.9.0
-        version: 1.9.0(@hjmds/design-contracts@1.9.0)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
+        specifier: 1.10.0
+        version: 1.10.0(@hjmds/design-contracts@1.10.0)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
       react:
         specifier: ^19.1.0
         version: 19.2.8
@@ -43,8 +43,8 @@ importers:
         specifier: ^5.2.0
         version: 5.2.0(eslint@9.39.5(supports-color@7.2.0))
       eslint-plugin-react-refresh:
-        specifier: ^0.5.6
-        version: 0.5.6(eslint@9.39.5(supports-color@7.2.0))
+        specifier: ^0.5.7
+        version: 0.5.7(eslint@9.39.5(supports-color@7.2.0))
       gh-pages:
         specifier: ^6.3.0
         version: 6.3.0
@@ -360,16 +360,16 @@ packages:
     resolution: {integrity: sha512-43/qtrDUokr7LJqoF2c3+RInu/t4zfrpYdoSDfYyhg52rwLV6TnOvdG4fXm7IkSB3wErkcmJS9iEhjVtOSEjjA==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
 
-  '@hjmds/design-contracts@1.9.0':
-    resolution: {integrity: sha512-YeGy8OPdu5IVfWmQ/UFbmtrTsnE4MA77ZQll8Ik9yy3mJPax4F7YHmh2zbmY4MKm7pzv8bW1GdkdnYRskKToEw==}
+  '@hjmds/design-contracts@1.10.0':
+    resolution: {integrity: sha512-SJGu+VSX3zBwLJsMk5TaQeqDdExH0uvymEgwzaAXE/fdRMOryB6eIVLUdyGmFy91548BnfjuPBXm/kvYXk6Jzw==}
     engines: {node: '>=20'}
 
-  '@hjmds/react@1.9.0':
-    resolution: {integrity: sha512-AEI6pUYUhDniETfbdIjB0UGkvIJkOducfZz8tPU7is2kDfCGMhV5JL8sRQf3p4TMJGSX4VLL8iDMmSfIMPxxcQ==}
+  '@hjmds/react@1.10.0':
+    resolution: {integrity: sha512-xlHyyy14CDGSknHuGBqKkkKQuSaT9ueMzA6dK+pYVhLbtQKMDfeNzmL76YzmIlkLbsO904fYriQXhyAJ8O9Bzg==}
     peerDependencies:
       '@dnd-kit/dom': 0.5.0
       '@dnd-kit/react': 0.5.0
-      '@hjmds/design-contracts': '>=1.9.0 <1.10.0'
+      '@hjmds/design-contracts': '>=1.10.0 <1.11.0'
       '@number-flow/react': 0.6.2
       bloom-menu: 0.1.0
       canvas-confetti: 1.9.4
@@ -831,8 +831,8 @@ packages:
     peerDependencies:
       eslint: ^3.0.0 || ^4.0.0 || ^5.0.0 || ^6.0.0 || ^7.0.0 || ^8.0.0-0 || ^9.0.0
 
-  eslint-plugin-react-refresh@0.5.6:
-    resolution: {integrity: sha512-uZnh24On2bk478AkaDAKcpRiYhS3qFSaSNvpXxV6/Ek/BBDICkWGG7MnBSfjnIlCVBei5vsLlIeQYxbF22+Udg==}
+  eslint-plugin-react-refresh@0.5.7:
+    resolution: {integrity: sha512-XhJSzLljuYD4UjNuFGJu2v7aD3sqNVK12w5/DCUfrNfHWegZo2+TsavNx8MuxMwEquuFAzNbNfXKU0WoZ+YUIg==}
     peerDependencies:
       eslint: ^9 || ^10
 
@@ -1611,11 +1611,11 @@ snapshots:
       '@eslint/core': 0.17.0
       levn: 0.4.1
 
-  '@hjmds/design-contracts@1.9.0': {}
+  '@hjmds/design-contracts@1.10.0': {}
 
-  '@hjmds/react@1.9.0(@hjmds/design-contracts@1.9.0)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)':
+  '@hjmds/react@1.10.0(@hjmds/design-contracts@1.10.0)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)':
     dependencies:
-      '@hjmds/design-contracts': 1.9.0
+      '@hjmds/design-contracts': 1.10.0
       react: 19.2.8
       react-dom: 19.2.8(react@19.2.8)
 
@@ -2027,7 +2027,7 @@ snapshots:
     dependencies:
       eslint: 9.39.5(supports-color@7.2.0)
 
-  eslint-plugin-react-refresh@0.5.6(eslint@9.39.5(supports-color@7.2.0)):
+  eslint-plugin-react-refresh@0.5.7(eslint@9.39.5(supports-color@7.2.0)):
     dependencies:
       eslint: 9.39.5(supports-color@7.2.0)
 
