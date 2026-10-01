@@ -75,3 +75,7 @@ The published exact 1.8.0 train and central integrity-verified catalog replace 1
 ## HJM 1.10.0 adoption (2026-09-30)
 
 게시된 정확한 1.10.0 train과 중앙 카탈로그(`f1cc7dba…`)가 1.9.0을 대체한다. 1.10.0은 Toast 시각 개선(tone badge·pill action, HJM #44)이며 `toastRecipe` 가산 필드뿐이라 이 앱의 코드 변경은 없다. 냉각 예외는 정확한 1.10.0만 둔다.
+
+## HJM 1.11.0 adoption (2026-10-02)
+
+공식 npm의 HJM 1.11.0과 중앙 `docs/profiles/hjm-release.json`의 무결성·카탈로그를 기준으로 exact 버전과 잠금 파일을 갱신했다. [HJM PR #46](https://github.com/jim1286/hjm-design-system/pull/46)은 구형 공개 alias를 제거했으므로 마이너 번호만으로 호환을 추정하지 않는다. 소비 정책 2.0.0과 현재 앱 코드의 타입·테스트·웹/앱 빌드를 각각 확인하며, 기기 동작과 배포는 별도 증거로 판정한다. 이전 1.10.0 냉각 예외를 계속 허용하는 대안은 사용자가 요청한 전수 이관과 맞지 않아 1.11.0만 남겼다.
