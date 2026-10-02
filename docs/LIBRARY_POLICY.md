@@ -84,3 +84,7 @@ The published exact 1.8.0 train and central integrity-verified catalog replace 1
 
 공식 npm의 HJM 1.12.0과 중앙 `docs/profiles/hjm-release.json`의 무결성·카탈로그를 기준으로 exact 버전과 잠금 파일을 갱신했다. [HJM PR #49](https://github.com/jim1286/hjm-design-system/pull/49)는 Native `Progress`의 `max` 기본값을 1에서 100으로 바꿨다. 사용자가 1.11.0과 같은 방식(minor, 관리 소비처 전수 이관)을 지시했으므로 이 앱의 HJM `Progress` 사용처를 확인하고 타입·테스트를 다시 돌렸다. 1.11.0 냉각 예외는 남기지 않고 1.12.0만 허용한다.
 
+## HJM 1.12.1 adoption (2026-10-02)
+
+[HJM PR #50](https://github.com/jim1286/hjm-design-system/pull/50) patch: Native Grid 셀 너비를 기기 픽셀 단위로 내림해 Android에서 마지막 열이 줄바꿈되던 결함을 고친다. 1.12.0 냉각 예외는 남기지 않고 1.12.1만 허용한다.
+
