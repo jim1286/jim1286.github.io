@@ -79,3 +79,8 @@ The published exact 1.8.0 train and central integrity-verified catalog replace 1
 ## HJM 1.11.0 adoption (2026-10-02)
 
 공식 npm의 HJM 1.11.0과 중앙 `docs/profiles/hjm-release.json`의 무결성·카탈로그를 기준으로 exact 버전과 잠금 파일을 갱신했다. [HJM PR #46](https://github.com/jim1286/hjm-design-system/pull/46)은 구형 공개 alias를 제거했으므로 마이너 번호만으로 호환을 추정하지 않는다. 소비 정책 2.0.0과 현재 앱 코드의 타입·테스트·웹/앱 빌드를 각각 확인하며, 기기 동작과 배포는 별도 증거로 판정한다. 이전 1.10.0 냉각 예외를 계속 허용하는 대안은 사용자가 요청한 전수 이관과 맞지 않아 1.11.0만 남겼다.
+
+## HJM 1.12.0 adoption (2026-10-02)
+
+공식 npm의 HJM 1.12.0과 중앙 `docs/profiles/hjm-release.json`의 무결성·카탈로그를 기준으로 exact 버전과 잠금 파일을 갱신했다. [HJM PR #49](https://github.com/jim1286/hjm-design-system/pull/49)는 Native `Progress`의 `max` 기본값을 1에서 100으로 바꿨다. 사용자가 1.11.0과 같은 방식(minor, 관리 소비처 전수 이관)을 지시했으므로 이 앱의 HJM `Progress` 사용처를 확인하고 타입·테스트를 다시 돌렸다. 1.11.0 냉각 예외는 남기지 않고 1.12.0만 허용한다.
+

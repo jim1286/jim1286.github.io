@@ -5,6 +5,8 @@ on:
     branches: [main]
 permissions:
   contents: read
+  # 변경 범위 판정(tools/ci-change-scope.mjs)이 이 workflow의 이전 성공 run을 조회한다.
+  actions: read
 concurrency:
   group: app-standard-portfolio-site-${{ github.ref }}
   cancel-in-progress: true
@@ -24,12 +26,24 @@ jobs:
         with:
           persist-credentials: false
           path: portfolio-site
+          # 변경 범위 판정이 게이트를 통과한 조상 커밋과 비교한다(그 조상은 임의로 멀 수 있다).
+          fetch-depth: 0
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020
         with:
           node-version-file: portfolio-site/.nvmrc
+      # Markdown·expo.version만 바뀐 push는 무거운 검사를 건너뛰고 계약·문서 검사만 한다(근거는 그 파일 머리 주석).
+      - name: Decide change scope
+        id: scope
+        run: node tools/ci-change-scope.mjs
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
       - run: corepack enable
       - run: corepack prepare pnpm@11.24.0 --activate
       - run: pnpm install --frozen-lockfile
         working-directory: portfolio-site
       - name: Contract and CI runtime checks (Flutter builds run locally)
+        if: ${{ steps.scope.outputs.heavy == 'true' }}
         run: node tools/run-quality.mjs check-ci
+      - name: Contract and documentation checks (heavy checks carried over)
+        if: ${{ steps.scope.outputs.heavy != 'true' }}
+        run: node tools/check-app-contract.mjs && node tools/check-doc-links.mjs
