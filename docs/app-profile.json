@@ -100,13 +100,6 @@
             "module": "NodeNext",
             "moduleResolution": "NodeNext"
           },
-          "lint": {
-            "package": "eslint",
-            "version": "9.39.5",
-            "sourceUrl": "https://registry.npmjs.org/eslint/9.39.5",
-            "checkedAt": "2026-09-04",
-            "rationale": "Keep one cross-runtime lint contract instead of accepting the Nest CLI oxlint default; ESLint 9.x because the Expo/Next presets depend on eslint-plugin-react, which does not support ESLint 10 yet."
-          },
           "test": {
             "package": "vitest",
             "version": "4.1.11",
@@ -139,7 +132,6 @@
       ],
       "uniqueIdsAndRoots": true,
       "requiredChecks": [
-        "lint",
         "typecheck",
         "test",
         "build"
@@ -167,9 +159,6 @@
     "versionPolicy": "reviewed-floor-in-major-train",
     "requiredScripts": [
       "dev",
-      "lint",
-      "format",
-      "format:check",
       "typecheck",
       "test",
       "test:e2e",
@@ -184,68 +173,6 @@
       "mobile": "dev:mobile",
       "web": "dev:web",
       "server": "dev:server"
-    },
-    "staticAnalysis": {
-      "checkedAt": "2026-09-04",
-      "linter": "eslint",
-      "formatter": "prettier",
-      "shared": [
-        {
-          "package": "eslint",
-          "version": "9.39.5",
-          "sourceUrl": "https://registry.npmjs.org/eslint/9.39.5",
-          "tarballUrl": "https://registry.npmjs.org/eslint/-/eslint-9.39.5.tgz",
-          "integrity": "sha512-DgZS62aPLXKlnxILS/AYCoRvHaZeXceIzlXPkkGGzJWSow1aEk0lbTlxUSlyjC8jcaKxAdOnTDz+o1JFSBsyjw=="
-        },
-        {
-          "package": "typescript-eslint",
-          "version": "8.69.0",
-          "sourceUrl": "https://registry.npmjs.org/typescript-eslint/8.69.0",
-          "tarballUrl": "https://registry.npmjs.org/typescript-eslint/-/typescript-eslint-8.69.0.tgz",
-          "integrity": "sha512-B3MltX0VqjUBNEe3b3sSuiRbfa6XrfHFtBiPamjT5AsW/dfq+y+bc0wyuS9DxAS1LyzCxRp2+rxzpLUvqM2BvA=="
-        },
-        {
-          "package": "prettier",
-          "version": "3.9.6",
-          "sourceUrl": "https://registry.npmjs.org/prettier/3.9.6",
-          "tarballUrl": "https://registry.npmjs.org/prettier/-/prettier-3.9.6.tgz",
-          "integrity": "sha512-OpN0zzVdiaiAhxpuuj5efpIS4sY9j7bY6uR5mnj5yPzGkdkjNKSJeUThPb60Jw29QuAZgA4o+/iB49kFiaBX6g=="
-        },
-        {
-          "package": "eslint-config-prettier",
-          "version": "10.1.8",
-          "sourceUrl": "https://registry.npmjs.org/eslint-config-prettier/10.1.8",
-          "tarballUrl": "https://registry.npmjs.org/eslint-config-prettier/-/eslint-config-prettier-10.1.8.tgz",
-          "integrity": "sha512-82GZUjRS0p/jganf6q1rEO25VSoHH0hKPCTrgillPjdI/3bgBhAE1QzHrHTizjpRvy6pGAvKjDJtk2pF9NDq8w=="
-        }
-      ],
-      "presets": {
-        "mobile": {
-          "package": "eslint-config-expo",
-          "version": "57.0.2",
-          "entry": "eslint-config-expo/flat.js",
-          "sourceUrl": "https://registry.npmjs.org/eslint-config-expo/57.0.2",
-          "tarballUrl": "https://registry.npmjs.org/eslint-config-expo/-/eslint-config-expo-57.0.2.tgz",
-          "integrity": "sha512-dOWkx+MWclLVnYpPPBzas4sfnPaAjk+fe/dbvJSzbWtHUR4fGGaTT/lTcOpxqhwRIlTKKBUYGKude0tcTBsZHg=="
-        },
-        "web": {
-          "package": "eslint-config-next",
-          "version": "16.3.3",
-          "entry": "eslint-config-next/core-web-vitals",
-          "sourceUrl": "https://registry.npmjs.org/eslint-config-next/16.3.3",
-          "tarballUrl": "https://registry.npmjs.org/eslint-config-next/-/eslint-config-next-16.3.3.tgz",
-          "integrity": "sha512-teqtsR26tnlfXFHfVLTM/4tzEzU8DMu6GS1sddZzhfGzgd2f2ofbgDUcsk6cssSCzX6Tk6fmWifJcdANSdPJrw=="
-        }
-      },
-      "canonicalFiles": [
-        ".editorconfig",
-        "prettier.config.mjs",
-        ".prettierignore",
-        "eslint.config.mjs",
-        "tools/eslint.base.mjs"
-      ],
-      "runtimeConfig": "each runtime root has eslint.config.mjs that imports hjmRuntimeConfig from tools/eslint.base.mjs and, for mobile/web, the pinned preset entry",
-      "rationale": "One lint/format contract across Expo, Next.js and NestJS: ESLint owns rules, Prettier owns formatting (eslint-config-prettier disables overlaps), framework presets add runtime-specific rules, and the base config encodes HJM import and shared-package dependency boundaries. ESLint stays on the 9.x line because eslint-plugin-react (required by both eslint-config-expo and eslint-config-next) supports ESLint <=9.7+ only; moving to ESLint 10 needs a standard revision once that plugin ships ESLint 10 support."
     }
   },
   "ci": {
@@ -569,12 +496,6 @@
       "level": "default",
       "summary": "tools/qa는 생성된 README의 최소 adapter 세트(exploreqa.toml, provider, boot, personas, lanes, run.sh)를 채운다.",
       "enforcement": "review"
-    },
-    {
-      "id": "APP-STATIC-001",
-      "level": "required",
-      "summary": "전 runtime이 profile toolchain.staticAnalysis의 ESLint·typescript-eslint·Prettier·eslint-config-prettier와 runtime preset을 각 train의 검토 하한 이상으로 쓰고, canonical .editorconfig·prettier.config.mjs·.prettierignore·eslint.config.mjs·tools/eslint.base.mjs를 byte 그대로 두며 runtime eslint.config.mjs는 base를 import한다.",
-      "enforcement": "schema-and-conformance"
     }
   ]
 }

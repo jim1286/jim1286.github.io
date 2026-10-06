@@ -1620,9 +1620,6 @@
           "additionalProperties": false,
           "required": [
             "dev",
-            "lint",
-            "format",
-            "format:check",
             "typecheck",
             "test",
             "test:e2e",
@@ -1648,15 +1645,6 @@
             "dev:server": {
               "type": "string",
               "pattern": "^pnpm --filter @[a-z0-9]+(?:-[a-z0-9]+)*/server dev$"
-            },
-            "lint": {
-              "const": "eslint . && pnpm --recursive lint"
-            },
-            "format": {
-              "const": "prettier --write ."
-            },
-            "format:check": {
-              "const": "prettier --check ."
             },
             "typecheck": {
               "const": "pnpm --recursive typecheck"
@@ -1684,7 +1672,7 @@
               "const": "node tools/check-doc-links.mjs"
             },
             "check": {
-              "const": "pnpm lint && pnpm format:check && pnpm typecheck && pnpm test && pnpm test:e2e && pnpm build && pnpm i18n:check && pnpm design:check && pnpm contract:check && pnpm docs:check"
+              "const": "pnpm typecheck && pnpm test && pnpm test:e2e && pnpm build && pnpm i18n:check && pnpm design:check && pnpm contract:check && pnpm docs:check"
             }
           }
         }
@@ -1767,20 +1755,11 @@
               "type": "object",
               "additionalProperties": false,
               "required": [
-                "lint",
                 "typecheck",
                 "test",
                 "build"
               ],
               "properties": {
-                "lint": {
-                  "type": "array",
-                  "minItems": 2,
-                  "items": {
-                    "type": "string",
-                    "minLength": 1
-                  }
-                },
                 "typecheck": {
                   "type": "array",
                   "minItems": 2,
@@ -1901,16 +1880,12 @@
             "contract:check",
             "design:check",
             "docs:check",
-            "standard:lint",
             "standard:typecheck",
             "standard:test",
             "standard:build",
             "standard:check"
           ],
           "properties": {
-            "standard:lint": {
-              "const": "node tools/run-quality.mjs lint"
-            },
             "standard:typecheck": {
               "const": "node tools/run-quality.mjs typecheck"
             },

@@ -9,14 +9,16 @@ import { promisify } from 'node:util';
 const execFileAsync = promisify(execFile);
 import { pathToFileURL } from 'node:url';
 
-export const bindingRoles = ['lint', 'typecheck', 'test', 'build'];
+// lint 역할은 2026-10-06 사용자 결정(CI·로컬 시간)으로 뺐다. Flutter의 typecheck는 `flutter analyze`를 그대로 쓰되
+// flutter_lints·lint 규칙 없이 돌려 타입·컴파일 오류만 본다(analysis_options.yaml은 생성물 제외용으로만 남는다).
+export const bindingRoles = ['typecheck', 'test', 'build'];
 const frameworks = { expo: ['mobile', 'expo'], nextjs: ['web', 'next'], vite: ['web', 'vite'],
   nestjs: ['server', '@nestjs/core'], node: ['server', null], flutter: ['mobile', null] };
 export const bound = (contract) => contract?.execution?.model === 'runtime-bindings-v1';
 const safePath = (path) => typeof path === 'string' && (path === '.' || (path.split('/').every((part) => part !== '.' && part !== '..') && /^[A-Za-z0-9._-][A-Za-z0-9._-]*(?:\/[A-Za-z0-9._-]+)*$/.test(path)));
 const fail = (findings, code, path, message) => findings.push({ code, path, message });
 export function bindingScripts() {
-  return Object.fromEntries(['lint', 'typecheck', 'test', 'build', 'check'].map((role) => [`standard:${role}`, `node tools/run-quality.mjs ${role}`]));
+  return Object.fromEntries([...bindingRoles, 'check'].map((role) => [`standard:${role}`, `node tools/run-quality.mjs ${role}`]));
 }
 export function validateBindings(contract, findings) {
   const ids = new Set();
@@ -191,7 +193,7 @@ export async function initializeFixtureAssets(root, runtime) {
 }
 
 export function boundQualitySteps(contract, role) {
-  if (!['check', 'check-ci', ...bindingRoles].includes(role)) throw new Error('Choose check, check-ci, lint, typecheck, test or build');
+  if (!['check', 'check-ci', ...bindingRoles].includes(role)) throw new Error('Choose check, check-ci, typecheck, test or build');
   const targets = ['check', 'check-ci'].includes(role) ? bindingRoles : [role];
   return targets.flatMap(target => contract.runtimes.map(runtime => ({
     runtime, target,
@@ -224,7 +226,6 @@ export async function runBoundQuality(root, role) {
     await initializeFixtureAssets(root, runtime);
     if (runtime.binding.prepare) { console.log(`[${runtime.id}] prepare`); await run(runtime.binding.prepare, cwd); }
   }
-  const completedFlutterAnalyses = new Set();
   for (const { runtime, target, execution } of steps) {
     if (execution === 'local-only') {
       console.log(`[${runtime.id}] build: not run in CI; local build evidence is required separately`);
@@ -232,17 +233,6 @@ export async function runBoundQuality(root, role) {
     }
     const cwd = await regular(root, runtime.root, true);
     const argv = runtime.binding.checks[target];
-    // Flutter maps both lint and typecheck to the same `flutter analyze` command.
-    // Running that exact command twice adds minutes but cannot add check coverage.
-    if (runtime.framework === 'flutter' && ['lint', 'typecheck'].includes(target)
-      && argv[0] === 'flutter' && argv[1] === 'analyze') {
-      const key = JSON.stringify([cwd, argv]);
-      if (completedFlutterAnalyses.has(key)) {
-        console.log(`[${runtime.id}] ${target}: same Flutter analyze command already ran`);
-        continue;
-      }
-      completedFlutterAnalyses.add(key);
-    }
     console.log(`[${runtime.id}] ${target}`);
     await run(argv, cwd);
   }

@@ -41,6 +41,9 @@ HJM contracts와 React renderer는 공통 UI 계약 및 foundation 적용을 위
 
 ## eslint-plugin-react-refresh 0.4 → 0.5 계열 검토 — 2026-09-10
 
+> 2026-10-06: 포트폴리오 lint·format 제거(사용자 결정: CI·로컬 시간 절약)로 ESLint와 `@eslint/js`·`eslint-plugin-react-hooks`·
+> `eslint-plugin-react-refresh`·`typescript-eslint`·`globals`, `eslint.config.js`를 삭제했다. 아래는 당시 검토 기록으로만 남긴다.
+
 중앙 등록부의 lane을 `registry:0.4`에서 `registry:0.5`로 옮겼다. 0.x 계열의 minor는
 semver 관례상 breaking이므로 상위 계열 진입은 아래 항목을 실제로 확인한 뒤에만 한다.
 

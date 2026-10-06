@@ -67,7 +67,7 @@ const execFileAsync = promisify(execFile);
 
 const contractVersion = 1;
 const standardVersion = '1.0.0';
-const canonicalProfileSha256 = '0c8c82543a270bfdae52ebd705eacb68c08e3f22d7cd5670eb535626d82b2637';
+const canonicalProfileSha256 = 'c6e61a1bdc369b38e2516110ba7f4b3871939351ca1ed22859668a800f859559';
 const approvedCentralVerifierCommit = '0000000000000000000000000000000000000000';
 const idPattern = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 const semverIdentifier = '(?:(?:0|[1-9]\\d*)|(?:\\d*[A-Za-z-][0-9A-Za-z-]*))';
@@ -84,9 +84,6 @@ const canonicalDocuments = {
 };
 const requiredScriptNames = [
   'dev',
-  'lint',
-  'format',
-  'format:check',
   'typecheck',
   'test',
   'test:e2e',
@@ -111,70 +108,9 @@ const canonicalLocalCheckCommands = {
   'contract:check': 'node tools/check-app-contract.mjs',
 };
 const canonicalNpmrcSource = 'registry=https://registry.npmjs.org/\n@hjmds:registry=https://registry.npmjs.org/\n';
-// The cross-runtime lint/format contract. Mirrored byte-for-byte in the profile's
-// toolchain.staticAnalysis so apps carry it in docs/app-profile.json.
-const staticAnalysisPolicy = {
-  "checkedAt": "2026-09-04",
-  "linter": "eslint",
-  "formatter": "prettier",
-  "shared": [
-    {
-      "package": "eslint",
-      "version": "9.39.5",
-      "sourceUrl": "https://registry.npmjs.org/eslint/9.39.5",
-      "tarballUrl": "https://registry.npmjs.org/eslint/-/eslint-9.39.5.tgz",
-      "integrity": "sha512-DgZS62aPLXKlnxILS/AYCoRvHaZeXceIzlXPkkGGzJWSow1aEk0lbTlxUSlyjC8jcaKxAdOnTDz+o1JFSBsyjw=="
-    },
-    {
-      "package": "typescript-eslint",
-      "version": "8.69.0",
-      "sourceUrl": "https://registry.npmjs.org/typescript-eslint/8.69.0",
-      "tarballUrl": "https://registry.npmjs.org/typescript-eslint/-/typescript-eslint-8.69.0.tgz",
-      "integrity": "sha512-B3MltX0VqjUBNEe3b3sSuiRbfa6XrfHFtBiPamjT5AsW/dfq+y+bc0wyuS9DxAS1LyzCxRp2+rxzpLUvqM2BvA=="
-    },
-    {
-      "package": "prettier",
-      "version": "3.9.6",
-      "sourceUrl": "https://registry.npmjs.org/prettier/3.9.6",
-      "tarballUrl": "https://registry.npmjs.org/prettier/-/prettier-3.9.6.tgz",
-      "integrity": "sha512-OpN0zzVdiaiAhxpuuj5efpIS4sY9j7bY6uR5mnj5yPzGkdkjNKSJeUThPb60Jw29QuAZgA4o+/iB49kFiaBX6g=="
-    },
-    {
-      "package": "eslint-config-prettier",
-      "version": "10.1.8",
-      "sourceUrl": "https://registry.npmjs.org/eslint-config-prettier/10.1.8",
-      "tarballUrl": "https://registry.npmjs.org/eslint-config-prettier/-/eslint-config-prettier-10.1.8.tgz",
-      "integrity": "sha512-82GZUjRS0p/jganf6q1rEO25VSoHH0hKPCTrgillPjdI/3bgBhAE1QzHrHTizjpRvy6pGAvKjDJtk2pF9NDq8w=="
-    }
-  ],
-  "presets": {
-    "mobile": {
-      "package": "eslint-config-expo",
-      "version": "57.0.2",
-      "entry": "eslint-config-expo/flat.js",
-      "sourceUrl": "https://registry.npmjs.org/eslint-config-expo/57.0.2",
-      "tarballUrl": "https://registry.npmjs.org/eslint-config-expo/-/eslint-config-expo-57.0.2.tgz",
-      "integrity": "sha512-dOWkx+MWclLVnYpPPBzas4sfnPaAjk+fe/dbvJSzbWtHUR4fGGaTT/lTcOpxqhwRIlTKKBUYGKude0tcTBsZHg=="
-    },
-    "web": {
-      "package": "eslint-config-next",
-      "version": "16.3.3",
-      "entry": "eslint-config-next/core-web-vitals",
-      "sourceUrl": "https://registry.npmjs.org/eslint-config-next/16.3.3",
-      "tarballUrl": "https://registry.npmjs.org/eslint-config-next/-/eslint-config-next-16.3.3.tgz",
-      "integrity": "sha512-teqtsR26tnlfXFHfVLTM/4tzEzU8DMu6GS1sddZzhfGzgd2f2ofbgDUcsk6cssSCzX6Tk6fmWifJcdANSdPJrw=="
-    }
-  },
-  "canonicalFiles": [
-    ".editorconfig",
-    "prettier.config.mjs",
-    ".prettierignore",
-    "eslint.config.mjs",
-    "tools/eslint.base.mjs"
-  ],
-  "runtimeConfig": "each runtime root has eslint.config.mjs that imports hjmRuntimeConfig from tools/eslint.base.mjs and, for mobile/web, the pinned preset entry",
-  "rationale": "One lint/format contract across Expo, Next.js and NestJS: ESLint owns rules, Prettier owns formatting (eslint-config-prettier disables overlaps), framework presets add runtime-specific rules, and the base config encodes HJM import and shared-package dependency boundaries. ESLint stays on the 9.x line because eslint-plugin-react (required by both eslint-config-expo and eslint-config-next) supports ESLint <=9.7+ only; moving to ESLint 10 needs a standard revision once that plugin ships ESLint 10 support."
-};
+// 2026-10-06 사용자 결정으로 ESLint·Prettier 계약(staticAnalysis)을 표준에서 뺐다. 이유는 CI·로컬 시간이다
+// (다에리 게이트 한 번에 lint 38s·format 16s, run 36425258275). 대체 도구(Biome 등)도 두지 않는다. 타입 오류는
+// typecheck가 계속 막는다. .editorconfig는 실행 비용이 없는 에디터 힌트라 남긴다.
 const packageManagerScanIgnoredDirectories = new Set([
   '.git',
   '.next',
@@ -188,9 +124,6 @@ const packageManagerScanIgnoredDirectories = new Set([
 function expectedToolchainScripts(appId, runtimes) {
   const expected = {
     dev: 'pnpm --parallel --recursive dev',
-    lint: 'eslint . && pnpm --recursive lint',
-    format: 'prettier --write .',
-    'format:check': 'prettier --check .',
     typecheck: 'pnpm --recursive typecheck',
     test: 'pnpm --recursive test',
     'test:e2e': 'pnpm --recursive test:e2e',
@@ -198,7 +131,7 @@ function expectedToolchainScripts(appId, runtimes) {
     'i18n:check': `pnpm --filter @${appId}/i18n check`,
     ...canonicalLocalCheckCommands,
     'docs:check': 'node tools/check-doc-links.mjs',
-    check: 'pnpm lint && pnpm format:check && pnpm typecheck && pnpm test && pnpm test:e2e && pnpm build && pnpm i18n:check && pnpm design:check && pnpm contract:check && pnpm docs:check',
+    check: 'pnpm typecheck && pnpm test && pnpm test:e2e && pnpm build && pnpm i18n:check && pnpm design:check && pnpm contract:check && pnpm docs:check',
   };
   for (const runtime of Array.isArray(runtimes) ? runtimes : []) {
     const scriptName = conditionalScriptNames[runtime?.kind];
@@ -230,7 +163,7 @@ export const reviewedVersionFloors = {
   },
   node: '24.20.0',
   packageManager: '11.24.0',
-  serverTooling: { eslint: '9.39.5', vitest: '4.1.11', supertest: '7.2.2' },
+  serverTooling: { vitest: '4.1.11', supertest: '7.2.2' },
 };
 const runtimeFrameworkFloors = reviewedVersionFloors.runtimeFramework;
 const nodeFloor = reviewedVersionFloors.node;
@@ -290,8 +223,7 @@ a draft-governance app. A rehearsal never grants a stage; it reports which
 findings the app can fix now and which are blocked by portfolio authority.
 
 verify-initializers re-queries the official npm registry for every initializer
-and lint/format package pinned in the active profile (--kind static-analysis
-selects only the latter) and compares dist.integrity and dist.tarball
+pinned in the active profile and compares dist.integrity and dist.tarball
 byte-for-byte; it replaces the manual npm view comparison.
 
 sync-standard reviews or updates only centrally owned projection files in an
@@ -1519,123 +1451,6 @@ function makeEditorconfig() {
   return 'root = true\n\n[*]\ncharset = utf-8\nend_of_line = lf\ninsert_final_newline = true\ntrim_trailing_whitespace = true\nindent_style = space\nindent_size = 2\n\n[*.md]\ntrim_trailing_whitespace = false\n';
 }
 
-function makePrettierConfig() {
-  return '// HJM-APP-STANDARD v1 canonical formatter contract. Bytes are compared by check-app; do not edit per app.\n'
-    + 'export default {\n  printWidth: 100,\n  singleQuote: true,\n  trailingComma: \'all\',\n  semi: true,\n  arrowParens: \'always\',\n  endOfLine: \'lf\',\n  proseWrap: \'preserve\',\n};\n';
-}
-
-function makePrettierIgnore() {
-  return '# Build output and dependencies\nnode_modules/\ndist/\nbuild/\ncoverage/\n.next/\n.expo/\nios/\nandroid/\npnpm-lock.yaml\n'
-    + '# Standard-owned projections: check-app compares these bytes, so they are never reformatted\n.github/\ndocs/\ntools/*.mjs\napp.contract.json\n';
-}
-
-function makeRootEslintConfig() {
-  return '// Lints shared packages and root scripts. Each runtime root has its own eslint.config.mjs\n'
-    + '// that imports hjmRuntimeConfig from tools/eslint.base.mjs (see the runtime README).\n'
-    + "import { hjmBaseConfig } from './tools/eslint.base.mjs';\n\n"
-    + "export default hjmBaseConfig({ rootDir: import.meta.dirname, ignores: ['apps/**', 'tools/**'] });\n";
-}
-
-function makeEslintBase() {
-  return `// HJM-APP-STANDARD v1 shared ESLint contract (vendored; regenerate, do not edit).
-// ESLint owns rules, Prettier owns formatting: eslint-config-prettier is applied last so the two never fight.
-import tseslint from 'typescript-eslint';
-import prettier from 'eslint-config-prettier';
-
-const generatedIgnores = [
-  '**/node_modules/**', '**/dist/**', '**/build/**', '**/coverage/**',
-  '**/.next/**', '**/.expo/**', '**/ios/**', '**/android/**', '**/*.d.ts',
-];
-
-// HJM renderer usage the design checker rejects; caught earlier in the editor.
-export const hjmImportRules = {
-  'no-restricted-syntax': [
-    'error',
-    { selector: 'ImportNamespaceSpecifier[parent.source.value=/^@hjmds\\\\//]', message: 'HJM renderers allow direct named imports only (maturity and prop enforcement need the symbol).' },
-    { selector: 'ExportAllDeclaration[source.value=/^@hjmds\\\\//]', message: 'Do not re-export HJM renderers; import them where they render.' },
-  ],
-  // Raw style props on HJM components are rejected by design:check, which knows each
-  // symbol's import origin; a syntax selector here would flag host View/div style too.
-};
-
-// packages/* stay renderer- and framework-neutral: domain rules, schemas, query keys, messages.
-export const sharedPackageRules = {
-  'no-restricted-imports': [
-    'error',
-    {
-      patterns: [{
-        group: ['react', 'react/*', 'react-dom', 'react-dom/*', 'react-native', 'react-native/*', 'next', 'next/*', 'expo', 'expo-*', '@expo/*', '@nestjs/*', '@hjmds/react', '@hjmds/react-native'],
-        message: 'Shared packages must not import a runtime framework or renderer (NEW_APP_DEVELOPMENT_GUIDE §2 dependency direction).',
-      }],
-    },
-  ],
-};
-
-export const baseRules = {
-  '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_', varsIgnorePattern: '^_' }],
-  '@typescript-eslint/consistent-type-imports': ['error', { prefer: 'type-imports', fixStyle: 'inline-type-imports' }],
-  'no-console': ['error', { allow: ['warn', 'error'] }],
-  eqeqeq: ['error', 'always', { null: 'ignore' }],
-  ...hjmImportRules,
-};
-
-// rootDir must be the directory of the calling eslint.config.mjs (import.meta.dirname):
-// typescript-eslint refuses to guess when a workspace has several tsconfig files.
-function parserRoot(rootDir) {
-  if (!rootDir) throw new Error('hjm eslint config requires rootDir: import.meta.dirname');
-  return { languageOptions: { parserOptions: { tsconfigRootDir: rootDir } } };
-}
-
-export function hjmBaseConfig({ rootDir, ignores = [] } = {}) {
-  return tseslint.config(
-    { ignores: [...generatedIgnores, ...ignores] },
-    ...tseslint.configs.recommended,
-    parserRoot(rootDir),
-    { files: ['**/*.{ts,tsx,mts,cts,js,jsx,mjs}'], rules: baseRules },
-    { files: ['packages/**/*.{ts,tsx,mts,cts,js,mjs}'], rules: sharedPackageRules },
-    // CLI scripts and config files talk through stdout by design.
-    { files: ['**/scripts/**', '**/tools/**', '**/*.config.{js,mjs,cjs,ts,mts}'], rules: { 'no-console': 'off' } },
-    prettier,
-  );
-}
-
-// Runtime roots call this with their framework preset (eslint-config-expo/flat.js,
-// eslint-config-next/core-web-vitals + typescript, or none for NestJS).
-export function hjmRuntimeConfig({ kind, rootDir, preset = [], ignores = [] } = {}) {
-  const presetConfigs = Array.isArray(preset) ? preset : [preset];
-  return tseslint.config(
-    { ignores: [...generatedIgnores, ...ignores] },
-    ...presetConfigs,
-    ...tseslint.configs.recommended,
-    parserRoot(rootDir),
-    { files: ['**/*.{ts,tsx,mts,cts,js,jsx,mjs}'], rules: baseRules },
-    // NestJS resolves constructor injection from decorator metadata, which needs value imports;
-    // 'import type' would erase the token. Console is the Nest logger fallback in bootstrap code.
-    ...(kind === 'server' ? [{ files: ['src/**/*.ts'], rules: { 'no-console': 'off', '@typescript-eslint/consistent-type-imports': 'off' } }] : []),
-    { files: ['**/scripts/**', '**/*.config.{js,mjs,cjs,ts,mts}'], rules: { 'no-console': 'off' } },
-    prettier,
-  );
-}
-`;
-}
-
-function makeRuntimeEslintSnippet(runtime) {
-  const basePath = relative(runtime.root, 'tools/eslint.base.mjs').split(sep).join('/');
-  if (runtime.kind === 'mobile') {
-    return "import expoConfig from 'eslint-config-expo/flat.js';\n"
-      + "import { hjmRuntimeConfig } from '" + basePath + "';\n\n"
-      + "export default hjmRuntimeConfig({ kind: 'mobile', rootDir: import.meta.dirname, preset: expoConfig });\n";
-  }
-  if (runtime.kind === 'web') {
-    return "import nextCoreWebVitals from 'eslint-config-next/core-web-vitals';\n"
-      + "import nextTypescript from 'eslint-config-next/typescript';\n"
-      + "import { hjmRuntimeConfig } from '" + basePath + "';\n\n"
-      + "export default hjmRuntimeConfig({ kind: 'web', rootDir: import.meta.dirname, preset: [...nextCoreWebVitals, ...nextTypescript] });\n";
-  }
-  return "import { hjmRuntimeConfig } from '" + basePath + "';\n\n"
-    + "export default hjmRuntimeConfig({ kind: 'server', rootDir: import.meta.dirname });\n";
-}
-
 // 게이트의 service container가 잡는 **호스트** 포트를 앱 ID에서 파생한다.
 // 왜 고정값이 아닌가: 한 self-hosted 호스트에 여러 저장소의 러너를 두면 고정 포트가
 // 충돌한다(2026-09-10 실측: "Bind for 0.0.0.0:5432 failed: port is already allocated").
@@ -1690,15 +1505,13 @@ export function qualityGateServicePorts(contract) {
 export const qualityGateJobs = [
   {
     id: 'static',
-    name: 'Lint, format, build, and contract checks',
+    name: 'Build and contract checks',
     services: false,
     browsers: false,
     // 빌드만 변경 범위 판정(scripts/ci-change-scope.mjs)으로 건너뛴다. 나머지는 늘 돈다: 설치·계약·디자인·문서 검사가
-    // 싸고, 판정이 틀려도 그쪽이 입력 변경을 본다. 빌드가 lint·format 뒤에 있는 것은 `check` 체인 순서다.
+    // 싸고, 판정이 틀려도 그쪽이 입력 변경을 본다. lint·format step은 2026-10-06 표준에서 뺐다(staticAnalysis 제거 주석).
     scopedScripts: ['build'],
     steps: [
-      ['Lint', 'lint'],
-      ['Check formatting', 'format:check'],
       ['Build', 'build'],
       ['Check i18n messages', 'i18n:check'],
       ['Check design contract', 'design:check'],
@@ -1753,7 +1566,7 @@ function makeQualityGateWorkflow(contract) {
           --health-cmd "redis-cli ping"
           --health-interval 5s --health-timeout 5s --health-retries 12
 `;
-  const resumeKeys = { lint: 'lint', 'format:check': 'format', build: 'build', test: 'unit', 'test:e2e': 'e2e' };
+  const resumeKeys = { build: 'build', test: 'unit', 'test:e2e': 'e2e' };
   // Typecheck also generates Prisma clients; keep that prerequisite on a fresh runner.
   const checkWhen = (scoped, script) => {
     const conditions = [];
@@ -1873,19 +1686,13 @@ function makeCodeowners(contract) {
 
 function makeRuntimeReadme(contract, runtime) {
   const serverPolicy = runtime.kind === 'server'
-    ? `\nNestJS v1 is fixed to ESM (moduleFormat esm, package type module, TypeScript NodeNext) with the ESLint/Vitest/Supertest floors recorded in docs/app-profile.json serverConformance. The Nest CLI oxlint/Jest alternative is not conformant.\n`
+    ? `\nNestJS v1 is fixed to ESM (moduleFormat esm, package type module, TypeScript NodeNext) with the Vitest/Supertest floors recorded in docs/app-profile.json serverConformance. The Nest CLI Jest alternative is not conformant.\n`
     : '';
-  const preset = staticAnalysisPolicy.presets[runtime.kind];
-  const sharedList = staticAnalysisPolicy.shared.map((entry) => entry.package + '@' + entry.version).join(', ');
   return `# ${contract.app.displayName} ${runtime.kind} runtime\n\n`
     + `Framework: ${runtime.framework} ${runtime.frameworkVersion}\n\n`
     + `Initialize this directory only with the exact initializer recorded by docs/app-profile.json, then verify the framework production dependency and frozen lockfile before running the repository conformance check. The recorded framework version is the reviewed floor of its major train: stay on that major, at or above it.\n`
     + serverPolicy
-    + `\n## Lint and format contract\n\n`
-    + `Replace the initializer's lint setup with the portfolio contract. Shared devDependencies live at the workspace root, at or above the reviewed floors (${sharedList})`
-    + (preset ? `; this runtime adds ${preset.package} at or above ${preset.version} inside the same major.` : '.')
-    + ` The \`lint\` script must be \`eslint .\`. Create \`eslint.config.mjs\` here with exactly:\n\n\`\`\`js\n${makeRuntimeEslintSnippet(runtime)}\`\`\`\n\n`
-    + `Formatting is owned by the root \`prettier.config.mjs\` (\`pnpm format\` / \`pnpm format:check\`); do not add a runtime-level Prettier or Biome configuration.\n`;
+    + `\nThe portfolio has no lint or format step (2026-10-06): remove the initializer's ESLint/Prettier setup and its \`lint\`/\`format\` scripts.\n`;
 }
 
 function makePlannedDesignEvidence(contract, evidence, componentIds) {
@@ -2626,9 +2433,6 @@ async function verifyServerRuntime(runtime, manifest) {
       add(runtime.root + '/package.json.devDependencies.' + name, 'NestJS v1 runtime devDependency ' + name + ' "' + manifest.devDependencies?.[name] + '" ' + violation);
     }
   }
-  if (!/^eslint(?:\\s|$)/.test(String(manifest.scripts?.lint || '').trim())) {
-    add(runtime.root + '/package.json.scripts.lint', 'NestJS v1 keeps the cross-runtime ESLint contract; the CLI oxlint default is not accepted');
-  }
   if (!/^vitest(?:\\s|$)/.test(String(manifest.scripts?.test || '').trim())) {
     add(runtime.root + '/package.json.scripts.test', 'NestJS v1 unit tests must run with Vitest');
   }
@@ -3126,7 +2930,7 @@ if (contract && runtimeBindings) {
           add(runtime.root + '/package.json.dependencies.' + frameworkPackage, 'implementation-conformant runtime must directly install its framework inside the ' + trainLabel(runtimeFrameworkFloors[runtime.kind]) + ' train; "' + manifest.dependencies?.[frameworkPackage] + '" ' + frameworkViolation);
         }
         await verifyServerRuntime(runtime, manifest);
-        for (const scriptName of ['dev', 'lint', 'typecheck', 'test', 'test:e2e', 'build']) {
+        for (const scriptName of ['dev', 'typecheck', 'test', 'test:e2e', 'build']) {
           if (isNoopScript(manifest.scripts?.[scriptName])) add(runtime.root + '/package.json.scripts.' + scriptName, 'implementation-conformant runtime requires a non-noop ' + scriptName + ' command');
         }
       }
@@ -3263,7 +3067,7 @@ if (contract && runtimeBindings) {
         add(runtime.root + '/package.json.dependencies.' + frameworkPackage, 'implementation-conformant runtime must directly install its framework inside the ' + trainLabel(runtimeFrameworkFloors[runtime.kind]) + ' train; "' + manifest.dependencies?.[frameworkPackage] + '" ' + frameworkViolation);
       }
       await verifyServerRuntime(runtime, manifest);
-      for (const scriptName of ['dev', 'lint', 'typecheck', 'test', 'test:e2e', 'build']) {
+      for (const scriptName of ['dev', 'typecheck', 'test', 'test:e2e', 'build']) {
         if (isNoopScript(manifest.scripts?.[scriptName])) {
           add(runtime.root + '/package.json.scripts.' + scriptName, 'implementation-conformant runtime requires a non-noop ' + scriptName + ' command');
         }
@@ -3333,10 +3137,6 @@ async function buildScaffoldFiles(contract) {
     ['.npmrc', canonicalNpmrcSource],
     ['.nvmrc', `${contract.toolchain.node}\n`],
     ['.editorconfig', makeEditorconfig()],
-    ['prettier.config.mjs', makePrettierConfig()],
-    ['.prettierignore', makePrettierIgnore()],
-    ['eslint.config.mjs', makeRootEslintConfig()],
-    ['tools/eslint.base.mjs', makeEslintBase()],
     ['README.md', makeReadme(contract)],
     ['app.contract.json', `${JSON.stringify(generatedContract, null, 2)}\n`],
     ['package.json', makePackageJson(contract)],
@@ -3826,80 +3626,6 @@ function validateDeclaredAdr(source, path, contract, expectedBinding, findings, 
   }
 }
 
-// Lint/format contract: canonical files are projection-checked at every stage; exact
-// devDependencies, runtime configs and lint scripts are implementation-gate checks.
-async function checkStaticAnalysisContract(appRoot, contract, implementationGate, findings) {
-  if (!implementationGate) return;
-  const readManifest = async (relativePath) => {
-    try {
-      return JSON.parse(await readRegularTextFile(resolve(appRoot, relativePath), relativePath));
-    } catch {
-      return null;
-    }
-  };
-  const rootManifest = await readManifest('package.json');
-  for (const entry of staticAnalysisPolicy.shared) {
-    const declared = rootManifest?.devDependencies?.[entry.package];
-    const violation = trainViolation(declared, entry.version);
-    if (violation) {
-      addFinding(findings, 'STATIC_ANALYSIS_DEPENDENCY_MISMATCH', `package.json.devDependencies.${entry.package}`, `Workspace root devDependency ${entry.package} "${declared}" ${violation} (profile toolchain.staticAnalysis records ${entry.version} as the reviewed floor).`);
-    }
-  }
-  for (const runtime of Array.isArray(contract.runtimes) ? contract.runtimes : []) {
-    const configPath = `${runtime.root}/eslint.config.mjs`;
-    let configSource = null;
-    try {
-      configSource = await readRegularTextFile(resolve(appRoot, configPath), configPath);
-    } catch {
-      addFinding(findings, 'STATIC_ANALYSIS_RUNTIME_CONFIG_MISSING', configPath, `${runtime.kind} runtime needs eslint.config.mjs; copy the snippet from ${runtime.root}/README.md.`);
-    }
-    const basePath = relative(runtime.root, 'tools/eslint.base.mjs').split(sep).join('/');
-    if (configSource !== null && !configSource.includes(`from '${basePath}'`)) {
-      addFinding(findings, 'STATIC_ANALYSIS_RUNTIME_CONFIG_UNBOUND', configPath, `${configPath} must import hjmRuntimeConfig from '${basePath}' so the runtime shares the portfolio lint contract.`);
-    }
-    const preset = staticAnalysisPolicy.presets[runtime.kind];
-    const runtimeManifest = await readManifest(`${runtime.root}/package.json`);
-    if (preset) {
-      if (configSource !== null && !configSource.includes(`'${preset.package}/`)) {
-        addFinding(findings, 'STATIC_ANALYSIS_PRESET_UNUSED', configPath, `${configPath} must load the ${preset.package} preset (${preset.entry}).`);
-      }
-      const presetViolation = runtimeManifest ? trainViolation(runtimeManifest.devDependencies?.[preset.package], preset.version) : null;
-      if (presetViolation) {
-        addFinding(findings, 'STATIC_ANALYSIS_PRESET_MISMATCH', `${runtime.root}/package.json.devDependencies.${preset.package}`, `${runtime.kind} runtime preset ${preset.package} "${runtimeManifest.devDependencies?.[preset.package]}" ${presetViolation} (reviewed floor ${preset.version}).`);
-      }
-    }
-    if (runtimeManifest && !/^eslint(?:\s|$)/.test(String(runtimeManifest.scripts?.lint || '').trim())) {
-      addFinding(findings, 'STATIC_ANALYSIS_LINT_SCRIPT_INVALID', `${runtime.root}/package.json.scripts.lint`, `${runtime.kind} runtime lint script must run eslint (the framework CLI lint wrapper is not the portfolio contract).`);
-    }
-    for (const forbidden of ['.prettierrc', '.prettierrc.json', '.prettierrc.js', '.prettierrc.cjs', '.prettierrc.mjs', 'prettier.config.js', 'prettier.config.cjs', 'prettier.config.mjs', 'biome.json', 'biome.jsonc']) {
-      if (await statWithoutFollowing(resolve(appRoot, runtime.root, forbidden))) {
-        addFinding(findings, 'STATIC_ANALYSIS_FORMATTER_OVERRIDE', `${runtime.root}/${forbidden}`, 'Formatting is owned by the root prettier.config.mjs; runtime-level formatter configuration is not allowed.');
-      }
-    }
-  }
-}
-
-// ESLint 10 resolves the config from each file's own directory, so a packages/*/eslint.config.*
-// would silently replace the root contract for that package. Shared packages are linted by the
-// root config only.
-async function checkSharedPackageLintConfigs(appRoot, findings) {
-  const packagesRoot = resolve(appRoot, 'packages');
-  let entries = [];
-  try {
-    entries = await readdir(packagesRoot, { withFileTypes: true });
-  } catch {
-    return;
-  }
-  for (const entry of entries) {
-    if (!entry.isDirectory()) continue;
-    for (const name of ['eslint.config.js', 'eslint.config.mjs', 'eslint.config.cjs', 'eslint.config.ts', 'eslint.config.mts', '.eslintrc', '.eslintrc.js', '.eslintrc.cjs', '.eslintrc.json']) {
-      if (await statWithoutFollowing(resolve(packagesRoot, entry.name, name))) {
-        addFinding(findings, 'STATIC_ANALYSIS_PACKAGE_CONFIG_FORBIDDEN', `packages/${entry.name}/${name}`, 'Shared packages are linted by the root eslint.config.mjs; a package-level ESLint config replaces the portfolio contract under ESLint 10 file-directory lookup.');
-      }
-    }
-  }
-}
-
 // An evidence record is either one regular file or a directory whose index.md carries the
 // type-specific narrative and whose every regular file is covered by one manifest digest.
 // Directories exist for screenshot/recording sets that cannot be a single Markdown file.
@@ -4123,10 +3849,6 @@ export function standardProjectionSources(contract) {
     ['.github/dependabot.yml', makeDependabotConfig()],
     ['.npmrc', canonicalNpmrcSource],
     ['.editorconfig', makeEditorconfig()],
-    ['prettier.config.mjs', makePrettierConfig()],
-    ['.prettierignore', makePrettierIgnore()],
-    ['eslint.config.mjs', makeRootEslintConfig()],
-    ['tools/eslint.base.mjs', makeEslintBase()],
     ['docs/app-contract.schema.json', readFileSync(canonicalSchemaPath, 'utf8')],
     ['docs/app-profile.json', readFileSync(canonicalProfilePath, 'utf8')],
     ['docs/hjm-catalog.snapshot.json', canonicalCatalogSource],
@@ -4519,7 +4241,7 @@ export async function checkAppConformance(appRoot, { now = new Date(), targetSta
     '.github/dependabot.yml',
     '.github/workflows/quality-gate.yml',
     '.npmrc',
-    ...staticAnalysisPolicy.canonicalFiles,
+    '.editorconfig',
     'README.md',
     'package.json',
     'pnpm-workspace.yaml',
@@ -4564,8 +4286,6 @@ export async function checkAppConformance(appRoot, { now = new Date(), targetSta
   if (bound(contract)) await checkBindings(absoluteRoot, contract, findings, canonicalRelease, { implementationGate });
   else {
     await checkPackageManagerRegistryBoundary(absoluteRoot, contract, findings);
-    await checkStaticAnalysisContract(absoluteRoot, contract, implementationGate, findings);
-    if (implementationGate) await checkSharedPackageLintConfigs(absoluteRoot, findings);
   }
   for (const runtime of Array.isArray(contract.runtimes) ? contract.runtimes : []) {
     await checkRequiredFile(absoluteRoot, `${runtime.root}/README.md`, findings);
@@ -4837,34 +4557,8 @@ export async function verifyInitializerProvenance({
   const cadence = profile.runtimePolicy?.reviewPolicy?.cadence ?? '';
   const staleAfterDays = reviewWindowDays[cadence.split('-')[0]] ?? Math.min(...Object.values(reviewWindowDays));
   const runtimes = (profile.runtimePolicy?.allowed || []).filter((runtime) => !kinds || kinds.includes(runtime.kind));
-  const staticAnalysis = profile.toolchain?.staticAnalysis;
-  const includeStaticAnalysis = staticAnalysis && (!kinds || kinds.includes('static-analysis'));
-  if (runtimes.length === 0 && !includeStaticAnalysis) {
-    addFinding(findings, 'INITIALIZER_KIND_UNKNOWN', 'profile.runtimePolicy.allowed', `No profile runtime matches ${JSON.stringify(kinds)}; use mobile, web, server or static-analysis.`);
-  }
-  if (includeStaticAnalysis) {
-    // The lint/format packages share the initializer freshness policy and window.
-    const staticCheckedAt = new Date(`${staticAnalysis.checkedAt}T00:00:00Z`);
-    if (Number.isNaN(staticCheckedAt.getTime()) || (now - staticCheckedAt) / 86_400_000 > staleAfterDays) {
-      addFinding(findings, 'INITIALIZER_PROVENANCE_STALE', 'profile.toolchain.staticAnalysis.checkedAt', `Static analysis provenance was last checked ${staticAnalysis.checkedAt}; the profile's ${cadence} review window is ${staleAfterDays} days.`);
-    }
-    const entries = [...(staticAnalysis.shared || []), ...Object.values(staticAnalysis.presets || {})];
-    for (const entry of entries) {
-      const spec = `${entry.package}@${entry.version}`;
-      const path = `profile.toolchain.staticAnalysis[${entry.package}]`;
-      let observed;
-      try {
-        observed = await view(spec);
-      } catch (error) {
-        addFinding(findings, 'INITIALIZER_LOOKUP_FAILED', path, `${spec}: ${error.message}`);
-        continue;
-      }
-      const observedIntegrity = observed?.['dist.integrity'] ?? observed?.dist?.integrity ?? observed?.integrity;
-      const observedTarball = observed?.['dist.tarball'] ?? observed?.dist?.tarball ?? observed?.tarball;
-      checked.push({ kind: 'static-analysis', subject: entry.package, spec, expectedIntegrity: entry.integrity, observedIntegrity, expectedTarballUrl: entry.tarballUrl, observedTarballUrl: observedTarball });
-      if (observedIntegrity !== entry.integrity) addFinding(findings, 'INITIALIZER_INTEGRITY_DRIFT', path, `${spec} registry dist.integrity ${JSON.stringify(observedIntegrity)} differs from the pinned ${JSON.stringify(entry.integrity)}.`);
-      if (observedTarball !== entry.tarballUrl) addFinding(findings, 'INITIALIZER_TARBALL_DRIFT', path, `${spec} registry dist.tarball ${JSON.stringify(observedTarball)} differs from the pinned ${JSON.stringify(entry.tarballUrl)}.`);
-    }
+  if (runtimes.length === 0) {
+    addFinding(findings, 'INITIALIZER_KIND_UNKNOWN', 'profile.runtimePolicy.allowed', `No profile runtime matches ${JSON.stringify(kinds)}; use mobile, web or server.`);
   }
   for (const runtime of runtimes) {
     const initializer = runtime.initializer || {};
@@ -4997,10 +4691,6 @@ export async function checkStandardAssets({ workspaceRoot = defaultWorkspaceRoot
       serverConformance: {
         packageType: 'module',
         tsconfig: { module: 'NodeNext', moduleResolution: 'NodeNext' },
-        lint: {
-          package: 'eslint', version: '9.39.5', sourceUrl: 'https://registry.npmjs.org/eslint/9.39.5', checkedAt: '2026-09-04',
-          rationale: 'Keep one cross-runtime lint contract instead of accepting the Nest CLI oxlint default; ESLint 9.x because the Expo/Next presets depend on eslint-plugin-react, which does not support ESLint 10 yet.',
-        },
         test: { package: 'vitest', version: '4.1.11', sourceUrl: 'https://registry.npmjs.org/vitest/latest', checkedAt: '2026-08-31' },
         e2e: { package: 'supertest', version: '7.2.2', sourceUrl: 'https://registry.npmjs.org/supertest/latest', checkedAt: '2026-08-31' },
       },
@@ -5099,9 +4789,6 @@ export async function checkStandardAssets({ workspaceRoot = defaultWorkspaceRoot
   if (JSON.stringify(parsed.profile?.ci?.actions) !== JSON.stringify(expectedActionsPolicy)
     || JSON.stringify(parsed.profile?.ci?.trustModel) !== JSON.stringify(expectedTrustModel)) {
     addFinding(findings, 'STANDARD_CI_TRUST_PROFILE_INVALID', 'docs/profiles/portfolio-default-v1.json.ci', 'CI action SHA pins, credential policy, updater, central verifier bootstrap status, protected paths, and fail-closed merge authority must match the reviewed v1 trust model.');
-  }
-  if (JSON.stringify(parsed.profile?.toolchain?.staticAnalysis) !== JSON.stringify(staticAnalysisPolicy)) {
-    addFinding(findings, 'STANDARD_STATIC_ANALYSIS_PROFILE_INVALID', 'docs/profiles/portfolio-default-v1.json.toolchain.staticAnalysis', 'The lint/format contract (ESLint, typescript-eslint, Prettier, eslint-config-prettier, runtime presets, canonical files) must match the reviewed v1 policy byte-for-byte.');
   }
   const expectedAcceptancePolicy = {
     requiredCategories: ['product', 'architecture', 'design', 'i18n', 'security', 'quality', 'release'],
