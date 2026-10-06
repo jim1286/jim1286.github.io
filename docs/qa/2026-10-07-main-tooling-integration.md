@@ -8,3 +8,5 @@
 - Limits: full builds, native/device QA, deployment, store upload/submission were not run. Host load was 53, so no full-suite/native build was started. Existing read-only generator tooling was reused; this is not fresh-install runtime validation.
 - Reproduce: run central check-library-policies.mjs, check-doc-links.mjs and node --test tests/app-standard.test.mjs tests/runtime-bindings.test.mjs; rerun product required gates in a quiet environment before deployment.
 - Artifacts: diagnostic logs were summarized here; no image/video/raw QA dump is committed. Product sources, reusable fixtures and other sessions' work are preserved.
+
+Final lock check: pnpm frozen lockfile-only validation passed for all 10 pnpm roots (including the separate Yajalal server). Node 24.20.0 was used; Utilverse declares 24.21.0 and emitted an engine warning, so its runtime validation remains open.
