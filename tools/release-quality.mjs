@@ -76,7 +76,8 @@ on:
     outputs:
       run: \${{ steps.intent.outputs.run }}
     steps:
-      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      # Keep the reviewed Dependabot v7 pin during standard projection; v7 hardens privileged PR checkout.
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           ref: \${{ github.sha }}
           fetch-depth: 0
