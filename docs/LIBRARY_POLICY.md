@@ -88,3 +88,7 @@ The published exact 1.8.0 train and central integrity-verified catalog replace 1
 
 [HJM PR #50](https://github.com/jim1286/hjm-design-system/pull/50) patch: Native Grid 셀 너비를 기기 픽셀 단위로 내림해 Android에서 마지막 열이 줄바꿈되던 결함을 고친다. 1.12.0 냉각 예외는 남기지 않고 1.12.1만 허용한다.
 
+
+## HJM 1.13.0 adoption (2026-10-06)
+
+공식 npm의 HJM 1.13.0(태그 v1.13.0)과 중앙 `docs/profiles/hjm-release.json`의 무결성·카탈로그를 기준으로 exact 버전과 잠금 파일을 갱신했다. 공개 API 삭제는 없지만 1.13.0은 Native 시각 style prop을 `@deprecated`로 표시하고 개발 빌드에서 경고한다(다음 major에서 제거). Dialog 액션이 반환한 promise를 기다리고, Web `Sheet`·`SearchField`·`Menu` 간격과 `ClipboardButton` 기본 tone(secondary), `Result` 액션 순서, 비활성 필드 흐림 범위가 바뀌었다. 사용자 지시(2026-10-06 "소비되는 앱웹들에 적용")에 따라 관리 소비처 전수 이관으로 반영했고, 1.12.1 냉각 예외는 남기지 않고 1.13.0만 허용한다. 확인 결과는 `docs/qa/2026-10-06-hjm-1.13-adoption.md`.
