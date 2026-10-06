@@ -92,3 +92,7 @@ The published exact 1.8.0 train and central integrity-verified catalog replace 1
 ## HJM 1.13.0 adoption (2026-10-06)
 
 공식 npm의 HJM 1.13.0(태그 v1.13.0)과 중앙 `docs/profiles/hjm-release.json`의 무결성·카탈로그를 기준으로 exact 버전과 잠금 파일을 갱신했다. 공개 API 삭제는 없지만 1.13.0은 Native 시각 style prop을 `@deprecated`로 표시하고 개발 빌드에서 경고한다(다음 major에서 제거). Dialog 액션이 반환한 promise를 기다리고, Web `Sheet`·`SearchField`·`Menu` 간격과 `ClipboardButton` 기본 tone(secondary), `Result` 액션 순서, 비활성 필드 흐림 범위가 바뀌었다. 사용자 지시(2026-10-06 "소비되는 앱웹들에 적용")에 따라 관리 소비처 전수 이관으로 반영했고, 1.12.1 냉각 예외는 남기지 않고 1.13.0만 허용한다. 확인 결과는 `docs/qa/2026-10-06-hjm-1.13-adoption.md`.
+
+## HJM 1.13.1 patch (2026-10-06)
+
+HJM 1.13.1(태그 v1.13.1) patch: SegmentedControl pills 큰 글자 줄바꿈, Native Chip `minHeight`, 고정 크기 Native Sheet 본문 채움, SearchScreen 확정 시 키보드 닫기, 선택 prop `hostGutter`. 이 사이트는 Provider·Link·Container·Stack·Text·Icon만 써서 해당 컴포넌트가 없고, production build를 1.13.0 build와 나란히 띄운 비교에서도 HJM 요소 차이가 0건이었다. 사용자 지시(2026-10-06 릴리스 후 소비 앱웹 적용)로 exact 버전만 맞췄고 1.13.0 냉각 예외는 남기지 않는다. 확인 결과는 `docs/qa/2026-10-06-hjm-1.13-adoption.md` 1.13.1 절.

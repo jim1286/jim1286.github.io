@@ -12,11 +12,11 @@ importers:
         specifier: ^6.3.4
         version: 6.3.4(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
       '@hjmds/design-contracts':
-        specifier: 1.13.0
-        version: 1.13.0
+        specifier: 1.13.1
+        version: 1.13.1
       '@hjmds/react':
-        specifier: 1.13.0
-        version: 1.13.0(@hjmds/design-contracts@1.13.0)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
+        specifier: 1.13.1
+        version: 1.13.1(@hjmds/design-contracts@1.13.1)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
       react:
         specifier: ^19.1.0
         version: 19.2.8
@@ -360,12 +360,12 @@ packages:
     resolution: {integrity: sha512-43/qtrDUokr7LJqoF2c3+RInu/t4zfrpYdoSDfYyhg52rwLV6TnOvdG4fXm7IkSB3wErkcmJS9iEhjVtOSEjjA==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
 
-  '@hjmds/design-contracts@1.13.0':
-    resolution: {integrity: sha512-TgDwgJC5UbRAJBpDdSxQA8RND5AN2GmU5zCNHPByEdcFD0aDCCz0UEndpMpNt5JmGOqLj0TjxllwARWWfUTkiw==}
+  '@hjmds/design-contracts@1.13.1':
+    resolution: {integrity: sha512-koNMHW/Hynl0cZvF6BDxLLoNTl6ZpxvTXoCn4PgvwJPNErKxVQPPsCL4+2Bb0q9L7tM7Rb1S/rLXvQYMNZ8Z7w==}
     engines: {node: '>=20'}
 
-  '@hjmds/react@1.13.0':
-    resolution: {integrity: sha512-8bUsJ0y5q9jNqCbDePYbdG19QiAIj4pw6TZx7LjuWXp08ngebn27m257hWwjVk2d2ZLgjh9U1k7o5fYfP95j5Q==}
+  '@hjmds/react@1.13.1':
+    resolution: {integrity: sha512-4CASVkGMiDcCmPojk3L2zKfpbJauDj4hXmOzCaobS6HbbmQHzweJF8paaoHvL13JvVJ1yzHsw8a26Hrz9MXABQ==}
     peerDependencies:
       '@blobatar/react': 2.7.0
       '@dnd-kit/dom': 0.5.0
@@ -1620,11 +1620,11 @@ snapshots:
       '@eslint/core': 0.17.0
       levn: 0.4.1
 
-  '@hjmds/design-contracts@1.13.0': {}
+  '@hjmds/design-contracts@1.13.1': {}
 
-  '@hjmds/react@1.13.0(@hjmds/design-contracts@1.13.0)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)':
+  '@hjmds/react@1.13.1(@hjmds/design-contracts@1.13.1)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)':
     dependencies:
-      '@hjmds/design-contracts': 1.13.0
+      '@hjmds/design-contracts': 1.13.1
       react: 19.2.8
       react-dom: 19.2.8(react@19.2.8)
 
