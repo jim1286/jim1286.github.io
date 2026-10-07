@@ -11,7 +11,7 @@ version: "1.1.0"
 
 # Portfolio Site 검사·배포
 
-## 1.1.0 릴리스 후보 — 2026-10-08
+## 1.1.0 공개 배포 — 2026-10-08
 
 HJM 1.16의 공개 화면·구성·컴포넌트 계약을 전면 적용하고 공유 i18n 작업을 통합했다.
 소개 문구·사용자 지정 사진·개발/마케팅 전략 도식을 반영하고 HJ 이니셜을 제거했다.
@@ -24,7 +24,18 @@ main `5e8dcddffa8985cadd530ec83d2481ccc67ac447`에 실제 병합됐다. 1.15 소
 `8867b7e`는 main에 patch-equivalent이며 폐쇄·삭제된 의존성 제안은 되살리지 않는다.
 공유 checkout의 미커밋 i18n은 제품 원천·로더·검사를 선택 통합했고 다른 세션의 원본 파일은
 삭제하지 않았다. 화면·도식·외부 링크 검증은 [제품 QA](qa/2026-10-08-hjm-adoption.md)에 기록한다.
-원격 릴리스 CI와 공개 배포 결과는 실제 완료 후 별도로 기록한다.
+[PR #26](https://github.com/jim1286/jim1286.github.io/pull/26)은 main
+`fa11db62d4f814cb7ab3d992c689afb9a723cdd2`로 병합됐다. 해당 커밋의 버전 상승 품질 검사
+[37686418093](https://github.com/jim1286/jim1286.github.io/actions/runs/37686418093)가 성공한 뒤
+동일한 clean source에서 `pnpm deploy`를 실행해 Hub 원본 비교와 전체 검사를 다시 통과했다.
+
+게시 전 gh-pages는 `0f3e1070821309a2da0eb2f2c5ac63cadc52b259`, 게시 후는
+`4dba815796129b946b0aa05ed97b927141ca94f8`이다. [Pages 실행
+37686559888](https://github.com/jim1286/jim1286.github.io/actions/runs/37686559888)은 성공했고
+provider의 built 상태를 확인했다. 2026-10-08 06:04 KST 일반 공개 URL 8개(루트·한국어 경로·
+사진·OG·도식 2개·JS/CSS)의 HTTP 200 및 로컬 배포 산출물과 바이트 일치를 확인했다.
+공개 호스트의 실제 캐시는 계속 max-age=600이며 캐시 정책을 변경한 것으로 기록하지 않는다.
+실제 복구 리허설은 미실행이다.
 
 ## 실행 순서
 
