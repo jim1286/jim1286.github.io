@@ -1,12 +1,12 @@
 {
   "name": "jimin-portfolio",
   "private": true,
-  "version": "1.0.0",
+  "version": "1.1.0",
   "type": "module",
   "homepage": "https://jim1286.github.io/",
   "scripts": {
     "dev": "vite",
-    "build": "pnpm run policy:check:snapshot && tsc -b && vite build",
+    "build": "pnpm i18n:check && pnpm run policy:check:snapshot && tsc -b && vite build && node scripts/build-locale-pages.mjs",
     "preview": "vite preview",
     "deploy": "pnpm run policy:check && pnpm run check && gh-pages -d dist",
     "policy:sync": "node scripts/sync-policy-links.mjs",
@@ -14,7 +14,7 @@
     "policy:check:snapshot": "node scripts/sync-policy-links.mjs --check-snapshot",
     "docs:check": "node tools/check-doc-links.mjs",
     "test": "node --test scripts/*.test.mjs",
-    "check": "pnpm run docs:check && pnpm run policy:check:snapshot && pnpm test && pnpm run build",
+    "check": "pnpm i18n:check && pnpm run docs:check && pnpm run policy:check:snapshot && pnpm test && pnpm run build",
     "docs:check:product": "node scripts/check-doc-links.mjs",
     "standard:typecheck": "node tools/run-quality.mjs typecheck",
     "standard:test": "node tools/run-quality.mjs test",
@@ -22,21 +22,23 @@
     "standard:check": "node tools/run-quality.mjs check",
     "contract:check": "node tools/check-app-contract.mjs",
     "design:check": "node tools/check-design-contract.mjs",
-    "typecheck": "tsc -b --pretty false"
+    "typecheck": "node tools/sync-i18n.mjs && tsc -b --pretty false",
+    "i18n:generate": "node tools/sync-i18n.mjs --write",
+    "i18n:check": "node tools/sync-i18n.mjs && node --test tools/sync-i18n.test.mjs"
   },
   "dependencies": {
     "@ant-design/icons": "^6.3.4",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
-    "@hjmds/design-contracts": "1.15.0",
-    "@hjmds/react": "1.15.0"
+    "@hjmds/design-contracts": "1.16.0",
+    "@hjmds/react": "1.16.0"
   },
   "devDependencies": {
     "@types/react": "^19.1.8",
     "@types/react-dom": "^19.1.6",
     "@vitejs/plugin-react": "^4.6.0",
     "gh-pages": "^6.3.0",
-    "typescript": "~6.0.3",
+    "typescript": "~7.0.2",
     "vite": "^7.0.4",
     "yaml": "2.9.1"
   },

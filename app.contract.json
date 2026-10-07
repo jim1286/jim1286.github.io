@@ -14,8 +14,8 @@
   "governance": {
     "status": "draft",
     "owner": "jimin",
-    "reviewedAt": "2026-09-09",
-    "documentVersion": "1.0.0",
+    "reviewedAt": "2026-10-08",
+    "documentVersion": "1.1.0",
     "mergePolicy": {
       "authority": "external-required-workflow",
       "status": "planned",
@@ -115,21 +115,21 @@
     "rationale": null,
     "contracts": {
       "package": "@hjmds/design-contracts",
-      "version": "1.15.0"
+      "version": "1.16.0"
     },
     "renderers": [
       {
         "kind": "web",
         "package": "@hjmds/react",
-        "version": "1.15.0"
+        "version": "1.16.0"
       }
     ],
     "versionPolicy": "exact-and-aligned",
     "adoptionPolicy": "stable-default",
     "catalog": {
-      "train": "1.15.0",
+      "train": "1.16.0",
       "snapshotPath": "docs/hjm-catalog.snapshot.json",
-      "sha256": "5d13c477d342ac599e480cbfcbf6df4414a28a3ba775a3cc0a30adc8cc07f428"
+      "sha256": "f2162057a773937808d5c1c7bf3ec25ef31ef04373518330ea3abbc26bf13a36"
     },
     "companionPolicy": {
       "id": "hjm-consumer-policy",
@@ -155,7 +155,7 @@
       "device-or-browser",
       "product-default"
     ],
-    "catalogRoot": "src",
+    "catalogRoot": "src/i18n",
     "legalCopyRoot": null,
     "timeZonePolicy": "UTC로 교환하고 사용자가 확정한 time zone으로 표시한다.",
     "currencyPolicy": "거래 또는 계정에 명시된 통화를 사용하고 locale로 추측하지 않는다."
@@ -397,5 +397,14 @@
   "waivers": [],
   "execution": {
     "model": "runtime-bindings-v1"
+  },
+  "qualityGate": {
+    "trigger": "version-bump",
+    "releaseVersions": [
+      {
+        "path": "package.json",
+        "kind": "web"
+      }
+    ]
   }
 }

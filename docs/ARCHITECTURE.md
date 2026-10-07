@@ -5,8 +5,8 @@ app_id: "portfolio-site"
 display_name: "Portfolio Site"
 status: draft
 owner: "jimin"
-reviewed: "2026-09-09"
-version: "1.0.0"
+reviewed: "2026-10-08"
+version: "1.1.0"
 ---
 
 # Portfolio Site 구조
@@ -25,12 +25,24 @@ version: "1.0.0"
 | [sync-policy-links.mjs](../scripts/sync-policy-links.mjs) | source/snapshot 비교와 생성 | Hub 부재 시 source 검사는 실패 |
 
 Hub와 site는 독립 저장소다. `HUB_CONFIG_DIR`로 다른 checkout 위치를 지정할 수 있다.
-source synchronization은 공개 origin·path template·앱 ID만 복사한다. snapshot digest는
+source synchronization은 공개 origin·path template·앱 ID와 게시 소유권·정확한 공개 정책 URL만 복사한다. snapshot digest는
 projection 무결성 비교에 사용하며 외부 승인·진위 보증은 아니다.
+
+## 문구·전략 도식
+
+2026-10-08 공유 i18n 작업을 통합해 `src/i18n/ko.ts`를 표시 문구의 원천으로 유지한다.
+`src/copy.ts`는 화면용 의미 별칭이며 독립 문구 사본이 아니다. 현재 지원 언어는 한국어 하나다.
+정적 `/ko-KR/` 진입 파일은 빌드 뒤 생성한다.
+
+사용자가 개발·마케팅 전략 도식을 요청해 `src/StrategySection.tsx`에 공통 UI 기반 흐름을 넣었다.
+확대·내보내기용 HTML은 [도식 원천과 재생성 안내](diagrams/README.md)의 JSON으로 생성한다.
+작은 화면에서 큰 SVG를 축소하는 대신 본문은 순서 목록을 사용한다.
+정책 snapshot schema 2와 계약 문서 버전 1.1.0은 이번 원천·화면·운영 변경을 함께 기록하며
+심사 자격증명이 있는 Hub 전체 프로필을 공개 데이터로 복사하지 않는다.
 
 ## 검사
 
-`pnpm check`는 문서 링크·snapshot·lint·단위 검사·production build를 포함한다.
+`pnpm check`는 i18n·문서 링크·snapshot·단위 검사·production build를 포함한다.
 정책 sync 테스트는 임시 원본/출력으로 원본 부재·원본 drift·생성물 변조·잘못된 경로를 검증한다.
 브라우저/기기별 UI, 외부 링크 가용성, 공개 배포 결과는 별도 확인 대상이다.
 
