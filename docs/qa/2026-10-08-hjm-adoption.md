@@ -12,6 +12,7 @@
 - 공유 dirty20 중 i18n catalog·loader·registry·생성기·설계·CLAUDE 등 신규 기능을 흡수했다. 12개 수집 파일의 before/after hash가 일치한 안정 snapshot을 사용했다. 공유 old package/lock의 HJM1.14·옛 ESLint를 되살리지 않고 현재 baseline에 필요한 script delta만 반영했다. QA2개는 main과 동일해 중복 복사하지 않았다.
 - 기존 feature/HJM 브랜치는 ancestry 또는 patch-equivalent로 통합됐다는 담당 A의 조사 결과를 반영했다. 열린 PR24의 TypeScript~7.0.2 delta는 pnpm으로 정상 lock 재생성해 포함했고 부모가 PR24를 실제 merge했다. 닫히고 원격 삭제된 React19.3/plugin5.2/hooks7.1 브랜치는 복원하지 않았다. gh-pages는 별도 배포 출력이다.
 - 유효 변경 흡수와 모든 checkout clean은 다르다. 공유 dirty는 계속 보존한다.
+- 부모 통합 체크포인트: source/version1.1.0 commit `1081292`, PR24 main ancestry merge `dbe9836`, patch-equivalent1.15 브랜치 ancestry merge `3e117e7`. 두 ancestry merge 뒤 source tree 변화0, frozen install/계약/문서 통과를 부모가 확인했다. PR26이 생성됐으며 공개 배포는 아직 별도다.
 - 초기 도입 체크포인트의 6파일 source digest `9c471161e713a270b6a30b219735f38642700f49979361f2960c101274d0b19d`는 과거 증거다. 최종 UI 입력 24파일(`src/**/*.ts/tsx`, site.css, 사진/OG, package/lock/workspace, i18n.config, index/Vite, locale build, i18n tools)의 정렬된 경로+NUL+SHA256+newline manifest digest는 minor metadata 변경 전 `9e7bb1cc62eb2346015efd78249bb4e971283fb3e0d1417bbd68f25baba0cfb4`이다.
 
 ## 3. 환경과 범위
@@ -65,7 +66,7 @@ OS 최대 접근성 글자와 그 최대값 모사 확대는 설계·추가 검�
 
 Safari/Firefox, 실제 VoiceOver/스크린리더 및 native 기기는 미실행이다. 새 번역·RTL·계측/캠페인 성과·메일 발송·로그인 제품 내부 동작은 이번 범위가 아니다. 제품에 없는 error/empty/input 상태를 추가해 검사 수를 늘리지 않았다. 최대 글자 조건은 후속에도 없다.
 
-부모가 제품 minor1.1.0·최종 version gate·PR/merge·gh-pages publish·공개 root/locale/asset 확인을 진행한다. 로컬 plain-static 200과 실제 공개 도메인은 다르다. 기존 governance registry pending/planned는 보존한다. snapshot 검사는 Hub 최신성 증거가 아니며 부모가 별도로 source-verified 확인했다.
+부모가 제품 minor1.1.0을 반영했고 최종 version gate·PR26 merge·gh-pages publish·공개 root/locale/asset 확인을 진행한다. 로컬 plain-static 200과 실제 공개 도메인은 다르다. 기존 governance registry pending/planned는 보존한다. snapshot 검사는 Hub 최신성 증거가 아니며 부모가 별도로 source-verified 확인했다.
 
 ## 7. 보관 처리
 
