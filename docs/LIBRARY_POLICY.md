@@ -99,3 +99,7 @@ The published exact 1.8.0 train and central integrity-verified catalog replace 1
 ## HJM 1.13.1 patch (2026-10-06)
 
 HJM 1.13.1(태그 v1.13.1) patch: SegmentedControl pills 큰 글자 줄바꿈, Native Chip `minHeight`, 고정 크기 Native Sheet 본문 채움, SearchScreen 확정 시 키보드 닫기, 선택 prop `hostGutter`. 이 사이트는 Provider·Link·Container·Stack·Text·Icon만 써서 해당 컴포넌트가 없고, production build를 1.13.0 build와 나란히 띄운 비교에서도 HJM 요소 차이가 0건이었다. 사용자 지시(2026-10-06 릴리스 후 소비 앱웹 적용)로 exact 버전만 맞췄고 1.13.0 냉각 예외는 남기지 않는다. 확인 결과는 `docs/qa/2026-10-06-hjm-1.13-adoption.md` 1.13.1 절.
+
+## HJM 1.14.0 dependency train (2026-10-07)
+
+The user requested all consumers to follow the published HJM train. Exact dependency pins, lockfile and design contract/catalog use the verified npm 1.14.0 release (tag v1.14.0, source 8d6f6651ea71450014f5ca5e484b6b78bea8828b). Local screen preview tarballs are replaced by registry packages where present; the exact cooldown exception is permitted because the release tag and tarball integrity were verified. Flutter products update their semantic adapter contract/catalog without introducing React packages. Consumer checks and remaining limitations are recorded in [the task QA report](qa/2026-10-07-hjm-1-14-upgrade.md). This dependency update does not publish an app binary or authorize a store release.
