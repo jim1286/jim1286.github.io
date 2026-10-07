@@ -41,6 +41,9 @@ HJM contracts와 React renderer는 공통 UI 계약 및 foundation 적용을 위
 
 ## eslint-plugin-react-refresh 0.4 → 0.5 계열 검토 — 2026-09-10
 
+> 2026-10-06: 포트폴리오 lint·format 제거(사용자 결정: CI·로컬 시간 절약)로 ESLint와 `@eslint/js`·`eslint-plugin-react-hooks`·
+> `eslint-plugin-react-refresh`·`typescript-eslint`·`globals`, `eslint.config.js`를 삭제했다. 아래는 당시 검토 기록으로만 남긴다.
+
 중앙 등록부의 lane을 `registry:0.4`에서 `registry:0.5`로 옮겼다. 0.x 계열의 minor는
 semver 관례상 breaking이므로 상위 계열 진입은 아래 항목을 실제로 확인한 뒤에만 한다.
 
@@ -79,3 +82,20 @@ The published exact 1.8.0 train and central integrity-verified catalog replace 1
 ## HJM 1.11.0 adoption (2026-10-02)
 
 공식 npm의 HJM 1.11.0과 중앙 `docs/profiles/hjm-release.json`의 무결성·카탈로그를 기준으로 exact 버전과 잠금 파일을 갱신했다. [HJM PR #46](https://github.com/jim1286/hjm-design-system/pull/46)은 구형 공개 alias를 제거했으므로 마이너 번호만으로 호환을 추정하지 않는다. 소비 정책 2.0.0과 현재 앱 코드의 타입·테스트·웹/앱 빌드를 각각 확인하며, 기기 동작과 배포는 별도 증거로 판정한다. 이전 1.10.0 냉각 예외를 계속 허용하는 대안은 사용자가 요청한 전수 이관과 맞지 않아 1.11.0만 남겼다.
+
+## HJM 1.12.0 adoption (2026-10-02)
+
+공식 npm의 HJM 1.12.0과 중앙 `docs/profiles/hjm-release.json`의 무결성·카탈로그를 기준으로 exact 버전과 잠금 파일을 갱신했다. [HJM PR #49](https://github.com/jim1286/hjm-design-system/pull/49)는 Native `Progress`의 `max` 기본값을 1에서 100으로 바꿨다. 사용자가 1.11.0과 같은 방식(minor, 관리 소비처 전수 이관)을 지시했으므로 이 앱의 HJM `Progress` 사용처를 확인하고 타입·테스트를 다시 돌렸다. 1.11.0 냉각 예외는 남기지 않고 1.12.0만 허용한다.
+
+## HJM 1.12.1 adoption (2026-10-02)
+
+[HJM PR #50](https://github.com/jim1286/hjm-design-system/pull/50) patch: Native Grid 셀 너비를 기기 픽셀 단위로 내림해 Android에서 마지막 열이 줄바꿈되던 결함을 고친다. 1.12.0 냉각 예외는 남기지 않고 1.12.1만 허용한다.
+
+
+## HJM 1.13.0 adoption (2026-10-06)
+
+공식 npm의 HJM 1.13.0(태그 v1.13.0)과 중앙 `docs/profiles/hjm-release.json`의 무결성·카탈로그를 기준으로 exact 버전과 잠금 파일을 갱신했다. 공개 API 삭제는 없지만 1.13.0은 Native 시각 style prop을 `@deprecated`로 표시하고 개발 빌드에서 경고한다(다음 major에서 제거). Dialog 액션이 반환한 promise를 기다리고, Web `Sheet`·`SearchField`·`Menu` 간격과 `ClipboardButton` 기본 tone(secondary), `Result` 액션 순서, 비활성 필드 흐림 범위가 바뀌었다. 사용자 지시(2026-10-06 "소비되는 앱웹들에 적용")에 따라 관리 소비처 전수 이관으로 반영했고, 1.12.1 냉각 예외는 남기지 않고 1.13.0만 허용한다. 확인 결과는 `docs/qa/2026-10-06-hjm-1.13-adoption.md`.
+
+## HJM 1.13.1 patch (2026-10-06)
+
+HJM 1.13.1(태그 v1.13.1) patch: SegmentedControl pills 큰 글자 줄바꿈, Native Chip `minHeight`, 고정 크기 Native Sheet 본문 채움, SearchScreen 확정 시 키보드 닫기, 선택 prop `hostGutter`. 이 사이트는 Provider·Link·Container·Stack·Text·Icon만 써서 해당 컴포넌트가 없고, production build를 1.13.0 build와 나란히 띄운 비교에서도 HJM 요소 차이가 0건이었다. 사용자 지시(2026-10-06 릴리스 후 소비 앱웹 적용)로 exact 버전만 맞췄고 1.13.0 냉각 예외는 남기지 않는다. 확인 결과는 `docs/qa/2026-10-06-hjm-1.13-adoption.md` 1.13.1 절.

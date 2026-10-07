@@ -1620,9 +1620,6 @@
           "additionalProperties": false,
           "required": [
             "dev",
-            "lint",
-            "format",
-            "format:check",
             "typecheck",
             "test",
             "test:e2e",
@@ -1648,15 +1645,6 @@
             "dev:server": {
               "type": "string",
               "pattern": "^pnpm --filter @[a-z0-9]+(?:-[a-z0-9]+)*/server dev$"
-            },
-            "lint": {
-              "const": "eslint . && pnpm --recursive lint"
-            },
-            "format": {
-              "const": "prettier --write ."
-            },
-            "format:check": {
-              "const": "prettier --check ."
             },
             "typecheck": {
               "const": "pnpm --recursive typecheck"
@@ -1684,7 +1672,7 @@
               "const": "node tools/check-doc-links.mjs"
             },
             "check": {
-              "const": "pnpm lint && pnpm format:check && pnpm typecheck && pnpm test && pnpm test:e2e && pnpm build && pnpm i18n:check && pnpm design:check && pnpm contract:check && pnpm docs:check"
+              "const": "pnpm typecheck && pnpm test && pnpm test:e2e && pnpm build && pnpm i18n:check && pnpm design:check && pnpm contract:check && pnpm docs:check"
             }
           }
         }
@@ -1767,20 +1755,11 @@
               "type": "object",
               "additionalProperties": false,
               "required": [
-                "lint",
                 "typecheck",
                 "test",
                 "build"
               ],
               "properties": {
-                "lint": {
-                  "type": "array",
-                  "minItems": 2,
-                  "items": {
-                    "type": "string",
-                    "minLength": 1
-                  }
-                },
                 "typecheck": {
                   "type": "array",
                   "minItems": 2,
@@ -1901,16 +1880,12 @@
             "contract:check",
             "design:check",
             "docs:check",
-            "standard:lint",
             "standard:typecheck",
             "standard:test",
             "standard:build",
             "standard:check"
           ],
           "properties": {
-            "standard:lint": {
-              "const": "node tools/run-quality.mjs lint"
-            },
             "standard:typecheck": {
               "const": "node tools/run-quality.mjs typecheck"
             },
@@ -2176,9 +2151,26 @@
             "gateWorkflow": {
               "$ref": "#/$defs/workflowPath"
             },
+            "trigger": {
+              "type": "string",
+              "enum": ["version-bump"]
+            },
+            "versionManifest": {
+              "type": "string",
+              "enum": ["apps/server/package.json", "modules/server/package.json"]
+            },
+            "imageTransport": {
+              "type": "string",
+              "enum": ["archive", "local-daemon"]
+            },
             "imageBuildHostId": {
               "type": "string",
               "pattern": "^(?:github-hosted|[a-z0-9]+(?:-[a-z0-9]+)*)$",
+              "maxLength": 63
+            },
+            "imageBuildFallbackHostId": {
+              "type": "string",
+              "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
               "maxLength": 63
             },
             "imageBuildDecisionAdrPath": {
@@ -2253,9 +2245,6 @@
     "qualityGate": {
       "type": "object",
       "additionalProperties": false,
-      "required": [
-        "servicePorts"
-      ],
       "properties": {
         "servicePorts": {
           "type": "object",
@@ -2272,6 +2261,25 @@
               "type": "integer"
             }
           }
+        },
+        "trigger": { "const": "version-bump" },
+        "releaseVersions": {
+          "type": "array", "minItems": 1, "uniqueItems": true,
+          "items": {
+            "type": "object", "additionalProperties": false,
+            "required": ["path", "kind"],
+            "properties": {
+              "path": { "$ref": "#/$defs/relativePath" },
+              "kind": { "enum": ["expo", "flutter", "server", "web"] }
+            }
+          }
+        },
+        "mode": {
+          "enum": [
+            "full",
+            "fast"
+          ],
+          "description": "Fast push/PR feedback omits full build and E2E; manual dispatch includes them. Default full. See NEW_APP_DEVELOPMENT_GUIDE."
         }
       }
     },

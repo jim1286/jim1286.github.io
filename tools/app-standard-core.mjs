@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 
+import { releaseQualityWorkflow } from './release-quality.mjs';
 import { readFileSync } from 'node:fs';
 import { execFile } from 'node:child_process';
 import {
@@ -66,7 +67,7 @@ const execFileAsync = promisify(execFile);
 
 const contractVersion = 1;
 const standardVersion = '1.0.0';
-const canonicalProfileSha256 = '0c8c82543a270bfdae52ebd705eacb68c08e3f22d7cd5670eb535626d82b2637';
+const canonicalProfileSha256 = 'c6e61a1bdc369b38e2516110ba7f4b3871939351ca1ed22859668a800f859559';
 const approvedCentralVerifierCommit = '0000000000000000000000000000000000000000';
 const idPattern = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 const semverIdentifier = '(?:(?:0|[1-9]\\d*)|(?:\\d*[A-Za-z-][0-9A-Za-z-]*))';
@@ -83,9 +84,6 @@ const canonicalDocuments = {
 };
 const requiredScriptNames = [
   'dev',
-  'lint',
-  'format',
-  'format:check',
   'typecheck',
   'test',
   'test:e2e',
@@ -110,70 +108,9 @@ const canonicalLocalCheckCommands = {
   'contract:check': 'node tools/check-app-contract.mjs',
 };
 const canonicalNpmrcSource = 'registry=https://registry.npmjs.org/\n@hjmds:registry=https://registry.npmjs.org/\n';
-// The cross-runtime lint/format contract. Mirrored byte-for-byte in the profile's
-// toolchain.staticAnalysis so apps carry it in docs/app-profile.json.
-const staticAnalysisPolicy = {
-  "checkedAt": "2026-09-04",
-  "linter": "eslint",
-  "formatter": "prettier",
-  "shared": [
-    {
-      "package": "eslint",
-      "version": "9.39.5",
-      "sourceUrl": "https://registry.npmjs.org/eslint/9.39.5",
-      "tarballUrl": "https://registry.npmjs.org/eslint/-/eslint-9.39.5.tgz",
-      "integrity": "sha512-DgZS62aPLXKlnxILS/AYCoRvHaZeXceIzlXPkkGGzJWSow1aEk0lbTlxUSlyjC8jcaKxAdOnTDz+o1JFSBsyjw=="
-    },
-    {
-      "package": "typescript-eslint",
-      "version": "8.69.0",
-      "sourceUrl": "https://registry.npmjs.org/typescript-eslint/8.69.0",
-      "tarballUrl": "https://registry.npmjs.org/typescript-eslint/-/typescript-eslint-8.69.0.tgz",
-      "integrity": "sha512-B3MltX0VqjUBNEe3b3sSuiRbfa6XrfHFtBiPamjT5AsW/dfq+y+bc0wyuS9DxAS1LyzCxRp2+rxzpLUvqM2BvA=="
-    },
-    {
-      "package": "prettier",
-      "version": "3.9.6",
-      "sourceUrl": "https://registry.npmjs.org/prettier/3.9.6",
-      "tarballUrl": "https://registry.npmjs.org/prettier/-/prettier-3.9.6.tgz",
-      "integrity": "sha512-OpN0zzVdiaiAhxpuuj5efpIS4sY9j7bY6uR5mnj5yPzGkdkjNKSJeUThPb60Jw29QuAZgA4o+/iB49kFiaBX6g=="
-    },
-    {
-      "package": "eslint-config-prettier",
-      "version": "10.1.8",
-      "sourceUrl": "https://registry.npmjs.org/eslint-config-prettier/10.1.8",
-      "tarballUrl": "https://registry.npmjs.org/eslint-config-prettier/-/eslint-config-prettier-10.1.8.tgz",
-      "integrity": "sha512-82GZUjRS0p/jganf6q1rEO25VSoHH0hKPCTrgillPjdI/3bgBhAE1QzHrHTizjpRvy6pGAvKjDJtk2pF9NDq8w=="
-    }
-  ],
-  "presets": {
-    "mobile": {
-      "package": "eslint-config-expo",
-      "version": "57.0.2",
-      "entry": "eslint-config-expo/flat.js",
-      "sourceUrl": "https://registry.npmjs.org/eslint-config-expo/57.0.2",
-      "tarballUrl": "https://registry.npmjs.org/eslint-config-expo/-/eslint-config-expo-57.0.2.tgz",
-      "integrity": "sha512-dOWkx+MWclLVnYpPPBzas4sfnPaAjk+fe/dbvJSzbWtHUR4fGGaTT/lTcOpxqhwRIlTKKBUYGKude0tcTBsZHg=="
-    },
-    "web": {
-      "package": "eslint-config-next",
-      "version": "16.3.3",
-      "entry": "eslint-config-next/core-web-vitals",
-      "sourceUrl": "https://registry.npmjs.org/eslint-config-next/16.3.3",
-      "tarballUrl": "https://registry.npmjs.org/eslint-config-next/-/eslint-config-next-16.3.3.tgz",
-      "integrity": "sha512-teqtsR26tnlfXFHfVLTM/4tzEzU8DMu6GS1sddZzhfGzgd2f2ofbgDUcsk6cssSCzX6Tk6fmWifJcdANSdPJrw=="
-    }
-  },
-  "canonicalFiles": [
-    ".editorconfig",
-    "prettier.config.mjs",
-    ".prettierignore",
-    "eslint.config.mjs",
-    "tools/eslint.base.mjs"
-  ],
-  "runtimeConfig": "each runtime root has eslint.config.mjs that imports hjmRuntimeConfig from tools/eslint.base.mjs and, for mobile/web, the pinned preset entry",
-  "rationale": "One lint/format contract across Expo, Next.js and NestJS: ESLint owns rules, Prettier owns formatting (eslint-config-prettier disables overlaps), framework presets add runtime-specific rules, and the base config encodes HJM import and shared-package dependency boundaries. ESLint stays on the 9.x line because eslint-plugin-react (required by both eslint-config-expo and eslint-config-next) supports ESLint <=9.7+ only; moving to ESLint 10 needs a standard revision once that plugin ships ESLint 10 support."
-};
+// 2026-10-06 사용자 결정으로 ESLint·Prettier 계약(staticAnalysis)을 표준에서 뺐다. 이유는 CI·로컬 시간이다
+// (다에리 게이트 한 번에 lint 38s·format 16s, run 36425258275). 대체 도구(Biome 등)도 두지 않는다. 타입 오류는
+// typecheck가 계속 막는다. .editorconfig는 실행 비용이 없는 에디터 힌트라 남긴다.
 const packageManagerScanIgnoredDirectories = new Set([
   '.git',
   '.next',
@@ -187,9 +124,6 @@ const packageManagerScanIgnoredDirectories = new Set([
 function expectedToolchainScripts(appId, runtimes) {
   const expected = {
     dev: 'pnpm --parallel --recursive dev',
-    lint: 'eslint . && pnpm --recursive lint',
-    format: 'prettier --write .',
-    'format:check': 'prettier --check .',
     typecheck: 'pnpm --recursive typecheck',
     test: 'pnpm --recursive test',
     'test:e2e': 'pnpm --recursive test:e2e',
@@ -197,7 +131,7 @@ function expectedToolchainScripts(appId, runtimes) {
     'i18n:check': `pnpm --filter @${appId}/i18n check`,
     ...canonicalLocalCheckCommands,
     'docs:check': 'node tools/check-doc-links.mjs',
-    check: 'pnpm lint && pnpm format:check && pnpm typecheck && pnpm test && pnpm test:e2e && pnpm build && pnpm i18n:check && pnpm design:check && pnpm contract:check && pnpm docs:check',
+    check: 'pnpm typecheck && pnpm test && pnpm test:e2e && pnpm build && pnpm i18n:check && pnpm design:check && pnpm contract:check && pnpm docs:check',
   };
   for (const runtime of Array.isArray(runtimes) ? runtimes : []) {
     const scriptName = conditionalScriptNames[runtime?.kind];
@@ -229,7 +163,7 @@ export const reviewedVersionFloors = {
   },
   node: '24.20.0',
   packageManager: '11.24.0',
-  serverTooling: { eslint: '9.39.5', vitest: '4.1.11', supertest: '7.2.2' },
+  serverTooling: { vitest: '4.1.11', supertest: '7.2.2' },
 };
 const runtimeFrameworkFloors = reviewedVersionFloors.runtimeFramework;
 const nodeFloor = reviewedVersionFloors.node;
@@ -289,8 +223,7 @@ a draft-governance app. A rehearsal never grants a stage; it reports which
 findings the app can fix now and which are blocked by portfolio authority.
 
 verify-initializers re-queries the official npm registry for every initializer
-and lint/format package pinned in the active profile (--kind static-analysis
-selects only the latter) and compares dist.integrity and dist.tarball
+pinned in the active profile and compares dist.integrity and dist.tarball
 byte-for-byte; it replaces the manual npm view comparison.
 
 sync-standard reviews or updates only centrally owned projection files in an
@@ -1168,17 +1101,29 @@ function validateWaivers(waivers, findings, now = new Date()) {
 // 배포는 계약이 선언한 경로·게이트·준비 판정을 저장소 파일에서 다시 읽어 대조한다.
 // 선언만으로 통과시키지 않는 이유: 이 블록의 값은 모두 다른 파일에도 존재하고,
 // 둘이 어긋나면 배포가 조용히 잘못된 commit·주소를 향한다(docs/deployment/VPS_PROVISIONING.md VP-06).
-// qualityGate는 파생 포트가 다른 앱과 겹쳤을 때만 쓰는 탈출구다.
+// qualityGate declares port overrides and the explicitly selected feedback cadence.
 function validateQualityGate(contract, findings) {
   const qualityGate = contract?.qualityGate;
   if (qualityGate === undefined) return;
-  if (bound(contract)) {
+  if (bound(contract) && (qualityGate.servicePorts !== undefined || qualityGate.mode !== undefined)) {
     // runtime-bindings 게이트는 service container를 띄우지 않는다.
     addFinding(findings, 'QUALITY_GATE_PORTS_UNUSED', 'contract.qualityGate', 'A runtime-bindings gate starts no service containers, so qualityGate.servicePorts has no effect.');
     return;
   }
   if (!assertObject(qualityGate, 'contract.qualityGate', findings)) return;
-  assertKeys(qualityGate, new Set(['servicePorts']), 'contract.qualityGate', findings);
+  assertKeys(qualityGate, new Set(['servicePorts', 'mode', 'trigger', 'releaseVersions']), 'contract.qualityGate', findings);
+  if (qualityGate.mode !== undefined && !['full', 'fast'].includes(qualityGate.mode))
+    addFinding(findings, 'QUALITY_GATE_MODE_INVALID', 'contract.qualityGate.mode', 'Quality gate mode must be full or fast.');
+  if (qualityGate.trigger !== undefined || qualityGate.releaseVersions !== undefined) {
+    const entries = qualityGate.releaseVersions;
+    if (qualityGate.trigger !== 'version-bump' || !Array.isArray(entries) || entries.length === 0 ||
+        entries.some(entry => !isPlainObject(entry) || !['expo', 'flutter', 'server', 'web'].includes(entry.kind) ||
+          typeof entry.path !== 'string' || !/^[A-Za-z0-9_-][A-Za-z0-9_./-]*$/.test(entry.path) || entry.path.split('/').includes('..')) ||
+        (Array.isArray(entries) && new Set(entries.map(entry => entry?.path)).size !== entries.length)) {
+      addFinding(findings, 'QUALITY_RELEASE_TRIGGER_INVALID', 'contract.qualityGate', 'Version-triggered quality requires distinct safe version paths and expo/flutter/server/web kinds.');
+    }
+  }
+  if (qualityGate.servicePorts === undefined) return;
   if (!assertObject(qualityGate.servicePorts, 'contract.qualityGate.servicePorts', findings)) return;
   assertKeys(qualityGate.servicePorts, new Set(['postgres', 'redis']), 'contract.qualityGate.servicePorts', findings);
   const { postgres, redis } = qualityGate.servicePorts;
@@ -1204,7 +1149,7 @@ function validateDeployment(deployment, findings) {
   const release = isPlainObject(deployment.release) ? deployment.release : undefined;
   // 운영 호스트에서 이미지를 빌드하면 OOM killer가 빌드가 아니라 방금 배포한 운영
   // 컨테이너를 고를 수 있다(VP-07). 그래도 하겠다면 ADR과 실측 여유가 있어야 한다.
-  const onTargetHost = Boolean(target && release && hasText(target.hostId) && release.imageBuildHostId === target.hostId);
+  const onTargetHost = Boolean(target && release && hasText(target.hostId) && (release.imageBuildHostId === target.hostId || release.imageBuildFallbackHostId === target.hostId));
   const buildEvidenceKeys = ['imageBuildDecisionAdrPath', 'imageBuildPeakMb', 'imageBuildAvailableMb'];
   if (onTargetHost) {
     for (const key of buildEvidenceKeys) {
@@ -1481,15 +1426,17 @@ function makeWorkspaceFile(contract) {
   return `packages:\n${contract.runtimes.map(({ root }) => `  - '${root}'`).join('\n')}\n  - 'packages/*'\n`;
 }
 
+// URL-owned development QA replaced fixture boot because separate databases made
+// the tested screen differ from the developer's running app; see 2026-09-28 QA change.
 function makeQaReadme(contract) {
   return `# ${contract.app.displayName} QA adapter\n\n`
-    + `This directory owns product-specific boot, fixture, persona, route, and recovery knowledge.\n`
-    + `Do not copy or fork the shared QA framework here. Record the product's local/CI QA entrypoint and evidence in its release document. The Hub's common qaBoot/releaseSmoke integration is not implemented.\n\n`
+    + `This directory owns persona, route, and report knowledge for an already-running development target.\n`
+    + `Start the product's development server first, then pass its URL to ExploreQA. Native UI needs an existing device and control host; record Device Hub evidence when no native host is available. Do not create or reset a QA database. The Hub's common qaBoot/releaseSmoke integration is not implemented.\n\n`
     + `## Minimum adapter set (HJM-APP-STANDARD v1, step 5)\n\n`
     + `| File | Owns | Required before active governance |\n| --- | --- | --- |\n`
     + `| \`exploreqa.toml\` | provider selection, report directory, lane/persona file anchors | yes |\n`
-    + `| \`provider.py\` (or static \`[provider]\` in the toml) | \`boot_cmd\`, \`sessions\`, \`default_seeds\`, \`persona_entry\`, \`teardown_spec\`, \`collect_evidence\`, \`AGENT_GUIDE_PROJECT\` | yes |\n`
-    + `| \`boot_dev.py\` / \`boot_store.py\` | development and store-fixture boot paths used by \`boot_cmd\` | dev yes, store when a store target exists |\n`
+    + `| \`provider.py\` (or static \`[provider]\` in the toml) | persona metadata, app adapter, optional already-running sessions and project guide | yes |\n`
+    + `| development URL or native session JSON | an already-running target supplied to \`--attach-url\` or \`--attach-sessions\` | yes |\n`
     + `| \`personas.json\` | who explores and what each persona must never do (\`PERSONA_SAFETY\`) | yes |\n`
     + `| \`lanes.json\` | lane → session/device mapping; one device per lane | yes |\n`
     + `| \`run.sh\` | the product's canonical local/CI QA entrypoint; common Hub integration is not implemented | yes |\n`
@@ -1502,123 +1449,6 @@ function makeQaReadme(contract) {
 
 function makeEditorconfig() {
   return 'root = true\n\n[*]\ncharset = utf-8\nend_of_line = lf\ninsert_final_newline = true\ntrim_trailing_whitespace = true\nindent_style = space\nindent_size = 2\n\n[*.md]\ntrim_trailing_whitespace = false\n';
-}
-
-function makePrettierConfig() {
-  return '// HJM-APP-STANDARD v1 canonical formatter contract. Bytes are compared by check-app; do not edit per app.\n'
-    + 'export default {\n  printWidth: 100,\n  singleQuote: true,\n  trailingComma: \'all\',\n  semi: true,\n  arrowParens: \'always\',\n  endOfLine: \'lf\',\n  proseWrap: \'preserve\',\n};\n';
-}
-
-function makePrettierIgnore() {
-  return '# Build output and dependencies\nnode_modules/\ndist/\nbuild/\ncoverage/\n.next/\n.expo/\nios/\nandroid/\npnpm-lock.yaml\n'
-    + '# Standard-owned projections: check-app compares these bytes, so they are never reformatted\n.github/\ndocs/\ntools/*.mjs\napp.contract.json\n';
-}
-
-function makeRootEslintConfig() {
-  return '// Lints shared packages and root scripts. Each runtime root has its own eslint.config.mjs\n'
-    + '// that imports hjmRuntimeConfig from tools/eslint.base.mjs (see the runtime README).\n'
-    + "import { hjmBaseConfig } from './tools/eslint.base.mjs';\n\n"
-    + "export default hjmBaseConfig({ rootDir: import.meta.dirname, ignores: ['apps/**', 'tools/**'] });\n";
-}
-
-function makeEslintBase() {
-  return `// HJM-APP-STANDARD v1 shared ESLint contract (vendored; regenerate, do not edit).
-// ESLint owns rules, Prettier owns formatting: eslint-config-prettier is applied last so the two never fight.
-import tseslint from 'typescript-eslint';
-import prettier from 'eslint-config-prettier';
-
-const generatedIgnores = [
-  '**/node_modules/**', '**/dist/**', '**/build/**', '**/coverage/**',
-  '**/.next/**', '**/.expo/**', '**/ios/**', '**/android/**', '**/*.d.ts',
-];
-
-// HJM renderer usage the design checker rejects; caught earlier in the editor.
-export const hjmImportRules = {
-  'no-restricted-syntax': [
-    'error',
-    { selector: 'ImportNamespaceSpecifier[parent.source.value=/^@hjmds\\\\//]', message: 'HJM renderers allow direct named imports only (maturity and prop enforcement need the symbol).' },
-    { selector: 'ExportAllDeclaration[source.value=/^@hjmds\\\\//]', message: 'Do not re-export HJM renderers; import them where they render.' },
-  ],
-  // Raw style props on HJM components are rejected by design:check, which knows each
-  // symbol's import origin; a syntax selector here would flag host View/div style too.
-};
-
-// packages/* stay renderer- and framework-neutral: domain rules, schemas, query keys, messages.
-export const sharedPackageRules = {
-  'no-restricted-imports': [
-    'error',
-    {
-      patterns: [{
-        group: ['react', 'react/*', 'react-dom', 'react-dom/*', 'react-native', 'react-native/*', 'next', 'next/*', 'expo', 'expo-*', '@expo/*', '@nestjs/*', '@hjmds/react', '@hjmds/react-native'],
-        message: 'Shared packages must not import a runtime framework or renderer (NEW_APP_DEVELOPMENT_GUIDE §2 dependency direction).',
-      }],
-    },
-  ],
-};
-
-export const baseRules = {
-  '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_', varsIgnorePattern: '^_' }],
-  '@typescript-eslint/consistent-type-imports': ['error', { prefer: 'type-imports', fixStyle: 'inline-type-imports' }],
-  'no-console': ['error', { allow: ['warn', 'error'] }],
-  eqeqeq: ['error', 'always', { null: 'ignore' }],
-  ...hjmImportRules,
-};
-
-// rootDir must be the directory of the calling eslint.config.mjs (import.meta.dirname):
-// typescript-eslint refuses to guess when a workspace has several tsconfig files.
-function parserRoot(rootDir) {
-  if (!rootDir) throw new Error('hjm eslint config requires rootDir: import.meta.dirname');
-  return { languageOptions: { parserOptions: { tsconfigRootDir: rootDir } } };
-}
-
-export function hjmBaseConfig({ rootDir, ignores = [] } = {}) {
-  return tseslint.config(
-    { ignores: [...generatedIgnores, ...ignores] },
-    ...tseslint.configs.recommended,
-    parserRoot(rootDir),
-    { files: ['**/*.{ts,tsx,mts,cts,js,jsx,mjs}'], rules: baseRules },
-    { files: ['packages/**/*.{ts,tsx,mts,cts,js,mjs}'], rules: sharedPackageRules },
-    // CLI scripts and config files talk through stdout by design.
-    { files: ['**/scripts/**', '**/tools/**', '**/*.config.{js,mjs,cjs,ts,mts}'], rules: { 'no-console': 'off' } },
-    prettier,
-  );
-}
-
-// Runtime roots call this with their framework preset (eslint-config-expo/flat.js,
-// eslint-config-next/core-web-vitals + typescript, or none for NestJS).
-export function hjmRuntimeConfig({ kind, rootDir, preset = [], ignores = [] } = {}) {
-  const presetConfigs = Array.isArray(preset) ? preset : [preset];
-  return tseslint.config(
-    { ignores: [...generatedIgnores, ...ignores] },
-    ...presetConfigs,
-    ...tseslint.configs.recommended,
-    parserRoot(rootDir),
-    { files: ['**/*.{ts,tsx,mts,cts,js,jsx,mjs}'], rules: baseRules },
-    // NestJS resolves constructor injection from decorator metadata, which needs value imports;
-    // 'import type' would erase the token. Console is the Nest logger fallback in bootstrap code.
-    ...(kind === 'server' ? [{ files: ['src/**/*.ts'], rules: { 'no-console': 'off', '@typescript-eslint/consistent-type-imports': 'off' } }] : []),
-    { files: ['**/scripts/**', '**/*.config.{js,mjs,cjs,ts,mts}'], rules: { 'no-console': 'off' } },
-    prettier,
-  );
-}
-`;
-}
-
-function makeRuntimeEslintSnippet(runtime) {
-  const basePath = relative(runtime.root, 'tools/eslint.base.mjs').split(sep).join('/');
-  if (runtime.kind === 'mobile') {
-    return "import expoConfig from 'eslint-config-expo/flat.js';\n"
-      + "import { hjmRuntimeConfig } from '" + basePath + "';\n\n"
-      + "export default hjmRuntimeConfig({ kind: 'mobile', rootDir: import.meta.dirname, preset: expoConfig });\n";
-  }
-  if (runtime.kind === 'web') {
-    return "import nextCoreWebVitals from 'eslint-config-next/core-web-vitals';\n"
-      + "import nextTypescript from 'eslint-config-next/typescript';\n"
-      + "import { hjmRuntimeConfig } from '" + basePath + "';\n\n"
-      + "export default hjmRuntimeConfig({ kind: 'web', rootDir: import.meta.dirname, preset: [...nextCoreWebVitals, ...nextTypescript] });\n";
-  }
-  return "import { hjmRuntimeConfig } from '" + basePath + "';\n\n"
-    + "export default hjmRuntimeConfig({ kind: 'server', rootDir: import.meta.dirname });\n";
 }
 
 // 게이트의 service container가 잡는 **호스트** 포트를 앱 ID에서 파생한다.
@@ -1648,13 +1478,19 @@ export function qualityGateServicePorts(contract) {
   return { postgres, redis: postgres + 1 };
 }
 
-// unbound 게이트는 루트 `pnpm check` 체인 하나를 job 셋으로 나눠 병렬로 돌린다.
+// unbound 게이트는 루트 `pnpm check` 체인 하나를 job 둘로 나눠 병렬로 돌린다(2026-09-29에 셋으로 나눴다가
+// 2026-09-30에 정적 검사와 빌드를 합쳤다 — 아래 "왜 둘인가").
 // 왜 나눴나: 한 step짜리 `pnpm check`가 다에리에서 588초였고(2026-09-28 run 36425258275:
 // lint 38s·format 16s·typecheck 43s·test 110s·test:e2e 242s·build 135s·나머지 검사 4s),
 // 어느 명령이 느린지 step 시간으로 보이지 않았으며, 같은 러너의 통합 스위트가 그 뒤에서 7분 넘게
 // 기다렸다(2026-09-29). 설치는 13초라 job마다 반복해도 비용이 작다.
 //
-// 왜 셋인가(명령마다 job 하나가 아닌가):
+// 왜 둘인가(2026-09-30 실측): job 셋을 러너 둘·VM 슬롯 둘에 올리면 셋째 job이 줄을 섰다. 최근 성공 3회에서
+// "Set up runner"(슬롯 대기 포함)가 130~295초였고, 가장 긴 test job(12~20분)이 늦게 시작해 전체가 늘어났다.
+// 정적 검사(4~8분)와 빌드(3~9분)는 각각 짧아 한 job에 이어 붙여도 test job보다 먼저 끝난다(합쳐 약 7~14분).
+// 그래서 test와 나머지가 슬롯 둘에 바로 올라가고, 설치·환경 준비도 한 번 줄었다.
+//
+// 왜 명령마다 job 하나가 아닌가:
 // - services는 한 job에만 둔다. 호스트 포트가 앱마다 하나로 파생되므로(qualityGateServicePorts)
 //   services job이 둘이면 러너를 늘린 순간 같은 VM에서 서로 "port is already allocated"로 죽는다.
 //   DEPLOYMENT_SERVICE_PORTS_DRIFT도 게이트가 여는 포트를 한 쌍으로 읽는다. test와 test:e2e가
@@ -1664,17 +1500,19 @@ export function qualityGateServicePorts(contract) {
 //   job 안에서 보존하면 앱별 지식 없이 기존 전제를 지킨다.
 // - linux-vm은 VM 전체 동시 실행이 2슬롯이다(docs/CI_RUNNERS.md "VM 안 동시 실행"). job이 많을수록
 //   설치를 반복하며 다른 저장소의 슬롯을 더 오래 잡으므로, 가장 긴 test job 옆에 나머지 둘이
-//   한 줄로 들어가는 크기로 맞췄다.
+//   한 줄로 들어가는 크기로 맞췄다. 그 크기가 이제 둘이다.
 // 각 job 안의 명령 순서는 `check` 체인 순서를 따른다. 로컬 `pnpm check`는 그대로 정본이다.
 export const qualityGateJobs = [
   {
     id: 'static',
-    name: 'Lint, format, and contract checks',
+    name: 'Build and contract checks',
     services: false,
     browsers: false,
+    // 빌드만 변경 범위 판정(scripts/ci-change-scope.mjs)으로 건너뛴다. 나머지는 늘 돈다: 설치·계약·디자인·문서 검사가
+    // 싸고, 판정이 틀려도 그쪽이 입력 변경을 본다. lint·format step은 2026-10-06 표준에서 뺐다(staticAnalysis 제거 주석).
+    scopedScripts: ['build'],
     steps: [
-      ['Lint', 'lint'],
-      ['Check formatting', 'format:check'],
+      ['Build', 'build'],
       ['Check i18n messages', 'i18n:check'],
       ['Check design contract', 'design:check'],
       ['Check app contract', 'contract:check'],
@@ -1686,24 +1524,30 @@ export const qualityGateJobs = [
     name: 'Typecheck and tests',
     services: true,
     browsers: true,
+    // Markdown·expo.version만 바뀐 push는 이 job의 무거운 step을 건너뛴다(scripts/ci-change-scope.mjs 머리 주석).
+    scoped: true,
     steps: [
       ['Typecheck', 'typecheck'],
       ['Unit tests', 'test'],
       ['End-to-end tests', 'test:e2e'],
     ],
   },
-  {
-    id: 'build',
-    name: 'Build',
-    services: false,
-    browsers: false,
-    steps: [['Build', 'build']],
-  },
 ];
 
 function makeQualityGateWorkflow(contract) {
   const ports = qualityGateServicePorts(contract);
   const appId = contract.app.id;
+  // Sep 30 user decision: early products need short edit/deploy loops. Fast mode
+  // keeps type/unit feedback on every push; full build/E2E remain manual, while
+  // deployments build their own exact source artifacts and exercise those images.
+  const fast = contract.qualityGate?.mode === 'fast';
+  const jobs = fast ? [
+    qualityGateJobs[0],
+    { ...qualityGateJobs[1], services: false, browsers: false,
+      steps: qualityGateJobs[1].steps.filter(([, script]) => script !== 'test:e2e') },
+    { id: 'regression', name: 'Manual end-to-end regression', services: true, browsers: true,
+      manual: true, steps: [['Typecheck', 'typecheck'], ['End-to-end tests', 'test:e2e']] },
+  ] : qualityGateJobs;
   const services = `    services:
       postgres:
         image: postgres:17
@@ -1722,9 +1566,21 @@ function makeQualityGateWorkflow(contract) {
           --health-cmd "redis-cli ping"
           --health-interval 5s --health-timeout 5s --health-retries 12
 `;
-  const job = ({ id, name, services: withServices, browsers, steps }) => `  ${id}:
+  const resumeKeys = { build: 'build', test: 'unit', 'test:e2e': 'e2e' };
+  // Typecheck also generates Prisma clients; keep that prerequisite on a fresh runner.
+  const checkWhen = (scoped, script) => {
+    const conditions = [];
+    if (fast && script === 'build') conditions.push("github.event_name == 'workflow_dispatch'");
+    if (scoped) conditions.push("steps.scope.outputs.heavy == 'true'");
+    if (resumeKeys[script]) conditions.push("steps.resume.outputs." + resumeKeys[script] + " != 'true'");
+    return conditions.length ? "        if: ${{ " + conditions.join(' && ') + " }}\n" : '';
+  };
+  const when = (scoped) => (scoped ? "        if: ${{ steps.scope.outputs.heavy == 'true' }}\n" : '');
+  const job = ({ id, name, services: withServices, browsers, steps, scoped, scopedScripts = [], manual }) => {
+    const usesScope = Boolean(scoped) || scopedScripts.length > 0;
+    return `  ${id}:
     name: ${name}
-    runs-on: \${{ vars.CI_RUNNER || 'ubuntu-latest' }}
+${manual ? "    if: github.event_name == 'workflow_dispatch'\n" : ''}    runs-on: \${{ vars.CI_RUNNER || 'ubuntu-latest' }}
     timeout-minutes: 30
     defaults:
       run:
@@ -1734,32 +1590,46 @@ ${withServices ? services : ''}    steps:
         with:
           persist-credentials: false
           path: ${appId}
-      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+${usesScope ? '          # 변경 범위 판정이 게이트를 통과한 조상 커밋과 비교한다(그 조상은 임의로 멀 수 있다).\n          fetch-depth: 0\n' : ''}      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
           node-version-file: ${appId}/.nvmrc
+${usesScope ? `      - name: Decide change scope
+        id: scope
+        run: node tools/ci-change-scope.mjs
+        env:
+          GITHUB_TOKEN: \${{ github.token }}
+` : ''}      - name: Reuse successful checks from earlier attempts
+        id: resume
+        run: node tools/ci-resume.mjs
+        env:
+          GITHUB_TOKEN: \${{ github.token }}
+          CI_RESUME_JOB_NAME: ${name}
       - name: Enable pinned package manager
-        run: corepack enable
+${when(scoped)}        run: corepack enable
       - name: Verify canonical npm registries
-        shell: bash
+${when(scoped)}        shell: bash
         run: |
           test "$(pnpm config get registry)" = "https://registry.npmjs.org/"
           test "$(pnpm config get '@hjmds:registry')" = "https://registry.npmjs.org/"
       - name: Install frozen dependencies
-        run: pnpm install --frozen-lockfile
+${when(scoped)}        run: pnpm install --frozen-lockfile
 ${browsers ? `      - name: Prepare declared browser test runtimes
-        run: pnpm --recursive --if-present browser:install
+${when(scoped)}        run: pnpm --recursive --if-present browser:install
 ` : ''}${steps.map(([label, script]) => `      - name: ${label}
-        run: pnpm ${script}
+${checkWhen(scoped || scopedScripts.includes(script), script)}        run: pnpm ${script}
 `).join('')}`;
-  return `name: App feedback quality gate (not merge authority)
+  };
+  return releaseQualityWorkflow(`name: App feedback quality gate (not merge authority)
 
 on:
-  pull_request:
+${fast ? '  # Fast push/PR feedback; manual dispatch also runs build and full E2E.\n  workflow_dispatch:\n' : ''}  pull_request:
   push:
     branches: [main]
 
 permissions:
   contents: read
+  # 변경 범위 판정(tools/ci-change-scope.mjs)이 이 workflow의 이전 성공 run을 조회한다.
+  actions: read
 
 concurrency:
   group: app-feedback-${appId}-\${{ github.ref }}
@@ -1789,10 +1659,10 @@ env:
 # public 저장소에는 절대 설정하지 않는다 — 포크 PR이 그 머신에서 코드를
 # 실행한다. public은 hosted가 무료라 설정할 이유도 없다.
 #
-# 세 job은 서로 기다리지 않는다(needs 없음). 병렬 효과는 그 저장소 러너 수와 VM 슬롯에
+# 두 job은 서로 기다리지 않는다(needs 없음). 병렬 효과는 그 저장소 러너 수와 VM 슬롯에
 # 달려 있다. 앞의 중앙 생성기 주석(scripts/app-standard.mjs qualityGateJobs)에 분할 근거가 있다.
 jobs:
-${qualityGateJobs.map(job).join('\n')}`;
+${jobs.map(job).join('\n')}`, contract);
 }
 
 function makeDependabotConfig() {
@@ -1816,19 +1686,13 @@ function makeCodeowners(contract) {
 
 function makeRuntimeReadme(contract, runtime) {
   const serverPolicy = runtime.kind === 'server'
-    ? `\nNestJS v1 is fixed to ESM (moduleFormat esm, package type module, TypeScript NodeNext) with the ESLint/Vitest/Supertest floors recorded in docs/app-profile.json serverConformance. The Nest CLI oxlint/Jest alternative is not conformant.\n`
+    ? `\nNestJS v1 is fixed to ESM (moduleFormat esm, package type module, TypeScript NodeNext) with the Vitest/Supertest floors recorded in docs/app-profile.json serverConformance. The Nest CLI Jest alternative is not conformant.\n`
     : '';
-  const preset = staticAnalysisPolicy.presets[runtime.kind];
-  const sharedList = staticAnalysisPolicy.shared.map((entry) => entry.package + '@' + entry.version).join(', ');
   return `# ${contract.app.displayName} ${runtime.kind} runtime\n\n`
     + `Framework: ${runtime.framework} ${runtime.frameworkVersion}\n\n`
     + `Initialize this directory only with the exact initializer recorded by docs/app-profile.json, then verify the framework production dependency and frozen lockfile before running the repository conformance check. The recorded framework version is the reviewed floor of its major train: stay on that major, at or above it.\n`
     + serverPolicy
-    + `\n## Lint and format contract\n\n`
-    + `Replace the initializer's lint setup with the portfolio contract. Shared devDependencies live at the workspace root, at or above the reviewed floors (${sharedList})`
-    + (preset ? `; this runtime adds ${preset.package} at or above ${preset.version} inside the same major.` : '.')
-    + ` The \`lint\` script must be \`eslint .\`. Create \`eslint.config.mjs\` here with exactly:\n\n\`\`\`js\n${makeRuntimeEslintSnippet(runtime)}\`\`\`\n\n`
-    + `Formatting is owned by the root \`prettier.config.mjs\` (\`pnpm format\` / \`pnpm format:check\`); do not add a runtime-level Prettier or Biome configuration.\n`;
+    + `\nThe portfolio has no lint or format step (2026-10-06): remove the initializer's ESLint/Prettier setup and its \`lint\`/\`format\` scripts.\n`;
 }
 
 function makePlannedDesignEvidence(contract, evidence, componentIds) {
@@ -2569,9 +2433,6 @@ async function verifyServerRuntime(runtime, manifest) {
       add(runtime.root + '/package.json.devDependencies.' + name, 'NestJS v1 runtime devDependency ' + name + ' "' + manifest.devDependencies?.[name] + '" ' + violation);
     }
   }
-  if (!/^eslint(?:\\s|$)/.test(String(manifest.scripts?.lint || '').trim())) {
-    add(runtime.root + '/package.json.scripts.lint', 'NestJS v1 keeps the cross-runtime ESLint contract; the CLI oxlint default is not accepted');
-  }
   if (!/^vitest(?:\\s|$)/.test(String(manifest.scripts?.test || '').trim())) {
     add(runtime.root + '/package.json.scripts.test', 'NestJS v1 unit tests must run with Vitest');
   }
@@ -3069,7 +2930,7 @@ if (contract && runtimeBindings) {
           add(runtime.root + '/package.json.dependencies.' + frameworkPackage, 'implementation-conformant runtime must directly install its framework inside the ' + trainLabel(runtimeFrameworkFloors[runtime.kind]) + ' train; "' + manifest.dependencies?.[frameworkPackage] + '" ' + frameworkViolation);
         }
         await verifyServerRuntime(runtime, manifest);
-        for (const scriptName of ['dev', 'lint', 'typecheck', 'test', 'test:e2e', 'build']) {
+        for (const scriptName of ['dev', 'typecheck', 'test', 'test:e2e', 'build']) {
           if (isNoopScript(manifest.scripts?.[scriptName])) add(runtime.root + '/package.json.scripts.' + scriptName, 'implementation-conformant runtime requires a non-noop ' + scriptName + ' command');
         }
       }
@@ -3206,7 +3067,7 @@ if (contract && runtimeBindings) {
         add(runtime.root + '/package.json.dependencies.' + frameworkPackage, 'implementation-conformant runtime must directly install its framework inside the ' + trainLabel(runtimeFrameworkFloors[runtime.kind]) + ' train; "' + manifest.dependencies?.[frameworkPackage] + '" ' + frameworkViolation);
       }
       await verifyServerRuntime(runtime, manifest);
-      for (const scriptName of ['dev', 'lint', 'typecheck', 'test', 'test:e2e', 'build']) {
+      for (const scriptName of ['dev', 'typecheck', 'test', 'test:e2e', 'build']) {
         if (isNoopScript(manifest.scripts?.[scriptName])) {
           add(runtime.root + '/package.json.scripts.' + scriptName, 'implementation-conformant runtime requires a non-noop ' + scriptName + ' command');
         }
@@ -3276,10 +3137,6 @@ async function buildScaffoldFiles(contract) {
     ['.npmrc', canonicalNpmrcSource],
     ['.nvmrc', `${contract.toolchain.node}\n`],
     ['.editorconfig', makeEditorconfig()],
-    ['prettier.config.mjs', makePrettierConfig()],
-    ['.prettierignore', makePrettierIgnore()],
-    ['eslint.config.mjs', makeRootEslintConfig()],
-    ['tools/eslint.base.mjs', makeEslintBase()],
     ['README.md', makeReadme(contract)],
     ['app.contract.json', `${JSON.stringify(generatedContract, null, 2)}\n`],
     ['package.json', makePackageJson(contract)],
@@ -3301,6 +3158,10 @@ async function buildScaffoldFiles(contract) {
     ['tools/check-app-contract.mjs', makeLocalContractChecker()],
     ['tools/check-doc-links.mjs', docLinksCore],
     ['tools/check-design-contract.mjs', makeLocalDesignChecker()],
+    ['tools/ci-change-scope.mjs', readFileSync(resolve(scriptDirectory, 'ci-change-scope.mjs'), 'utf8')],
+    ['tools/server-release-gate.mjs', readFileSync(resolve(scriptDirectory, 'server-release-gate.mjs'), 'utf8')],
+    ['tools/release-quality.mjs', readFileSync(resolve(scriptDirectory, 'release-quality.mjs'), 'utf8')],
+    ['tools/ci-resume.mjs', readFileSync(resolve(scriptDirectory, 'ci-resume.mjs'), 'utf8')],
     ['tools/json-schema-validator.mjs', jsonSchemaCore],
     ['tools/qa/README.md', makeQaReadme(contract)],
   ]);
@@ -3765,80 +3626,6 @@ function validateDeclaredAdr(source, path, contract, expectedBinding, findings, 
   }
 }
 
-// Lint/format contract: canonical files are projection-checked at every stage; exact
-// devDependencies, runtime configs and lint scripts are implementation-gate checks.
-async function checkStaticAnalysisContract(appRoot, contract, implementationGate, findings) {
-  if (!implementationGate) return;
-  const readManifest = async (relativePath) => {
-    try {
-      return JSON.parse(await readRegularTextFile(resolve(appRoot, relativePath), relativePath));
-    } catch {
-      return null;
-    }
-  };
-  const rootManifest = await readManifest('package.json');
-  for (const entry of staticAnalysisPolicy.shared) {
-    const declared = rootManifest?.devDependencies?.[entry.package];
-    const violation = trainViolation(declared, entry.version);
-    if (violation) {
-      addFinding(findings, 'STATIC_ANALYSIS_DEPENDENCY_MISMATCH', `package.json.devDependencies.${entry.package}`, `Workspace root devDependency ${entry.package} "${declared}" ${violation} (profile toolchain.staticAnalysis records ${entry.version} as the reviewed floor).`);
-    }
-  }
-  for (const runtime of Array.isArray(contract.runtimes) ? contract.runtimes : []) {
-    const configPath = `${runtime.root}/eslint.config.mjs`;
-    let configSource = null;
-    try {
-      configSource = await readRegularTextFile(resolve(appRoot, configPath), configPath);
-    } catch {
-      addFinding(findings, 'STATIC_ANALYSIS_RUNTIME_CONFIG_MISSING', configPath, `${runtime.kind} runtime needs eslint.config.mjs; copy the snippet from ${runtime.root}/README.md.`);
-    }
-    const basePath = relative(runtime.root, 'tools/eslint.base.mjs').split(sep).join('/');
-    if (configSource !== null && !configSource.includes(`from '${basePath}'`)) {
-      addFinding(findings, 'STATIC_ANALYSIS_RUNTIME_CONFIG_UNBOUND', configPath, `${configPath} must import hjmRuntimeConfig from '${basePath}' so the runtime shares the portfolio lint contract.`);
-    }
-    const preset = staticAnalysisPolicy.presets[runtime.kind];
-    const runtimeManifest = await readManifest(`${runtime.root}/package.json`);
-    if (preset) {
-      if (configSource !== null && !configSource.includes(`'${preset.package}/`)) {
-        addFinding(findings, 'STATIC_ANALYSIS_PRESET_UNUSED', configPath, `${configPath} must load the ${preset.package} preset (${preset.entry}).`);
-      }
-      const presetViolation = runtimeManifest ? trainViolation(runtimeManifest.devDependencies?.[preset.package], preset.version) : null;
-      if (presetViolation) {
-        addFinding(findings, 'STATIC_ANALYSIS_PRESET_MISMATCH', `${runtime.root}/package.json.devDependencies.${preset.package}`, `${runtime.kind} runtime preset ${preset.package} "${runtimeManifest.devDependencies?.[preset.package]}" ${presetViolation} (reviewed floor ${preset.version}).`);
-      }
-    }
-    if (runtimeManifest && !/^eslint(?:\s|$)/.test(String(runtimeManifest.scripts?.lint || '').trim())) {
-      addFinding(findings, 'STATIC_ANALYSIS_LINT_SCRIPT_INVALID', `${runtime.root}/package.json.scripts.lint`, `${runtime.kind} runtime lint script must run eslint (the framework CLI lint wrapper is not the portfolio contract).`);
-    }
-    for (const forbidden of ['.prettierrc', '.prettierrc.json', '.prettierrc.js', '.prettierrc.cjs', '.prettierrc.mjs', 'prettier.config.js', 'prettier.config.cjs', 'prettier.config.mjs', 'biome.json', 'biome.jsonc']) {
-      if (await statWithoutFollowing(resolve(appRoot, runtime.root, forbidden))) {
-        addFinding(findings, 'STATIC_ANALYSIS_FORMATTER_OVERRIDE', `${runtime.root}/${forbidden}`, 'Formatting is owned by the root prettier.config.mjs; runtime-level formatter configuration is not allowed.');
-      }
-    }
-  }
-}
-
-// ESLint 10 resolves the config from each file's own directory, so a packages/*/eslint.config.*
-// would silently replace the root contract for that package. Shared packages are linted by the
-// root config only.
-async function checkSharedPackageLintConfigs(appRoot, findings) {
-  const packagesRoot = resolve(appRoot, 'packages');
-  let entries = [];
-  try {
-    entries = await readdir(packagesRoot, { withFileTypes: true });
-  } catch {
-    return;
-  }
-  for (const entry of entries) {
-    if (!entry.isDirectory()) continue;
-    for (const name of ['eslint.config.js', 'eslint.config.mjs', 'eslint.config.cjs', 'eslint.config.ts', 'eslint.config.mts', '.eslintrc', '.eslintrc.js', '.eslintrc.cjs', '.eslintrc.json']) {
-      if (await statWithoutFollowing(resolve(packagesRoot, entry.name, name))) {
-        addFinding(findings, 'STATIC_ANALYSIS_PACKAGE_CONFIG_FORBIDDEN', `packages/${entry.name}/${name}`, 'Shared packages are linted by the root eslint.config.mjs; a package-level ESLint config replaces the portfolio contract under ESLint 10 file-directory lookup.');
-      }
-    }
-  }
-}
-
 // An evidence record is either one regular file or a directory whose index.md carries the
 // type-specific narrative and whose every regular file is covered by one manifest digest.
 // Directories exist for screenshot/recording sets that cannot be a single Markdown file.
@@ -4047,6 +3834,9 @@ function bindingProjectionSources(contract) {
     ['tools/check-design-contract.mjs', makeLocalContractChecker()],
     ['tools/check-hjm-source.mjs', makeLocalDesignChecker({ runtimeBindings: true })],
     ['tools/check-doc-links.mjs', readFileSync(resolve(scriptDirectory, 'check-doc-links.mjs'), 'utf8')],
+    ['tools/ci-change-scope.mjs', readFileSync(resolve(scriptDirectory, 'ci-change-scope.mjs'), 'utf8')],
+    ['tools/server-release-gate.mjs', readFileSync(resolve(scriptDirectory, 'server-release-gate.mjs'), 'utf8')],
+    ['tools/release-quality.mjs', readFileSync(resolve(scriptDirectory, 'release-quality.mjs'), 'utf8')],
     ['tools/json-schema-validator.mjs', readFileSync(resolve(scriptDirectory, 'json-schema-validator.mjs'), 'utf8')],
     ['.github/workflows/app-standard.yml', bindingWorkflow(contract)],
   ]);
@@ -4059,10 +3849,6 @@ export function standardProjectionSources(contract) {
     ['.github/dependabot.yml', makeDependabotConfig()],
     ['.npmrc', canonicalNpmrcSource],
     ['.editorconfig', makeEditorconfig()],
-    ['prettier.config.mjs', makePrettierConfig()],
-    ['.prettierignore', makePrettierIgnore()],
-    ['eslint.config.mjs', makeRootEslintConfig()],
-    ['tools/eslint.base.mjs', makeEslintBase()],
     ['docs/app-contract.schema.json', readFileSync(canonicalSchemaPath, 'utf8')],
     ['docs/app-profile.json', readFileSync(canonicalProfilePath, 'utf8')],
     ['docs/hjm-catalog.snapshot.json', canonicalCatalogSource],
@@ -4075,6 +3861,10 @@ export function standardProjectionSources(contract) {
     ['tools/check-app-contract.mjs', makeLocalContractChecker()],
     ['tools/check-doc-links.mjs', readFileSync(resolve(scriptDirectory, 'check-doc-links.mjs'), 'utf8')],
     ['tools/check-design-contract.mjs', makeLocalDesignChecker()],
+    ['tools/ci-change-scope.mjs', readFileSync(resolve(scriptDirectory, 'ci-change-scope.mjs'), 'utf8')],
+    ['tools/server-release-gate.mjs', readFileSync(resolve(scriptDirectory, 'server-release-gate.mjs'), 'utf8')],
+    ['tools/release-quality.mjs', readFileSync(resolve(scriptDirectory, 'release-quality.mjs'), 'utf8')],
+    ['tools/ci-resume.mjs', readFileSync(resolve(scriptDirectory, 'ci-resume.mjs'), 'utf8')],
     ['tools/json-schema-validator.mjs', readFileSync(resolve(scriptDirectory, 'json-schema-validator.mjs'), 'utf8')],
     ['.github/workflows/quality-gate.yml', makeQualityGateWorkflow(contract)],
   ]);
@@ -4113,7 +3903,7 @@ export async function syncStandardProjections(appRoot, { write = false } = {}) {
   const findings = [];
   // Only explicitly introduced central projections may be created during migration.
   // Missing older scaffold files still require repair, and symlinks are rejected.
-  const mayCreate = new Set([canonicalReleaseRelativePath, canonicalCatalogRelativePath, 'tools/runtime-bindings.mjs', 'tools/version-train.mjs', 'tools/hjm-source-analysis.mjs', 'tools/check-hjm-source.mjs']);
+  const mayCreate = new Set(['tools/release-quality.mjs', 'tools/server-release-gate.mjs', canonicalReleaseRelativePath, canonicalCatalogRelativePath, 'tools/ci-change-scope.mjs', 'tools/ci-resume.mjs', 'tools/runtime-bindings.mjs', 'tools/version-train.mjs', 'tools/hjm-source-analysis.mjs', 'tools/check-hjm-source.mjs']);
   const readProjection = async (path) => await assertSyncPath(absoluteRoot, path, { allowMissing: mayCreate.has(path) })
     ? readRegularTextFile(resolve(absoluteRoot, path), path) : null;
   for (const [path, expected] of standardProjectionSources(contract)) {
@@ -4177,7 +3967,8 @@ async function checkDeploymentContract(appRoot, contract, findings) {
   const deployWorkflow = sources.get(deployment.release?.workflow);
   const gateWorkflow = sources.get(deployment.release?.gateWorkflow);
   const workflowPath = deployment.release?.workflow;
-  if (gateWorkflow && deployWorkflow) {
+  const versionTriggered = deployment.release?.trigger === 'version-bump';
+  if (gateWorkflow && deployWorkflow && !versionTriggered) {
     // GitHub은 workflow_run을 **워크플로 이름 문자열**로 연결한다. 파일 경로가 아니다.
     // 게이트의 name:을 바꾸면 배포가 실패하지 않고 조용히 트리거되지 않는다.
     const gateName = gateWorkflow.match(/^name:[ \t]*(\S.*?)[ \t]*$/m)?.[1];
@@ -4190,18 +3981,38 @@ async function checkDeploymentContract(appRoot, contract, findings) {
     }
   }
   if (!deployWorkflow) return;
-  // workflow_run의 GITHUB_SHA는 기본 브랜치 tip이다. 검사받은 commit은 head_sha뿐이다.
-  if (!deployWorkflow.includes('github.event.workflow_run.head_sha')) {
-    addFinding(findings, 'DEPLOYMENT_SHA_PROVENANCE_MISSING', workflowPath, 'The deployment workflow must resolve the release from github.event.workflow_run.head_sha; GITHUB_SHA is the default-branch tip, not the checked commit.');
-  }
-  if (!/workflow_run\.conclusion[ \t]*==[ \t]*'success'/.test(deployWorkflow)) {
-    addFinding(findings, 'DEPLOYMENT_GATE_CONCLUSION_UNCHECKED', workflowPath, "The deployment workflow must require github.event.workflow_run.conclusion == 'success'; completed also fires on failure and cancellation.");
+  if (versionTriggered) {
+    // Push carries the exact before SHA; workflow_run loses that release-intent boundary.
+    // The shared helper must approve the bump and same-SHA quality before image jobs run.
+    const gateFile = deployment.release.gateWorkflow.split('/').at(-1);
+    const manifest = deployment.release.versionManifest;
+    if (!manifest || !deployWorkflow.includes(`node tools/server-release-gate.mjs ${manifest} ${gateFile}`) ||
+        !deployWorkflow.includes('needs.release-gate.outputs.deploy') ||
+        !deployWorkflow.includes('github.sha') || !/^  push:/m.test(deployWorkflow)) {
+      addFinding(findings, 'DEPLOYMENT_VERSION_GATE_MISSING', workflowPath, 'Version-triggered deployment requires the shared version/quality gate, push source SHA, and dependent image job.');
+    }
+  } else {
+    // workflow_run의 GITHUB_SHA는 기본 브랜치 tip이다. 검사받은 commit은 head_sha뿐이다.
+    if (!deployWorkflow.includes('github.event.workflow_run.head_sha')) {
+      addFinding(findings, 'DEPLOYMENT_SHA_PROVENANCE_MISSING', workflowPath, 'The deployment workflow must resolve the release from github.event.workflow_run.head_sha; GITHUB_SHA is the default-branch tip, not the checked commit.');
+    }
+    if (!/workflow_run\.conclusion[ \t]*==[ \t]*'success'/.test(deployWorkflow)) {
+      addFinding(findings, 'DEPLOYMENT_GATE_CONCLUSION_UNCHECKED', workflowPath, "The deployment workflow must require github.event.workflow_run.conclusion == 'success'; completed also fires on failure and cancellation.");
+    }
   }
   // 이미지 신원과 전송 무결성. 이게 없으면 어떤 바이트가 운영에 올라갔는지 사후에 모른다.
   if (!/image inspect/.test(deployWorkflow) || !deployWorkflow.includes('{{.Id}}')) {
     addFinding(findings, 'DEPLOYMENT_IMAGE_ID_UNRECORDED', workflowPath, 'The deployment workflow must record the built image ID (docker image inspect --format \'{{.Id}}\').');
   }
-  if (!/sha256sum/.test(deployWorkflow)) {
+  // Diairy measured 44s packaging plus reload on the very same daemon. There is
+  // no transferred archive to hash in that case; preserve image ID provenance and
+  // require the explicit transport plus the build/target host match instead.
+  if (deployment.release?.imageTransport === 'local-daemon') {
+    if (deployment.release.imageBuildHostId !== deployment.target?.hostId ||
+        !deployWorkflow.includes('IMAGE_TRANSPORT=local-daemon')) {
+      addFinding(findings, 'DEPLOYMENT_LOCAL_TRANSPORT_MISMATCH', workflowPath, 'local-daemon transport requires the same build and target host and explicit IMAGE_TRANSPORT=local-daemon in the deployment command.');
+    }
+  } else if (!/sha256sum/.test(deployWorkflow)) {
     addFinding(findings, 'DEPLOYMENT_ARCHIVE_DIGEST_MISSING', workflowPath, 'The deployment workflow must record a sha256 digest of the transferred image archive.');
   }
   if (!deployWorkflow.includes('StrictHostKeyChecking=yes') || !deployWorkflow.includes('UserKnownHostsFile')) {
@@ -4233,10 +4044,21 @@ async function checkDeploymentContract(appRoot, contract, findings) {
       }
     }
   }
-  const runsOn = deployWorkflow.match(/^[ \t]*runs-on:[ \t]*(.+?)[ \t]*$/m)?.[1];
+  // Version-gated workflows have a small intent job before the image job. Its CI_RUNNER
+  // is not the image build host; inspect the job that actually handles Docker images.
+  const imageJob = versionTriggered
+    ? deployWorkflow.split(/(?=^  [\w-]+:[ \t]*$)/m).find(block => /docker (?:build|buildx build|image inspect)/.test(block)) ?? ''
+    : deployWorkflow;
+  const runsOn = imageJob.match(/^[ \t]*runs-on:[ \t]*(.+?)[ \t]*$/m)?.[1];
+  if (versionTriggered && !hasText(runsOn)) addFinding(findings, 'DEPLOYMENT_BUILD_HOST_UNRESOLVED', workflowPath, 'Version-triggered deployment must declare the image job runner.');
   if (hasText(runsOn) && isPlainObject(deployment.release)) {
     let buildHost;
-    if (runsOn.includes('${{')) buildHost = null;
+    // Quota fallback is now explicit in the contract. Accept only the bounded DEPLOY_RUNNER
+    // selector; arbitrary expressions still hide the default builder (2026-10-01 hosted return).
+    const selector = /^\$\{\{ vars\.DEPLOY_RUNNER \|\| '(ubuntu-latest|ubuntu-24\.04-arm)' \}\}$/.exec(runsOn);
+    if (selector && hasText(deployment.release.imageBuildFallbackHostId) && deployment.release.imageTransport !== 'local-daemon') {
+      buildHost = 'github-hosted';
+    } else if (runsOn.includes('${{')) buildHost = null;
     else if (/(?:^|[[,\s])self-hosted(?:$|[\],\s])/.test(runsOn)) {
       // self-hosted 러너는 라벨 목록이고 마지막 라벨이 그 머신을 고른다.
       const labels = runsOn.replace(/^\[|\]$/g, '').split(',').map((label) => label.trim().replace(/^['"]|['"]$/g, ''));
@@ -4419,7 +4241,7 @@ export async function checkAppConformance(appRoot, { now = new Date(), targetSta
     '.github/dependabot.yml',
     '.github/workflows/quality-gate.yml',
     '.npmrc',
-    ...staticAnalysisPolicy.canonicalFiles,
+    '.editorconfig',
     'README.md',
     'package.json',
     'pnpm-workspace.yaml',
@@ -4441,6 +4263,10 @@ export async function checkAppConformance(appRoot, { now = new Date(), targetSta
     'tools/check-doc-links.mjs',
     'tools/check-design-contract.mjs',
     'tools/json-schema-validator.mjs',
+    'tools/ci-change-scope.mjs',
+    'tools/ci-resume.mjs',
+    'tools/server-release-gate.mjs',
+    'tools/release-quality.mjs',
     'tools/qa/README.md',
   ];
   const fileSources = new Map();
@@ -4460,8 +4286,6 @@ export async function checkAppConformance(appRoot, { now = new Date(), targetSta
   if (bound(contract)) await checkBindings(absoluteRoot, contract, findings, canonicalRelease, { implementationGate });
   else {
     await checkPackageManagerRegistryBoundary(absoluteRoot, contract, findings);
-    await checkStaticAnalysisContract(absoluteRoot, contract, implementationGate, findings);
-    if (implementationGate) await checkSharedPackageLintConfigs(absoluteRoot, findings);
   }
   for (const runtime of Array.isArray(contract.runtimes) ? contract.runtimes : []) {
     await checkRequiredFile(absoluteRoot, `${runtime.root}/README.md`, findings);
@@ -4733,34 +4557,8 @@ export async function verifyInitializerProvenance({
   const cadence = profile.runtimePolicy?.reviewPolicy?.cadence ?? '';
   const staleAfterDays = reviewWindowDays[cadence.split('-')[0]] ?? Math.min(...Object.values(reviewWindowDays));
   const runtimes = (profile.runtimePolicy?.allowed || []).filter((runtime) => !kinds || kinds.includes(runtime.kind));
-  const staticAnalysis = profile.toolchain?.staticAnalysis;
-  const includeStaticAnalysis = staticAnalysis && (!kinds || kinds.includes('static-analysis'));
-  if (runtimes.length === 0 && !includeStaticAnalysis) {
-    addFinding(findings, 'INITIALIZER_KIND_UNKNOWN', 'profile.runtimePolicy.allowed', `No profile runtime matches ${JSON.stringify(kinds)}; use mobile, web, server or static-analysis.`);
-  }
-  if (includeStaticAnalysis) {
-    // The lint/format packages share the initializer freshness policy and window.
-    const staticCheckedAt = new Date(`${staticAnalysis.checkedAt}T00:00:00Z`);
-    if (Number.isNaN(staticCheckedAt.getTime()) || (now - staticCheckedAt) / 86_400_000 > staleAfterDays) {
-      addFinding(findings, 'INITIALIZER_PROVENANCE_STALE', 'profile.toolchain.staticAnalysis.checkedAt', `Static analysis provenance was last checked ${staticAnalysis.checkedAt}; the profile's ${cadence} review window is ${staleAfterDays} days.`);
-    }
-    const entries = [...(staticAnalysis.shared || []), ...Object.values(staticAnalysis.presets || {})];
-    for (const entry of entries) {
-      const spec = `${entry.package}@${entry.version}`;
-      const path = `profile.toolchain.staticAnalysis[${entry.package}]`;
-      let observed;
-      try {
-        observed = await view(spec);
-      } catch (error) {
-        addFinding(findings, 'INITIALIZER_LOOKUP_FAILED', path, `${spec}: ${error.message}`);
-        continue;
-      }
-      const observedIntegrity = observed?.['dist.integrity'] ?? observed?.dist?.integrity ?? observed?.integrity;
-      const observedTarball = observed?.['dist.tarball'] ?? observed?.dist?.tarball ?? observed?.tarball;
-      checked.push({ kind: 'static-analysis', subject: entry.package, spec, expectedIntegrity: entry.integrity, observedIntegrity, expectedTarballUrl: entry.tarballUrl, observedTarballUrl: observedTarball });
-      if (observedIntegrity !== entry.integrity) addFinding(findings, 'INITIALIZER_INTEGRITY_DRIFT', path, `${spec} registry dist.integrity ${JSON.stringify(observedIntegrity)} differs from the pinned ${JSON.stringify(entry.integrity)}.`);
-      if (observedTarball !== entry.tarballUrl) addFinding(findings, 'INITIALIZER_TARBALL_DRIFT', path, `${spec} registry dist.tarball ${JSON.stringify(observedTarball)} differs from the pinned ${JSON.stringify(entry.tarballUrl)}.`);
-    }
+  if (runtimes.length === 0) {
+    addFinding(findings, 'INITIALIZER_KIND_UNKNOWN', 'profile.runtimePolicy.allowed', `No profile runtime matches ${JSON.stringify(kinds)}; use mobile, web or server.`);
   }
   for (const runtime of runtimes) {
     const initializer = runtime.initializer || {};
@@ -4893,10 +4691,6 @@ export async function checkStandardAssets({ workspaceRoot = defaultWorkspaceRoot
       serverConformance: {
         packageType: 'module',
         tsconfig: { module: 'NodeNext', moduleResolution: 'NodeNext' },
-        lint: {
-          package: 'eslint', version: '9.39.5', sourceUrl: 'https://registry.npmjs.org/eslint/9.39.5', checkedAt: '2026-09-04',
-          rationale: 'Keep one cross-runtime lint contract instead of accepting the Nest CLI oxlint default; ESLint 9.x because the Expo/Next presets depend on eslint-plugin-react, which does not support ESLint 10 yet.',
-        },
         test: { package: 'vitest', version: '4.1.11', sourceUrl: 'https://registry.npmjs.org/vitest/latest', checkedAt: '2026-08-31' },
         e2e: { package: 'supertest', version: '7.2.2', sourceUrl: 'https://registry.npmjs.org/supertest/latest', checkedAt: '2026-08-31' },
       },
@@ -4995,9 +4789,6 @@ export async function checkStandardAssets({ workspaceRoot = defaultWorkspaceRoot
   if (JSON.stringify(parsed.profile?.ci?.actions) !== JSON.stringify(expectedActionsPolicy)
     || JSON.stringify(parsed.profile?.ci?.trustModel) !== JSON.stringify(expectedTrustModel)) {
     addFinding(findings, 'STANDARD_CI_TRUST_PROFILE_INVALID', 'docs/profiles/portfolio-default-v1.json.ci', 'CI action SHA pins, credential policy, updater, central verifier bootstrap status, protected paths, and fail-closed merge authority must match the reviewed v1 trust model.');
-  }
-  if (JSON.stringify(parsed.profile?.toolchain?.staticAnalysis) !== JSON.stringify(staticAnalysisPolicy)) {
-    addFinding(findings, 'STANDARD_STATIC_ANALYSIS_PROFILE_INVALID', 'docs/profiles/portfolio-default-v1.json.toolchain.staticAnalysis', 'The lint/format contract (ESLint, typescript-eslint, Prettier, eslint-config-prettier, runtime presets, canonical files) must match the reviewed v1 policy byte-for-byte.');
   }
   const expectedAcceptancePolicy = {
     requiredCategories: ['product', 'architecture', 'design', 'i18n', 'security', 'quality', 'release'],

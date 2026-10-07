@@ -18,8 +18,8 @@ minimumReleaseAgeStrict: true
 # "직접 게시한 이 버전만 건너뛴다"는 규칙이 한눈에 안 읽힌다. 이력은 git 로그가 갖는다.
 minimumReleaseAgeExcludePrune: true
 
-# HJM 1.11.0: published train integrity verified by central release import; exact exemptions only.
+# HJM 1.13.1: published train integrity verified by central release import; exact exemptions only.
 # Remove automatically once the release ages past pnpm policy; do not exempt the namespace.
 minimumReleaseAgeExclude:
-  - '@hjmds/design-contracts@1.11.0'
-  - '@hjmds/react@1.11.0'
+  - '@hjmds/design-contracts@1.13.1'
+  - '@hjmds/react@1.13.1'

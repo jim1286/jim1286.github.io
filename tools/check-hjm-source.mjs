@@ -18,7 +18,7 @@ const frameworkPackages = { mobile: 'expo', web: 'next', server: '@nestjs/core' 
 // standard records; the lockfile still resolves one version per install. Baked in at
 // generation time from the central constant so the projection cannot drift from it.
 const runtimeFrameworkFloors = {"mobile":"57.0.18","web":"16.3.3","server":"12.0.1"};
-const serverTooling = {"eslint":"9.39.5","vitest":"4.1.11","supertest":"7.2.2"};
+const serverTooling = {"vitest":"4.1.11","supertest":"7.2.2"};
 
 async function collectPackageFiles(directory) {
   for (const entry of await readdir(directory, { withFileTypes: true })) {
@@ -640,9 +640,6 @@ async function verifyServerRuntime(runtime, manifest) {
     if (violation) {
       add(runtime.root + '/package.json.devDependencies.' + name, 'NestJS v1 runtime devDependency ' + name + ' "' + manifest.devDependencies?.[name] + '" ' + violation);
     }
-  }
-  if (!/^eslint(?:\s|$)/.test(String(manifest.scripts?.lint || '').trim())) {
-    add(runtime.root + '/package.json.scripts.lint', 'NestJS v1 keeps the cross-runtime ESLint contract; the CLI oxlint default is not accepted');
   }
   if (!/^vitest(?:\s|$)/.test(String(manifest.scripts?.test || '').trim())) {
     add(runtime.root + '/package.json.scripts.test', 'NestJS v1 unit tests must run with Vitest');
@@ -1434,7 +1431,7 @@ if (contract && runtimeBindings) {
           add(runtime.root + '/package.json.dependencies.' + frameworkPackage, 'implementation-conformant runtime must directly install its framework inside the ' + trainLabel(runtimeFrameworkFloors[runtime.kind]) + ' train; "' + manifest.dependencies?.[frameworkPackage] + '" ' + frameworkViolation);
         }
         await verifyServerRuntime(runtime, manifest);
-        for (const scriptName of ['dev', 'lint', 'typecheck', 'test', 'test:e2e', 'build']) {
+        for (const scriptName of ['dev', 'typecheck', 'test', 'test:e2e', 'build']) {
           if (isNoopScript(manifest.scripts?.[scriptName])) add(runtime.root + '/package.json.scripts.' + scriptName, 'implementation-conformant runtime requires a non-noop ' + scriptName + ' command');
         }
       }
@@ -1571,7 +1568,7 @@ if (contract && runtimeBindings) {
         add(runtime.root + '/package.json.dependencies.' + frameworkPackage, 'implementation-conformant runtime must directly install its framework inside the ' + trainLabel(runtimeFrameworkFloors[runtime.kind]) + ' train; "' + manifest.dependencies?.[frameworkPackage] + '" ' + frameworkViolation);
       }
       await verifyServerRuntime(runtime, manifest);
-      for (const scriptName of ['dev', 'lint', 'typecheck', 'test', 'test:e2e', 'build']) {
+      for (const scriptName of ['dev', 'typecheck', 'test', 'test:e2e', 'build']) {
         if (isNoopScript(manifest.scripts?.[scriptName])) {
           add(runtime.root + '/package.json.scripts.' + scriptName, 'implementation-conformant runtime requires a non-noop ' + scriptName + ' command');
         }

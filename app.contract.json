@@ -65,11 +65,6 @@
         ],
         "frameworkSpecifier": "^7.0.4",
         "checks": {
-          "lint": [
-            "pnpm",
-            "run",
-            "lint"
-          ],
           "typecheck": [
             "pnpm",
             "run",
@@ -106,7 +101,6 @@
     },
     "node": "24.20.0",
     "scripts": {
-      "standard:lint": "node tools/run-quality.mjs lint",
       "standard:typecheck": "node tools/run-quality.mjs typecheck",
       "standard:test": "node tools/run-quality.mjs test",
       "standard:build": "node tools/run-quality.mjs build",
@@ -121,21 +115,21 @@
     "rationale": null,
     "contracts": {
       "package": "@hjmds/design-contracts",
-      "version": "1.11.0"
+      "version": "1.13.1"
     },
     "renderers": [
       {
         "kind": "web",
         "package": "@hjmds/react",
-        "version": "1.11.0"
+        "version": "1.13.1"
       }
     ],
     "versionPolicy": "exact-and-aligned",
     "adoptionPolicy": "stable-default",
     "catalog": {
-      "train": "1.11.0",
+      "train": "1.13.1",
       "snapshotPath": "docs/hjm-catalog.snapshot.json",
-      "sha256": "7207dc849191a1e5c4c2f30bca2957f19170d477eb98bd3a94e07ac03cb617e0"
+      "sha256": "e59f6608637fb899e42ad02827aef53548ef2286db7fc2ae6c5ab347eeefaf5b"
     },
     "companionPolicy": {
       "id": "hjm-consumer-policy",
