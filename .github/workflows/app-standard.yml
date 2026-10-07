@@ -1,8 +1,11 @@
 name: App standard quality
+# Version manifests only: routine source/PR pushes do not run quality (2026-10-01).
 on:
-  pull_request:
+  workflow_dispatch:
   push:
     branches: [main]
+    paths: ["package.json"]
+
 permissions:
   contents: read
   # 변경 범위 판정(tools/ci-change-scope.mjs)이 이 workflow의 이전 성공 run을 조회한다.
@@ -10,8 +13,34 @@ permissions:
 concurrency:
   group: app-standard-portfolio-site-${{ github.ref }}
   cancel-in-progress: true
+env:
+  RELEASE_QUALITY: '1'
+
 jobs:
+  release-intent:
+    runs-on: ${{ vars.CI_RUNNER || 'ubuntu-latest' }}
+    timeout-minutes: 5
+    outputs:
+      run: ${{ steps.intent.outputs.run }}
+    steps:
+      # Keep the reviewed Dependabot v7 pin during standard projection; v7 hardens privileged PR checkout.
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      # Admission executes repository code too: use the product's exact Node pin,
+      # not the hosted runner's changing default (2026-10-08 consumer CI audit).
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020
+        with:
+          node-version-file: .nvmrc
+      - name: Admit only an increased release version
+        id: intent
+        run: node tools/release-quality.mjs
+
   quality:
+    needs: release-intent
+    if: needs.release-intent.outputs.run == 'true'
     # 기본은 hosted. 저장소 변수 CI_RUNNER를 설정한 저장소만 self-hosted로 간다.
     # 비워 두면 오늘과 동일하다. 켜기 전에 러너 여유 메모리와 이 게이트의 빌드
     # 피크를 비교한다(2026-09-10 실측 Next 피크 2358MB). public 저장소에는

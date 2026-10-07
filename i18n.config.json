@@ -1,0 +1,19 @@
+{
+  "sourceLocale": "ko-KR",
+  "defaultLocale": "ko-KR",
+  "fallbackChain": [
+    "ko-KR"
+  ],
+  "catalogRoot": "src/i18n",
+  "output": "src/i18n",
+  "importExtension": "",
+  "locales": [
+    {
+      "tag": "ko-KR",
+      "label": "한국어",
+      "direction": "ltr",
+      "catalog": "./ko",
+      "export": "ko"
+    }
+  ]
+}

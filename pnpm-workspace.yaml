@@ -18,10 +18,11 @@ minimumReleaseAgeStrict: true
 # "직접 게시한 이 버전만 건너뛴다"는 규칙이 한눈에 안 읽힌다. 이력은 git 로그가 갖는다.
 minimumReleaseAgeExcludePrune: true
 
-# HJM 1.15.0: published train integrity verified by central release import; exact exemptions only.
+# HJM 1.16.0: tag 4df598a6 and official tarball integrity verified by central release import.
 # Remove automatically once the release ages past pnpm policy; do not exempt the namespace.
 minimumReleaseAgeExclude:
-  - '@hjmds/design-contracts@1.15.0'
-  - '@hjmds/react@1.15.0'
+  - '@hjmds/design-contracts@1.16.0'
+  - '@hjmds/react@1.16.0'
 
-# Exact HJM 1.15.0 cooldown exceptions follow the verified tag and tarball receipt in docs/qa/2026-10-07-hjm-1-15-upgrade.md.
+# Old 1.15 exact exemptions were pruned after lock regeneration.
+# Receipt and failure history: docs/qa/2026-10-08-hjm-adoption.md.

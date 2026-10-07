@@ -1,192 +1,204 @@
-import { useEffect, type ReactNode } from 'react';
+import { useEffect, useRef, useState, type MouseEvent, type ReactNode } from 'react';
+import { Collapsible } from '@hjmds/react/collapsible';
 import { HjmProvider } from '@hjmds/react/provider';
 import { Link } from '@hjmds/react/actions';
-import { BrandProvider } from './BrandProvider';
-import { Container, Stack, Text } from '@hjmds/react/layout';
-import { Icon } from '@hjmds/react/display';
+import { Container, Grid, Section, Stack, Surface, Text } from '@hjmds/react/layout';
+import { Badge, Card, Icon, Statistic, Tag } from '@hjmds/react/display';
+import { Heading } from '@hjmds/react/heading';
+import { Asset } from '@hjmds/react/asset';
+import { ScreenLayout } from '@hjmds/react/screens';
+import { SkipNav } from '@hjmds/react/skip-nav';
 import '@hjmds/react/styles.css';
-import {
-  AndroidFilled,
-  AppleFilled,
-  ArrowUpOutlined,
-  ExportOutlined,
-  GithubOutlined,
-  MailOutlined,
-  SafetyCertificateOutlined,
-} from '@ant-design/icons';
-import { apps, legalDocuments, portfolioSummary } from './siteData';
+import { AndroidFilled, AppleFilled, ArrowUpOutlined, ExportOutlined, GithubOutlined, MailOutlined, SafetyCertificateOutlined } from '@ant-design/icons';
+import { BrandProvider } from './BrandProvider';
+import StrategySection from './StrategySection';
+import { siteCopy as copy, appCopy } from './copy';
+import { apps, legalDocuments, portfolioSummary, type PortfolioApp } from './siteData';
 import './styles/site.css';
 
 const developerEmail = 'jimin1286@gmail.com';
 const githubProfile = 'https://github.com/jim1286';
 const posliApps = apps.filter((app) => app.socialHook && app.statusTone === 'live');
 
-function ExternalLink({ href, className, ariaLabel, children }: { href: string; className?: string; ariaLabel?: string; children: ReactNode }) {
-  return (
-    <Link href={href} className={className} aria-label={ariaLabel} target="_blank" rel="noreferrer" tone="neutral">
-      {children}
-    </Link>
-  );
+function ExternalLink({ href, ariaLabel, children }: { href: string; ariaLabel?: string; children: ReactNode }) {
+  return <Link href={href} aria-label={ariaLabel} target="_blank" rel="noreferrer noopener" variant="standalone" tone="neutral">{children}</Link>;
+}
+
+function AppLinks({ app, social = false }: { app: PortfolioApp; social?: boolean }) {
+  return <Stack axis="inline" gap="sm" wrap role="group" aria-label={appCopy.open(app.name)}>
+    {app.webUrl && <ExternalLink href={app.webUrl} ariaLabel={social ? appCopy.web(app.name) : undefined}><ExportOutlined aria-hidden /> {social ? copy.webOpen : copy.web}</ExternalLink>}
+    {app.iosUrl && <ExternalLink href={app.iosUrl} ariaLabel={social ? appCopy.ios(app.name) : undefined}><AppleFilled aria-hidden /> {social ? copy.ios : copy.appStore}</ExternalLink>}
+    {app.androidUrl && <ExternalLink href={app.androidUrl} ariaLabel={social ? appCopy.android(app.name) : undefined}><AndroidFilled aria-hidden /> {social ? copy.android : copy.googlePlay}</ExternalLink>}
+    {/* Anonymous navigation and owner metadata establish private/archived
+        repository access. Preserve source data without offering visitor 404s.
+        See docs/qa/2026-10-08-hjm-adoption.md. */}
+    {!social && (app.sourceAccess !== 'public'
+      ? <Text variant="caption" tone="muted">{app.sourceAccess === 'archived' ? app.status : copy.privateSource}</Text>
+      : <ExternalLink href={app.githubUrl}><GithubOutlined aria-hidden /> {copy.source}</ExternalLink>)}
+  </Stack>;
+}
+
+function ProductIcon({ app }: { app: PortfolioApp }) {
+  return <Asset descriptor={{ kind: 'image', size: 'large', shape: 'rounded', decorative: true }}><img src={app.icon} alt="" /></Asset>;
+}
+
+function SiteHeader() {
+  const [compact, setCompact] = useState(() => window.matchMedia('(max-width: 799px)').matches);
+  const [open, setOpen] = useState(false);
+  const menu = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const query = window.matchMedia('(max-width: 799px)');
+    const change = () => { setCompact(query.matches); setOpen(false); };
+    query.addEventListener('change', change);
+    return () => query.removeEventListener('change', change);
+  }, []);
+  const followSection = (event: MouseEvent<HTMLAnchorElement>) => {
+    if (!compact) return;
+    const destination = document.getElementById(event.currentTarget.hash.slice(1));
+    setOpen(false);
+    // Focus follows the visited section after native hash navigation; returning
+    // to the header would make the next Tab disagree with the visible location.
+    requestAnimationFrame(() => destination?.focus({ preventScroll: true }));
+  };
+  return <BrandProvider surface="forest"><header className="site-header">
+    <Container size="content" gutter="regular">
+      <div className="header-content" onKeyDown={event => {
+        if (event.key === 'Escape' && compact && open) {
+          setOpen(false);
+          menu.current?.querySelector('button')?.focus();
+        }
+      }}>
+        <Link href="#top" variant="standalone" tone="neutral" aria-label={copy.home}><Text emphasis="strong">{copy.brandName}</Text></Link>
+        {/* A single public disclosure keeps the sticky mobile header small;
+            desktop uses its inline presentation instead of duplicate links. */}
+        <Collapsible ref={menu} className="header-menu" trigger={copy.menu} open={open} onOpenChange={setOpen} presentation={compact ? 'disclosure' : 'inline'}>
+          <Stack axis={compact ? 'block' : 'inline'} gap="sm" align="center">
+        <nav aria-label={copy.navigation}><Stack axis="inline" gap="sm" wrap>
+          <Link href="#posli" onClick={followSection} variant="standalone" tone="neutral">{copy.posliNav}</Link>
+          <Link href="#apps" onClick={followSection} variant="standalone" tone="neutral">{copy.appsNav}</Link>
+          <Link href="#strategy" onClick={followSection} variant="standalone" tone="neutral">{copy.strategyNav}</Link>
+          <Link href="#legal" onClick={followSection} variant="standalone" tone="neutral">{copy.legalNav}</Link>
+          <Link href="#developer" onClick={followSection} variant="standalone" tone="neutral">{copy.developerNav}</Link>
+        </Stack></nav>
+        <Link href={`mailto:${developerEmail}`} variant="standalone" tone="neutral">{copy.contact} <ExportOutlined aria-hidden /></Link>
+          </Stack>
+        </Collapsible>
+      </div>
+    </Container>
+  </header></BrandProvider>;
 }
 
 export default function App() {
-  // The social bio opens /#posli before React mounts; scroll again after the anchor exists.
+  // The social bio opens /#posli before React mounts; the same document anchor is
+  // preserved inside the shared screen's single scroll owner.
   useEffect(() => {
     if (window.location.hash === '#posli') document.getElementById('posli')?.scrollIntoView({ behavior: 'instant' });
   }, []);
 
-  return (
-    <HjmProvider theme="system" host="contents">
-    <BrandProvider>
-    <Container className="site-shell" size="full" gutter="none">
-      <a className="skip-link" href="#main">본문 바로가기</a>
+  return <HjmProvider theme="system" host="contents"><BrandProvider>
+    <SkipNav targetId="main" label={copy.skip} />
+    <div className="portfolio-host">
+      {/* HJM publishes an introduction recipe, not a portable LandingScreen.
+          Its public shell/sections/cards express this static marketing flow;
+          OverviewScreen would invent data tools. See docs/DESIGN.md. */}
+      <ScreenLayout title={copy.home} header={<SiteHeader />} contentInset="none" layoutStyle={{ maxWidth: 'none' }}>
+        <div id="main" tabIndex={-1}>
+          <BrandProvider surface="forest"><Surface as="section" padding="none" radius="sm" className="hero" id="top" aria-labelledby="hero-title">
+            <div className="section-padding"><Container size="content" gutter="regular"><Grid columns={{ compact: 1, expanded: 2 }} gap={{ compact: 'xl' }} minColumnWidth={{ compact: 280 }}>
+              <Stack gap="xl">
+                <Text as="p" variant="caption" fontRole="code" tone="muted">{copy.eyebrow}</Text>
+                <Heading level="level1" id="hero-title">{copy.heroStart}<br /><span className="hero-brand-word">{copy.heroFocus}</span>{copy.heroEnd}</Heading>
+                <Text as="p" variant="bodyLarge" tone="muted">{copy.heroDescription}</Text>
+                <Stack axis="inline" gap="md" wrap align="center">
+                  <BrandProvider surface="lime"><Surface padding="sm" radius="md"><Link href="#apps" variant="standalone" tone="neutral">{copy.browse} <Icon name="chevronEnd" decorative /></Link></Surface></BrandProvider>
+                  <ExternalLink href={githubProfile}><GithubOutlined aria-hidden /> {copy.github}</ExternalLink>
+                </Stack>
+              </Stack>
+              <aside aria-label={copy.summary}>
+                <Card title={copy.summaryIndex} headingLevel={2} tone="sunken" padding="xl">
+                  <Stack gap="lg">
+                    <Statistic descriptor={{ id: 'apps', label: copy.appsCount, value: String(portfolioSummary.appCount).padStart(2, '0') }} />
+                    <Statistic descriptor={{ id: 'stores', label: copy.storesCount, value: String(portfolioSummary.storeLinkedAppCount).padStart(2, '0') }} />
+                    <Statistic descriptor={{ id: 'platforms', label: copy.platformsCount, value: String(portfolioSummary.storePlatforms.length).padStart(2, '0') }} />
+                    <Stack axis="inline" gap="sm" wrap>{portfolioSummary.storePlatforms.map(platform => <Tag key={platform}>{platform}</Tag>)}</Stack>
+                  </Stack>
+                </Card>
+              </aside>
+            </Grid></Container></div>
+          </Surface></BrandProvider>
 
-      <header className="site-header">
-        <a className="brand" href="#top" aria-label="황지민 개발자 사이트 홈">
-          <span className="brand-mark">HJ</span>
-          <span>Hwang Jimin</span>
-        </a>
-        <nav aria-label="주요 메뉴">
-          <a href="#posli">포슬이의 앱</a>
-          <a href="#apps">Apps</a>
-          <a href="#legal">Support &amp; Privacy</a>
-          <a href="#developer">Developer</a>
-        </nav>
-        <a className="header-contact" href={`mailto:${developerEmail}`}>Contact <ExportOutlined /></a>
-      </header>
+          <BrandProvider surface="warm"><Surface as="section" padding="none" radius="sm" id="posli" tabIndex={-1} aria-labelledby="posli-title">
+            <div className="section-padding"><Container size="content" gutter="regular"><Stack gap="xl">
+              <Stack axis="inline" gap="xl" wrap align="center">
+                <Asset descriptor={{ kind: 'image', size: 'xlarge', shape: 'square', accessibilityLabel: copy.posliAlt }}><img src="/posli-avatar.png" alt="" /></Asset>
+                <Stack gap="sm"><Text as="p" variant="caption" fontRole="code" tone="muted">{copy.posliIndex}</Text><Heading level="level2" id="posli-title">{copy.posliTitle}</Heading><Text as="p" tone="muted">{copy.posliDescription}</Text></Stack>
+              </Stack>
+              <Grid columns={{ compact: 1, medium: 2 }} gap={{ compact: 'md' }} minColumnWidth={{ compact: 280 }}>
+                {posliApps.map(app => <Card key={app.id} title={app.name} description={app.socialHook} leading={<ProductIcon app={app} />} actions={<AppLinks app={app} social />} padding="lg" />)}
+              </Grid>
+            </Stack></Container></div>
+          </Surface></BrandProvider>
 
-      <main id="main">
-        <section className="hero" id="top">
-          <div className="hero-copy">
-            <p className="eyebrow"><span /> INDEPENDENT APP DEVELOPER · SEOUL</p>
-            <h1>일상의 질문을<br /><em>쓸모 있는 앱</em>으로<br />만듭니다.</h1>
-            <p className="hero-description">
-              야구 기록부터 햇빛을 피하는 좌석, 오프라인 비행 정보까지.<br />
-              작지만 분명한 문제를 발견하고 직접 설계하고 출시합니다.
-            </p>
-            <Stack className="hero-actions" axis="inline" gap="sm" wrap>
-              <a className="button button-primary" href="#apps">앱 둘러보기 <Icon className="button-icon" name="chevronEnd" decorative /></a>
-              <ExternalLink className="button button-secondary" href={githubProfile}><GithubOutlined /> GitHub</ExternalLink>
-            </Stack>
-          </div>
+          <div className="section-padding"><Container size="content" gutter="regular"><Stack gap="md">
+            <Text as="p" variant="caption" fontRole="code" tone="muted">{copy.appsIndex}</Text>
+            <Section id="apps" tabIndex={-1} title={copy.appsTitle} description={copy.appsDescription}>
+              <Grid columns={{ compact: 1, medium: 2 }} gap={{ compact: 'lg' }} minColumnWidth={{ compact: 280 }}>
+                {apps.map(app => <Card key={app.id} title={<>{app.name}<Text as="small" variant="caption" tone="muted" layoutStyle={{ marginInlineStart: 12 }}> {app.englishName}</Text></>} description={app.description} leading={<ProductIcon app={app} />} tone={app.featured ? 'accent' : 'default'} padding="lg" actions={<AppLinks app={app} />}>
+                  <Stack gap="sm">
+                    <Text variant="caption" fontRole="code" tone="muted">{copy.appIndex(app.index)}</Text>
+                    <Badge variant={app.statusTone === 'live' ? 'filled' : 'outline'}>{app.status}</Badge>
+                    <Stack axis="inline" gap="xs" wrap aria-label={appCopy.technologies(app.name)}>{app.tags.map(tag => <Tag key={tag}>{tag}</Tag>)}</Stack>
+                  </Stack>
+                </Card>)}
+              </Grid>
+            </Section>
+          </Stack></Container></div>
 
-          <aside className="hero-panel" aria-label="포트폴리오 현황">
-            <p className="panel-label">PORTFOLIO / 2026</p>
-            <div className="metric"><strong>{String(portfolioSummary.appCount).padStart(2, '0')}</strong><span>소개 중인 앱</span></div>
-            <div className="metric"><strong>{String(portfolioSummary.storeLinkedAppCount).padStart(2, '0')}</strong><span>스토어 링크가 있는 앱</span></div>
-            <div className="metric"><strong>{String(portfolioSummary.storePlatforms.length).padStart(2, '0')}</strong><span>스토어 연결 플랫폼</span></div>
-            <div className="panel-footer">{portfolioSummary.storePlatforms.map((platform) => <span key={platform}>{platform}</span>)}</div>
-          </aside>
-        </section>
+          <StrategySection />
 
-        <section className="section posli-section" id="posli" aria-labelledby="posli-title">
-          <div className="posli-intro">
-            <img src="/posli-avatar.png" alt="작은 앱 카드를 품에 안은 포슬이" className="posli-avatar" />
-            <div>
-              <p className="section-index">POSLI / APP CARDS</p>
-              <h2 id="posli-title">포슬이가 꺼낸<br />앱 카드 🥔</h2>
-              <p>포슬이가 만든 앱들이야. 지금 필요한 카드를 골라봐.</p>
-            </div>
-          </div>
-          <div className="posli-grid">
-            {posliApps.map((app) => (
-              <article className="posli-card" key={app.id}>
-                <img src={app.icon} alt="" className="posli-app-icon" />
-                <div className="posli-card-body">
-                  <h3>{app.name}</h3>
-                  <p>{app.socialHook}</p>
-                </div>
-                <div className="posli-card-links" aria-label={`${app.name} 열기`}>
-                  {app.webUrl && <ExternalLink href={app.webUrl} ariaLabel={`${app.name} 웹에서 열기`}>웹에서 열기 <ExportOutlined /></ExternalLink>}
-                  {app.iosUrl && <ExternalLink href={app.iosUrl} ariaLabel={`${app.name} iOS 앱 열기`}>iOS <AppleFilled /></ExternalLink>}
-                  {app.androidUrl && <ExternalLink href={app.androidUrl} ariaLabel={`${app.name} Android 앱 열기`}>Android <AndroidFilled /></ExternalLink>}
-                </div>
-              </article>
-            ))}
-          </div>
-        </section>
+          <BrandProvider surface="forest"><Surface as="section" padding="none" radius="sm">
+            <div className="section-padding"><Container size="content" gutter="regular"><Stack gap="md">
+              <Text as="p" variant="caption" fontRole="code" tone="muted">{copy.legalIndex}</Text>
+              <Section id="legal" tabIndex={-1} title={copy.legalTitle} description={copy.legalDescription}>
+                <Stack gap="lg">{legalDocuments.map(document => <Card key={document.id} title={document.name} description={document.note} headingLevel={3} tone="sunken" padding="lg" actions={<Stack axis="inline" gap="sm" wrap>
+                  <ExternalLink href={document.privacyUrl}>{copy.privacy} <ExportOutlined aria-hidden /></ExternalLink>
+                  {document.deletionUrl && <ExternalLink href={document.deletionUrl}>{copy.deletion} <ExportOutlined aria-hidden /></ExternalLink>}
+                  <ExternalLink href={document.supportUrl}>{copy.support} <ExportOutlined aria-hidden /></ExternalLink>
+                </Stack>}><Text variant="caption" fontRole="code" tone="muted">{document.index}</Text></Card>)}</Stack>
+              </Section>
+              <Text as="p" variant="caption" tone="muted"><SafetyCertificateOutlined aria-hidden /> {copy.legalNote}</Text>
+            </Stack></Container></div>
+          </Surface></BrandProvider>
 
-        <section className="section apps-section" id="apps">
-          <div className="section-heading">
-            <div><p className="section-index">01 / APPS</p><h2>만든 앱</h2></div>
-            <p>직접 기획하고 개발하는 제품입니다.<br />출시 상태와 공식 링크를 함께 제공합니다.</p>
-          </div>
+          <div className="section-padding"><Container size="content" gutter="regular">
+            <Section id="developer" tabIndex={-1}><Grid columns={{ compact: 1, expanded: 2 }} gap={{ compact: 'xl' }} minColumnWidth={{ compact: 280 }}>
+              <div className="developer-photo-wrap"><img src="/profile.jpg" alt={copy.developerAlt} className="developer-photo" /><Text variant="caption" fontRole="code">{copy.seoul}</Text></div>
+              <Stack gap="lg">
+                <Text as="p" variant="caption" fontRole="code" tone="muted">{copy.developerIndex}</Text>
+                <Heading level="level2">{copy.developerStart}<br />{copy.developerEnd}</Heading>
+                <Text as="p" variant="bodyLarge" tone="muted">{copy.developerDescription}</Text>
+                <dl className="developer-facts">
+                  <div><dt><Text variant="label">{copy.developer}</Text></dt><dd><Text emphasis="strong">{copy.developerName}</Text></dd></div>
+                  <div><dt><Text variant="label">{copy.email}</Text></dt><dd><Link href={`mailto:${developerEmail}`}>{developerEmail}</Link></dd></div>
+                  <div><dt><Text variant="label">{copy.github}</Text></dt><dd><ExternalLink href={githubProfile}>{copy.githubAddress}</ExternalLink></dd></div>
+                </dl>
+              </Stack>
+            </Grid></Section>
+          </Container></div>
 
-          <div className="app-grid">
-            {apps.map((app) => (
-              <article className={`app-card ${app.featured ? 'featured' : ''}`} key={app.id}>
-                <div className="app-card-top">
-                  <img src={app.icon} alt="" className="app-icon" />
-                  <span className={`status status-${app.statusTone}`}>{app.status}</span>
-                </div>
-                <p className="app-number">APP / {app.index}</p>
-                <h3>{app.name}<small>{app.englishName}</small></h3>
-                <p className="app-description">{app.description}</p>
-                <ul className="tag-list" aria-label={`${app.name} 기술`}>
-                  {app.tags.map((tag) => <li key={tag}>{tag}</li>)}
-                </ul>
-                <div className="app-links">
-                  {app.webUrl && <ExternalLink href={app.webUrl}><ExportOutlined /> Web</ExternalLink>}
-                  {app.iosUrl && <ExternalLink href={app.iosUrl}><AppleFilled /> App Store</ExternalLink>}
-                  {app.androidUrl && <ExternalLink href={app.androidUrl}><AndroidFilled /> Google Play</ExternalLink>}
-                  <ExternalLink href={app.githubUrl}><GithubOutlined /> Source</ExternalLink>
-                </div>
-              </article>
-            ))}
-          </div>
-        </section>
+          <BrandProvider surface="orange"><Surface as="section" padding="none" radius="sm"><div className="section-padding"><Container size="content" gutter="regular"><Stack gap="lg">
+            <Text as="p" variant="caption" fontRole="code">{copy.contactIndex}</Text>
+            <Heading level="level3" semanticLevel={2}>{copy.contactQuestion}</Heading>
+            <Link href={`mailto:${developerEmail}`} variant="standalone" tone="neutral">{copy.mail} <MailOutlined aria-hidden /></Link>
+          </Stack></Container></div></Surface></BrandProvider>
 
-        <section className="section legal-section" id="legal">
-          <div className="section-heading light">
-            <div><p className="section-index">02 / SUPPORT &amp; PRIVACY</p><h2>공식 문서</h2></div>
-            <p>스토어 이용자와 심사를 위한 앱별<br />개인정보처리방침 및 지원 채널입니다.</p>
-          </div>
-
-          <div className="legal-list">
-            {legalDocuments.map((document) => (
-              <article className="legal-row" key={document.id}>
-                <div className="legal-identity">
-                  <span>{document.index}</span>
-                  <div><h3>{document.name}</h3><p>{document.note}</p></div>
-                </div>
-                <div className="legal-links">
-                  <ExternalLink href={document.privacyUrl}>개인정보처리방침 <ExportOutlined /></ExternalLink>
-                  {document.deletionUrl && <ExternalLink href={document.deletionUrl}>계정 삭제 <ExportOutlined /></ExternalLink>}
-                  <ExternalLink href={document.supportUrl}>지원 <ExportOutlined /></ExternalLink>
-                </div>
-              </article>
-            ))}
-          </div>
-          <p className="legal-note"><SafetyCertificateOutlined /> 공개 문서는 앱별 데이터 처리 방식과 지원 절차를 안내합니다.</p>
-        </section>
-
-        <section className="section developer-section" id="developer">
-          <div className="developer-photo-wrap"><img src="/profile.jpg" alt="개발자 황지민" className="developer-photo" /><span>BASED IN SEOUL</span></div>
-          <div className="developer-copy">
-            <p className="section-index">03 / DEVELOPER</p>
-            <h2>안녕하세요,<br />개발자 <em>황지민</em>입니다.</h2>
-            <p>아이디어를 실제로 사용할 수 있는 제품으로 완성합니다. 모바일 앱의 기획, 디자인, 개발과 스토어 운영까지 전 과정을 직접 맡고 있습니다.</p>
-            <dl>
-              <div><dt>Developer</dt><dd>Hwang Jimin · 황지민</dd></div>
-              <div><dt>Email</dt><dd><a href={`mailto:${developerEmail}`}>{developerEmail}</a></dd></div>
-              <div><dt>GitHub</dt><dd><ExternalLink href={githubProfile}>github.com/jim1286</ExternalLink></dd></div>
-            </dl>
-          </div>
-        </section>
-
-        <section className="contact-band">
-          <p>CONTACT</p>
-          <a href={`mailto:${developerEmail}`}>앱에 관해 궁금한 점이 있나요?<br /><span>메일 보내기 <MailOutlined /></span></a>
-        </section>
-      </main>
-
-      <footer>
-        <a className="brand footer-brand" href="#top"><span className="brand-mark">HJ</span><span>Hwang Jimin</span></a>
-        <Text as="p" variant="caption" tone="inverse">© 2026 Hwang Jimin. All rights reserved.</Text>
-        <a href="#top" aria-label="맨 위로">TOP <ArrowUpOutlined /></a>
-      </footer>
-    </Container>
-    </BrandProvider>
-    </HjmProvider>
-  );
+          <BrandProvider surface="forest"><footer className="site-footer"><Container size="content" gutter="regular"><Stack axis="inline" gap="lg" wrap align="center" justify="between">
+            <Link href="#top" variant="standalone" tone="neutral">{copy.brandName}</Link>
+            <Text as="p" variant="caption" tone="muted">{copy.copyright}</Text>
+            <Link href="#top" variant="standalone" tone="neutral" aria-label={copy.topLabel}>{copy.top} <ArrowUpOutlined aria-hidden /></Link>
+          </Stack></Container></footer></BrandProvider>
+        </div>
+      </ScreenLayout>
+    </div>
+  </BrandProvider></HjmProvider>;
 }

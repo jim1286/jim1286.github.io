@@ -1,5 +1,7 @@
+import { getCopy } from './i18n';
 // 정책 URL은 Hub config에서 생성한 policyLinks.generated.ts가 단일 원천이다(손으로 복사하지 않음).
 import { policyUrl } from './policyLinks.generated';
+const copy = getCopy();
 export type PortfolioApp = {
   id: string;
   index: string;
@@ -8,7 +10,8 @@ export type PortfolioApp = {
   description: string;
   icon: string;
   status: string;
-  statusTone: 'live' | 'development';
+  statusTone: 'live' | 'archived';
+  sourceAccess: 'public' | 'private' | 'archived';
   tags: string[];
   githubUrl: string;
   webUrl?: string;
@@ -24,74 +27,83 @@ export const apps: PortfolioApp[] = [
   {
     id: 'yajalal',
     index: '01',
-    name: '야잘알',
+    name: copy.product001,
     englishName: 'Yajalal',
-    description: 'KBO 경기 일정과 선수 기록, AI 분석, FA 현황을 한곳에서 확인하는 프로야구 정보 앱입니다.',
+    description: copy.product002,
     icon: '/apps/yajalal.png',
-    status: 'iOS · Android 공개',
+    status: copy.product003,
     statusTone: 'live',
+    // Anonymous GitHub navigation is 404; owner metadata confirms private.
+    // Retain the repository URL as historical data, not public navigation.
+    sourceAccess: 'private',
     tags: ['Flutter', 'NestJS', 'KBO'],
     githubUrl: 'https://github.com/jim1286/yajalal',
     iosUrl: 'https://apps.apple.com/kr/app/%EC%95%BC%EC%9E%98%EC%95%8C/id6749580205?uo=4',
     androidUrl: 'https://play.google.com/store/apps/details?id=dev.hjm.yajalal&hl=ko',
-    socialHook: '타율·출루율·OPS를 나란히 살펴볼 수 있어.',
+    socialHook: copy.product004,
     featured: true,
   },
   {
     id: 'choose-window',
     index: '02',
-    name: '선택의창',
+    name: copy.product005,
     englishName: 'Choose Window',
-    description: '이동 시간과 방향, 태양 위치를 분석해 햇빛을 덜 받는 좌석을 추천하는 여행 도우미입니다.',
+    description: copy.product006,
     icon: '/apps/choose-window.png',
-    status: 'iOS · Android 공개',
+    status: copy.product007,
     statusTone: 'live',
+    sourceAccess: 'private',
     tags: ['Flutter', 'Maps', 'Mobility'],
     githubUrl: 'https://github.com/jim1286/choose_window',
     iosUrl: 'https://apps.apple.com/kr/app/%EC%84%A0%ED%83%9D%EC%9D%98%EC%B0%BD/id6759096524?uo=4',
     androidUrl: 'https://play.google.com/store/apps/details?id=dev.hjm.choosewindow&hl=ko',
-    socialHook: '경로와 출발 시각으로 좌우 창가의 햇빛을 예상해.',
+    socialHook: copy.product008,
   },
   {
     id: 'burntok',
     index: '03',
-    name: '번뚝',
+    name: copy.product009,
     englishName: 'BurnTok',
-    description: '작은 앱을 만들고 직접 써본 뒤, 수정·공유·리믹스하며 서로의 생각을 이어가는 창작 놀이터입니다.',
+    description: copy.product010,
     icon: '/apps/burntok.png',
-    status: '웹 · iOS 공개',
+    status: copy.product011,
     statusTone: 'live',
+    sourceAccess: 'private',
     tags: ['React Native', 'Next.js', 'NestJS'],
     githubUrl: 'https://github.com/jim1286/BurnTok',
     webUrl: 'https://burntok.jmstudioapps.com/',
     iosUrl: 'https://apps.apple.com/kr/app/id6810606625',
-    socialHook: '떠오른 작은 앱을 만들고, 써보고, 고쳐볼 수 있어.',
+    socialHook: copy.product012,
   },
   {
     id: 'taground',
     index: '04',
-    name: '태그라운드',
+    name: copy.product013,
     englishName: 'Taground',
-    description: '정확한 위치나 개인 목록을 노출하지 않고 국가와 관심사로 연결되는 로컬 코호트·그룹 채팅 앱입니다.',
+    description: copy.product014,
     icon: '/apps/taground.png',
-    status: '보관 중',
-    statusTone: 'development',
+    status: copy.product015,
+    // Central retirement tombstone makes this an archived portfolio entry,
+    // not a currently developed product. See the HJM adoption QA report.
+    statusTone: 'archived',
+    sourceAccess: 'archived',
     tags: ['Expo', 'NestJS', 'PostgreSQL'],
     githubUrl: 'https://github.com/jim1286/taground',
   },
   {
     id: 'unairplane',
     index: '05',
-    name: '비행중',
+    name: copy.product016,
     englishName: 'Unairplane',
-    description: '미리 확인한 운항 일정과 내장 공개 데이터를 이용해 인터넷 없이 비행 진행 상황을 추정하는 앱입니다.',
+    description: copy.product017,
     icon: '/apps/unairplane.png',
-    status: 'iOS 공개',
+    status: copy.product018,
     statusTone: 'live',
+    sourceAccess: 'private',
     tags: ['Expo', 'React Native', 'Offline'],
     githubUrl: 'https://github.com/jim1286/unairplane',
     iosUrl: 'https://apps.apple.com/kr/app/id6806942992',
-    socialHook: '저장한 일정으로 비행 구간을 오프라인에서 추정해.',
+    socialHook: copy.product019,
   },
 ];
 
@@ -121,24 +133,24 @@ export const legalDocuments: LegalDocument[] = [
   {
     id: 'yajalal',
     index: '01',
-    name: '야잘알 · Yajalal',
-    note: 'KBO 정보 및 AI 분석 앱',
+    name: copy.product020,
+    note: copy.product021,
     privacyUrl: policyUrl('yajalal', 'privacyPolicy'),
     supportUrl: policyUrl('yajalal', 'support'),
   },
   {
     id: 'choose-window',
     index: '02',
-    name: '선택의창 · Choose Window',
-    note: '햇빛 회피 좌석 추천 앱',
+    name: copy.product022,
+    note: copy.product023,
     privacyUrl: policyUrl('choose-window', 'privacyPolicy'),
     supportUrl: policyUrl('choose-window', 'support'),
   },
   {
     id: 'burntok',
     index: '03',
-    name: '번뚝 · BurnTok',
-    note: 'AI 앱 창작 커뮤니티',
+    name: copy.product024,
+    note: copy.product025,
     privacyUrl: policyUrl('burntok', 'privacyPolicy'),
     deletionUrl: policyUrl('burntok', 'accountDeletion'),
     supportUrl: policyUrl('burntok', 'support'),

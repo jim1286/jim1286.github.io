@@ -4892,17 +4892,48 @@ export async function checkStandardAssets({ workspaceRoot = defaultWorkspaceRoot
   }
   try {
     const metaWorkflow = await readRegularTextFile(resolve(root, '.github/workflows/portfolio-meta.yml'), 'Root metadata workflow');
-    const centralWorkflow = await readRegularTextFile(resolve(root, '.github/workflows/app-standard-required.yml'), 'Central verifier bootstrap workflow');
+    const centralWorkflow = await readRegularTextFile(resolve(root, 'docs/ci/app-standard-required.template.yml'), 'Central verifier publication template');
     const dependabot = await readRegularTextFile(resolve(root, '.github/dependabot.yml'), 'Root Dependabot policy');
     for (const [path, source] of [
       ['.github/workflows/portfolio-meta.yml', metaWorkflow],
-      ['.github/workflows/app-standard-required.yml', centralWorkflow],
+      ['docs/ci/app-standard-required.template.yml', centralWorkflow],
     ]) {
       if (!source.includes('actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1')
         || !source.includes('persist-credentials: false')
         || !source.includes('actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0')) {
         addFinding(findings, 'STANDARD_ACTION_PIN_INVALID', path, 'Root workflows must pin checkout/setup-node by reviewed full SHA and disable checkout credential persistence.');
       }
+    }
+    // The unpublished app authority is a publication asset. Activating it in this meta
+    // repository misclassifies policy changes as app conformance and fails every PR.
+    try {
+      await lstat(resolve(root, '.github/workflows/app-standard-required.yml'));
+      addFinding(findings, 'CENTRAL_AUTHORITY_ACTIVE_IN_META', '.github/workflows/app-standard-required.yml', 'Keep the unpublished app authority in docs/ci/app-standard-required.template.yml; portfolio-meta.yml verifies the metadata subject without granting app merge eligibility.');
+    } catch (error) {
+      if (error.code !== 'ENOENT') throw error;
+    }
+    const requiredMetaCommands = [
+      'node --test tests/*.test.mjs',
+      'node scripts/app-standard.mjs check-standard-assets',
+      'node scripts/app-standard.mjs validate-contract --contract docs/examples/app-contract.example.json',
+      'node scripts/check-policy-consistency.mjs --root-only',
+      'node scripts/app-standard.mjs check-doc-links',
+      'node scripts/app-standard.mjs create --contract docs/examples/app-contract.example.json',
+      'node scripts/app-standard.mjs check-app --app-root',
+      'node scripts/portfolio.mjs --json list',
+      'node scripts/ci-status.mjs --json',
+    ];
+    if (requiredMetaCommands.some(command => !metaWorkflow.includes(command))
+      || metaWorkflow.includes('continue-on-error: true')) {
+      addFinding(findings, 'META_CHECK_GRAPH_INVALID', '.github/workflows/portfolio-meta.yml', 'Keep the metadata tool, schema/profile/example/template, policy/document, scaffold, catalog and inventory checks mandatory; root CI does not substitute app authority.');
+    }
+    if (!metaWorkflow.includes('merge_group:')
+      || !metaWorkflow.includes('portfolio-standard-required:')
+      || !metaWorkflow.includes('needs: [portfolio-metadata, initializer-provenance]')
+      || !metaWorkflow.includes('test "$METADATA_RESULT" = \'success\'')
+      || !metaWorkflow.includes('SUBJECT_SHA: ${{ github.sha }}')
+      || !metaWorkflow.includes('test "$(git rev-parse HEAD)" = "$SUBJECT_SHA"')) {
+      addFinding(findings, 'META_REQUIRED_VERIFIER_INVALID', '.github/workflows/portfolio-meta.yml', 'Metadata PR/merge-group checks must verify the exact event checkout and require successful metadata/provenance prerequisites, separately from app authority.');
     }
     if (!centralWorkflow.includes('pull_request:')
       || !centralWorkflow.includes('merge_group:')
@@ -4912,9 +4943,11 @@ export async function checkStandardAssets({ workspaceRoot = defaultWorkspaceRoot
       || !centralWorkflow.includes('verify-central-pin.mjs')
       || !centralWorkflow.includes('pnpm install --frozen-lockfile')
       || !centralWorkflow.includes('run: pnpm check')
+      || centralWorkflow.match(/runs-on: ubuntu-latest/g)?.length !== 3
+      || centralWorkflow.includes('runs-on: ${{ vars.CI_RUNNER')
       || centralWorkflow.match(/node standard\/scripts\/app-standard\.mjs check-app --app-root app/g)?.length !== 2
       || !centralWorkflow.includes('git -C app diff --exit-code HEAD -- .')) {
-      addFinding(findings, 'CENTRAL_VERIFIER_BOOTSTRAP_INVALID', '.github/workflows/app-standard-required.yml', 'The bootstrap source must expose pull_request/merge_group ruleset events, fail closed on the unpublished commit, compare the approved immutable validator commit, install frozen dependencies, and execute the canonical quality graph inside the single required job.');
+      addFinding(findings, 'CENTRAL_VERIFIER_BOOTSTRAP_INVALID', 'docs/ci/app-standard-required.template.yml', 'The publication template must expose pull_request/merge_group ruleset events, fail closed on the unpublished commit, compare the approved immutable validator commit, install frozen dependencies, and execute the canonical quality graph inside the single required job.');
     }
     if (!dependabot.includes('package-ecosystem: github-actions') || !dependabot.includes('interval: monthly')) {
       addFinding(findings, 'STANDARD_ACTION_UPDATE_POLICY_INVALID', '.github/dependabot.yml', 'GitHub Action pins require monthly Dependabot or an equivalent managed updater.');

@@ -1,0 +1,171 @@
+{
+  "schema_version": 1,
+  "diagram_type": "workflow",
+  "meta": {
+    "title": "마케팅 전략",
+    "subtitle": "제품을 만들고 알리는 운영 방향입니다.",
+    "animation": "none"
+  },
+  "lanes": [
+    {
+      "id": "problem",
+      "label": "문제와 대상"
+    },
+    {
+      "id": "reach",
+      "label": "대상에 맞는 전달 방식"
+    },
+    {
+      "id": "value",
+      "label": "제품의 핵심과 반응"
+    },
+    {
+      "id": "improve",
+      "label": "설명과 제품 개선"
+    }
+  ],
+  "nodes": [
+    {
+      "id": "problem",
+      "lane": "problem",
+      "col": 2,
+      "type": "backend",
+      "label": "사용 문제·대상",
+      "sublabel": "누구에게 필요한가",
+      "width": 148
+    },
+    {
+      "id": "search",
+      "lane": "reach",
+      "col": 1,
+      "type": "frontend",
+      "label": "검색형",
+      "sublabel": "키워드·스토어 첫 화면",
+      "width": 152
+    },
+    {
+      "id": "discovery",
+      "lane": "reach",
+      "col": 4,
+      "type": "frontend",
+      "label": "발견형",
+      "sublabel": "사용 장면·포슬이 콘텐츠",
+      "width": 166
+    },
+    {
+      "id": "value",
+      "lane": "value",
+      "col": 1,
+      "type": "messagebus",
+      "label": "핵심 가치 전달",
+      "sublabel": "스토어와 제품에서",
+      "width": 152
+    },
+    {
+      "id": "response",
+      "lane": "value",
+      "col": 4,
+      "type": "database",
+      "label": "반응 확인",
+      "sublabel": "피드백 살펴보기",
+      "width": 132
+    },
+    {
+      "id": "improve",
+      "lane": "improve",
+      "col": 2,
+      "type": "backend",
+      "label": "제품·설명 개선",
+      "sublabel": "배운 점을 다음 시도에",
+      "width": 164
+    }
+  ],
+  "edges": [
+    {
+      "from": "problem",
+      "to": "search",
+      "role": "branch",
+      "variant": "emphasis",
+      "fromSide": "bottom",
+      "toSide": "top",
+      "route": "drop"
+    },
+    {
+      "from": "problem",
+      "to": "discovery",
+      "role": "branch",
+      "variant": "emphasis",
+      "fromSide": "bottom",
+      "toSide": "top",
+      "route": "drop"
+    },
+    {
+      "from": "search",
+      "to": "value",
+      "variant": "emphasis",
+      "fromSide": "bottom",
+      "toSide": "top",
+      "route": "drop"
+    },
+    {
+      "from": "discovery",
+      "to": "value",
+      "variant": "emphasis",
+      "fromSide": "bottom",
+      "toSide": "top",
+      "route": "drop"
+    },
+    {
+      "from": "value",
+      "to": "response",
+      "variant": "emphasis"
+    },
+    {
+      "from": "response",
+      "to": "improve",
+      "variant": "emphasis",
+      "fromSide": "bottom",
+      "toSide": "top",
+      "route": "drop"
+    },
+    {
+      "from": "improve",
+      "to": "problem",
+      "role": "return",
+      "variant": "dashed",
+      "fromSide": "left",
+      "toSide": "left",
+      "route": "return-left",
+      "channelX": 22
+    }
+  ],
+  "cards": [
+    {
+      "dot": "cyan",
+      "title": "문제와 전달",
+      "items": [
+        "누구에게 어떤 도움이 되는지 먼저 정리합니다.",
+        "키워드와 스토어 첫 화면에서 필요한 가치를 보여 줍니다.",
+        "사용 장면과 포슬이 콘텐츠로 앱을 소개합니다."
+      ]
+    },
+    {
+      "dot": "emerald",
+      "title": "핵심 가치와 개선",
+      "items": [
+        "앱이 언제 어떤 도움이 되는지 간결하게 설명합니다.",
+        "확인 가능한 반응과 피드백을 살펴봅니다.",
+        "배운 내용을 제품과 소개 문구에 반영합니다."
+      ]
+    },
+    {
+      "dot": "slate",
+      "title": "도식의 범위",
+      "items": [
+        "개인 개발자의 운영 방향을 설명합니다.",
+        "성과 수치나 자동 계측 완료를 뜻하지 않습니다.",
+        "모든 채널을 한꺼번에 운영하는 계획은 아닙니다."
+      ]
+    }
+  ]
+}

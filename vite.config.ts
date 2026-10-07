@@ -1,9 +1,29 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
+import { ko } from './src/i18n/ko'
+
+// Korean is the sole registered source locale. Share its public description
+// with SSR-readable metadata instead of maintaining separate marketing copy.
+// Keep URL/image bindings in index.html owned by the existing static host.
+const metadata = {
+  PORTFOLIO_TITLE: ko.seoTitle,
+  PORTFOLIO_DESCRIPTION: ko.seoDescription,
+  PORTFOLIO_IMAGE_ALT: ko.seoImageAlt,
+}
+const escapeHtml = (value: string) => value.replace(/[&<>"']/g, char => ({
+  '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;',
+}[char]!))
 
 // https://vite.dev/config/
 export default defineConfig({
-  plugins: [react()],
+  plugins: [react(), {
+    name: 'portfolio-source-metadata',
+    transformIndexHtml: {
+      order: 'pre',
+      handler: html => Object.entries(metadata).reduce((result, [key, value]) =>
+        result.replaceAll(`%${key}%`, escapeHtml(value)), html),
+    },
+  }],
   base: '/',
   build: {
     outDir: 'dist',

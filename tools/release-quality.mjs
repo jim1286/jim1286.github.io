@@ -82,6 +82,11 @@ on:
           ref: \${{ github.sha }}
           fetch-depth: 0
           persist-credentials: false
+      # Admission executes repository code too: use the product's exact Node pin,
+      # not the hosted runner's changing default (2026-10-08 consumer CI audit).
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020
+        with:
+          node-version-file: .nvmrc
       - name: Admit only an increased release version
         id: intent
         run: node tools/release-quality.mjs

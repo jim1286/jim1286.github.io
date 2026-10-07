@@ -12,6 +12,7 @@ function fixture(run) {
   const data = { policySite: { origin: 'https://policies.example.test', paths: { privacyPolicy: '/privacy/{id}', accountDeletion: '/privacy/{id}/delete-account', support: '/support/{id}' } } };
   mkdirSync(join(hubConfig, 'apps', 'example'), { recursive: true });
   writeFileSync(join(hubConfig, 'apps', 'example', 'policy.json'), '{}');
+  writeFileSync(join(hubConfig, 'apps', 'example', 'app.json'), '{"store":{}}');
   writeFileSync(join(hubConfig, 'portfolio.json'), JSON.stringify(data));
   try { run(options, data); } finally { rmSync(root, { recursive: true, force: true }); }
 }
@@ -44,4 +45,69 @@ test('invalid templates and snapshot digests fail closed', () => fixture((option
   data.policySite.paths.support = '//untrusted.example/{id}';
   writeFileSync(join(options.hubConfig, 'portfolio.json'), JSON.stringify(data));
   assert.throws(() => synchronizePolicies({ ...options, mode: 'sync' }), /invalid policy path/);
+}));
+
+test('app-owned policy destinations survive public projection without exposing profile data', () => fixture((options) => {
+  const store = {
+    policyPublication: 'app-owned',
+    privacyPolicyUrl: 'https://product.example.test/legal/privacy',
+    accountDeletionUrl: 'https://product.example.test/legal/account-deletion',
+    supportUrl: 'https://product.example.test/legal/',
+    reviewPassword: 'fixture-private-value',
+  };
+  const profile = join(options.hubConfig, 'apps', 'example', 'app.json');
+  writeFileSync(profile, JSON.stringify({ store }));
+  synchronizePolicies({ ...options, mode: 'sync' });
+  const snapshot = JSON.parse(readFileSync(options.snapshotFile, 'utf8'));
+  assert.equal(snapshot.schemaVersion, 2);
+  assert.equal(snapshot.projection.publications.example, 'app-owned');
+  assert.deepEqual(snapshot.projection.urls.example, {
+    privacyPolicy: store.privacyPolicyUrl,
+    accountDeletion: store.accountDeletionUrl,
+    support: store.supportUrl,
+  });
+  for (const path of [options.snapshotFile, options.output]) {
+    const text = readFileSync(path, 'utf8');
+    assert.doesNotMatch(text, /fixture-private-value|reviewPassword/);
+    assert.match(text, /https:\/\/product\.example\.test\/legal\/privacy/);
+  }
+  assert.equal(synchronizePolicies({ ...options, mode: 'source' }), 'source-verified');
+  store.supportUrl = 'https://product.example.test/help';
+  writeFileSync(profile, JSON.stringify({ store }));
+  assert.throws(() => synchronizePolicies({ ...options, mode: 'source' }), /differs from Hub/);
+}));
+
+test('retired policy bindings remain available without an active app profile', () => fixture((options) => {
+  const directory = join(options.hubConfig, 'apps', 'example');
+  rmSync(join(directory, 'app.json'));
+  writeFileSync(join(directory, 'retired.json'), JSON.stringify({ id: 'example', store: {} }));
+  synchronizePolicies({ ...options, mode: 'sync' });
+  const snapshot = JSON.parse(readFileSync(options.snapshotFile, 'utf8'));
+  assert.equal(snapshot.projection.publications.example, 'central');
+  assert.equal(snapshot.projection.urls.example.privacyPolicy, 'https://policies.example.test/privacy/example');
+  assert.equal(synchronizePolicies({ ...options, mode: 'source' }), 'source-verified');
+}));
+
+test('central defaults and explicit public overrides use the same canonical URL contract', () => fixture((options) => {
+  const profile = join(options.hubConfig, 'apps', 'example', 'app.json');
+  writeFileSync(profile, JSON.stringify({ store: { supportUrl: 'https://support.example.test/' } }));
+  synchronizePolicies({ ...options, mode: 'sync' });
+  const snapshot = JSON.parse(readFileSync(options.snapshotFile, 'utf8'));
+  assert.deepEqual(snapshot.projection.urls.example, {
+    privacyPolicy: 'https://policies.example.test/privacy/example',
+    accountDeletion: 'https://policies.example.test/privacy/example/delete-account',
+    support: 'https://support.example.test/',
+  });
+}));
+
+test('app-owned omissions, unsupported publication and credential-bearing destinations fail closed', () => fixture((options) => {
+  const profile = join(options.hubConfig, 'apps', 'example', 'app.json');
+  writeFileSync(profile, JSON.stringify({ store: { policyPublication: 'app-owned' } }));
+  assert.throws(() => synchronizePolicies({ ...options, mode: 'sync' }), /app-owned policy URL is missing/);
+  writeFileSync(profile, JSON.stringify({ store: { policyPublication: 'unknown' } }));
+  assert.throws(() => synchronizePolicies({ ...options, mode: 'sync' }), /unsupported policy publication/);
+  for (const supportUrl of ['http://support.example.test/', 'https://user:password@support.example.test/']) {
+    writeFileSync(profile, JSON.stringify({ store: { supportUrl } }));
+    assert.throws(() => synchronizePolicies({ ...options, mode: 'sync' }), /public HTTPS without credentials/);
+  }
 }));
