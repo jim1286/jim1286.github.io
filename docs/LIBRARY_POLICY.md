@@ -103,3 +103,7 @@ HJM 1.13.1(태그 v1.13.1) patch: SegmentedControl pills 큰 글자 줄바꿈, N
 ## HJM 1.14.0 dependency train (2026-10-07)
 
 The user requested all consumers to follow the published HJM train. Exact dependency pins, lockfile and design contract/catalog use the verified npm 1.14.0 release (tag v1.14.0, source 8d6f6651ea71450014f5ca5e484b6b78bea8828b). Local screen preview tarballs are replaced by registry packages where present; the exact cooldown exception is permitted because the release tag and tarball integrity were verified. Flutter products update their semantic adapter contract/catalog without introducing React packages. Consumer checks and remaining limitations are recorded in [the task QA report](qa/2026-10-07-hjm-1-14-upgrade.md). This dependency update does not publish an app binary or authorize a store release.
+
+## HJM 1.15.0 adoption (2026-10-07)
+
+사용자의 릴리스 후 소비 앱 버전 갱신 지시에 따라 공식 npm에 게시된 exact 1.15.0과 중앙 release record를 채택한다. 출처는 `v1.15.0`의 `9aa33e2063dc65d0427697fb5a20b48ab7cba387`이며 카탈로그와 tarball integrity는 중앙 record에서 투사한다. 로컬 미게시 테마 후속 소스를 가져오는 대신 게시된 패키지를 사용해 재현 가능한 설치를 유지한다. 냉각 예외는 무결성을 확인한 exact 버전만 허용하고 자동 만료 정책을 유지한다. 제품의 브랜드 설정을 유지하며 새 선택형 subpath나 peer는 추가하지 않는다. 결과와 검증 한계는 [작업 QA](qa/2026-10-07-hjm-1-15-upgrade.md)에 기록한다.
