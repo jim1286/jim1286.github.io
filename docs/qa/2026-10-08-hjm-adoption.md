@@ -2,7 +2,7 @@
 
 ## 1. 최종 판정
 
-로컬 도입·통합과 아래 명시한 Chromium UI 검증 통과. 새 사진, 전체 문구, 개발·마케팅 전략, 모바일 메뉴, HJ 표시 삭제를 반영했다. 원격 minor gate·merge·GitHub Pages 공개 배포는 부모 담당이며 이 리포트로 완료를 주장하지 않는다. 최종 실제 브라우저 확인: 2026-10-08 05:58 KST.
+로컬 도입·통합과 아래 명시한 Chromium UI 검증 통과. 새 사진, 전체 문구, 개발·마케팅 전략, 모바일 메뉴, HJ 표시 삭제를 반영했다. main 통합·1.1.0 버전 상승 품질 CI·GitHub Pages 게시 및 공개 산출물 일치까지 확인했다. 최종 실제 브라우저 확인: 2026-10-08 05:58 KST.
 
 ## 2. 대상과 통합 판단
 
@@ -62,12 +62,28 @@ OS 최대 접근성 글자와 그 최대값 모사 확대는 설계·추가 검�
 
 최종 관찰 artifact: JS index-CPOpsJi1.js331.53kB/gzip106.59, CSS index-DgCZAD7g.css152.62kB/gzip21.39. dist/index.html SHA256 `e6fb5250932da1d2f7ad73c8fef11e903a213e18acf2a8848a996ec1d550b611`, locale HTML `889cce50db0c56fa0e80fdd95c9a70215046249c2e2befd93316cf5e2da9a82b`. minor metadata 후 부모 최종 gate/배포 artifact와 구분한다.
 
+### 1.1.0 통합·원격 CI·공개 산출물
+
+- PR24는 main `5e8dcddffa8985cadd530ec83d2481ccc67ac447`에 병합됐다. PR26은 source `fa11db62d4f814cb7ab3d992c689afb9a723cdd2`로 실제 병합됐다. 현재 원격 source branch는 모두 main ancestry에 포함되며 gh-pages만 별도 산출물 branch다.
+- 해당 source의 자동 버전 상승 판정 및 실제 품질 job은 [37686418093](https://github.com/jim1286/jim1286.github.io/actions/runs/37686418093)에서 성공했다. 별도의 우회·skip-ci를 추가하지 않았다.
+- clean source에서 `HUB_CONFIG_DIR`를 지정한 `pnpm deploy`가 원본 source-verified·canonical check 후 게시에 성공했다. 생성된 HTML/JS/CSS는 앞선 브라우저 QA 산출물과 동일하다.
+- gh-pages `0f3e1070821309a2da0eb2f2c5ac63cadc52b259` → `4dba815796129b946b0aa05ed97b927141ca94f8`. [Pages 실행 37686559888](https://github.com/jim1286/jim1286.github.io/actions/runs/37686559888) 성공·provider built 관측.
+- 2026-10-08 06:04 KST 쿼리 없는 공개 `/`, `/ko-KR/`, `/profile.jpg`, `/og.png`, `/diagrams/development-strategy.html`, `/diagrams/marketing-strategy.html`, `/assets/index-CPOpsJi1.js`, `/assets/index-DgCZAD7g.css` 모두 HTTP 200이고 local dist 및 gh-pages bytes와 일치했다. 공개 Cache-Control은 모두 max-age=600이다. 게시 중 이전 응답·404는 provider building 시점과 구분해 재확인했다.
+
+공개 브라우저도 익명 새 context의 390×844/light, 1440×1000/dark에서 재확인했다.
+루트·한국어 직접 진입·새로고침 200, 최신 제목·ko-KR/ltr·HJ 본문 없음·15카드·84px header·
+가로 넘침/실행 오류 0을 확인했다. 사진은 912×732 원본 비율, OG는 1731×909 메타와 실제 URL로
+연결된다. 개발7/마케팅5 단계와 두 크게 보기의 공개 도식 이동·뒤로 가기 복귀도 확인했다.
+
 ## 6. 미확인 경계와 다음 담당
 
 Safari/Firefox, 실제 VoiceOver/스크린리더 및 native 기기는 미실행이다. 새 번역·RTL·계측/캠페인 성과·메일 발송·로그인 제품 내부 동작은 이번 범위가 아니다. 제품에 없는 error/empty/input 상태를 추가해 검사 수를 늘리지 않았다. 최대 글자 조건은 후속에도 없다.
 
-부모가 제품 minor1.1.0을 반영했고 최종 version gate·PR26 merge·gh-pages publish·공개 root/locale/asset 확인을 진행한다. 로컬 plain-static 200과 실제 공개 도메인은 다르다. 기존 governance registry pending/planned는 보존한다. snapshot 검사는 Hub 최신성 증거가 아니며 부모가 별도로 source-verified 확인했다.
+제품 minor1.1.0·version gate·PR26 merge·gh-pages publish·공개 root/locale/asset 확인은 위의 실제 증거로 완료했다. 실제 rollback 리허설은 미실행이며 절차 문서화와 구분한다. 기존 governance registry pending/planned는 보존한다. snapshot 검사는 Hub 최신성 증거가 아니며 부모가 별도로 source-verified 확인했다.
 
 ## 7. 보관 처리
 
-현재 본 작업 raw images만 /tmp/portfolio-hjm-1.16-qa-c-20261008에 최종 검토용으로 남긴다. 최종 비교시트는 *-final-sheet.png, 전체문서는 *-final-whole.png이며 HJ가 있는 앞선 캡처와 구분한다. 부모의 마지막 실제 시각 검토가 끝나면 이 raw PNG/임시 출력·자체 static 서버를 정리한다. 최종 결과는 이 단일 리포트에 남기고 도식 HTML/JSON, 제품 자산·재사용 코드·계약 evidence·다른 세션 출력은 보존한다. 배포에 사용할 dist 정리는 부모와 조율한다.
+최종 시각 검토와 공개 브라우저 검증 후 본 작업 원시 PNG 124개(19,642,447 bytes)와
+`/tmp/portfolio-hjm-1.16-qa-c-20261008`을 제거했다. 자체 static 서버(4216/PID29172)를
+종료하고 listener가 없음을 확인했다. source·도식 HTML/JSON·제품 자산·재사용 코드·계약
+증거·사용자 첨부 및 다른 세션 출력은 보존했다. dist는 게시 산출물 비교를 위해 보존한다.
