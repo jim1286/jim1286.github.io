@@ -18,23 +18,22 @@ import './styles/site.css';
 
 const developerEmail = 'jimin1286@gmail.com';
 const githubProfile = 'https://github.com/jim1286';
-const posliApps = apps.filter((app) => app.socialHook && app.statusTone === 'live');
 
 function ExternalLink({ href, ariaLabel, children }: { href: string; ariaLabel?: string; children: ReactNode }) {
   return <Link href={href} aria-label={ariaLabel} target="_blank" rel="noreferrer noopener" variant="standalone" tone="neutral">{children}</Link>;
 }
 
-function AppLinks({ app, social = false }: { app: PortfolioApp; social?: boolean }) {
+function AppLinks({ app }: { app: PortfolioApp }) {
   return <Stack axis="inline" gap="sm" wrap role="group" aria-label={appCopy.open(app.name)}>
-    {app.webUrl && <ExternalLink href={app.webUrl} ariaLabel={social ? appCopy.web(app.name) : undefined}><ExportOutlined aria-hidden /> {social ? copy.webOpen : copy.web}</ExternalLink>}
-    {app.iosUrl && <ExternalLink href={app.iosUrl} ariaLabel={social ? appCopy.ios(app.name) : undefined}><AppleFilled aria-hidden /> {social ? copy.ios : copy.appStore}</ExternalLink>}
-    {app.androidUrl && <ExternalLink href={app.androidUrl} ariaLabel={social ? appCopy.android(app.name) : undefined}><AndroidFilled aria-hidden /> {social ? copy.android : copy.googlePlay}</ExternalLink>}
+    {app.webUrl && <ExternalLink href={app.webUrl} ariaLabel={appCopy.web(app.name)}><ExportOutlined aria-hidden /> {copy.web}</ExternalLink>}
+    {app.iosUrl && <ExternalLink href={app.iosUrl} ariaLabel={appCopy.ios(app.name)}><AppleFilled aria-hidden /> {copy.appStore}</ExternalLink>}
+    {app.androidUrl && <ExternalLink href={app.androidUrl} ariaLabel={appCopy.android(app.name)}><AndroidFilled aria-hidden /> {copy.googlePlay}</ExternalLink>}
     {/* Anonymous navigation and owner metadata establish private/archived
         repository access. Preserve source data without offering visitor 404s.
         See docs/qa/2026-10-08-hjm-adoption.md. */}
-    {!social && (app.sourceAccess !== 'public'
+    {app.sourceAccess !== 'public'
       ? <Text variant="caption" tone="muted">{app.sourceAccess === 'archived' ? app.status : copy.privateSource}</Text>
-      : <ExternalLink href={app.githubUrl}><GithubOutlined aria-hidden /> {copy.source}</ExternalLink>)}
+      : <ExternalLink href={app.githubUrl}><GithubOutlined aria-hidden /> {copy.source}</ExternalLink>}
   </Stack>;
 }
 
@@ -74,7 +73,6 @@ function SiteHeader() {
         <Collapsible ref={menu} className="header-menu" trigger={copy.menu} open={open} onOpenChange={setOpen} presentation={compact ? 'disclosure' : 'inline'}>
           <Stack axis={compact ? 'block' : 'inline'} gap="sm" align="center">
         <nav aria-label={copy.navigation}><Stack axis="inline" gap="sm" wrap>
-          <Link href="#posli" onClick={followSection} variant="standalone" tone="neutral">{copy.posliNav}</Link>
           <Link href="#apps" onClick={followSection} variant="standalone" tone="neutral">{copy.appsNav}</Link>
           <Link href="#strategy" onClick={followSection} variant="standalone" tone="neutral">{copy.strategyNav}</Link>
           <Link href="#legal" onClick={followSection} variant="standalone" tone="neutral">{copy.legalNav}</Link>
@@ -89,12 +87,6 @@ function SiteHeader() {
 }
 
 export default function App() {
-  // The social bio opens /#posli before React mounts; the same document anchor is
-  // preserved inside the shared screen's single scroll owner.
-  useEffect(() => {
-    if (window.location.hash === '#posli') document.getElementById('posli')?.scrollIntoView({ behavior: 'instant' });
-  }, []);
-
   return <HjmProvider theme="system" host="contents"><BrandProvider>
     <SkipNav targetId="main" label={copy.skip} />
     <div className="portfolio-host">
@@ -127,23 +119,11 @@ export default function App() {
             </Grid></Container></div>
           </Surface></BrandProvider>
 
-          <BrandProvider surface="warm"><Surface as="section" padding="none" radius="sm" id="posli" tabIndex={-1} aria-labelledby="posli-title">
-            <div className="section-padding"><Container size="content" gutter="regular"><Stack gap="xl">
-              <Stack axis="inline" gap="xl" wrap align="center">
-                <Asset descriptor={{ kind: 'image', size: 'xlarge', shape: 'square', accessibilityLabel: copy.posliAlt }}><img src="/posli-avatar.png" alt="" /></Asset>
-                <Stack gap="sm"><Text as="p" variant="caption" fontRole="code" tone="muted">{copy.posliIndex}</Text><Heading level="level2" id="posli-title">{copy.posliTitle}</Heading><Text as="p" tone="muted">{copy.posliDescription}</Text></Stack>
-              </Stack>
-              <Grid columns={{ compact: 1, medium: 2 }} gap={{ compact: 'md' }} minColumnWidth={{ compact: 280 }}>
-                {posliApps.map(app => <Card key={app.id} title={app.name} description={app.socialHook} leading={<ProductIcon app={app} />} actions={<AppLinks app={app} social />} padding="lg" />)}
-              </Grid>
-            </Stack></Container></div>
-          </Surface></BrandProvider>
-
           <div className="section-padding"><Container size="content" gutter="regular"><Stack gap="md">
             <Text as="p" variant="caption" fontRole="code" tone="muted">{copy.appsIndex}</Text>
             <Section id="apps" tabIndex={-1} title={copy.appsTitle} description={copy.appsDescription}>
               <Grid columns={{ compact: 1, medium: 2 }} gap={{ compact: 'lg' }} minColumnWidth={{ compact: 280 }}>
-                {apps.map(app => <Card key={app.id} title={<>{app.name}<Text as="small" variant="caption" tone="muted" layoutStyle={{ marginInlineStart: 12 }}> {app.englishName}</Text></>} description={app.description} leading={<ProductIcon app={app} />} tone={app.featured ? 'accent' : 'default'} padding="lg" actions={<AppLinks app={app} />}>
+                {apps.map(app => <Card key={app.id} title={<>{app.name}{app.englishName !== app.name && <Text as="small" variant="caption" tone="muted" layoutStyle={{ marginInlineStart: 12 }}> {app.englishName}</Text>}</>} description={app.description} leading={<ProductIcon app={app} />} tone={app.featured ? 'accent' : 'default'} padding="lg" actions={<AppLinks app={app} />}>
                   <Stack gap="sm">
                     <Text variant="caption" fontRole="code" tone="muted">{copy.appIndex(app.index)}</Text>
                     <Badge variant={app.statusTone === 'live' ? 'filled' : 'outline'}>{app.status}</Badge>

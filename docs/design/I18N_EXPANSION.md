@@ -48,7 +48,8 @@
 GitHub Pages에는 Vite preview의 SPA fallback이 없으므로 빌드 후 등록 언어별 실제
 `dist/<locale>/index.html`을 만든다. 기존 root absolute assets와 SEO 원문을 유지하고
 초기 `lang/dir`만 locale metadata로 연결한다. plain 정적 HTTP 서버에서 `/ko-KR/`
-직접 진입·새로고침·`/#posli` 공유 링크가 200과 실제 구역 이동으로 동작함을 확인했다.
+당시 직접 진입·새로고침·`/#posli` 공유 링크가 200과 실제 구역 이동으로 동작함을 확인했다.
+2026-10-09 사용자 요청으로 캐릭터 진입점을 제거했으므로 이 검증은 과거 이력이다. 현행 앱 소개는 `/#apps`다.
 공개 도메인 배포 검증은 이 로컬 증거와 구분한다.
 
 검사·원본 통합 판단·브라우저 범위는 [도입 QA](../qa/2026-10-08-hjm-adoption.md)에 보존한다.

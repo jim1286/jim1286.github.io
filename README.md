@@ -16,6 +16,8 @@
 
 ## 개발
 
+앱 아이콘과 최신 제품 소개의 원천·동기화는 [앱 자산 안내](docs/APP_ASSETS.md)를 따릅니다.
+
 ```bash
 pnpm install --frozen-lockfile
 pnpm run dev
@@ -49,7 +51,7 @@ Hub 최신 상태를 확인한 것으로 표시하지 않습니다.
 [제품](docs/PRODUCT.md) · [아키텍처](docs/ARCHITECTURE.md) · [디자인](docs/DESIGN.md) ·
 [릴리스](docs/RELEASE.md). 이 앱은 공통 v1 심사 대상이며, 실제 계약 이관은 완료했고 구현 준수·운영 evidence는 별도 검증 대상입니다.
 
-소셜 브랜드에서 앱으로 이어지는 포슬이 앱 카드 진입점은 [`/#posli`](https://jim1286.github.io/#posli)입니다. 공개 배포 전에는 이 주소가 아직 새 화면을 가리키지 않으며, 제품 범위와 검증 기준은 [제품 문서](docs/PRODUCT.md#포슬이-소셜-진입점)에 기록합니다.
+앱 소개는 `/#apps`에서 제공하며, 캐릭터 브랜딩·소셜 운영 사례는 마케팅 전략에서 설명합니다. [제품 문서](docs/PRODUCT.md#개발자-포트폴리오와-마케팅-사례)에 현재 경계를 기록합니다.
 
 ## 공통 개발 계약
 

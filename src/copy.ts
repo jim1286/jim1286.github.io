@@ -1,19 +1,17 @@
 import { getCopy } from './i18n';
 
 // The existing catalog/URL loader remains the only copy source. Meaningful
-// aliases let the HJM layout change without replacing its 100 original keys;
+// aliases let the HJM layout change while the catalog owns complete phrases;
 // completed phrases live in every registered source catalog, never in JSX.
 const catalog = getCopy();
 export const siteCopy = {
   skip: catalog.page001, home: catalog.page002, brandName: catalog.page004,
-  navigation: catalog.page005, menu: catalog.navigationMenu, posliNav: catalog.page006, appsNav: catalog.page007, strategyNav: catalog.strategyNav,
+  navigation: catalog.page005, menu: catalog.navigationMenu, appsNav: catalog.page007, strategyNav: catalog.strategyNav,
   legalNav: catalog.page008, developerNav: catalog.page009, contact: catalog.page010,
   eyebrow: catalog.page011, heroStart: catalog.page012, heroFocus: catalog.page013,
   heroEnd: catalog.heroEnding, heroDescription: catalog.heroDescription,
   browse: catalog.page018, github: catalog.page019, summary: catalog.page020, summaryIndex: catalog.page021,
   appsCount: catalog.page022, storesCount: catalog.page023, platformsCount: catalog.page024,
-  posliAlt: catalog.page025, posliIndex: catalog.page026, posliTitle: catalog.posliTitle,
-  posliDescription: catalog.page029, webOpen: catalog.page032, ios: catalog.page034, android: catalog.page036,
   appsIndex: catalog.page037, appsTitle: catalog.page038, appsDescription: catalog.appsDescription,
   web: catalog.page043, appStore: catalog.page044, googlePlay: catalog.page045, source: catalog.page046, privateSource: catalog.privateSource,
   legalIndex: catalog.page047, legalTitle: catalog.page048, legalDescription: catalog.legalDescription,
@@ -53,6 +51,10 @@ export const strategyCopy = {
   developmentReleaseDetail: catalog.developmentReleaseDetail,
   developmentImprovement: catalog.developmentImprovement,
   developmentImprovementDetail: catalog.developmentImprovementDetail,
+  marketingBrandTitle: catalog.marketingBrandTitle,
+  marketingBrandDetail: catalog.marketingBrandDetail,
+  marketingChannelsDetail: catalog.marketingChannelsDetail,
+  marketingBrandBoundary: catalog.marketingBrandBoundary,
   marketingProblem: catalog.marketingProblem,
   marketingProblemDetail: catalog.marketingProblemDetail,
   marketingDiscovery: catalog.marketingDiscovery,

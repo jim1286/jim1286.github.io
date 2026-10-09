@@ -5,7 +5,7 @@ export const policyPaths = {
   "accountDeletion": "/privacy/{id}/delete-account",
   "support": "/support/{id}"
 } as const;
-export const appsWithPolicy = ["burntok","choose-window","spint","taground","unairplane","yajalal"] as const;
+export const appsWithPolicy = ["burntok","choose-window","diairy","spint","taground","unairplane","yajalal"] as const;
 export const policyUrls = {
   "burntok": {
     "privacyPolicy": "https://burntok.jmstudioapps.com/legal/privacy",
@@ -16,6 +16,11 @@ export const policyUrls = {
     "privacyPolicy": "https://hjm-app-policies.jimin1286.chatgpt.site/privacy/choose-window",
     "accountDeletion": "https://hjm-app-policies.jimin1286.chatgpt.site/privacy/choose-window/delete-account",
     "support": "https://hjm-app-policies.jimin1286.chatgpt.site/support/choose-window"
+  },
+  "diairy": {
+    "privacyPolicy": "https://airy.jmstudioapps.com/legal/privacy",
+    "accountDeletion": "https://airy.jmstudioapps.com/legal/account-deletion",
+    "support": "https://airy.jmstudioapps.com/legal/"
   },
   "spint": {
     "privacyPolicy": "https://api.spint.jmstudioapps.com/legal/privacy",

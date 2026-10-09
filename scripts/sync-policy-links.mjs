@@ -52,7 +52,15 @@ function readHub(hubConfig) {
   const portfolio = JSON.parse(readFileSync(source, 'utf8'));
   const appsRoot = resolve(hubConfig, 'apps');
   const apps = readdirSync(appsRoot, { withFileTypes: true })
-    .filter((entry) => entry.isDirectory() && existsSync(resolve(appsRoot, entry.name, 'policy.json')))
+    .filter((entry) => {
+      if (!entry.isDirectory()) return false;
+      if (existsSync(resolve(appsRoot, entry.name, 'policy.json'))) return true;
+      // App-owned policies (Diairy) need no central Site binding. Requiring
+      // policy.json omitted their verified public URLs from the portfolio.
+      const profilePath = resolve(appsRoot, entry.name, 'app.json');
+      if (!existsSync(profilePath)) return false;
+      return JSON.parse(readFileSync(profilePath, 'utf8')).store?.policyPublication === 'app-owned';
+    })
     .map((entry) => entry.name).sort();
   // BurnTok's app-owned policies deliberately do not exist on the central Site.
   // Project only public URL fields, not entire profiles that can contain review credentials.

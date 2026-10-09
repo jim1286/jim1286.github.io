@@ -35,6 +35,14 @@ export default function StrategySection() {
             </li>)}</ol>
           </Card>
           <Card title={copy.marketingStrategyTitle} headingLevel={3} padding="lg" actions={<Link href="/diagrams/marketing-strategy.html" variant="standalone">{copy.marketingDiagram} <Icon name="chevronEnd" decorative /></Link>}>
+            {/* Keep the brand inside its operating case study: a second mascot
+                landing would duplicate the product list removed by the user. */}
+            <Surface padding="md" radius="md" tone="sunken"><Stack gap="md">
+              <Text as="p" emphasis="strong">{copy.marketingBrandTitle}</Text>
+              <Text as="p">{copy.marketingBrandDetail}</Text>
+              <Text as="p" tone="muted">{copy.marketingChannelsDetail}</Text>
+              <Text as="p" tone="muted">{copy.marketingBrandBoundary}</Text>
+            </Stack></Surface>
             <ol className="strategy-steps">{marketing.map(([label, detail], index) => <li key={label}>
               <Stack gap="sm"><Text emphasis="strong">{label}</Text><Text tone="muted">{detail}</Text>
                 {index === 1 && <Grid columns={{ compact: 1, medium: 2 }} gap={{ compact: 'sm' }} minColumnWidth={{ compact: 120 }}>

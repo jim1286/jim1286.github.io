@@ -5,6 +5,18 @@ import { join } from 'node:path';
 import { test } from 'node:test';
 import { synchronizePolicies } from './sync-policy-links.mjs';
 
+test('app-owned policy URLs do not require a central policy binding', () => fixture((options) => {
+  rmSync(join(options.hubConfig, 'apps', 'example', 'policy.json'));
+  writeFileSync(join(options.hubConfig, 'apps', 'example', 'app.json'), JSON.stringify({
+    store: { policyPublication: 'app-owned', privacyPolicyUrl: 'https://example.test/legal/privacy',
+      accountDeletionUrl: 'https://example.test/legal/delete', supportUrl: 'https://example.test/legal/' },
+    reviewPassword: 'fixture-private-value',
+  }));
+  assert.equal(synchronizePolicies({ ...options, mode: 'sync' }), 'source-synchronized');
+  assert.match(readFileSync(options.output, 'utf8'), /https:\/\/example\.test\/legal\/privacy/);
+  assert.doesNotMatch(readFileSync(options.output, 'utf8'), /reviewPassword|fixture-private-value/);
+}));
+
 function fixture(run) {
   const root = mkdtempSync(join(tmpdir(), 'policy-links-'));
   const hubConfig = join(root, 'hub');

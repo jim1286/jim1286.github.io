@@ -10,19 +10,18 @@ export type PortfolioApp = {
   description: string;
   icon: string;
   status: string;
-  statusTone: 'live' | 'archived';
+  statusTone: 'live' | 'archived' | 'development';
   sourceAccess: 'public' | 'private' | 'archived';
   tags: string[];
   githubUrl: string;
   webUrl?: string;
   iosUrl?: string;
   androidUrl?: string;
-  socialHook?: string;
   featured?: boolean;
 };
 
-// 2026-09-27 공개 스토어/웹 페이지를 직접 확인해 연결한다. 버전 숫자는 릴리스마다
-// 달라지므로 카드 상태에서 빼고, 확인되지 않은 Android 주소는 추측해 넣지 않는다.
+// Public listings were refreshed on 2026-10-09, including Diairy and Spint.
+// Keep release versions out of copy and omit Android links without public evidence.
 export const apps: PortfolioApp[] = [
   {
     id: 'yajalal',
@@ -40,7 +39,6 @@ export const apps: PortfolioApp[] = [
     githubUrl: 'https://github.com/jim1286/yajalal',
     iosUrl: 'https://apps.apple.com/kr/app/%EC%95%BC%EC%9E%98%EC%95%8C/id6749580205?uo=4',
     androidUrl: 'https://play.google.com/store/apps/details?id=dev.hjm.yajalal&hl=ko',
-    socialHook: copy.product004,
     featured: true,
   },
   {
@@ -57,7 +55,6 @@ export const apps: PortfolioApp[] = [
     githubUrl: 'https://github.com/jim1286/choose_window',
     iosUrl: 'https://apps.apple.com/kr/app/%EC%84%A0%ED%83%9D%EC%9D%98%EC%B0%BD/id6759096524?uo=4',
     androidUrl: 'https://play.google.com/store/apps/details?id=dev.hjm.choosewindow&hl=ko',
-    socialHook: copy.product008,
   },
   {
     id: 'burntok',
@@ -73,7 +70,6 @@ export const apps: PortfolioApp[] = [
     githubUrl: 'https://github.com/jim1286/BurnTok',
     webUrl: 'https://burntok.jmstudioapps.com/',
     iosUrl: 'https://apps.apple.com/kr/app/id6810606625',
-    socialHook: copy.product012,
   },
   {
     id: 'taground',
@@ -103,7 +99,34 @@ export const apps: PortfolioApp[] = [
     tags: ['Expo', 'React Native', 'Offline'],
     githubUrl: 'https://github.com/jim1286/unairplane',
     iosUrl: 'https://apps.apple.com/kr/app/id6806942992',
-    socialHook: copy.product019,
+    androidUrl: 'https://play.google.com/store/apps/details?id=com.hjm.unairplane',
+  },
+  {
+    id: 'diairy', index: '06', name: 'Diairy', englishName: 'Diairy',
+    description: copy.diairyDescription, icon: '/apps/diairy.png',
+    status: copy.diairyStatus, statusTone: 'live', sourceAccess: 'private',
+    tags: ['React Native', 'Next.js', 'NestJS'],
+    githubUrl: 'https://github.com/jim1286/diairy',
+    webUrl: 'https://airy.jmstudioapps.com/',
+    iosUrl: 'https://apps.apple.com/kr/app/id6810897107',
+    androidUrl: 'https://play.google.com/store/apps/details?id=com.jimin.diairy',
+  },
+  {
+    id: 'spint', index: '07', name: 'Spint', englishName: 'Spint',
+    description: copy.spintDescription, icon: '/apps/spint.png',
+    status: copy.spintStatus, statusTone: 'live', sourceAccess: 'private',
+    tags: ['Expo', 'React Native', 'NestJS'],
+    githubUrl: 'https://github.com/jim1286/spint',
+    iosUrl: 'https://apps.apple.com/kr/app/id6816477162',
+  },
+  {
+    id: 'utilverse', index: '08', name: 'Utilverse', englishName: 'Utilverse',
+    description: copy.utilverseDescription, icon: '/apps/utilverse.png',
+    // An implemented product and a GitHub checkout do not prove store publication.
+    // The portfolio catalog still marks this product incubating.
+    status: copy.developmentStatus, statusTone: 'development', sourceAccess: 'private',
+    tags: ['Expo', 'React Native', 'NestJS'],
+    githubUrl: 'https://github.com/jim1286/utilverse',
   },
 ];
 
@@ -154,5 +177,17 @@ export const legalDocuments: LegalDocument[] = [
     privacyUrl: policyUrl('burntok', 'privacyPolicy'),
     deletionUrl: policyUrl('burntok', 'accountDeletion'),
     supportUrl: policyUrl('burntok', 'support'),
+  },
+  {
+    id: 'diairy', index: '04', name: 'Diairy', note: copy.diairyLegalNote,
+    privacyUrl: policyUrl('diairy', 'privacyPolicy'),
+    deletionUrl: policyUrl('diairy', 'accountDeletion'),
+    supportUrl: policyUrl('diairy', 'support'),
+  },
+  {
+    id: 'spint', index: '05', name: 'Spint', note: copy.spintLegalNote,
+    privacyUrl: policyUrl('spint', 'privacyPolicy'),
+    deletionUrl: policyUrl('spint', 'accountDeletion'),
+    supportUrl: policyUrl('spint', 'support'),
   },
 ];

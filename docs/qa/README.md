@@ -8,6 +8,7 @@
 
 | 작업 | 리포트 |
 | --- | --- |
+| 프로필·제품 정보 최신화와 마케팅 사례 통합 | [2026-10-09-profile-products-refresh](2026-10-09-profile-products-refresh.md) |
 | gh-pages 게시 이력 main 통합 | [2026-10-09-gh-pages-main-merge](2026-10-09-gh-pages-main-merge.md) |
 | QA 리포트 — HJM 개발 후보 CI | [2026-10-09-hjm-development-ci](2026-10-09-hjm-development-ci.md) |
 | Portfolio Site HJM 1.16.0 도입·통합 QA | [2026-10-08-hjm-adoption](2026-10-08-hjm-adoption.md) |

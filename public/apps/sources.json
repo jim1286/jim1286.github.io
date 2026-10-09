@@ -1,0 +1,30 @@
+{
+  "burntok": {
+    "source": "apps/burntok/apps/mobile/assets/release-hub/icon.ios-opaque.png",
+    "sha256": "6d0716d1ebb52ad2f7041225d9cb2025150ed8ae369a4b01e4ed06c364e766cb"
+  },
+  "unairplane": {
+    "source": "apps/unairplane/assets/release-hub/icon.ios-opaque.png",
+    "sha256": "2098fe809c58bc000c3396060af092a4b2c60154b4321ebce115360f1e41551d"
+  },
+  "choose-window": {
+    "source": "apps/choose-window/assets/icons/launcher.png",
+    "sha256": "17589ccbd82530d6e0c6b891cf97dbc05b19ee2746bbe1bd45fc5410cb0cb05c"
+  },
+  "yajalal": {
+    "source": "apps/yajalal/modules/app/assets/icons/launcher.png",
+    "sha256": "194b93f4443084087159de9c48a6d106382ca77d4e46d16d9adbfe1bf95406b0"
+  },
+  "diairy": {
+    "source": "apps/diairy/packages/assets/brand/generated/v4/icon-1024.png",
+    "sha256": "315bb645130624828ccd0443334795cfb5cedef1869b3cf343467e62d67c1e6d"
+  },
+  "spint": {
+    "source": "apps/spint/apps/mobile/assets/release-hub/icon.ios-opaque.png",
+    "sha256": "008eaa49dcbc2ab26ad106dcc99229c59aed6d321a6d068273e5dd1b3b064f08"
+  },
+  "utilverse": {
+    "source": "apps/utilverse/apps/mobile/assets/images/icon.png",
+    "sha256": "898bb28e1fb1ef98084445def4ed462deb63ade63da53f08f1c167892195bad1"
+  }
+}

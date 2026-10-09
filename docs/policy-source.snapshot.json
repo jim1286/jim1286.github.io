@@ -1,7 +1,7 @@
 {
   "schemaVersion": 2,
   "source": "app-release-hub",
-  "sourceDigest": "22b22c0b537f756191ba062f1f5f6cb7386a334c30986b2bcc0355c4d4e8da27",
+  "sourceDigest": "e564b83b0d210778614dd70dde184ddfb2471c8c6189e9ad2f0e9aba0bed4b4f",
   "projection": {
     "origin": "https://hjm-app-policies.jimin1286.chatgpt.site",
     "paths": {
@@ -12,6 +12,7 @@
     "apps": [
       "burntok",
       "choose-window",
+      "diairy",
       "spint",
       "taground",
       "unairplane",
@@ -20,6 +21,7 @@
     "publications": {
       "burntok": "app-owned",
       "choose-window": "central",
+      "diairy": "app-owned",
       "spint": "app-owned",
       "taground": "central",
       "unairplane": "central",
@@ -35,6 +37,11 @@
         "privacyPolicy": "https://hjm-app-policies.jimin1286.chatgpt.site/privacy/choose-window",
         "accountDeletion": "https://hjm-app-policies.jimin1286.chatgpt.site/privacy/choose-window/delete-account",
         "support": "https://hjm-app-policies.jimin1286.chatgpt.site/support/choose-window"
+      },
+      "diairy": {
+        "privacyPolicy": "https://airy.jmstudioapps.com/legal/privacy",
+        "accountDeletion": "https://airy.jmstudioapps.com/legal/account-deletion",
+        "support": "https://airy.jmstudioapps.com/legal/"
       },
       "spint": {
         "privacyPolicy": "https://api.spint.jmstudioapps.com/legal/privacy",
