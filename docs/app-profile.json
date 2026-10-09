@@ -198,7 +198,7 @@
       },
       "updatePolicy": {
         "cadence": "monthly-and-immediate-on-critical-security-advisory",
-        "automation": "dependabot-or-renovate",
+        "automation": "manual-reviewed-updates",
         "organizationPolicy": "full-length-sha-only"
       }
     },
@@ -235,7 +235,6 @@
       "unverifiedExternalSettingsAction": "not-merge-eligible",
       "requiredGeneratedFiles": [
         ".github/CODEOWNERS",
-        ".github/dependabot.yml",
         ".npmrc"
       ],
       "registryPolicy": {

@@ -54,7 +54,7 @@ const execFileAsync = promisify(execFile);
 
 const contractVersion = 1;
 const standardVersion = '1.0.0';
-const canonicalProfileSha256 = 'c6e61a1bdc369b38e2516110ba7f4b3871939351ca1ed22859668a800f859559';
+const canonicalProfileSha256 = '25bece267d58c156f187d7b0e7c386767f0439e8137676bd62d8cc6e6fbda79a';
 const approvedCentralVerifierCommit = '0000000000000000000000000000000000000000';
 const idPattern = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 const semverIdentifier = '(?:(?:0|[1-9]\\d*)|(?:\\d*[A-Za-z-][0-9A-Za-z-]*))';
@@ -155,10 +155,10 @@ export const reviewedVersionFloors = {
 const runtimeFrameworkFloors = reviewedVersionFloors.runtimeFramework;
 const nodeFloor = reviewedVersionFloors.node;
 const packageManagerFloor = reviewedVersionFloors.packageManager;
+// 2026-10-09: user removed bot PR automation; scaffold/sync no longer own a Dependabot config.
 const requiredProtectedPaths = [
   '.github/workflows/quality-gate.yml',
   '.github/CODEOWNERS',
-  '.github/dependabot.yml',
   'app.contract.json',
   'package.json',
   '.npmrc',
@@ -1695,16 +1695,6 @@ jobs:
 ${jobs.map(job).join('\n')}`, contract);
 }
 
-function makeDependabotConfig() {
-  return `version: 2
-updates:
-  - package-ecosystem: github-actions
-    directory: /
-    schedule:
-      interval: monthly
-`;
-}
-
 function makeCodeowners(contract) {
   const mergePolicy = contract.governance?.mergePolicy;
   if (!mergePolicy || typeof mergePolicy.codeownerTeam !== 'string' || !Array.isArray(mergePolicy.protectedPaths)) return '';
@@ -3162,7 +3152,6 @@ async function buildScaffoldFiles(contract) {
   const files = new Map([
     ...previewProjectionSources(contract),
     ['.github/CODEOWNERS', makeCodeowners(contract)],
-    ['.github/dependabot.yml', makeDependabotConfig()],
     ['.github/workflows/quality-gate.yml', makeQualityGateWorkflow(contract)],
     ['.gitignore', 'node_modules/\n.next/\ndist/\nbuild/\n.expo/\ncoverage/\n.env\n.env.*\n!.env.example\n.DS_Store\n'],
     ['.npmrc', canonicalNpmrcSource],
@@ -4095,7 +4084,6 @@ export function standardProjectionSources(contract, designRelease) {
   return new Map([
     ...previewProjectionSources(contract),
     ['.github/CODEOWNERS', makeCodeowners(contract)],
-    ['.github/dependabot.yml', makeDependabotConfig()],
     ['.npmrc', canonicalNpmrcSource],
     ['.editorconfig', makeEditorconfig()],
     ['docs/app-contract.schema.json', readFileSync(canonicalSchemaPath, 'utf8')],
@@ -4520,10 +4508,9 @@ export async function checkAppConformance(appRoot, { now = new Date(), targetSta
     }
   }
 
-  const requiredFiles = bound(contract) ? [...bindingProjectionSources(contract).keys(), '.github/dependabot.yml', ...Object.entries(canonicalDocuments).filter(([key]) => key !== 'decisionsDir').map(([,path]) => path)] : [
+  const requiredFiles = bound(contract) ? [...bindingProjectionSources(contract).keys(), ...Object.entries(canonicalDocuments).filter(([key]) => key !== 'decisionsDir').map(([,path]) => path)] : [
     ...previewProjectionSources(contract).map(([path]) => path),
     '.github/CODEOWNERS',
-    '.github/dependabot.yml',
     '.github/workflows/quality-gate.yml',
     '.npmrc',
     '.editorconfig',
@@ -5035,7 +5022,7 @@ export async function checkStandardAssets({ workspaceRoot = defaultWorkspaceRoot
     },
     updatePolicy: {
       cadence: 'monthly-and-immediate-on-critical-security-advisory',
-      automation: 'dependabot-or-renovate',
+      automation: 'manual-reviewed-updates',
       organizationPolicy: 'full-length-sha-only',
     },
   };
@@ -5070,7 +5057,7 @@ export async function checkStandardAssets({ workspaceRoot = defaultWorkspaceRoot
     authoritativeMergeGate: 'external-required-workflow-at-immutable-commit',
     eligibilitySource: 'central-verifier-only',
     unverifiedExternalSettingsAction: 'not-merge-eligible',
-    requiredGeneratedFiles: ['.github/CODEOWNERS', '.github/dependabot.yml', '.npmrc'],
+    requiredGeneratedFiles: ['.github/CODEOWNERS', '.npmrc'],
     registryPolicy: {
       canonicalConfigPath: '.npmrc',
       defaultRegistry: 'https://registry.npmjs.org/',
@@ -5203,7 +5190,6 @@ export async function checkStandardAssets({ workspaceRoot = defaultWorkspaceRoot
   try {
     const metaWorkflow = await readRegularTextFile(resolve(root, '.github/workflows/portfolio-meta.yml'), 'Root metadata workflow');
     const centralWorkflow = await readRegularTextFile(resolve(root, 'docs/ci/app-standard-required.template.yml'), 'Central verifier publication template');
-    const dependabot = await readRegularTextFile(resolve(root, '.github/dependabot.yml'), 'Root Dependabot policy');
     for (const [path, source] of [
       ['.github/workflows/portfolio-meta.yml', metaWorkflow],
       ['docs/ci/app-standard-required.template.yml', centralWorkflow],
@@ -5258,9 +5244,6 @@ export async function checkStandardAssets({ workspaceRoot = defaultWorkspaceRoot
       || centralWorkflow.match(/node standard\/scripts\/app-standard\.mjs check-app --app-root app/g)?.length !== 2
       || !centralWorkflow.includes('git -C app diff --exit-code HEAD -- .')) {
       addFinding(findings, 'CENTRAL_VERIFIER_BOOTSTRAP_INVALID', 'docs/ci/app-standard-required.template.yml', 'The publication template must expose pull_request/merge_group ruleset events, fail closed on the unpublished commit, compare the approved immutable validator commit, install frozen dependencies, and execute the canonical quality graph inside the single required job.');
-    }
-    if (!dependabot.includes('package-ecosystem: github-actions') || !dependabot.includes('interval: monthly')) {
-      addFinding(findings, 'STANDARD_ACTION_UPDATE_POLICY_INVALID', '.github/dependabot.yml', 'GitHub Action pins require monthly Dependabot or an equivalent managed updater.');
     }
   } catch (error) {
     addFinding(findings, error.code || 'STANDARD_CI_ASSET_INVALID', '.github', error.message);
