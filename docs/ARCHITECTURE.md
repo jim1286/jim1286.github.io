@@ -40,6 +40,13 @@ projection 무결성 비교에 사용하며 외부 승인·진위 보증은 아�
 정책 snapshot schema 2와 계약 문서 버전 1.1.0은 이번 원천·화면·운영 변경을 함께 기록하며
 심사 자격증명이 있는 Hub 전체 프로필을 공개 데이터로 복사하지 않는다.
 
+## 공개 호스트
+
+2026-10-09 사용자 요청으로 jmstudioapps.com을 대표 origin으로 사용한다. Node runtime 서버 없이 Vite dist를
+기존 VPS Caddy가 제공하며 www는 대표 origin으로 이동한다. 공개 정적 파일과 비공개 배포 manifest를 분리하고
+source·archive/file digest를 검증해 원자 승격한다. 기존 Pages source/built artifact 설정 불일치를 유지하는
+도메인 별칭 대신 직접 게시 경로를 택했다. [배포 실행서](../deploy/static-site/README.md)를 따른다.
+
 ## 검사
 
 `pnpm check`는 i18n·문서 링크·snapshot·단위 검사·production build를 포함한다.

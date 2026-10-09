@@ -1,6 +1,6 @@
 # 황지민 · 공식 개발자 사이트
 
-[jim1286.github.io](https://jim1286.github.io/)에 배포되는 독립 개발자·앱 포트폴리오
+[jmstudioapps.com](https://jmstudioapps.com/)에 배포되는 독립 개발자·앱 포트폴리오
 사이트입니다. 앱 스토어의 개발자/마케팅 웹사이트와 앱별 개인정보처리방침·계정 삭제·지원
 문서의 공식 진입점으로 사용합니다.
 
@@ -9,7 +9,7 @@
 - 앱 identity와 저장소: `app-portfolio/portfolio.json`
 - 버전, 스토어 상태와 URL: App Release Hub의 release profile 및 store binding
 - 앱 설명: 각 앱 저장소의 최신 README
-- 개인정보처리방침과 지원 문서: `hjm-app-policies.jimin1286.chatgpt.site`
+- 개인정보처리방침과 지원 문서: `policies.jmstudioapps.com`
 
 정책 본문은 이 저장소에 복제하지 않습니다. 이 사이트는 정책 사이트의 앱별 공식 문서로
 연결하며, 정책의 개정과 배포는 App Release Hub가 관리합니다.
@@ -26,11 +26,11 @@ pnpm check
 
 ## 배포
 
-2026-10-09 사용자 요청으로 기존 `gh-pages` 이력과 게시 산출물을 main에 통합했다.
-산출물은 `.published/gh-pages-20261008/`에 보관하며 개발용 `index.html`과 소스는 유지한다.
-현재 GitHub Pages 설정은 `main`의 루트다. 기존 `pnpm run deploy` 명령에는 `gh-pages` publisher가
-남아 있어 다음 운영 배포 전에 배포 Mac에서 main 기반 게시 경로를 정리해야 한다.
-공개 배포는 [릴리스 지침](docs/RELEASE.md)을 따릅니다.
+2026-10-09 사용자가 자체 도메인 이전을 승인해 기존 VPS의 Caddy가 검증된 dist를 제공한다.
+`www`는 메인 주소로 이동한다. GitHub 주소·운영 이력은 기존 링크 호환을 위해 유지한다.
+다른 환경에서도 Node/pnpm과 관리 SSH 권한으로 [자체 호스팅 배포 절차](deploy/static-site/README.md)를 실행할 수 있다.
+현재 기본 `pnpm run deploy`는 정적 artifact publisher이며 source/main과 앱 버전은 별개다.
+공개 결과는 [QA](docs/qa/2026-10-09-owned-domain-deployment.md)에 기록한다.
 
 ## 2026-09-04 toolchain 변경 근거
 

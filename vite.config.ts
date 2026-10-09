@@ -4,7 +4,7 @@ import { ko } from './src/i18n/ko'
 
 // Korean is the sole registered source locale. Share its public description
 // with SSR-readable metadata instead of maintaining separate marketing copy.
-// Keep URL/image bindings in index.html owned by the existing static host.
+// The owned-domain URL/image bindings in index.html are shared by the static hosts.
 const metadata = {
   PORTFOLIO_TITLE: ko.seoTitle,
   PORTFOLIO_DESCRIPTION: ko.seoDescription,

@@ -11,6 +11,14 @@ version: "1.1.0"
 
 # Portfolio Site 검사·배포
 
+## 자체 도메인 운영 — 2026-10-09
+
+현재 기본 공개 origin은 https://jmstudioapps.com, www는 메인으로 308 이동한다.
+사용자의 도메인·독립 배포 요청으로 기존 VPS Caddy의 정적 게시로 전환하며 GitHub Pages는 이전 주소 호환용으로 유지한다.
+[실행서](../deploy/static-site/README.md)와 [QA](qa/2026-10-09-owned-domain-deployment.md)를 따른다.
+아래 GitHub 게시 설정·명령·SHA는 당시 이력이다. 제품 버전·자동 CI trigger는 바꾸지 않는다.
+현재 `pnpm run deploy`는 이미 검사한 artifact와 exact source SHA를 받는 VPS publisher다.
+
 ## gh-pages 이력 main 통합 — 2026-10-09
 
 사용자의 병합 요청으로 원격 `gh-pages`의 `4dba815796129b946b0aa05ed97b927141ca94f8`까지의

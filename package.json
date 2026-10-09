@@ -3,12 +3,12 @@
   "private": true,
   "version": "1.1.0",
   "type": "module",
-  "homepage": "https://jim1286.github.io/",
+  "homepage": "https://jmstudioapps.com/",
   "scripts": {
     "dev": "vite",
     "build": "pnpm i18n:check && pnpm run policy:check:snapshot && tsc -b && vite build && node scripts/build-locale-pages.mjs",
     "preview": "vite preview",
-    "deploy": "pnpm run policy:check && pnpm run check && gh-pages -d dist",
+    "deploy": "bash deploy/static-site/publish.sh",
     "policy:sync": "node scripts/sync-policy-links.mjs",
     "policy:check": "node scripts/sync-policy-links.mjs --check",
     "policy:check:snapshot": "node scripts/sync-policy-links.mjs --check-snapshot",
@@ -24,7 +24,9 @@
     "design:check": "node tools/check-design-contract.mjs",
     "typecheck": "node tools/sync-i18n.mjs && tsc -b --pretty false",
     "i18n:generate": "node tools/sync-i18n.mjs --write",
-    "i18n:check": "node tools/sync-i18n.mjs && node --test tools/sync-i18n.test.mjs"
+    "i18n:check": "node tools/sync-i18n.mjs && node --test tools/sync-i18n.test.mjs",
+    "deploy:prepare": "node scripts/static-site-artifact.mjs prepare",
+    "deploy:verify": "node scripts/static-site-artifact.mjs verify"
   },
   "dependencies": {
     "@ant-design/icons": "^6.3.4",
