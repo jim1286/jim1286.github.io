@@ -1,5 +1,5 @@
 // Generated from the public Hub projection. Run pnpm policy:sync; do not edit.
-export const policyOrigin = "https://hjm-app-policies.jimin1286.chatgpt.site";
+export const policyOrigin = "https://policies.jmstudioapps.com";
 export const policyPaths = {
   "privacyPolicy": "/privacy/{id}",
   "accountDeletion": "/privacy/{id}/delete-account",
@@ -13,9 +13,9 @@ export const policyUrls = {
     "support": "https://burntok.jmstudioapps.com/legal/"
   },
   "choose-window": {
-    "privacyPolicy": "https://hjm-app-policies.jimin1286.chatgpt.site/privacy/choose-window",
-    "accountDeletion": "https://hjm-app-policies.jimin1286.chatgpt.site/privacy/choose-window/delete-account",
-    "support": "https://hjm-app-policies.jimin1286.chatgpt.site/support/choose-window"
+    "privacyPolicy": "https://policies.jmstudioapps.com/privacy/choose-window",
+    "accountDeletion": "https://policies.jmstudioapps.com/privacy/choose-window/delete-account",
+    "support": "https://policies.jmstudioapps.com/support/choose-window"
   },
   "diairy": {
     "privacyPolicy": "https://airy.jmstudioapps.com/legal/privacy",
@@ -28,19 +28,19 @@ export const policyUrls = {
     "support": "https://api.spint.jmstudioapps.com/legal/"
   },
   "taground": {
-    "privacyPolicy": "https://hjm-app-policies.jimin1286.chatgpt.site/privacy/taground",
-    "accountDeletion": "https://hjm-app-policies.jimin1286.chatgpt.site/privacy/taground/delete-account",
-    "support": "https://hjm-app-policies.jimin1286.chatgpt.site/support/taground"
+    "privacyPolicy": "https://policies.jmstudioapps.com/privacy/taground",
+    "accountDeletion": "https://policies.jmstudioapps.com/privacy/taground/delete-account",
+    "support": "https://policies.jmstudioapps.com/support/taground"
   },
   "unairplane": {
-    "privacyPolicy": "https://hjm-app-policies.jimin1286.chatgpt.site/privacy/unairplane",
-    "accountDeletion": "https://hjm-app-policies.jimin1286.chatgpt.site/privacy/unairplane/delete-account",
-    "support": "https://hjm-app-policies.jimin1286.chatgpt.site/support/unairplane"
+    "privacyPolicy": "https://policies.jmstudioapps.com/privacy/unairplane",
+    "accountDeletion": "https://policies.jmstudioapps.com/privacy/unairplane/delete-account",
+    "support": "https://policies.jmstudioapps.com/support/unairplane"
   },
   "yajalal": {
-    "privacyPolicy": "https://hjm-app-policies.jimin1286.chatgpt.site/privacy/yajalal",
-    "accountDeletion": "https://hjm-app-policies.jimin1286.chatgpt.site/privacy/yajalal/delete-account",
-    "support": "https://hjm-app-policies.jimin1286.chatgpt.site/support/yajalal"
+    "privacyPolicy": "https://policies.jmstudioapps.com/privacy/yajalal",
+    "accountDeletion": "https://policies.jmstudioapps.com/privacy/yajalal/delete-account",
+    "support": "https://policies.jmstudioapps.com/support/yajalal"
   }
 } as const;
 export type PolicyAppId = (typeof appsWithPolicy)[number];
