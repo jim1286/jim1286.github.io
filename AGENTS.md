@@ -17,3 +17,15 @@
 
 2026-10-09 앱별 QA 위치·형식 통일 요청으로 [QA 안내](docs/QA.md)를 단일 진입점으로 사용한다.
 실행 범위·검사 명령·도구는 안내에서, 작업별 판정·재현·미확인 범위는 [결과 색인](docs/qa/README.md)에서 찾는다.
+
+## 자체 도메인 게시
+
+2026-10-09 사용자 요청으로 대표 origin은 jmstudioapps.com, www는 대표 주소 이동, 중앙 정책은
+policies.jmstudioapps.com이다. [VPS 정적 실행서](deploy/static-site/README.md)를 먼저 읽는다.
+`pnpm run deploy`는 검증된 artifact·SSH 대상·키 파일 경로·exact source SHA를 받는다. 개발 HTML을
+게시하지 않고 build한 dist의 파일 집합/hash와 실제 공개 bytes·DNS/TLS를 검증한다. Sites/Codex 계정은 필요 없다.
+
+기존 GitHub 주소는 main /docs의 이동 안내로 유지한다. /docs/index.html·404.html·ko-KR/index.html은
+그 호환 계층이며 Vite dist와 혼동하지 않는다. GitHub 이동 안내는 HTTP 서버 redirect가 아니다.
+도메인/링크 변경 뒤 Hub 원천과 snapshot을 함께 확인하고 이력서·스토어·프로필 소비자 영향을
+작업별 QA에 기록한다. root AGENTS의 main 작업/정리 및 delivery 분담 규칙은 유지한다.

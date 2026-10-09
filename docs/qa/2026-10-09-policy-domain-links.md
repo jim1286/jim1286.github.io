@@ -24,3 +24,6 @@ Hub 중앙 정책이 https://policies.jmstudioapps.com 로 실제 게시된 뒤 
 브랜치·worktree를 만들지 않았고 기존 main 한 곳에서 지정 파일만 커밋했다. 기존 ignored dist는 제품의
 반복 build 출력이며 원시 QA 캡처·임시 로그는 만들지 않았다. 정책 snapshot은 재현 가능한 공개 계약
 입력이라 보존한다. source 저장소와 Pages의 기존 운영 브랜치/게시 산출물은 유지한다.
+
+후속 2026-10-09 자체 도메인 포트폴리오 배포가 완료되어 이때 source에만 반영했던 정책 링크도 새 호스트에서 제공된다.
+현재 결과는 [도메인 배포 QA](2026-10-09-owned-domain-deployment.md)와 [영향 조사](2026-10-09-domain-migration-impact.md)를 따른다.
