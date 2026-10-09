@@ -54,3 +54,8 @@ Hub 최신 상태를 확인한 것으로 표시하지 않습니다.
 `pnpm install --frozen-lockfile` 후 `pnpm standard:check`로 모든 선언된 runtime의 lint/typecheck/test/build를 실행한다.
 Flutter SDK는 runtime의 `.fvmrc`를 따른다. 기존 제품 CI는 유지하며 공통 피드백 CI를 추가한다.
 계약 작성 상태는 governance-scaffold이며 구현·실기기·외부 required gate 완료를 뜻하지 않는다.
+
+## QA 자료 진입점
+
+2026-10-09 앱별 QA 위치·형식 통일 요청으로 [QA 안내](docs/QA.md)를 단일 진입점으로 사용한다.
+실행 범위·검사 명령·도구는 안내에서, 작업별 판정·재현·미확인 범위는 [결과 색인](docs/qa/README.md)에서 찾는다.
