@@ -1,3 +1,4 @@
+import { vitePlugin } from './tools/hjm-local-source.mjs'
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import { ko } from './src/i18n/ko'
@@ -16,7 +17,7 @@ const escapeHtml = (value: string) => value.replace(/[&<>"']/g, char => ({
 
 // https://vite.dev/config/
 export default defineConfig({
-  plugins: [react(), {
+  plugins: [vitePlugin(), react(), {
     name: 'portfolio-source-metadata',
     transformIndexHtml: {
       order: 'pre',
