@@ -24,7 +24,10 @@ pnpm check
 
 ## 배포
 
-`pnpm run deploy`는 Hub 원본 비교와 전체 검사를 통과한 뒤 빌드 결과를 `gh-pages`에 게시합니다.
+2026-10-09 사용자 요청으로 기존 `gh-pages` 이력과 게시 산출물을 main에 통합했다.
+산출물은 `.published/gh-pages-20261008/`에 보관하며 개발용 `index.html`과 소스는 유지한다.
+현재 GitHub Pages 설정은 `main`의 루트다. 기존 `pnpm run deploy` 명령에는 `gh-pages` publisher가
+남아 있어 다음 운영 배포 전에 배포 Mac에서 main 기반 게시 경로를 정리해야 한다.
 공개 배포는 [릴리스 지침](docs/RELEASE.md)을 따릅니다.
 
 ## 2026-09-04 toolchain 변경 근거

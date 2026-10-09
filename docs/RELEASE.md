@@ -11,6 +11,19 @@ version: "1.1.0"
 
 # Portfolio Site 검사·배포
 
+## gh-pages 이력 main 통합 — 2026-10-09
+
+사용자의 병합 요청으로 원격 `gh-pages`의 `4dba815796129b946b0aa05ed97b927141ca94f8`까지의
+이력을 main의 두 번째 parent로 연결하고 25개 게시 파일을 `.published/gh-pages-20261008/`에
+동일 blob으로 보존했다. 루트의 개발용 `index.html`을 빌드 결과로 덮어쓰는 대안은 Vite 개발·
+빌드를 깨뜨리므로 배제했다. 이 디렉터리는 이전 게시 산출물 보관용이며 현재 Pages 게시 경로가 아니다.
+검사·보관 결과는 [통합 QA](qa/2026-10-09-gh-pages-main-merge.md)에 있다.
+
+이날 GitHub API의 실제 게시 설정은 `main` + `/`, `build_type: legacy`였다. 아래 10-08의
+`gh-pages` 배포 기록은 당시 이력이며 현재 설정의 증거가 아니다. 기존 `package.json#scripts.deploy`
+에는 `gh-pages -d dist`가 남아 있으므로 다음 운영 배포 전에 mac-ci delivery가 main 기반 게시
+방식과 현재 설정을 연결해야 한다. 이 Git 병합을 새 웹 배포·공개 화면 검증으로 보고하지 않는다.
+
 ## 1.1.0 공개 배포 — 2026-10-08
 
 HJM 1.16의 공개 화면·구성·컴포넌트 계약을 전면 적용하고 공유 i18n 작업을 통합했다.
@@ -91,7 +104,8 @@ OTA 연결 요청은 이 제품에서는 검증된 `dist/`의 GitHub Pages 게�
 이행한다. 네이티브 EAS Update나 새 Service Worker를 설치하는 대안은 이 runtime에
 필요하지 않으므로 사용하지 않는다. 현재 소스에도 Service Worker 등록은 없다.
 
-GitHub Pages는 `gh-pages`의 루트를 공개한다. Vite가 생성한 JS/CSS는 내용 hash 파일명으로
+2026-10-08 게시 기록에서는 GitHub Pages가 `gh-pages`의 루트를 공개했다. 10-09의 실제 설정은
+위 통합 기록을 따른다. Vite가 생성한 JS/CSS는 내용 hash 파일명으로
 구분하고, HTML과 `public/`의 고정 이름 자산은 호스트의 실제 캐시 정책을 따른다.
 2026-10-08 배포 전 공개 루트 응답은 `Cache-Control: max-age=600` 및 ETag를 반환했다.
 이 호스트에서 임의의 no-cache/immutable 헤더를 설정했다고 주장하지 않는다. 게시 뒤
