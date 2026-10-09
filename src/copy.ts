@@ -19,7 +19,7 @@ export const siteCopy = {
   developerAlt: catalog.page055, seoul: catalog.page056, developerIndex: catalog.page057,
   developerStart: catalog.page058, developerEnd: catalog.developerTitle,
   developerDescription: catalog.page062, developer: catalog.page063, developerName: catalog.page064,
-  email: catalog.page065, githubAddress: catalog.page067, contactIndex: catalog.page068,
+  email: catalog.page065, githubAddress: catalog.page067, storybook: catalog.storybook, contactIndex: catalog.page068,
   contactQuestion: catalog.page069, mail: catalog.page070, copyright: catalog.page073,
   topLabel: catalog.page074, top: catalog.page075, appIndex: catalog.appIndex,
 } as const;

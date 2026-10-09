@@ -13,7 +13,7 @@ import { AndroidFilled, AppleFilled, ArrowUpOutlined, ExportOutlined, GithubOutl
 import { BrandProvider } from './BrandProvider';
 import StrategySection from './StrategySection';
 import { siteCopy as copy, appCopy } from './copy';
-import { apps, legalDocuments, portfolioSummary, type PortfolioApp } from './siteData';
+import { apps, legalDocuments, portfolioSummary, storybookUrl, type PortfolioApp } from './siteData';
 import './styles/site.css';
 
 const developerEmail = 'jimin1286@gmail.com';
@@ -161,6 +161,7 @@ export default function App() {
                   <div><dt><Text variant="label">{copy.developer}</Text></dt><dd><Text emphasis="strong">{copy.developerName}</Text></dd></div>
                   <div><dt><Text variant="label">{copy.email}</Text></dt><dd><Link href={`mailto:${developerEmail}`}>{developerEmail}</Link></dd></div>
                   <div><dt><Text variant="label">{copy.github}</Text></dt><dd><ExternalLink href={githubProfile}>{copy.githubAddress}</ExternalLink></dd></div>
+                  <div><dt><Text variant="label">{copy.storybook}</Text></dt><dd><ExternalLink href={storybookUrl}>storybook.jmstudioapps.com</ExternalLink></dd></div>
                 </dl>
               </Stack>
             </Grid></Section>

@@ -1,5 +1,6 @@
 // Page labels and product descriptions are source copy; URLs and release facts remain in siteData.
 export const ko = {
+"storybook": "HJM 스토리북",
 "page001": "본문 바로가기",
 "page002": "황지민 포트폴리오 홈",
 "page004": "Hwang Jimin",

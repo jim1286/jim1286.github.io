@@ -2,6 +2,8 @@ import { getCopy } from './i18n';
 // 정책 URL은 Hub config에서 생성한 policyLinks.generated.ts가 단일 원천이다(손으로 복사하지 않음).
 import { policyUrl } from './policyLinks.generated';
 const copy = getCopy();
+// The HJM showcase is independently hosted so its URLs survive portfolio rebuilds.
+export const storybookUrl = 'https://storybook.jmstudioapps.com/';
 export type PortfolioApp = {
   id: string;
   index: string;
