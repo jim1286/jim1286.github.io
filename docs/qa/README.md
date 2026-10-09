@@ -1,6 +1,6 @@
 # Portfolio Site QA 결과 색인
 
-검토일: 2026-10-09 · [QA 실행 안내](../QA.md) · [작성 템플릿](../templates/QA_REPORT.md)
+검토일: 2026-10-10 · [QA 실행 안내](../QA.md) · [작성 템플릿](../templates/QA_REPORT.md)
 
 2026-10-09 사용자 요청으로 최종 결과를 작업별 Markdown 리포트와 이 색인으로 통일했다. 링크된 판정은 각 기록의 실행 시점·대상·범위에만 유효하며, 이 색인이 현재 제품 통과를 뜻하지 않는다. 과거 폴더별 기록은 작업별 파일로 통합했고 기존 판정과 한계를 보존했다.
 
@@ -8,6 +8,7 @@
 
 | 작업 | 리포트 |
 | --- | --- |
+| 자체 도메인 HJM Storybook 연결 | [2026-10-10-storybook-link](2026-10-10-storybook-link.md) |
 | 도메인 이전 소비자·이력서 영향 조사 및 현재 링크 갱신 | [2026-10-09-domain-migration-impact](2026-10-09-domain-migration-impact.md) |
 | 포트폴리오 자체 도메인 이전 | [2026-10-09-owned-domain-deployment](2026-10-09-owned-domain-deployment.md) |
 | 자체 도메인 정책 링크 동기화 | [2026-10-09-policy-domain-links](2026-10-09-policy-domain-links.md) |
