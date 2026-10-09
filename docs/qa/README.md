@@ -7,10 +7,10 @@
 ## 작업별 리포트
 
 | 작업 | 리포트 |
-| 도메인 이전 소비자·이력서 영향 조사 | [2026-10-09-domain-migration-impact](2026-10-09-domain-migration-impact.md) |
+| --- | --- |
+| 도메인 이전 소비자·이력서 영향 조사 및 현재 링크 갱신 | [2026-10-09-domain-migration-impact](2026-10-09-domain-migration-impact.md) |
 | 포트폴리오 자체 도메인 이전 | [2026-10-09-owned-domain-deployment](2026-10-09-owned-domain-deployment.md) |
 | 자체 도메인 정책 링크 동기화 | [2026-10-09-policy-domain-links](2026-10-09-policy-domain-links.md) |
-| --- | --- |
 | 프로필·제품 정보 최신화와 마케팅 사례 통합 | [2026-10-09-profile-products-refresh](2026-10-09-profile-products-refresh.md) |
 | gh-pages 게시 이력 main 통합 | [2026-10-09-gh-pages-main-merge](2026-10-09-gh-pages-main-merge.md) |
 | QA 리포트 — HJM 개발 후보 CI | [2026-10-09-hjm-development-ci](2026-10-09-hjm-development-ci.md) |
