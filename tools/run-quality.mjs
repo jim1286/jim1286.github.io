@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-import { runBoundQuality } from './runtime-bindings.mjs';
+import { runBoundQuality, qualityOptions } from './runtime-bindings.mjs';
 import { resolve } from 'node:path';
-try { await runBoundQuality(resolve(import.meta.dirname, '..'), process.argv[2] ?? 'check'); }
+try { await runBoundQuality(resolve(import.meta.dirname, '..'), process.argv[2] ?? 'check', qualityOptions(process.argv.slice(3))); }
 catch (error) { console.error(error.message); process.exitCode = 1; }

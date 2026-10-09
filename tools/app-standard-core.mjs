@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 
 import { releaseQualityWorkflow } from './release-quality.mjs';
-import { readFileSync } from 'node:fs';
-import { execFile } from 'node:child_process';
+import { existsSync, readFileSync } from 'node:fs';
+import { execFile, execFileSync } from 'node:child_process';
 import {
   lstat,
   mkdir,
@@ -23,9 +23,9 @@ import {
 } from 'node:path';
 import { createHash } from 'node:crypto';
 import { fileURLToPath, pathToFileURL } from 'node:url';
-import { promisify } from 'node:util';
+import { promisify, isDeepStrictEqual } from 'node:util';
 import { checkDocLinks } from './check-doc-links.mjs';
-import { bound, bindingScripts, validateBindings, checkBindings, bindingWorkflow } from './runtime-bindings.mjs';
+import { yamlParser, bound, bindingScripts, validateBindings, checkBindings, bindingWorkflow } from './runtime-bindings.mjs';
 import { auditJsonSchema, validateWithJsonSchema } from './json-schema-validator.mjs';
 import { resolvedVersionViolation, trainLabel, trainViolation } from './version-train.mjs';
 import { analyzeHjmSource } from './hjm-source-analysis.mjs';
@@ -50,19 +50,6 @@ const canonicalCatalogSource = readFileSync(canonicalCatalogPath, 'utf8');
 const canonicalCatalog = JSON.parse(canonicalCatalogSource);
 const canonicalCatalogSha256 = createHash('sha256').update(canonicalCatalogSource).digest('hex');
 const expectedCatalogSha256 = canonicalRelease.catalog.sha256;
-const catalogMaturity = new Map(canonicalCatalog.components.map(({ id, status }) => [id, status]));
-// consumer-policy.md ships inside @hjmds/design-contracts (export "./consumer-policy.md"),
-// so the citable policy version is the one the pinned release published, recorded by
-// sync-design-system.mjs. A hardcoded '1.2.0' fell behind HJM 1.5's policy 1.3.0
-// unnoticed (2026-09-27 audit §5). sync-standard does not rewrite app contracts; when a
-// release bumps the policy, list the previous version here only until every app contract
-// is bumped by hand. 2026-09-27: all eight contracts moved to 1.3.0, so '1.2.0' was
-// removed. An empty list keeps an old citation failing instead of passing silently.
-const legacyCompanionPolicyVersions = [];
-const acceptedCompanionPolicyVersions = new Set([
-  ...(canonicalRelease.consumerPolicy ? [canonicalRelease.consumerPolicy.version] : []),
-  ...legacyCompanionPolicyVersions,
-]);
 const execFileAsync = promisify(execFile);
 
 const contractVersion = 1;
@@ -211,7 +198,7 @@ const usage = `Usage:
   node scripts/app-standard.mjs [--json] check-doc-links [--workspace-root PATH]
   node scripts/app-standard.mjs [--json] check-standard-assets
   node scripts/app-standard.mjs [--json] verify-initializers [--kind mobile|web|server]
-  node scripts/app-standard.mjs [--json] sync-standard --app-root PATH [--write]
+  node scripts/app-standard.mjs [--json] sync-standard --app-root PATH [--only PATH,PATH] [--write]
   node scripts/app-standard.mjs [--json] sync-docs --app-root PATH [--write]
   node scripts/app-standard.mjs [--json] digest-evidence --app-root PATH [--evidence EV-NNN]
 
@@ -263,7 +250,7 @@ function assertDesignReleaseRecord(release) {
       || !/^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$/.test(release.consumerPolicy.version)
       || release.consumerPolicy.sourcePath !== 'packages/design-contracts/docs/consumer-policy.md'
       || !/^[a-f0-9]{64}$/.test(release.consumerPolicy.contentSha256)))) {
-    throw new Error('Invalid central HJM release record; import a published release with sync-design-system.mjs.');
+    throw new Error('Invalid HJM release record; import a published release with sync-design-system.mjs.');
   }
   for (const name of packageNames) {
     const item = release.packages[name];
@@ -271,9 +258,47 @@ function assertDesignReleaseRecord(release) {
       || item.metadataUrl !== `https://registry.npmjs.org/${encodeURIComponent(name)}/${version}`
       || item.tarballUrl !== `https://registry.npmjs.org/${name}/-/${name.split('/')[1]}-${version}.tgz`
       || !/^sha512-[A-Za-z0-9+/]{86}==$/.test(item.integrity)) {
-      throw new Error(`Invalid central HJM release package: ${name}`);
+      throw new Error(`Invalid HJM release package: ${name}`);
     }
   }
+}
+
+// Applications adopt releases independently (NEW_APP_DEVELOPMENT_GUIDE §4).
+// Pass the selected bundle explicitly: mutable globals would leak one app's pin
+// into the next app during portfolio checks or concurrent tests.
+export function designReleaseContext(releaseSource, catalogSource) {
+  const release = JSON.parse(releaseSource);
+  assertDesignReleaseRecord(release);
+  const catalog = JSON.parse(catalogSource);
+  if (createHash('sha256').update(catalogSource).digest('hex') !== release.catalog.sha256
+    || catalog.$id !== `hjm.catalog-snapshot/${release.version}`
+    || catalog.designSystemVersion !== release.version
+    || JSON.stringify(catalog.source) !== JSON.stringify(release.source)
+    || !Array.isArray(catalog.components)
+    || catalog.components.some(({ id, status }) => !/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(id)
+      || !['stable', 'beta', 'planned', 'deprecated'].includes(status))
+    || new Set(catalog.components.map(({ id }) => id)).size !== catalog.components.length) {
+    throw new Error('HJM release catalog digest, provenance or components are invalid');
+  }
+  return { release, releaseSource, catalogSource, catalog };
+}
+
+async function loadAppDesignRelease(appRoot, contract, { allowMissing = false } = {}) {
+  const sources = [];
+  for (const path of [canonicalReleaseRelativePath, canonicalCatalogRelativePath]) {
+    const exists = await assertSyncPath(appRoot, path, { allowMissing });
+    sources.push(exists ? await readRegularTextFile(resolve(appRoot, path), path) : null);
+  }
+  // Only bootstrap missing records for the current default; never silently replace
+  // an existing or differently pinned release during a standard-tools update.
+  if (sources.some((source) => source === null)) {
+    if (contract.designSystem?.contracts?.version !== canonicalDesignVersion
+      || sources.some((source, i) => source !== null && source !== [canonicalReleaseSource, canonicalCatalogSource][i])) {
+      throw new Error('Missing app HJM release bundle; import its exact published version first');
+    }
+    return designReleaseContext(canonicalReleaseSource, canonicalCatalogSource);
+  }
+  return designReleaseContext(...sources);
 }
 
 function hasText(value) {
@@ -589,7 +614,12 @@ function validateToolchain(toolchain, runtimes, appId, findings) {
   }
 }
 
-function validateDesignSystem(designSystem, runtimes, acceptance, app, governance, findings, { implementationGate } = {}) {
+function validateDesignSystem(designSystem, runtimes, acceptance, app, governance, findings, { implementationGate, designRelease } = {}) {
+  const selected = designRelease ?? designReleaseContext(canonicalReleaseSource, canonicalCatalogSource);
+  const canonicalDesignVersion = selected.release.version;
+  const expectedCatalogSha256 = selected.release.catalog.sha256;
+  const catalogMaturity = new Map(selected.catalog.components.map(({ id, status }) => [id, status]));
+  const acceptedCompanionPolicyVersions = new Set(selected.release.consumerPolicy ? [selected.release.consumerPolicy.version] : []);
   if (!assertObject(designSystem, 'contract.designSystem', findings)) return;
   const runtimeKinds = new Set(Array.isArray(runtimes) ? runtimes.map(({ kind }) => kind) : []);
   const hasFrontend = runtimeKinds.has('mobile') || runtimeKinds.has('web');
@@ -622,7 +652,7 @@ function validateDesignSystem(designSystem, runtimes, acceptance, app, governanc
     }
     contractsVersion = designSystem.contracts.version;
     if (contractsVersion !== canonicalDesignVersion) {
-      addFinding(findings, 'DESIGN_VERSION_INVALID', 'contract.designSystem.contracts.version', `HJM-APP-STANDARD v1 requires exact HJM version ${canonicalDesignVersion} from ${canonicalReleaseRelativePath}.`);
+      addFinding(findings, 'DESIGN_VERSION_INVALID', 'contract.designSystem.contracts.version', `HJM-APP-STANDARD v1 requires the app-selected exact HJM version ${canonicalDesignVersion} from ${canonicalReleaseRelativePath}.`);
     }
   }
   if (designSystem.versionPolicy !== 'exact-and-aligned') {
@@ -1185,7 +1215,7 @@ function validateDeployment(deployment, findings) {
   }
 }
 
-export function validateAppContract(contract, { now = new Date(), targetStage } = {}) {
+export function validateAppContract(contract, { now = new Date(), targetStage, designRelease } = {}) {
   const implementationGate = resolveImplementationGate(contract, targetStage);
   const findings = [...validateWithJsonSchema(contract, canonicalSchema).findings];
   if (!assertObject(contract, 'contract', findings)) return { ok: false, findings };
@@ -1285,7 +1315,7 @@ export function validateAppContract(contract, { now = new Date(), targetStage } 
     contract.app,
     contract.governance,
     findings,
-    { implementationGate },
+    { implementationGate, designRelease },
   );
   validateI18n(contract.i18n, findings);
   validateRelease(contract.release, contract.runtimes, findings);
@@ -3130,6 +3160,7 @@ async function buildScaffoldFiles(contract) {
   const renderedAdr = substituteTemplate(adr, values);
 
   const files = new Map([
+    ...previewProjectionSources(contract),
     ['.github/CODEOWNERS', makeCodeowners(contract)],
     ['.github/dependabot.yml', makeDependabotConfig()],
     ['.github/workflows/quality-gate.yml', makeQualityGateWorkflow(contract)],
@@ -3812,11 +3843,125 @@ export async function syncDocumentProjections(appRoot, { write = false } = {}) {
   };
 }
 
+// Development feedback is explicitly selected per app; it must not inherit the
+// release-version trigger or broaden a single HJM edit into every consumer's CI.
+export function hjmPreviewWorkflow(contract) {
+  if (!contract.runtimes?.some(r => ['expo', 'nextjs', 'vite'].includes(r.framework))) return null;
+  return `name: HJM candidate compatibility (not release approval)
+# Opt-in integration feedback: no version bump and no automatic app rollout.
+on:
+  workflow_dispatch:
+    inputs:
+      hjm_sha:
+        description: Full HJM commit SHA to test without publishing
+        required: true
+        type: string
+      checks:
+        description: Fast frontend feedback or full product typecheck/test/build
+        type: choice
+        default: fast
+        options: [fast, full]
+permissions:
+  contents: read
+concurrency:
+  group: hjm-preview-\${{ github.ref }}-\${{ inputs.hjm_sha }}
+  cancel-in-progress: true
+jobs:
+  compatibility:
+    # Unpublished code runs on an ephemeral hosted runner, never a signing Mac.
+    runs-on: ubuntu-latest
+    # One sequential web/native consumer build can exceed the ordinary 30m gate.
+    timeout-minutes: 45
+    env:
+      HJM_CANDIDATE_SHA: \${{ inputs.hjm_sha }}
+      HJM_CHECK_MODE: \${{ inputs.checks }}
+      CI: 'true'
+      # Public disposable service fixtures, not application production secrets.
+      DATABASE_URL: postgresql://postgres:postgres@127.0.0.1:5432/app_test
+      REDIS_URL: redis://127.0.0.1:6379/10
+      DEVICE_TOKEN_SIGNING_KEY: public-ci-test-signing-key-at-least-32
+      LETTER_ENCRYPTION_KEY: AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: app_test
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U postgres -d app_test"
+          --health-interval 5s --health-timeout 5s --health-retries 12
+      redis:
+        image: redis:7-alpine
+        ports: ['6379:6379']
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 5s --health-timeout 5s --health-retries 12
+    defaults:
+      run:
+        working-directory: app
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: \${{ github.sha }}
+          path: app
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          # One Node declaration per app (baseline devEnvironment.node); the app sits under app/.
+          node-version-file: app/.nvmrc
+      - name: Validate immutable candidate identity
+        run: node -e 'if (!/^[a-f0-9]{40}$/.test(process.env.HJM_CANDIDATE_SHA) || /^0+$/.test(process.env.HJM_CANDIDATE_SHA)) process.exit(1)'
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          repository: jim1286/hjm-design-system
+          ref: \${{ inputs.hjm_sha }}
+          path: hjm
+          persist-credentials: false
+      - name: Enable package managers declared by each checkout
+        run: corepack enable
+      - name: Install app baseline from its frozen lockfile
+        run: pnpm install --frozen-lockfile
+      - name: Check app-selected baseline identity
+        run: node tools/hjm-preview.mjs baseline .
+      - name: Build unpublished HJM packages
+        working-directory: hjm
+        run: |
+          pnpm install --frozen-lockfile
+          pnpm build
+          pnpm typecheck
+      - name: Pack immutable candidate and overlay only this disposable app checkout
+        run: |
+          node tools/hjm-preview.mjs pack ../hjm ../hjm-artifacts "$HJM_CANDIDATE_SHA"
+          node tools/hjm-preview.mjs apply . ../hjm-artifacts "$HJM_CANDIDATE_SHA"
+          pnpm install --no-frozen-lockfile
+      - name: Run selected candidate checks
+        run: node tools/hjm-preview.mjs check . "$HJM_CHECK_MODE"
+      - name: Record candidate result
+        if: always()
+        env:
+          CANDIDATE_JOB_STATUS: \${{ job.status }}
+        run: |
+          node -e 'const fs=require("node:fs"); fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY, \`HJM candidate: \${process.env.HJM_CANDIDATE_SHA}\\n\\nApp: \${process.env.GITHUB_SHA}\\n\\nResult: \${process.env.CANDIDATE_JOB_STATUS}\\n\\nScope: \${process.env.HJM_CHECK_MODE} candidate checks. No publication, deployment, device QA, or release approval.\\n\`); if(fs.existsSync(".hjm-preview.json")) fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY, "\\n\`\`\`json\\n"+fs.readFileSync(".hjm-preview.json","utf8")+"\`\`\`\\n");'
+`;
+}
+
+function previewProjectionSources(contract) {
+  const workflow = hjmPreviewWorkflow(contract);
+  return workflow ? [
+    ['tools/hjm-preview.mjs', readFileSync(resolve(scriptDirectory, 'hjm-preview.mjs'), 'utf8')],
+    ['.github/workflows/hjm-preview.yml', workflow],
+  ] : [];
+}
+
 // One allow-list serves both verification and in-place standard updates. Product
 // contracts, prose, evidence, manifests, lockfiles and runtime sources are not owned here.
-function bindingProjectionSources(contract) {
+function bindingProjectionSources(contract, designRelease) {
+  const { releaseSource: canonicalReleaseSource, catalogSource: canonicalCatalogSource } = designRelease ?? designReleaseContext(readFileSync(resolve(defaultWorkspaceRoot, canonicalReleaseRelativePath), 'utf8'), readFileSync(canonicalCatalogPath, 'utf8'));
   const core = readFileSync(fileURLToPath(import.meta.url), 'utf8');
   return new Map([
+    ...previewProjectionSources(contract),
     ['.github/CODEOWNERS', makeCodeowners(contract)],
     ['.npmrc', canonicalNpmrcSource],
     ['.nvmrc', `${contract.toolchain.node}\n`],
@@ -3828,7 +3973,7 @@ function bindingProjectionSources(contract) {
     ['tools/runtime-bindings.mjs', readFileSync(resolve(scriptDirectory, 'runtime-bindings.mjs'), 'utf8')],
     ['tools/version-train.mjs', readFileSync(resolve(scriptDirectory, 'version-train.mjs'), 'utf8')],
     ['tools/hjm-source-analysis.mjs', readFileSync(resolve(scriptDirectory, 'hjm-source-analysis.mjs'), 'utf8')],
-    ['tools/run-quality.mjs', `#!/usr/bin/env node\nimport { runBoundQuality } from './runtime-bindings.mjs';\nimport { resolve } from 'node:path';\ntry { await runBoundQuality(resolve(import.meta.dirname, '..'), process.argv[2] ?? 'check'); }\ncatch (error) { console.error(error.message); process.exitCode = 1; }\n`],
+    ['tools/run-quality.mjs', `#!/usr/bin/env node\nimport { runBoundQuality, qualityOptions } from './runtime-bindings.mjs';\nimport { resolve } from 'node:path';\ntry { await runBoundQuality(resolve(import.meta.dirname, '..'), process.argv[2] ?? 'check', qualityOptions(process.argv.slice(3))); }\ncatch (error) { console.error(error.message); process.exitCode = 1; }\n`],
     ['tools/app-standard-core.mjs', core],
     ['tools/check-app-contract.mjs', makeLocalContractChecker()],
     ['tools/check-design-contract.mjs', makeLocalContractChecker()],
@@ -3842,9 +3987,113 @@ function bindingProjectionSources(contract) {
   ]);
 }
 
-export function standardProjectionSources(contract) {
-  if (bound(contract)) return bindingProjectionSources(contract);
+// Verbatim copies of central helpers. A stale copy of a committed central version
+// is an optional update; bytes that no central commit produced are a local fork of
+// the gate or its validator and stay a failure. Generated stubs (run-quality,
+// check-*-contract, check-hjm-source) and CODEOWNERS have no such history and
+// remain byte-strict: treating all of tools/ and .github/ as advisory let an app
+// rewrite run-quality.mjs while conformance stayed ok (2026-10-09 review).
+const verbatimProjectionOrigins = new Map([
+  ['tools/app-standard-core.mjs', 'scripts/app-standard.mjs'],
+  ...['runtime-bindings', 'version-train', 'hjm-source-analysis', 'check-doc-links', 'ci-change-scope', 'server-release-gate',
+    'release-quality', 'ci-resume', 'json-schema-validator', 'hjm-preview'].map(name => [`tools/${name}.mjs`, `scripts/${name}.mjs`]),
+]);
+// History lookups only mean something in the central checkout. An app's copy of
+// this file resolves defaultWorkspaceRoot to the app itself and must not treat
+// the app's own history as central provenance.
+const centralCheckout = existsSync(resolve(defaultWorkspaceRoot, 'portfolio.json'));
+const centralBlobCache = new Map();
+const gitBlobId = source => createHash('sha1').update(`blob ${Buffer.byteLength(source)}\0`).update(source).digest('hex');
+export function centralHistoryBlobs(path, root = defaultWorkspaceRoot) {
+  const key = `${root}\0${path}`;
+  if (!centralBlobCache.has(key)) {
+    let blobs = new Set();
+    try {
+      const raw = execFileSync('git', ['log', '--format=', '--raw', '--no-abbrev', '--no-renames', '--', path], { cwd: root, encoding: 'utf8', maxBuffer: 64 * 1024 * 1024, stdio: ['ignore', 'pipe', 'ignore'] });
+      blobs = new Set(raw.split('\n').map(line => line.split(/\s+/)[3]).filter(id => /^[a-f0-9]{40}$/.test(id) && !/^0+$/.test(id)));
+    } catch { /* No history: fail closed; drift is reported as a finding. */ }
+    centralBlobCache.set(key, blobs);
+  }
+  return centralBlobCache.get(key);
+}
+
+// Every HJM release record the central checkout ever registered, by version.
+// designReleaseContext only proves internal consistency: an app could edit its
+// catalog together with release.catalog.sha256 (e.g. beta -> stable) and pass.
+export function centralReleaseRecords(root = defaultWorkspaceRoot) {
+  const records = new Map();
+  const add = source => {
+    try {
+      const record = JSON.parse(source);
+      if (typeof record?.version === 'string') records.set(record.version, [...(records.get(record.version) ?? []), record]);
+    } catch { /* A malformed historical record registers nothing. */ }
+  };
+  add(readFileSync(resolve(root, canonicalReleaseRelativePath), 'utf8'));
+  for (const id of centralHistoryBlobs(canonicalReleaseRelativePath, root)) {
+    try { add(execFileSync('git', ['cat-file', '-p', id], { cwd: root, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] })); }
+    catch { /* Unreachable blob: skip; an unknown version is reported, not trusted. */ }
+  }
+  return records;
+}
+
+// Workflows are checked by execution invariants instead of bytes; editor config
+// is presentation. Everything else that is projected stays byte-strict unless it
+// is a stale but genuine central helper.
+export function projectionIsAdvisory(path, actualSource, { root = defaultWorkspaceRoot, central = centralCheckout } = {}) {
+  if (path === '.editorconfig' || path === '.github/dependabot.yml' || path.startsWith('.github/workflows/')) return true;
+  const origin = verbatimProjectionOrigins.get(path);
+  return Boolean(origin && central && typeof actualSource === 'string' && centralHistoryBlobs(origin, root).has(gitBlobId(actualSource)));
+}
+
+export function workflowInvariantErrors(actual, expected) {
+  const errors = [];
+  const same = isDeepStrictEqual;
+  const needs = value => value === undefined ? [] : Array.isArray(value) ? value : [value];
+  if (!actual || typeof actual !== 'object') return ['Workflow must be an object'];
+  // Trigger/permission/environment changes affect authority or what the required
+  // commands execute; names, formatting, runner, timeout, concurrency, extra jobs
+  // and steps after the last required step can vary without copying a central
+  // byte snapshot. The 2026-10-09 review bypassed a looser version by adding an
+  // `if: false` dependency job and by rewriting tools/ before the required step.
+  for (const key of ['on', 'permissions', 'defaults', 'env']) if (!same(actual[key], expected[key])) errors.push(`${key} differs from the declared contract`);
+  for (const [id, required] of Object.entries(expected.jobs ?? {})) {
+    const job = actual.jobs?.[id];
+    if (!job) { errors.push(`Missing job ${id}`); continue; }
+    for (const key of ['if', 'permissions', 'strategy', 'defaults', 'container', 'env']) if (!same(job[key], required[key])) errors.push(`${id}.${key} changes execution`);
+    for (const [name, value] of Object.entries(required.services ?? {}))
+      if (!same(job.services?.[name], value)) errors.push(`${id} changes required services.${name}`);
+    if (job['continue-on-error']) errors.push(`${id} ignores failure`);
+    // A skipped dependency skips this job, and GitHub reports a skipped required job as passing.
+    const actualNeeds = needs(job.needs), requiredNeeds = needs(required.needs);
+    if (actualNeeds.length !== requiredNeeds.length || !requiredNeeds.every(n => actualNeeds.includes(n))) errors.push(`${id} changes required dependencies`);
+    const steps = Array.isArray(job.steps) ? job.steps : [];
+    const matched = new Set();
+    let cursor = 0;
+    for (const step of required.steps ?? []) {
+      const index = steps.findIndex((candidate, i) => i >= cursor &&
+        (step.run !== undefined ? candidate.run === step.run : candidate.uses === step.uses ||
+          (typeof candidate.uses === 'string' && /@[a-f0-9]{40}$/.test(candidate.uses) && /@[a-f0-9]{40}$/.test(step.uses ?? '') && candidate.uses.split('@')[0] === step.uses.split('@')[0])));
+      if (index < 0) { errors.push(`${id} missing command/action ${step.run ?? step.uses}`); continue; }
+      const candidate = steps[index]; cursor = index + 1; matched.add(index);
+      for (const key of ['if', 'continue-on-error', 'working-directory', 'shell', 'id'])
+        if (!same(candidate[key], step[key])) errors.push(`${id} required step changes ${key}`);
+      // Extra `with`/`env` keys (checkout ref, NODE_OPTIONS) change what runs.
+      for (const key of ['with', 'env']) {
+        const want = step[key] && 'CI_RESUME_JOB_NAME' in step[key] && key === 'env' ? { ...step[key], CI_RESUME_JOB_NAME: job.name ?? id } : step[key];
+        if (!same(candidate[key], want)) errors.push(`${id} required step changes ${key}`);
+      }
+    }
+    const last = Math.max(-1, ...matched);
+    for (let i = 0; i < last; i++) if (!matched.has(i)) errors.push(`${id} inserts step ${steps[i]?.name ?? steps[i]?.run ?? steps[i]?.uses ?? i} before required execution`);
+  }
+  return errors;
+}
+
+export function standardProjectionSources(contract, designRelease) {
+  const { releaseSource: canonicalReleaseSource, catalogSource: canonicalCatalogSource } = designRelease ?? designReleaseContext(readFileSync(resolve(defaultWorkspaceRoot, canonicalReleaseRelativePath), 'utf8'), readFileSync(canonicalCatalogPath, 'utf8'));
+  if (bound(contract)) return bindingProjectionSources(contract, designRelease);
   return new Map([
+    ...previewProjectionSources(contract),
     ['.github/CODEOWNERS', makeCodeowners(contract)],
     ['.github/dependabot.yml', makeDependabotConfig()],
     ['.npmrc', canonicalNpmrcSource],
@@ -3887,15 +4136,25 @@ async function assertSyncPath(appRoot, path, { allowMissing = false } = {}) {
   return true;
 }
 
-export async function syncStandardProjections(appRoot, { write = false } = {}) {
+export async function syncStandardProjections(appRoot, { write = false, only = [] } = {}) {
   if (basename(scriptDirectory) === 'tools') {
     throw Object.assign(new Error('Run sync-standard from the central portfolio checkout, not a vendored app validator.'), { code: 'CENTRAL_STANDARD_REQUIRED' });
   }
   const { workspaceRoot: absoluteRoot } = await ensureSafeWorkspaceRoot(appRoot);
   await assertSyncPath(absoluteRoot, 'app.contract.json');
   const { contract } = await loadAppContract(resolve(absoluteRoot, 'app.contract.json'));
-  const validation = validateAppContract(contract);
-  if (!validation.ok) return { ...validation, appRoot: absoluteRoot };
+  let designRelease;
+  try { designRelease = await loadAppDesignRelease(absoluteRoot, contract, { allowMissing: true }); }
+  catch (error) { return { ok: false, appRoot: absoluteRoot, findings: [finding('DESIGN_RELEASE_INVALID', canonicalReleaseRelativePath, error.message)] }; }
+  const validation = validateAppContract(contract, { designRelease });
+  // Updating a validator must not require already passing that newer validator.
+  // An explicit development-tools-only sync leaves unrelated contract findings
+  // visible and never changes product contracts or grants conformance.
+  const developmentTools = new Set(['tools/app-standard-core.mjs', 'tools/hjm-preview.mjs', '.github/workflows/hjm-preview.yml', 'tools/release-quality.mjs', 'tools/server-release-gate.mjs', 'tools/runtime-bindings.mjs', 'tools/run-quality.mjs', 'tools/check-doc-links.mjs']);
+  const toolsOnly = Array.isArray(only) && only.length > 0 && only.every(path => developmentTools.has(path));
+  if (!validation.ok && !toolsOnly) return { ...validation, appRoot: absoluteRoot };
+  if (!idPattern.test(contract.app?.id ?? '') || !/^\d+\.\d+\.\d+$/.test(contract.toolchain?.node ?? '')
+    || !Array.isArray(contract.runtimes)) throw new Error('App identity, Node version and runtimes are required for tool sync');
   if (basename(absoluteRoot) !== contract.app.id) {
     throw Object.assign(new Error('App root basename must match contract.app.id.'), { code: 'APP_ROOT_ID_MISMATCH' });
   }
@@ -3903,10 +4162,25 @@ export async function syncStandardProjections(appRoot, { write = false } = {}) {
   const findings = [];
   // Only explicitly introduced central projections may be created during migration.
   // Missing older scaffold files still require repair, and symlinks are rejected.
-  const mayCreate = new Set(['tools/release-quality.mjs', 'tools/server-release-gate.mjs', canonicalReleaseRelativePath, canonicalCatalogRelativePath, 'tools/ci-change-scope.mjs', 'tools/ci-resume.mjs', 'tools/runtime-bindings.mjs', 'tools/version-train.mjs', 'tools/hjm-source-analysis.mjs', 'tools/check-hjm-source.mjs']);
+  const mayCreate = new Set(['tools/hjm-preview.mjs', '.github/workflows/hjm-preview.yml', 'tools/release-quality.mjs', 'tools/server-release-gate.mjs', canonicalReleaseRelativePath, canonicalCatalogRelativePath, 'tools/ci-change-scope.mjs', 'tools/ci-resume.mjs', 'tools/runtime-bindings.mjs', 'tools/version-train.mjs', 'tools/hjm-source-analysis.mjs', 'tools/check-hjm-source.mjs']);
   const readProjection = async (path) => await assertSyncPath(absoluteRoot, path, { allowMissing: mayCreate.has(path) })
     ? readRegularTextFile(resolve(absoluteRoot, path), path) : null;
-  for (const [path, expected] of standardProjectionSources(contract)) {
+  const projections = standardProjectionSources(contract, designRelease);
+  if (only.includes('tools/app-standard-core.mjs')) {
+    only = [...only];
+    // Older checkouts predate these core imports. Add missing dependencies to
+    // the plan so a partial tool update cannot leave an unloadable validator.
+    for (const path of ['tools/release-quality.mjs', 'tools/server-release-gate.mjs']) {
+      if (!await statWithoutFollowing(resolve(absoluteRoot, path))) only.push(path);
+    }
+  }
+  if (!Array.isArray(only) || only.some(path => !projections.has(path))) {
+    throw new Error('--only must name standard-owned projection paths for this app');
+  }
+  // A tooling change can be adopted without sweeping unrelated policy updates
+  // into a shared checkout. Full conformance still reports remaining drift.
+  for (const [path, expected] of projections) {
+    if (only.length && !only.includes(path)) continue;
     try {
       const original = await readProjection(path);
       if (original !== expected) updates.push({ path, original, expected });
@@ -3941,6 +4215,7 @@ export async function syncStandardProjections(appRoot, { write = false } = {}) {
   return {
     ok: findings.length === 0, appRoot: absoluteRoot,
     action: write && findings.length === 0 ? 'write' : 'dry-run',
+    contractFindings: validation.findings,
     standardUpdates: updates.map(({ path, original, expected }) => ({ path, beforeSha256: digest(original), afterSha256: digest(expected) })),
     findings,
   };
@@ -4194,6 +4469,9 @@ async function checkDeclaredBetaUsage(appRoot, contract, findings) {
 export async function checkAppConformance(appRoot, { now = new Date(), targetStage } = {}) {
   const absoluteRoot = resolve(appRoot);
   const findings = [];
+  if (await statWithoutFollowing(resolve(absoluteRoot, '.hjm-preview.json'))) {
+    addFinding(findings, 'HJM_PREVIEW_NOT_RELEASE_ELIGIBLE', '.hjm-preview.json', 'Candidate overlays are development feedback only; release from a clean checkout with published dependencies.');
+  }
   resolveImplementationGate(undefined, targetStage);
   const rootStat = await statWithoutFollowing(absoluteRoot);
   if (!rootStat || !rootStat.isDirectory() || rootStat.isSymbolicLink()) {
@@ -4217,7 +4495,13 @@ export async function checkAppConformance(appRoot, { now = new Date(), targetSta
   const implementationGate = resolveImplementationGate(contract, targetStage);
   const declaredStage = requiresImplementationGate(contract.app, contract.governance) ? 'implementation-conformant' : 'governance-scaffold';
   const rehearsal = implementationGate && declaredStage !== 'implementation-conformant';
-  findings.push(...validateAppContract(contract, { now, targetStage }).findings);
+  let designRelease;
+  try { designRelease = await loadAppDesignRelease(absoluteRoot, contract); }
+  catch (error) {
+    addFinding(findings, 'DESIGN_RELEASE_INVALID', canonicalReleaseRelativePath, error.message);
+    designRelease = designReleaseContext(canonicalReleaseSource, canonicalCatalogSource);
+  }
+  findings.push(...validateAppContract(contract, { now, targetStage, designRelease }).findings);
   if (!isPlainObject(contract.app) || !idPattern.test(contract.app.id || '')) {
     return { ok: false, appRoot: absoluteRoot, findings };
   }
@@ -4237,6 +4521,7 @@ export async function checkAppConformance(appRoot, { now = new Date(), targetSta
   }
 
   const requiredFiles = bound(contract) ? [...bindingProjectionSources(contract).keys(), '.github/dependabot.yml', ...Object.entries(canonicalDocuments).filter(([key]) => key !== 'decisionsDir').map(([,path]) => path)] : [
+    ...previewProjectionSources(contract).map(([path]) => path),
     '.github/CODEOWNERS',
     '.github/dependabot.yml',
     '.github/workflows/quality-gate.yml',
@@ -4276,14 +4561,24 @@ export async function checkAppConformance(appRoot, { now = new Date(), targetSta
     });
     if (source !== null) fileSources.set(path, source);
   }
-  const canonicalProjectionSources = standardProjectionSources(contract);
+  const advisories = [];
+  // A version central registered must match that record exactly. A version central
+  // has not registered yet stays allowed (apps adopt independently, AGENTS.md
+  // 2026-10-09) but is reported so the import is re-verified against npm.
+  if (centralCheckout && designRelease) {
+    const registered = centralReleaseRecords().get(designRelease.release.version);
+    if (!registered) addFinding(advisories, 'DESIGN_RELEASE_UNREGISTERED', canonicalReleaseRelativePath, `HJM ${designRelease.release.version} is not registered centrally; re-run node scripts/sync-design-system.mjs --app-root PATH --version ${designRelease.release.version} to confirm the record against npm.`);
+    else if (!registered.some(record => isDeepStrictEqual(record, designRelease.release)))
+      addFinding(findings, 'DESIGN_RELEASE_PROVENANCE', canonicalReleaseRelativePath, `HJM ${designRelease.release.version} record differs from the centrally registered record; re-import it with sync-design-system --app-root.`);
+  }
+  const canonicalProjectionSources = standardProjectionSources(contract, designRelease);
   for (const [path, expectedSource] of canonicalProjectionSources) {
     const actualSource = fileSources.get(path);
     if (actualSource !== undefined && actualSource !== expectedSource) {
-      addFinding(findings, 'STANDARD_PROJECTION_DRIFT', path, `${path} bytes differ from the canonical standard projection; run central sync-standard --app-root PATH to review updates, then repeat with --write.`);
+      addFinding(projectionIsAdvisory(path, actualSource) ? advisories : findings, 'STANDARD_PROJECTION_DRIFT', path, `${path} bytes differ from the canonical standard projection; run central sync-standard --app-root PATH to review updates, then repeat with --write.`);
     }
   }
-  if (bound(contract)) await checkBindings(absoluteRoot, contract, findings, canonicalRelease, { implementationGate });
+  if (bound(contract)) await checkBindings(absoluteRoot, contract, findings, designRelease.release, { implementationGate });
   else {
     await checkPackageManagerRegistryBoundary(absoluteRoot, contract, findings);
   }
@@ -4400,9 +4695,23 @@ export async function checkAppConformance(appRoot, { now = new Date(), targetSta
   if (nvmrc && nvmrc.trim() !== contract.toolchain?.node) {
     addFinding(findings, 'NODE_VERSION_MISMATCH', '.nvmrc', '.nvmrc must exactly match contract.toolchain.node.');
   }
-  const qualityWorkflow = fileSources.get('.github/workflows/quality-gate.yml');
-  if (qualityWorkflow && qualityWorkflow !== (bound(contract) ? bindingWorkflow(contract) : makeQualityGateWorkflow(contract))) {
-    addFinding(findings, 'QUALITY_WORKFLOW_NONCANONICAL', '.github/workflows/quality-gate.yml', 'Quality workflow must exactly match the generated v1 workflow; comments or alternate no-op steps cannot satisfy this gate.');
+  // Bound apps gate on app-standard.yml; checking only quality-gate.yml left their
+  // real gate unchecked once workflow drift became advisory (2026-10-09 review).
+  const gateWorkflows = [
+    [bound(contract) ? '.github/workflows/app-standard.yml' : '.github/workflows/quality-gate.yml', bound(contract) ? bindingWorkflow(contract) : makeQualityGateWorkflow(contract)],
+    ['.github/workflows/hjm-preview.yml', hjmPreviewWorkflow(contract)],
+  ];
+  for (const [path, expected] of gateWorkflows) {
+    const actual = fileSources.get(path);
+    if (!actual || !expected) continue;
+    try {
+      // A fresh canonical scaffold validates before installing parser dependencies.
+      const errors = actual === expected ? [] : workflowInvariantErrors(yamlParser(absoluteRoot).parse(actual), yamlParser(absoluteRoot).parse(expected));
+      for (const error of errors)
+        addFinding(findings, 'QUALITY_WORKFLOW_INVARIANT', path, error);
+    } catch (error) {
+      addFinding(findings, 'QUALITY_WORKFLOW_INVALID', path, error.message);
+    }
   }
   for (const [key, path] of Object.entries(canonicalDocuments)) {
     if (key === 'decisionsDir') continue;
@@ -4514,6 +4823,7 @@ export async function checkAppConformance(appRoot, { now = new Date(), targetSta
   const result = {
     ok,
     appRoot: absoluteRoot,
+    advisories,
     mode: rehearsal ? 'rehearsal' : 'conformance',
     declaredStage,
     // A rehearsal never grants a stage: the contract still declares draft governance.
@@ -4977,6 +5287,9 @@ function parseArguments(argv) {
       options.json = true;
     } else if (argument === '--write') {
       options.write = true;
+    } else if (argument === '--only') {
+      options.only = (argv[++index] || '').split(',').filter(Boolean);
+      if (!options.only.length) throw new Error('--only requires comma-separated projection paths');
     } else if (argument === '--contract') {
       options.contractPath = argv[index + 1];
       index += 1;
@@ -5038,7 +5351,7 @@ export async function execute(argv) {
     if (options.command === 'validate-contract') {
       if (!options.contractPath) throw Object.assign(new Error('validate-contract requires --contract PATH.'), { code: 'CONTRACT_ARGUMENT_REQUIRED' });
       const { contract, contractPath } = await loadAppContract(options.contractPath);
-      result = { ...await validateAgainstCanonicalStandard(contract), contractPath };
+      result = { ...validateAppContract(contract, { designRelease: basename(contractPath) === 'app.contract.json' ? await loadAppDesignRelease(dirname(contractPath), contract, { allowMissing: true }) : undefined }), contractPath };
     } else if (options.command === 'create') {
       if (!options.contractPath) throw Object.assign(new Error('create requires --contract PATH.'), { code: 'CONTRACT_ARGUMENT_REQUIRED' });
       const { contract, contractPath } = await loadAppContract(options.contractPath);
@@ -5054,7 +5367,7 @@ export async function execute(argv) {
       result = await verifyInitializerProvenance({ kinds: options.kinds });
     } else if (options.command === 'sync-standard') {
       if (!options.appRoot) throw Object.assign(new Error('sync-standard requires --app-root PATH.'), { code: 'APP_ROOT_ARGUMENT_REQUIRED' });
-      result = await syncStandardProjections(options.appRoot, { write: options.write });
+      result = await syncStandardProjections(options.appRoot, { write: options.write, only: options.only });
     } else if (options.command === 'sync-docs') {
       if (!options.appRoot) throw Object.assign(new Error('sync-docs requires --app-root PATH.'), { code: 'APP_ROOT_ARGUMENT_REQUIRED' });
       result = await syncDocumentProjections(options.appRoot, { write: options.write });
@@ -5075,6 +5388,7 @@ export async function execute(argv) {
 }
 
 function writeHumanResult(result) {
+  for (const item of result.advisories ?? []) process.stdout.write(`  advisory [${item.code}] ${item.path}: ${item.code === 'STANDARD_PROJECTION_DRIFT' ? 'optional standard update' : item.message}\n`);
   if (result.usage) process.stdout.write(`${result.usage}\n`);
   if (result.ok && !result.usage) {
     if (result.standardUpdates !== undefined) {

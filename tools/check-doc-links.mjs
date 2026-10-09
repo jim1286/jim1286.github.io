@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-import { spawn } from 'node:child_process';
+import { execFileSync, spawn } from 'node:child_process';
 import { lstat, readFile, readdir } from 'node:fs/promises';
 import { dirname, extname, isAbsolute, relative, resolve, sep } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
@@ -21,6 +21,8 @@ const ignoredDirectories = new Set([
   'node_modules',
   'outputs',
   'reports',
+  // Personal scratch notes are not maintained documentation (2026-10-09).
+  'scratchpad',
 ]);
 
 /**
@@ -378,21 +380,40 @@ function markdownAnchors(source) {
   return anchors;
 }
 
-export async function checkDocLinks({ rootPath = defaultRoot } = {}) {
+export async function checkDocLinks({ rootPath = defaultRoot, changed = false, base } = {}) {
   const absoluteRoot = resolve(rootPath);
   const findings = [];
   const { portfolioMode, roots: independentRoots } = await loadIndependentRoots(absoluteRoot);
   const walked = await collectMarkdownFiles(absoluteRoot, { portfolioMode });
   const ignored = await ignoredByGit(absoluteRoot, walked);
   const files = walked.filter((file) => !ignored.has(file));
+  // Scoped runs still walk every document: a deleted/renamed file or a changed
+  // heading breaks links in documents that did not change, and checking only the
+  // changed sources let those reach main (2026-10-09 review). Keep findings whose
+  // source changed or whose target changed; leave old unrelated debt to the full
+  // audit. Independent module checkouts are outside root git diff; their own
+  // tools/check-doc-links.mjs and the scheduled full audit cover them.
+  let changedPaths = null;
+  if (changed || base) {
+    const git = args => execFileSync('git', ['-C', absoluteRoot, ...args], { encoding: 'utf8' }).split('\0').filter(Boolean);
+    changedPaths = new Set([
+      ...git(['diff', '--name-only', '-z', '--no-renames', '--diff-filter=ACMRD', ...(base ? [base] : [])]),
+      ...git(['diff', '--cached', '--name-only', '-z', '--no-renames', '--diff-filter=ACMRD']),
+      ...git(['ls-files', '--others', '--exclude-standard', '-z']),
+    ].map(path => resolve(absoluteRoot, path)));
+  }
+  let filesChecked = 0;
   const anchorCache = new Map();
 
   for (const filePath of files) {
+    const sourceChanged = !changedPaths || changedPaths.has(filePath);
+    const report = (target, item) => { if (sourceChanged || (target && changedPaths.has(target))) findings.push(item); };
     const source = await readFile(filePath, 'utf8');
     const sourceLabel = relative(absoluteRoot, filePath);
+    if (sourceChanged) filesChecked += 1;
     const referenceData = markdownReferenceData(source);
     for (const { label, line } of referenceData.unresolved) {
-      findings.push(finding(
+      report(null, finding(
         'LINK_REFERENCE_UNRESOLVED',
         `${sourceLabel}:${line}`,
         `Reference-style Markdown link has no definition: ${label}`,
@@ -411,7 +432,7 @@ export async function checkDocLinks({ rootPath = defaultRoot } = {}) {
       try {
         decodedPath = decodeURIComponent(rawPath);
       } catch {
-        findings.push(finding(
+        report(null, finding(
           'LINK_ENCODING_INVALID',
           `${sourceLabel}:${line}`,
           `Local link has invalid percent encoding: ${destination}`,
@@ -419,7 +440,7 @@ export async function checkDocLinks({ rootPath = defaultRoot } = {}) {
         continue;
       }
       if (isAbsolute(decodedPath)) {
-        findings.push(finding(
+        report(null, finding(
           'ABSOLUTE_LOCAL_LINK',
           `${sourceLabel}:${line}`,
           `Local Markdown links must be repository-relative: ${destination}`,
@@ -431,7 +452,7 @@ export async function checkDocLinks({ rootPath = defaultRoot } = {}) {
         ? filePath
         : resolve(dirname(filePath), decodedPath || '.');
       if (!isInside(absoluteRoot, targetPath)) {
-        findings.push(finding(
+        report(targetPath, finding(
           'LINK_ESCAPES_ROOT',
           `${sourceLabel}:${line}`,
           `Local link escapes the portfolio root: ${destination}`,
@@ -447,13 +468,13 @@ export async function checkDocLinks({ rootPath = defaultRoot } = {}) {
 
       const inspected = await inspectPathWithoutSymlink(absoluteRoot, targetPath);
       if (inspected.symlinkPath) {
-        findings.push(finding(
+        report(targetPath, finding(
           'LINK_TARGET_SYMLINK',
           `${sourceLabel}:${line}`,
           `Local documentation target traverses a symlink: ${destination}`,
         ));
       } else if (!inspected.exists) {
-        findings.push(finding(
+        report(targetPath, finding(
           'LINK_TARGET_MISSING',
           `${sourceLabel}:${line}`,
           `Local documentation target does not exist: ${destination}`,
@@ -463,7 +484,7 @@ export async function checkDocLinks({ rootPath = defaultRoot } = {}) {
         try {
           decodedFragment = decodeURIComponent(rawFragment);
         } catch {
-          findings.push(finding(
+          report(targetPath, finding(
             'LINK_ANCHOR_ENCODING_INVALID',
             `${sourceLabel}:${line}`,
             `Local link anchor has invalid percent encoding: ${destination}`,
@@ -477,7 +498,7 @@ export async function checkDocLinks({ rootPath = defaultRoot } = {}) {
           anchorCache.set(targetPath, anchors);
         }
         if (!anchors.has(decodedFragment)) {
-          findings.push(finding(
+          report(targetPath, finding(
             'LINK_ANCHOR_MISSING',
             `${sourceLabel}:${line}`,
             `Local Markdown anchor does not exist: ${destination}`,
@@ -487,17 +508,24 @@ export async function checkDocLinks({ rootPath = defaultRoot } = {}) {
     }
   }
 
-  return { ok: findings.length === 0, filesChecked: files.length, findings };
+  return { ok: findings.length === 0, filesChecked: changedPaths ? filesChecked : files.length, findings };
 }
 
 async function main(argv) {
   let rootPath = defaultRoot;
   let json = false;
+  let changed = false;
+  let base;
   for (let index = 0; index < argv.length; index += 1) {
     const argument = argv[index];
     if (argument === '--root') {
       rootPath = argv[index + 1];
       index += 1;
+    } else if (argument === '--changed') {
+      changed = true;
+    } else if (argument === '--base') {
+      base = argv[++index];
+      if (!base || base.startsWith('--')) throw new Error('--base requires a Git ref');
     } else if (argument === '--json') {
       json = true;
     } else {
@@ -506,7 +534,7 @@ async function main(argv) {
   }
   if (!rootPath) throw new Error('--root requires a path.');
 
-  const result = await checkDocLinks({ rootPath });
+  const result = await checkDocLinks({ rootPath, changed, base });
   if (json) {
     process.stdout.write(`${JSON.stringify(result, null, 2)}\n`);
   } else if (result.ok) {

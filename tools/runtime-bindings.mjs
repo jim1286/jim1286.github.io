@@ -70,7 +70,7 @@ async function regular(root, path, directory = false) {
   if (directory ? !stat.isDirectory() : !stat.isFile()) throw new Error(`Wrong file type: ${path}`);
   return absolute;
 }
-function yamlParser(root) {
+export function yamlParser(root) {
   const base = basename(import.meta.dirname) === 'scripts'
     ? resolve(import.meta.dirname, 'library-policy-tools/package.json') : resolve(root, 'package.json');
   return createRequire(base)('yaml');
@@ -192,32 +192,47 @@ export async function initializeFixtureAssets(root, runtime) {
   }
 }
 
-export function boundQualitySteps(contract, role) {
+export function boundQualitySteps(contract, role, { runtimeIds = [] } = {}) {
   if (!['check', 'check-ci', ...bindingRoles].includes(role)) throw new Error('Choose check, check-ci, typecheck, test or build');
+  for (const id of runtimeIds) if (!contract.runtimes.some(runtime => runtime.id === id)) throw new Error(`Unknown runtime: ${id}`);
+  const runtimes = contract.runtimes.filter(runtime => !runtimeIds.length || runtimeIds.includes(runtime.id));
   const targets = ['check', 'check-ci'].includes(role) ? bindingRoles : [role];
-  return targets.flatMap(target => contract.runtimes.map(runtime => ({
+  return targets.flatMap(target => runtimes.map(runtime => ({
     runtime, target,
     execution: role === 'check-ci' && target === 'build' && runtime.framework === 'flutter' ? 'local-only' : 'run',
   })));
 }
 
-export async function runBoundQuality(root, role) {
+// Local checks tolerate patch/minor updates within the declared major; CI remains
+// exact for reproducibility. Rejecting every local patch blocked unrelated edits.
+export function assertToolchainVersion(name, actual, expected, strict) {
+  if (actual === expected) return;
+  if (strict || !/^\d+\.\d+\.\d+$/.test(actual) || !/^\d+\.\d+\.\d+$/.test(expected) || actual.split('.')[0] !== expected.split('.')[0])
+    throw new Error(`Use ${name} ${expected}; current ${actual}`);
+  console.warn(`${name} ${actual}: local compatible major; CI uses ${expected}`);
+}
+
+export async function runBoundQuality(root, role, options = {}) {
   const contract = JSON.parse(await readFile(resolve(root, 'app.contract.json'), 'utf8'));
-  if (process.versions.node !== contract.toolchain.node) throw new Error(`Use Node ${contract.toolchain.node}; current ${process.versions.node}`);
+  const strict = role === 'check-ci' || Boolean(process.env.CI && process.env.CI !== 'false') || process.env.GITHUB_ACTIONS === 'true';
+  assertToolchainVersion('Node', process.versions.node, contract.toolchain.node, strict);
   const pnpmVersion = (await execFileAsync('pnpm', ['--version'], { cwd: root })).stdout.trim();
-  if (pnpmVersion !== contract.toolchain.packageManager.version) throw new Error(`Use pnpm ${contract.toolchain.packageManager.version}; current ${pnpmVersion}`);
-  const findings = []; validateBindings(contract, findings);
+  assertToolchainVersion('pnpm', pnpmVersion, contract.toolchain.packageManager.version, strict);
+  const steps = boundQualitySteps(contract, role, options);
+  const selectedRuntimes = [...new Set(steps.map(step => step.runtime))];
+  // A direct scoped check validates the selected binding, not an unrelated runtime under repair.
+  const findings = []; validateBindings({ ...contract, runtimes: selectedRuntimes }, findings);
   if (findings.length) throw new Error(JSON.stringify(findings));
-  const steps = boundQualitySteps(contract, role);
   if (process.env.GITHUB_ACTIONS === 'true' && steps.some(step => step.runtime.framework === 'flutter' && step.target === 'build' && step.execution === 'run'))
     throw new Error('Flutter builds run locally. Use check-ci on GitHub Actions and provide separate local build evidence.');
   const run = async (argv, cwd) => new Promise((resolveResult, reject) => {
     const child = spawn(argv[0], argv.slice(1), { cwd, stdio: 'inherit', shell: false });
     child.on('error', reject); child.on('exit', (code, signal) => code === 0 ? resolveResult() : reject(new Error(`Command failed (${code ?? signal}): ${argv.join(' ')}`)));
   });
-  await run([process.execPath, 'tools/check-app-contract.mjs'], root);
-  if (['check', 'check-ci'].includes(role)) await run([process.execPath, 'tools/check-doc-links.mjs'], root);
-  for (const runtime of contract.runtimes) {
+  // Direct typecheck/test/build must remain usable while governance edits are in progress.
+  if (['check', 'check-ci'].includes(role)) await run([process.execPath, 'tools/check-app-contract.mjs'], root);
+  if (['check', 'check-ci'].includes(role)) await run([process.execPath, 'tools/check-doc-links.mjs', ...(strict ? [] : ['--changed'])], root);
+  for (const runtime of selectedRuntimes) {
     const cwd = await regular(root, runtime.root, true);
     if (runtime.framework === 'flutter') {
       const sdk = JSON.parse((await execFileAsync('flutter', ['--version', '--machine'], { cwd, maxBuffer: 1024 * 1024 })).stdout);
@@ -238,7 +253,14 @@ export async function runBoundQuality(root, role) {
   }
 }
 
+export function qualityOptions(args) {
+  return { runtimeIds: args.map(argument => {
+    if (!argument.startsWith('--runtime=') || !argument.slice(10)) throw new Error(`Unknown argument: ${argument}`);
+    return argument.slice(10);
+  }) };
+}
+
 if (process.argv[1] && import.meta.url === pathToFileURL(resolve(process.argv[1])).href) {
-  try { await runBoundQuality(resolve(import.meta.dirname, '..'), process.argv[2] ?? 'check'); }
+  try { await runBoundQuality(resolve(import.meta.dirname, '..'), process.argv[2] ?? 'check', qualityOptions(process.argv.slice(3))); }
   catch (error) { console.error(error.message); process.exitCode = 1; }
 }

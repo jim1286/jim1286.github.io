@@ -1,0 +1,97 @@
+name: HJM candidate compatibility (not release approval)
+# Opt-in integration feedback: no version bump and no automatic app rollout.
+on:
+  workflow_dispatch:
+    inputs:
+      hjm_sha:
+        description: Full HJM commit SHA to test without publishing
+        required: true
+        type: string
+      checks:
+        description: Fast frontend feedback or full product typecheck/test/build
+        type: choice
+        default: fast
+        options: [fast, full]
+permissions:
+  contents: read
+concurrency:
+  group: hjm-preview-${{ github.ref }}-${{ inputs.hjm_sha }}
+  cancel-in-progress: true
+jobs:
+  compatibility:
+    # Unpublished code runs on an ephemeral hosted runner, never a signing Mac.
+    runs-on: ubuntu-latest
+    # One sequential web/native consumer build can exceed the ordinary 30m gate.
+    timeout-minutes: 45
+    env:
+      HJM_CANDIDATE_SHA: ${{ inputs.hjm_sha }}
+      HJM_CHECK_MODE: ${{ inputs.checks }}
+      CI: 'true'
+      # Public disposable service fixtures, not application production secrets.
+      DATABASE_URL: postgresql://postgres:postgres@127.0.0.1:5432/app_test
+      REDIS_URL: redis://127.0.0.1:6379/10
+      DEVICE_TOKEN_SIGNING_KEY: public-ci-test-signing-key-at-least-32
+      LETTER_ENCRYPTION_KEY: AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: app_test
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U postgres -d app_test"
+          --health-interval 5s --health-timeout 5s --health-retries 12
+      redis:
+        image: redis:7-alpine
+        ports: ['6379:6379']
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 5s --health-timeout 5s --health-retries 12
+    defaults:
+      run:
+        working-directory: app
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.sha }}
+          path: app
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          # One Node declaration per app (baseline devEnvironment.node); the app sits under app/.
+          node-version-file: app/.nvmrc
+      - name: Validate immutable candidate identity
+        run: node -e 'if (!/^[a-f0-9]{40}$/.test(process.env.HJM_CANDIDATE_SHA) || /^0+$/.test(process.env.HJM_CANDIDATE_SHA)) process.exit(1)'
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          repository: jim1286/hjm-design-system
+          ref: ${{ inputs.hjm_sha }}
+          path: hjm
+          persist-credentials: false
+      - name: Enable package managers declared by each checkout
+        run: corepack enable
+      - name: Install app baseline from its frozen lockfile
+        run: pnpm install --frozen-lockfile
+      - name: Check app-selected baseline identity
+        run: node tools/hjm-preview.mjs baseline .
+      - name: Build unpublished HJM packages
+        working-directory: hjm
+        run: |
+          pnpm install --frozen-lockfile
+          pnpm build
+          pnpm typecheck
+      - name: Pack immutable candidate and overlay only this disposable app checkout
+        run: |
+          node tools/hjm-preview.mjs pack ../hjm ../hjm-artifacts "$HJM_CANDIDATE_SHA"
+          node tools/hjm-preview.mjs apply . ../hjm-artifacts "$HJM_CANDIDATE_SHA"
+          pnpm install --no-frozen-lockfile
+      - name: Run selected candidate checks
+        run: node tools/hjm-preview.mjs check . "$HJM_CHECK_MODE"
+      - name: Record candidate result
+        if: always()
+        env:
+          CANDIDATE_JOB_STATUS: ${{ job.status }}
+        run: |
+          node -e 'const fs=require("node:fs"); fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY, `HJM candidate: ${process.env.HJM_CANDIDATE_SHA}\n\nApp: ${process.env.GITHUB_SHA}\n\nResult: ${process.env.CANDIDATE_JOB_STATUS}\n\nScope: ${process.env.HJM_CHECK_MODE} candidate checks. No publication, deployment, device QA, or release approval.\n`); if(fs.existsSync(".hjm-preview.json")) fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY, "\n```json\n"+fs.readFileSync(".hjm-preview.json","utf8")+"```\n");'
