@@ -69,6 +69,8 @@ for route in m['files']:
         assert r.status==200
         assert hashlib.sha256(r.read()).hexdigest()==route['sha256'],route['path']
         assert r.headers.get('X-Content-Type-Options')=='nosniff'
+        expected_cache='no-cache' if route['file'].endswith('.html') else 'public, max-age=31536000, immutable' if route['path'].startswith('/assets/') else 'public, max-age=300'
+        assert r.headers.get('Cache-Control')==expected_cache,(route['path'],r.headers.get('Cache-Control'))
 for path in ['/__missing__','/manifest.json','/.env']:
     try: urllib.request.urlopen('http://127.0.0.1:18085'+path,timeout=5);raise AssertionError('Unexpected public file: '+path)
     except urllib.error.HTTPError as e: assert e.code==404
