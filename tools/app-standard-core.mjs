@@ -1508,76 +1508,25 @@ export function qualityGateServicePorts(contract) {
   return { postgres, redis: postgres + 1 };
 }
 
-// unbound 게이트는 루트 `pnpm check` 체인 하나를 job 둘로 나눠 병렬로 돌린다(2026-09-29에 셋으로 나눴다가
-// 2026-09-30에 정적 검사와 빌드를 합쳤다 — 아래 "왜 둘인가").
-// 왜 나눴나: 한 step짜리 `pnpm check`가 다에리에서 588초였고(2026-09-28 run 36425258275:
-// lint 38s·format 16s·typecheck 43s·test 110s·test:e2e 242s·build 135s·나머지 검사 4s),
-// 어느 명령이 느린지 step 시간으로 보이지 않았으며, 같은 러너의 통합 스위트가 그 뒤에서 7분 넘게
-// 기다렸다(2026-09-29). 설치는 13초라 job마다 반복해도 비용이 작다.
-//
-// 왜 둘인가(2026-09-30 실측): job 셋을 러너 둘·VM 슬롯 둘에 올리면 셋째 job이 줄을 섰다. 최근 성공 3회에서
-// "Set up runner"(슬롯 대기 포함)가 130~295초였고, 가장 긴 test job(12~20분)이 늦게 시작해 전체가 늘어났다.
-// 정적 검사(4~8분)와 빌드(3~9분)는 각각 짧아 한 job에 이어 붙여도 test job보다 먼저 끝난다(합쳐 약 7~14분).
-// 그래서 test와 나머지가 슬롯 둘에 바로 올라가고, 설치·환경 준비도 한 번 줄었다.
-//
-// 왜 명령마다 job 하나가 아닌가:
-// - services는 한 job에만 둔다. 호스트 포트가 앱마다 하나로 파생되므로(qualityGateServicePorts)
-//   services job이 둘이면 러너를 늘린 순간 같은 VM에서 서로 "port is already allocated"로 죽는다.
-//   DEPLOYMENT_SERVICE_PORTS_DRIFT도 게이트가 여는 포트를 한 쌍으로 읽는다. test와 test:e2e가
-//   같은 job에 남는 이유다.
-// - typecheck는 테스트 job 맨 앞에 둔다. 체인에서 typecheck가 test보다 먼저 돌며 남기던 부산물
-//   (`prisma generate` 결과)을 spint 서버 unit test가 읽는다(생성 client는 gitignore). 순서를
-//   job 안에서 보존하면 앱별 지식 없이 기존 전제를 지킨다.
-// - linux-vm은 VM 전체 동시 실행이 2슬롯이다(docs/CI_RUNNERS.md "VM 안 동시 실행"). job이 많을수록
-//   설치를 반복하며 다른 저장소의 슬롯을 더 오래 잡으므로, 가장 긴 test job 옆에 나머지 둘이
-//   한 줄로 들어가는 크기로 맞췄다. 그 크기가 이제 둘이다.
-// 각 job 안의 명령 순서는 `check` 체인 순서를 따른다. 로컬 `pnpm check`는 그대로 정본이다.
+// 2026-10-12: repeated mobile/web setup and duplicate build/test gates delayed
+// releases. Automatic feedback now checks types once; deployment builds the exact
+// artifact. Full regression and policy audits remain an explicit manual operation.
 export const qualityGateJobs = [
-  {
-    id: 'static',
-    name: 'Build and contract checks',
-    services: false,
-    browsers: false,
-    // 빌드만 변경 범위 판정(scripts/ci-change-scope.mjs)으로 건너뛴다. 나머지는 늘 돈다: 설치·계약·디자인·문서 검사가
-    // 싸고, 판정이 틀려도 그쪽이 입력 변경을 본다. lint·format step은 2026-10-06 표준에서 뺐다(staticAnalysis 제거 주석).
-    scopedScripts: ['build'],
-    steps: [
-      ['Build', 'build'],
-      ['Check i18n messages', 'i18n:check'],
-      ['Check design contract', 'design:check'],
-      ['Check app contract', 'contract:check'],
+  { id: 'essential', name: 'Changed runtime typecheck', services: false, browsers: false,
+    scoped: true, steps: [['Typecheck', 'typecheck']] },
+  { id: 'regression', name: 'Manual regression and audits', services: true, browsers: true,
+    manual: true, steps: [
+      ['Typecheck', 'typecheck'], ['Unit tests', 'test'], ['Build', 'build'],
+      ['End-to-end tests', 'test:e2e'], ['Check i18n messages', 'i18n:check'],
+      ['Check design contract', 'design:check'], ['Check app contract', 'contract:check'],
       ['Check documentation links', 'docs:check'],
-    ],
-  },
-  {
-    id: 'test',
-    name: 'Typecheck and tests',
-    services: true,
-    browsers: true,
-    // Markdown·expo.version만 바뀐 push는 이 job의 무거운 step을 건너뛴다(scripts/ci-change-scope.mjs 머리 주석).
-    scoped: true,
-    steps: [
-      ['Typecheck', 'typecheck'],
-      ['Unit tests', 'test'],
-      ['End-to-end tests', 'test:e2e'],
-    ],
-  },
+    ] },
 ];
 
 function makeQualityGateWorkflow(contract) {
   const ports = qualityGateServicePorts(contract);
   const appId = contract.app.id;
-  // Sep 30 user decision: early products need short edit/deploy loops. Fast mode
-  // keeps type/unit feedback on every push; full build/E2E remain manual, while
-  // deployments build their own exact source artifacts and exercise those images.
-  const fast = contract.qualityGate?.mode === 'fast';
-  const jobs = fast ? [
-    qualityGateJobs[0],
-    { ...qualityGateJobs[1], services: false, browsers: false,
-      steps: qualityGateJobs[1].steps.filter(([, script]) => script !== 'test:e2e') },
-    { id: 'regression', name: 'Manual end-to-end regression', services: true, browsers: true,
-      manual: true, steps: [['Typecheck', 'typecheck'], ['End-to-end tests', 'test:e2e']] },
-  ] : qualityGateJobs;
+  const jobs = qualityGateJobs;
   const services = `    services:
       postgres:
         image: postgres:17
@@ -1600,7 +1549,6 @@ function makeQualityGateWorkflow(contract) {
   // Typecheck also generates Prisma clients; keep that prerequisite on a fresh runner.
   const checkWhen = (scoped, script) => {
     const conditions = [];
-    if (fast && script === 'build') conditions.push("github.event_name == 'workflow_dispatch'");
     if (scoped) conditions.push("steps.scope.outputs.heavy == 'true'");
     if (resumeKeys[script]) conditions.push("steps.resume.outputs." + resumeKeys[script] + " != 'true'");
     return conditions.length ? "        if: ${{ " + conditions.join(' && ') + " }}\n" : '';
@@ -1610,7 +1558,7 @@ function makeQualityGateWorkflow(contract) {
     const usesScope = Boolean(scoped) || scopedScripts.length > 0;
     return `  ${id}:
     name: ${name}
-${manual ? "    if: github.event_name == 'workflow_dispatch'\n" : ''}    runs-on: \${{ vars.CI_RUNNER || 'ubuntu-latest' }}
+${manual ? "    if: github.event_name == 'workflow_dispatch' && inputs.full_regression == true\n" : scoped && contract.qualityGate?.trigger === 'version-bump' ? "    if: needs.release-intent.outputs.heavy == 'true' && !(github.event_name == 'workflow_dispatch' && inputs.full_regression == true)\n" : ''}    runs-on: \${{ vars.CI_RUNNER || 'ubuntu-latest' }}
     timeout-minutes: 30
     defaults:
       run:
@@ -1628,31 +1576,41 @@ ${usesScope ? `      - name: Decide change scope
         run: node tools/ci-change-scope.mjs
         env:
           GITHUB_TOKEN: \${{ github.token }}
-` : ''}      - name: Reuse successful checks from earlier attempts
+` : ''}${manual ? `      - name: Reuse successful checks from earlier attempts
         id: resume
         run: node tools/ci-resume.mjs
         env:
           GITHUB_TOKEN: \${{ github.token }}
           CI_RESUME_JOB_NAME: ${name}
-      - name: Enable pinned package manager
+` : ''}      - name: Enable pinned package manager
 ${when(scoped)}        run: corepack enable
-      - name: Verify canonical npm registries
-${when(scoped)}        shell: bash
-        run: |
-          test "$(pnpm config get registry)" = "https://registry.npmjs.org/"
-          test "$(pnpm config get '@hjmds:registry')" = "https://registry.npmjs.org/"
+      - name: Check source prerequisites before installation
+${when(scoped)}        run: node tools/deployment-preflight.mjs source
+        env:
+          CI_RUNTIME_IDS: \${{ steps.scope.outputs.runtimes }}
       - name: Install frozen dependencies
 ${when(scoped)}        run: pnpm install --frozen-lockfile
+      - name: Check installed prerequisites before typecheck or build
+${when(scoped)}        run: node tools/deployment-preflight.mjs dependencies
+        env:
+          CI_RUNTIME_IDS: \${{ steps.scope.outputs.runtimes }}
 ${browsers ? `      - name: Prepare declared browser test runtimes
 ${when(scoped)}        run: pnpm --recursive --if-present browser:install
 ` : ''}${steps.map(([label, script]) => `      - name: ${label}
-${checkWhen(scoped || scopedScripts.includes(script), script)}        run: pnpm ${script}
-`).join('')}`;
+${checkWhen(scoped || scopedScripts.includes(script), script)}        run: ${['typecheck', 'test', 'build'].includes(script) ? `node tools/ci-change-scope.mjs --run ${script}` : `pnpm ${script}`}
+${['typecheck', 'test', 'build'].includes(script) && usesScope ? '        env:\n          CI_RUNTIME_IDS: ${{ steps.scope.outputs.runtimes }}\n' : ''}`).join('')}`;
   };
   return releaseQualityWorkflow(`name: App feedback quality gate (not merge authority)
 
 on:
-${fast ? '  # Fast push/PR feedback; manual dispatch also runs build and full E2E.\n  workflow_dispatch:\n' : ''}  pull_request:
+  # Full regression and audits require an explicit opt-in manual run.
+  workflow_dispatch:
+    inputs:
+      full_regression:
+        description: Run full tests and audits
+        type: boolean
+        default: false
+  pull_request:
   push:
     branches: [main]
 
@@ -2950,7 +2908,9 @@ if (contract && runtimeBindings) {
           add(runtime.root + '/package.json.dependencies.' + frameworkPackage, 'implementation-conformant runtime must directly install its framework inside the ' + trainLabel(runtimeFrameworkFloors[runtime.kind]) + ' train; "' + manifest.dependencies?.[frameworkPackage] + '" ' + frameworkViolation);
         }
         await verifyServerRuntime(runtime, manifest);
-        for (const scriptName of ['dev', 'typecheck', 'test', 'test:e2e', 'build']) {
+        // Native device QA is separate. Do not force file-existence or duplicate
+      // unit suites to masquerade as mobile e2e merely to fill a script key.
+      for (const scriptName of ['dev', 'typecheck', 'test', ...(runtime.kind === 'mobile' ? [] : ['test:e2e']), 'build']) {
           if (isNoopScript(manifest.scripts?.[scriptName])) add(runtime.root + '/package.json.scripts.' + scriptName, 'implementation-conformant runtime requires a non-noop ' + scriptName + ' command');
         }
       }
@@ -3087,7 +3047,9 @@ if (contract && runtimeBindings) {
         add(runtime.root + '/package.json.dependencies.' + frameworkPackage, 'implementation-conformant runtime must directly install its framework inside the ' + trainLabel(runtimeFrameworkFloors[runtime.kind]) + ' train; "' + manifest.dependencies?.[frameworkPackage] + '" ' + frameworkViolation);
       }
       await verifyServerRuntime(runtime, manifest);
-      for (const scriptName of ['dev', 'typecheck', 'test', 'test:e2e', 'build']) {
+      // Native device QA is separate. Do not force file-existence or duplicate
+      // unit suites to masquerade as mobile e2e merely to fill a script key.
+      for (const scriptName of ['dev', 'typecheck', 'test', ...(runtime.kind === 'mobile' ? [] : ['test:e2e']), 'build']) {
         if (isNoopScript(manifest.scripts?.[scriptName])) {
           add(runtime.root + '/package.json.scripts.' + scriptName, 'implementation-conformant runtime requires a non-noop ' + scriptName + ' command');
         }
@@ -3179,6 +3141,7 @@ async function buildScaffoldFiles(contract) {
     ['tools/check-doc-links.mjs', docLinksCore],
     ['tools/check-design-contract.mjs', makeLocalDesignChecker()],
     ['tools/ci-change-scope.mjs', readFileSync(resolve(scriptDirectory, 'ci-change-scope.mjs'), 'utf8')],
+    ['tools/deployment-preflight.mjs', readFileSync(resolve(scriptDirectory, 'deployment-preflight.mjs'), 'utf8')],
     ['tools/server-release-gate.mjs', readFileSync(resolve(scriptDirectory, 'server-release-gate.mjs'), 'utf8')],
     ['tools/release-quality.mjs', readFileSync(resolve(scriptDirectory, 'release-quality.mjs'), 'utf8')],
     ['tools/ci-resume.mjs', readFileSync(resolve(scriptDirectory, 'ci-resume.mjs'), 'utf8')],
@@ -3969,6 +3932,7 @@ function bindingProjectionSources(contract, designRelease) {
     ['tools/check-hjm-source.mjs', makeLocalDesignChecker({ runtimeBindings: true })],
     ['tools/check-doc-links.mjs', readFileSync(resolve(scriptDirectory, 'check-doc-links.mjs'), 'utf8')],
     ['tools/ci-change-scope.mjs', readFileSync(resolve(scriptDirectory, 'ci-change-scope.mjs'), 'utf8')],
+    ['tools/deployment-preflight.mjs', readFileSync(resolve(scriptDirectory, 'deployment-preflight.mjs'), 'utf8')],
     ['tools/server-release-gate.mjs', readFileSync(resolve(scriptDirectory, 'server-release-gate.mjs'), 'utf8')],
     ['tools/release-quality.mjs', readFileSync(resolve(scriptDirectory, 'release-quality.mjs'), 'utf8')],
     ['tools/json-schema-validator.mjs', readFileSync(resolve(scriptDirectory, 'json-schema-validator.mjs'), 'utf8')],
@@ -4099,6 +4063,7 @@ export function standardProjectionSources(contract, designRelease) {
     ['tools/check-doc-links.mjs', readFileSync(resolve(scriptDirectory, 'check-doc-links.mjs'), 'utf8')],
     ['tools/check-design-contract.mjs', makeLocalDesignChecker()],
     ['tools/ci-change-scope.mjs', readFileSync(resolve(scriptDirectory, 'ci-change-scope.mjs'), 'utf8')],
+    ['tools/deployment-preflight.mjs', readFileSync(resolve(scriptDirectory, 'deployment-preflight.mjs'), 'utf8')],
     ['tools/server-release-gate.mjs', readFileSync(resolve(scriptDirectory, 'server-release-gate.mjs'), 'utf8')],
     ['tools/release-quality.mjs', readFileSync(resolve(scriptDirectory, 'release-quality.mjs'), 'utf8')],
     ['tools/ci-resume.mjs', readFileSync(resolve(scriptDirectory, 'ci-resume.mjs'), 'utf8')],
@@ -4150,7 +4115,7 @@ export async function syncStandardProjections(appRoot, { write = false, only = [
   const findings = [];
   // Only explicitly introduced central projections may be created during migration.
   // Missing older scaffold files still require repair, and symlinks are rejected.
-  const mayCreate = new Set(['tools/hjm-preview.mjs', '.github/workflows/hjm-preview.yml', 'tools/release-quality.mjs', 'tools/server-release-gate.mjs', canonicalReleaseRelativePath, canonicalCatalogRelativePath, 'tools/ci-change-scope.mjs', 'tools/ci-resume.mjs', 'tools/runtime-bindings.mjs', 'tools/version-train.mjs', 'tools/hjm-source-analysis.mjs', 'tools/check-hjm-source.mjs']);
+  const mayCreate = new Set(['tools/hjm-preview.mjs', '.github/workflows/hjm-preview.yml', 'tools/release-quality.mjs', 'tools/server-release-gate.mjs', canonicalReleaseRelativePath, canonicalCatalogRelativePath, 'tools/ci-change-scope.mjs', 'tools/deployment-preflight.mjs', 'tools/ci-resume.mjs', 'tools/runtime-bindings.mjs', 'tools/version-train.mjs', 'tools/hjm-source-analysis.mjs', 'tools/check-hjm-source.mjs']);
   const readProjection = async (path) => await assertSyncPath(absoluteRoot, path, { allowMissing: mayCreate.has(path) })
     ? readRegularTextFile(resolve(absoluteRoot, path), path) : null;
   const projections = standardProjectionSources(contract, designRelease);
@@ -4231,7 +4196,7 @@ async function checkDeploymentContract(appRoot, contract, findings) {
   const gateWorkflow = sources.get(deployment.release?.gateWorkflow);
   const workflowPath = deployment.release?.workflow;
   const versionTriggered = deployment.release?.trigger === 'version-bump';
-  if (gateWorkflow && deployWorkflow && !versionTriggered) {
+  if (gateWorkflow && deployWorkflow && (!versionTriggered || /^  workflow_run:/m.test(deployWorkflow))) {
     // GitHub은 workflow_run을 **워크플로 이름 문자열**로 연결한다. 파일 경로가 아니다.
     // 게이트의 name:을 바꾸면 배포가 실패하지 않고 조용히 트리거되지 않는다.
     const gateName = gateWorkflow.match(/^name:[ \t]*(\S.*?)[ \t]*$/m)?.[1];
@@ -4245,14 +4210,16 @@ async function checkDeploymentContract(appRoot, contract, findings) {
   }
   if (!deployWorkflow) return;
   if (versionTriggered) {
-    // Push carries the exact before SHA; workflow_run loses that release-intent boundary.
-    // The shared helper must approve the bump and same-SHA quality before image jobs run.
+    // A completed quality event carries its original push boundary in a run-bound
+    // receipt. Retain push compatibility while consumers migrate without polling.
     const gateFile = deployment.release.gateWorkflow.split('/').at(-1);
     const manifest = deployment.release.versionManifest;
     if (!manifest || !deployWorkflow.includes(`node tools/server-release-gate.mjs ${manifest} ${gateFile}`) ||
         !deployWorkflow.includes('needs.release-gate.outputs.deploy') ||
-        !deployWorkflow.includes('github.sha') || !/^  push:/m.test(deployWorkflow)) {
-      addFinding(findings, 'DEPLOYMENT_VERSION_GATE_MISSING', workflowPath, 'Version-triggered deployment requires the shared version/quality gate, push source SHA, and dependent image job.');
+        !(deployWorkflow.includes('github.sha') && /^  push:/m.test(deployWorkflow) ||
+          /^  workflow_run:/m.test(deployWorkflow) && deployWorkflow.includes('github.event.workflow_run.head_sha') &&
+          deployWorkflow.includes("workflow_run.conclusion == 'success'") && deployWorkflow.includes('needs.release-gate.outputs.source-sha'))) {
+      addFinding(findings, 'DEPLOYMENT_VERSION_GATE_MISSING', workflowPath, 'Version-triggered deployment requires the shared version/quality gate, exact checked source SHA, and dependent image job.');
     }
   } else {
     // workflow_run의 GITHUB_SHA는 기본 브랜치 tip이다. 검사받은 commit은 head_sha뿐이다.
@@ -4536,6 +4503,7 @@ export async function checkAppConformance(appRoot, { now = new Date(), targetSta
     'tools/check-design-contract.mjs',
     'tools/json-schema-validator.mjs',
     'tools/ci-change-scope.mjs',
+    'tools/deployment-preflight.mjs',
     'tools/ci-resume.mjs',
     'tools/server-release-gate.mjs',
     'tools/release-quality.mjs',

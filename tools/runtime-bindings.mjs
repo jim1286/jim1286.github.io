@@ -1,6 +1,7 @@
 import { releaseQualityWorkflow } from './release-quality.mjs';
 // Framework adapters for the shared v1 contract. No product-ID exceptions.
-import { readFile, lstat, copyFile } from 'node:fs/promises';
+import { readFile, lstat, copyFile, realpath, stat } from 'node:fs/promises';
+import { homedir } from 'node:os';
 import { constants } from 'node:fs';
 import { resolve, relative, dirname, basename } from 'node:path';
 import { createRequire } from 'node:module';
@@ -166,18 +167,24 @@ export function bindingWorkflow(contract) {
   const inCheckout = (path) => path === '.' ? appRoot : `${appRoot}/${path}`;
   const flutter = contract.runtimes.find((r) => r.framework === 'flutter');
   const installs = [...new Set(['.', ...contract.runtimes.filter((r) => r.framework !== 'flutter').map((r) => r.binding.lockfile.replace(/(?:^|\/)pnpm-lock\.yaml$/, '') || '.')])];
-  return releaseQualityWorkflow(`name: App standard quality\non:\n  pull_request:\n  push:\n    branches: [main]\npermissions:\n  contents: read\n  # 변경 범위 판정(tools/ci-change-scope.mjs)이 이 workflow의 이전 성공 run을 조회한다.\n  actions: read\nconcurrency:\n  group: app-standard-${appRoot}-\${{ github.ref }}\n  cancel-in-progress: true\njobs:\n  quality:\n    # 기본은 hosted. 저장소 변수 CI_RUNNER를 설정한 저장소만 self-hosted로 간다.\n    # 비워 두면 오늘과 동일하다. 켜기 전에 러너 여유 메모리와 이 게이트의 빌드\n    # 피크를 비교한다(2026-09-10 실측 Next 피크 2358MB). public 저장소에는\n    # 설정하지 않는다 - 포크 PR이 그 머신에서 코드를 실행한다.\n    runs-on: \${{ vars.CI_RUNNER || 'ubuntu-latest' }}\n    timeout-minutes: 30\n    defaults:\n      run:\n        working-directory: ${appRoot}\n    steps:\n      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1\n        with:\n          persist-credentials: false\n          path: ${appRoot}\n          # 변경 범위 판정이 게이트를 통과한 조상 커밋과 비교한다(그 조상은 임의로 멀 수 있다).\n          fetch-depth: 0\n      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020\n        with:\n          node-version-file: ${appRoot}/.nvmrc\n      # Markdown·expo.version만 바뀐 push는 무거운 검사를 건너뛰고 계약·문서 검사만 한다(근거는 그 파일 머리 주석).\n      - name: Decide change scope\n        id: scope\n        run: node tools/ci-change-scope.mjs\n        env:\n          GITHUB_TOKEN: \${{ github.token }}\n      - run: corepack enable\n      - run: corepack prepare pnpm@11.24.0 --activate\n${flutter ? `      # Hosted runners are ephemeral, so keep their Actions SDK cache. Local
+  // A server-only candidate must not download the Flutter SDK or resolve pods/app
+  // dependencies. Empty scope means unknown history and keeps the full setup.
+  const runtimeWhen = runtime => `steps.scope.outputs.heavy == 'true' && (steps.scope.outputs.runtimes == '' || contains(format(',{0},', steps.scope.outputs.runtimes), ',${runtime.id},'))`;
+
+  return releaseQualityWorkflow(`name: App standard quality\non:\n  workflow_dispatch:\n    inputs:\n      full_regression:\n        description: Run full tests and audits\n        type: boolean\n        default: false\n  pull_request:\n  push:\n    branches: [main]\npermissions:\n  contents: read\n  # 변경 범위 판정(tools/ci-change-scope.mjs)이 이 workflow의 이전 성공 run을 조회한다.\n  actions: read\nconcurrency:\n  group: app-standard-${appRoot}-\${{ github.ref }}\n  cancel-in-progress: true\njobs:\n  quality:\n    # 기본은 hosted. 저장소 변수 CI_RUNNER를 설정한 저장소만 self-hosted로 간다.\n    # 비워 두면 오늘과 동일하다. 켜기 전에 러너 여유 메모리와 이 게이트의 빌드\n    # 피크를 비교한다(2026-09-10 실측 Next 피크 2358MB). public 저장소에는\n    # 설정하지 않는다 - 포크 PR이 그 머신에서 코드를 실행한다.\n${contract.qualityGate?.trigger === 'version-bump' ? "    if: needs.release-intent.outputs.heavy == 'true'\n" : ''}    runs-on: \${{ vars.CI_RUNNER || 'ubuntu-latest' }}\n    timeout-minutes: 30\n    defaults:\n      run:\n        working-directory: ${appRoot}\n    steps:\n      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1\n        with:\n          persist-credentials: false\n          path: ${appRoot}\n          # 변경 범위 판정이 게이트를 통과한 조상 커밋과 비교한다(그 조상은 임의로 멀 수 있다).\n          fetch-depth: 0\n      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020\n        with:\n          node-version-file: ${appRoot}/.nvmrc\n      # Markdown·expo.version만 바뀐 push는 검증된 이전 타입 결과를 승계한다(근거는 그 파일 머리 주석).\n      - name: Decide change scope\n        id: scope\n        run: node tools/ci-change-scope.mjs\n        env:\n          GITHUB_TOKEN: \${{ github.token }}\n      - run: corepack enable\n      - run: corepack prepare pnpm@11.24.0 --activate\n${flutter ? `      # Hosted runners are ephemeral, so keep their Actions SDK cache. Local
       # runners retain Flutter in RUNNER_TOOL_CACHE; cloning into RUNNER_TEMP
       # discarded that copy after every job and cost several minutes per run.
       - uses: subosito/flutter-action@1a449444c387b1966244ae4d4f8c696479add0b2
-        if: \${{ steps.scope.outputs.heavy == 'true' }}
+        if: \${{ ${runtimeWhen(flutter)} }}
         with:
           flutter-version: ${flutter.frameworkVersion}
           channel: stable
-          cache: \${{ runner.environment != 'self-hosted' }}\n` : ''}${installs.map((cwd) => `      - run: pnpm install --frozen-lockfile\n${cwd === '.' ? '' : "        if: \${{ steps.scope.outputs.heavy == 'true' }}\n"}        working-directory: ${inCheckout(cwd)}\n`).join('')}${contract.runtimes.filter((r) => r.framework === 'flutter').map((r) => `      - run: flutter pub get --enforce-lockfile\n        if: \${{ steps.scope.outputs.heavy == 'true' }}\n        working-directory: ${inCheckout(r.root)}\n`).join('')}      - name: Contract and CI runtime checks (Flutter builds run locally)\n        if: \${{ steps.scope.outputs.heavy == 'true' }}\n        run: node tools/run-quality.mjs check-ci\n      - name: Contract and documentation checks (heavy checks carried over)\n        if: \${{ steps.scope.outputs.heavy != 'true' }}\n        run: node tools/check-app-contract.mjs && node tools/check-doc-links.mjs\n`, contract);
+          cache: \${{ runner.environment != 'self-hosted' }}\n` : ''}      - name: Check source prerequisites before installation\n        run: node tools/deployment-preflight.mjs source\n        env:\n          CI_RUNTIME_IDS: \${{ steps.scope.outputs.runtimes }}\n${installs.map((cwd) => `      - run: pnpm install --frozen-lockfile\n        if: \${{ steps.scope.outputs.heavy == 'true' }}\n        working-directory: ${inCheckout(cwd)}\n`).join('')}${contract.runtimes.filter((r) => r.framework === 'flutter').map((r) => `      - run: flutter pub get --enforce-lockfile\n        if: \${{ ${runtimeWhen(r)} }}\n        working-directory: ${inCheckout(r.root)}\n`).join('')}      - name: Check installed prerequisites\n        if: \${{ steps.scope.outputs.heavy == 'true' }}\n        run: node tools/deployment-preflight.mjs dependencies\n        env:\n          CI_RUNTIME_IDS: \${{ steps.scope.outputs.runtimes }}\n      - name: Changed runtime typecheck (manual dispatch includes regression)\n        if: \${{ steps.scope.outputs.heavy == 'true' }}\n        run: node tools/run-quality.mjs check-ci\n        env:\n          CI_RUNTIME_IDS: \${{ steps.scope.outputs.runtimes }}\n          CI_FULL_REGRESSION: \${{ github.event_name == 'workflow_dispatch' && inputs.full_regression == true && '1' || '' }}\n      - name: Source prerequisites (unchanged runtime checks carried over)\n        if: \${{ steps.scope.outputs.heavy != 'true' }}\n        run: node tools/deployment-preflight.mjs source\n`, contract);
 }
 
-export async function initializeFixtureAssets(root, runtime) {
+export async function initializeFixtureAssets(root, runtime, {
+  credentialsRoot = process.env.HJM_CREDENTIALS_ROOT ?? resolve(homedir(), 'Developer/HJM-Credentials'),
+} = {}) {
   const cwd = await regular(root, runtime.root, true);
   for (const fixture of runtime.binding.fixtures ?? []) {
     if (runtime.framework !== 'flutter' || fixture.source !== '.env.example' || !/^\.env(?:\.(?:development|production|test))?$/.test(fixture.target))
@@ -187,16 +194,38 @@ export async function initializeFixtureAssets(root, runtime) {
     try { await copyFile(source, target, constants.COPYFILE_EXCL); }
     catch (error) {
       if (error.code !== 'EEXIST') throw error;
-      await regular(root, relative(root, target));
+      if (fixture.target !== '.env' || !(await lstat(target)).isSymbolicLink()) {
+        await regular(root, relative(root, target));
+        continue;
+      }
+      // 2026-10-07 credential centralization (security/README.md) left `.env` as a link
+      // to the app's private body under HJM-Credentials. Accept exactly that link; every
+      // other contract/fixture symlink stays forbidden. Copying the body back into the
+      // checkout was rejected because it recreates the duplicate the move removed.
+      // The contract app ID, not the checkout folder name, identifies the owner (worktrees).
+      const appId = JSON.parse(await readFile(resolve(root, 'app.contract.json'), 'utf8')).app?.id;
+      if (typeof appId !== 'string' || !/^[a-z][a-z0-9-]*$/.test(appId)) {
+        throw new Error('A valid app ID is required for centralized environment input');
+      }
+      const expected = resolve(await realpath(credentialsRoot), 'apps', appId, 'runtime/local.env');
+      const resolvedTarget = await realpath(target);
+      const targetStat = await stat(resolvedTarget);
+      if (resolvedTarget !== expected || !targetStat.isFile()
+        || (targetStat.mode & 0o077) !== 0
+        || (process.getuid && targetStat.uid !== process.getuid())) {
+        throw new Error('Environment link must resolve to this app\'s private centralized credentials');
+      }
     }
   }
 }
 
-export function boundQualitySteps(contract, role, { runtimeIds = [] } = {}) {
+export function boundQualitySteps(contract, role, { runtimeIds = [], full = false } = {}) {
   if (!['check', 'check-ci', ...bindingRoles].includes(role)) throw new Error('Choose check, check-ci, typecheck, test or build');
   for (const id of runtimeIds) if (!contract.runtimes.some(runtime => runtime.id === id)) throw new Error(`Unknown runtime: ${id}`);
   const runtimes = contract.runtimes.filter(runtime => !runtimeIds.length || runtimeIds.includes(runtime.id));
-  const targets = ['check', 'check-ci'].includes(role) ? bindingRoles : [role];
+  // Actual deployment builds remain mandatory; automatic feedback avoids rebuilding
+  // them and mounting every unit/DOM suite before the same source is built again.
+  const targets = role === 'check-ci' ? (full ? bindingRoles : ['typecheck']) : role === 'check' ? bindingRoles : [role];
   return targets.flatMap(target => runtimes.map(runtime => ({
     runtime, target,
     execution: role === 'check-ci' && target === 'build' && runtime.framework === 'flutter' ? 'local-only' : 'run',
@@ -218,6 +247,11 @@ export async function runBoundQuality(root, role, options = {}) {
   assertToolchainVersion('Node', process.versions.node, contract.toolchain.node, strict);
   const pnpmVersion = (await execFileAsync('pnpm', ['--version'], { cwd: root })).stdout.trim();
   assertToolchainVersion('pnpm', pnpmVersion, contract.toolchain.packageManager.version, strict);
+  // Scope comes from the same workflow's successful first-parent gate. Unknown
+  // paths fan out in ci-change-scope; direct/local checks keep their normal scope.
+  if (role === 'check-ci' && process.env.CI_RUNTIME_IDS && !options.runtimeIds?.length)
+    options = { ...options, runtimeIds: process.env.CI_RUNTIME_IDS.split(',').filter(Boolean) };
+  options = { ...options, full: options.full ?? process.env.CI_FULL_REGRESSION === '1' };
   const steps = boundQualitySteps(contract, role, options);
   const selectedRuntimes = [...new Set(steps.map(step => step.runtime))];
   // A direct scoped check validates the selected binding, not an unrelated runtime under repair.
@@ -230,8 +264,8 @@ export async function runBoundQuality(root, role, options = {}) {
     child.on('error', reject); child.on('exit', (code, signal) => code === 0 ? resolveResult() : reject(new Error(`Command failed (${code ?? signal}): ${argv.join(' ')}`)));
   });
   // Direct typecheck/test/build must remain usable while governance edits are in progress.
-  if (['check', 'check-ci'].includes(role)) await run([process.execPath, 'tools/check-app-contract.mjs'], root);
-  if (['check', 'check-ci'].includes(role)) await run([process.execPath, 'tools/check-doc-links.mjs', ...(strict ? [] : ['--changed'])], root);
+  if (role === 'check' || (role === 'check-ci' && options.full)) await run([process.execPath, 'tools/check-app-contract.mjs'], root);
+  if (role === 'check' || (role === 'check-ci' && options.full)) await run([process.execPath, 'tools/check-doc-links.mjs', ...(strict ? [] : ['--changed'])], root);
   for (const runtime of selectedRuntimes) {
     const cwd = await regular(root, runtime.root, true);
     if (runtime.framework === 'flutter') {

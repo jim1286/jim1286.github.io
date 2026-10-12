@@ -2,7 +2,8 @@
 // Release-only CI keeps routine pushes free of quality jobs. Path filters admit only
 // version manifests; this cheap gate distinguishes version increases from config edits.
 import { execFileSync } from 'node:child_process';
-import { readFileSync, appendFileSync } from 'node:fs';
+import { readFileSync, appendFileSync, writeFileSync } from 'node:fs';
+import { join } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { compareVersions } from './server-release-gate.mjs';
 
@@ -52,16 +53,35 @@ export function releaseQualityWorkflow(source, contract) {
   source = source.slice(0, start) + `# Version manifests only: routine source/PR pushes do not run quality (2026-10-01).
 on:
   workflow_dispatch:
+    inputs:
+      full_regression:
+        description: Run full tests and audits (default runs only the essential gate)
+        type: boolean
+        default: false
   push:
     branches: [main]
     paths: ${JSON.stringify(paths)}
 ` + source.slice(end);
-  // Release candidates must execute current checks even when only a version changed.
-  // Carrying over a previous push's heavy checks would defeat the user's pre-deploy gate.
+  // Admission still binds the gate to this release SHA. ci-change-scope may reuse
+  // unchanged behavior from a passing ancestor under the Oct 12 minimization policy;
+  // contract checks and the delivery artifact build still inspect the candidate.
   if (/^env:$/m.test(source)) source = source.replace(/^env:$/m, "env:\n  RELEASE_QUALITY: '1'");
   else source = source.replace(/^jobs:$/m, "env:\n  RELEASE_QUALITY: '1'\n\njobs:");
+  if (!/^  actions: read$/m.test(source)) source = source.replace('  contents: read\n', '  contents: read\n  actions: read # successful ancestor scope\n');
   const jobsAt = source.indexOf('jobs:\n');
   let jobs = source.slice(jobsAt + 6);
+  // Compute once in admission, before scarce runner slots are requested. Reusing
+  // that result also avoids duplicate GitHub history calls in each heavy job.
+  const scopeStep = `      - name: Decide change scope
+        id: scope
+        run: node tools/ci-change-scope.mjs
+        env:
+          GITHUB_TOKEN: \${{ github.token }}
+`;
+  const scopeHistory = '          # 변경 범위 판정이 게이트를 통과한 조상 커밋과 비교한다(그 조상은 임의로 멀 수 있다).\n          fetch-depth: 0\n';
+  // Source prerequisites run once in admission, before package/SDK installation.
+  jobs = jobs.replace(/      - name: Check source prerequisites before installation\n(?:        if:.*\n)?        run: node tools\/deployment-preflight.mjs source\n        env:\n          CI_RUNTIME_IDS:.*\n/g, '');
+  jobs = jobs.replaceAll(scopeStep, '').replaceAll(scopeHistory, '').replaceAll('steps.scope.outputs', 'needs.release-intent.outputs');
   jobs = jobs.split(/(?=^  [\w-]+:\n)/m).map(block => {
     if (!/^  [\w-]+:\n/.test(block)) return block;
     if (/^    needs:/m.test(block)) throw new Error('Review existing job dependencies before release gating');
@@ -70,11 +90,23 @@ on:
     else block = block.replace(/^(  [\w-]+:\n)/, `$1    if: ${condition}\n`);
     return block.replace(/^(  [\w-]+:\n)/, '$1    needs: release-intent\n');
   }).join('');
+  const receiptStep = paths.some(path => /^(apps|modules)\/(server|web)\/package\.json$/.test(path)) ? `      # The small receipt replaces 40-minute polling jobs in web/server deploys.
+      - name: Preserve the original push boundary
+        if: github.event_name == 'push'
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        with:
+          name: release-intent-\${{ github.run_attempt }}
+          path: \${{ runner.temp }}/release-intent.json
+          retention-days: 7
+          if-no-files-found: error
+` : '';
   const intent = `  release-intent:
     runs-on: \${{ vars.CI_RUNNER || 'ubuntu-latest' }}
     timeout-minutes: 5
     outputs:
       run: \${{ steps.intent.outputs.run }}
+      heavy: \${{ steps.scope.outputs.heavy }}
+      runtimes: \${{ steps.scope.outputs.runtimes }}
     steps:
       # Keep the reviewed Dependabot v7 pin during standard projection; v7 hardens privileged PR checkout.
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -90,6 +122,17 @@ on:
       - name: Admit only an increased release version
         id: intent
         run: node tools/release-quality.mjs
+${receiptStep}      - name: Check source prerequisites before setup
+        if: steps.intent.outputs.run == 'true'
+        run: node tools/deployment-preflight.mjs source
+      # Decide before heavy jobs claim a runner slot. Only verified unchanged
+      # behavior carries over; unknown history still admits the full checks.
+      - name: Decide changed runtime scope
+        id: scope
+        if: steps.intent.outputs.run == 'true'
+        run: node tools/ci-change-scope.mjs
+        env:
+          GITHUB_TOKEN: \${{ github.token }}
 
 `;
   return source.slice(0, jobsAt + 6) + intent + jobs;
@@ -98,9 +141,18 @@ on:
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   try {
     const env = process.env;
-    const run = releaseQualityIntent({ contract: JSON.parse(readFileSync('app.contract.json', 'utf8')), event: JSON.parse(readFileSync(env.GITHUB_EVENT_PATH, 'utf8')), eventName: env.GITHUB_EVENT_NAME, ref: env.GITHUB_REF, sha: env.GITHUB_SHA });
+    const event = JSON.parse(readFileSync(env.GITHUB_EVENT_PATH, 'utf8'));
+    const run = releaseQualityIntent({ contract: JSON.parse(readFileSync('app.contract.json', 'utf8')), event, eventName: env.GITHUB_EVENT_NAME, ref: env.GITHUB_REF, sha: env.GITHUB_SHA });
     if (!env.GITHUB_OUTPUT) throw new Error('GITHUB_OUTPUT missing');
     appendFileSync(env.GITHUB_OUTPUT, `run=${run}\n`);
+    // workflow_run omits push.before. Carry only the original boundary, bound to
+    // this run/attempt/SHA, so downstream jobs need neither polling nor HEAD^ guesses.
+    if (env.GITHUB_EVENT_NAME === 'push' && env.RUNNER_TEMP) {
+      writeFileSync(join(env.RUNNER_TEMP, 'release-intent.json'), JSON.stringify({
+        schemaVersion: 1, repository: env.GITHUB_REPOSITORY, sha: env.GITHUB_SHA,
+        before: event.before, runId: Number(env.GITHUB_RUN_ID), attempt: Number(env.GITHUB_RUN_ATTEMPT), deploy: run,
+      }));
+    }
     console.log(`Release quality: ${run ? 'version increased or explicit manual check' : 'version unchanged; no quality checks'}`);
   } catch (error) { console.error(error.message); process.exitCode = 1; }
 }

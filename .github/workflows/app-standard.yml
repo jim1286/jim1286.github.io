@@ -2,6 +2,11 @@ name: App standard quality
 # Version manifests only: routine source/PR pushes do not run quality (2026-10-01).
 on:
   workflow_dispatch:
+    inputs:
+      full_regression:
+        description: Run full tests and audits (default runs only the essential gate)
+        type: boolean
+        default: false
   push:
     branches: [main]
     paths: ["package.json"]
@@ -22,6 +27,8 @@ jobs:
     timeout-minutes: 5
     outputs:
       run: ${{ steps.intent.outputs.run }}
+      heavy: ${{ steps.scope.outputs.heavy }}
+      runtimes: ${{ steps.scope.outputs.runtimes }}
     steps:
       # Keep the reviewed Dependabot v7 pin during standard projection; v7 hardens privileged PR checkout.
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -37,14 +44,25 @@ jobs:
       - name: Admit only an increased release version
         id: intent
         run: node tools/release-quality.mjs
+      - name: Check source prerequisites before setup
+        if: steps.intent.outputs.run == 'true'
+        run: node tools/deployment-preflight.mjs source
+      # Decide before heavy jobs claim a runner slot. Only verified unchanged
+      # behavior carries over; unknown history still admits the full checks.
+      - name: Decide changed runtime scope
+        id: scope
+        if: steps.intent.outputs.run == 'true'
+        run: node tools/ci-change-scope.mjs
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
 
   quality:
     needs: release-intent
-    if: needs.release-intent.outputs.run == 'true'
     # 기본은 hosted. 저장소 변수 CI_RUNNER를 설정한 저장소만 self-hosted로 간다.
     # 비워 두면 오늘과 동일하다. 켜기 전에 러너 여유 메모리와 이 게이트의 빌드
     # 피크를 비교한다(2026-09-10 실측 Next 피크 2358MB). public 저장소에는
     # 설정하지 않는다 - 포크 PR이 그 머신에서 코드를 실행한다.
+    if: needs.release-intent.outputs.run == 'true' && (needs.release-intent.outputs.heavy == 'true')
     runs-on: ${{ vars.CI_RUNNER || 'ubuntu-latest' }}
     timeout-minutes: 30
     defaults:
@@ -55,24 +73,26 @@ jobs:
         with:
           persist-credentials: false
           path: portfolio-site
-          # 변경 범위 판정이 게이트를 통과한 조상 커밋과 비교한다(그 조상은 임의로 멀 수 있다).
-          fetch-depth: 0
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020
         with:
           node-version-file: portfolio-site/.nvmrc
-      # Markdown·expo.version만 바뀐 push는 무거운 검사를 건너뛰고 계약·문서 검사만 한다(근거는 그 파일 머리 주석).
-      - name: Decide change scope
-        id: scope
-        run: node tools/ci-change-scope.mjs
-        env:
-          GITHUB_TOKEN: ${{ github.token }}
+      # Markdown·expo.version만 바뀐 push는 검증된 이전 타입 결과를 승계한다(근거는 그 파일 머리 주석).
       - run: corepack enable
       - run: corepack prepare pnpm@11.24.0 --activate
       - run: pnpm install --frozen-lockfile
+        if: ${{ needs.release-intent.outputs.heavy == 'true' }}
         working-directory: portfolio-site
-      - name: Contract and CI runtime checks (Flutter builds run locally)
-        if: ${{ steps.scope.outputs.heavy == 'true' }}
+      - name: Check installed prerequisites
+        if: ${{ needs.release-intent.outputs.heavy == 'true' }}
+        run: node tools/deployment-preflight.mjs dependencies
+        env:
+          CI_RUNTIME_IDS: ${{ needs.release-intent.outputs.runtimes }}
+      - name: Changed runtime typecheck (manual dispatch includes regression)
+        if: ${{ needs.release-intent.outputs.heavy == 'true' }}
         run: node tools/run-quality.mjs check-ci
-      - name: Contract and documentation checks (heavy checks carried over)
-        if: ${{ steps.scope.outputs.heavy != 'true' }}
-        run: node tools/check-app-contract.mjs && node tools/check-doc-links.mjs
+        env:
+          CI_RUNTIME_IDS: ${{ needs.release-intent.outputs.runtimes }}
+          CI_FULL_REGRESSION: ${{ github.event_name == 'workflow_dispatch' && inputs.full_regression == true && '1' || '' }}
+      - name: Source prerequisites (unchanged runtime checks carried over)
+        if: ${{ needs.release-intent.outputs.heavy != 'true' }}
+        run: node tools/deployment-preflight.mjs source
