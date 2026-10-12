@@ -141,7 +141,8 @@ export function sshPreflight(env = process.env) {
   const directory = mkdtempSync(resolve(tmpdir(), 'deployment-access-'));
   try {
     const key = resolve(directory, 'key'); const hosts = resolve(directory, 'known_hosts');
-    writeFileSync(key, env.PREFLIGHT_SSH_KEY, { mode: 0o600 });
+    // GitHub secrets may omit the final LF; OpenSSH rejects that valid key material.
+    writeFileSync(key, env.PREFLIGHT_SSH_KEY.trimEnd() + '\n', { mode: 0o600 });
     writeFileSync(hosts, env.PREFLIGHT_SSH_KNOWN_HOSTS + '\n', { mode: 0o600 });
     // Read-only authentication and staging-parent permissions before building an
     // image. Keep the same pinned host keys as deployment; never trust keyscan.
