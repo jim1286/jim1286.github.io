@@ -8,6 +8,7 @@
 
 | 작업 | 리포트 |
 | --- | --- |
+| e2e·통합 및 CI 최소화 | [2026-10-12-ci-test-minimization](2026-10-12-ci-test-minimization.md) |
 | 자체 도메인 HJM Storybook 연결 | [2026-10-10-storybook-link](2026-10-10-storybook-link.md) |
 | 도메인 이전 소비자·이력서 영향 조사 및 현재 링크 갱신 | [2026-10-09-domain-migration-impact](2026-10-09-domain-migration-impact.md) |
 | 포트폴리오 자체 도메인 이전 | [2026-10-09-owned-domain-deployment](2026-10-09-owned-domain-deployment.md) |

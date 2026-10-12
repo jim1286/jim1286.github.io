@@ -12,6 +12,9 @@ test "$(git rev-parse HEAD)" = "$source_sha"
 # Shared marketing work is unrelated, but executable/static site inputs must match SHA.
 git diff --quiet "$source_sha" -- package.json pnpm-lock.yaml index.html vite.config.ts src public scripts deploy/static-site i18n.config.json
 node scripts/static-site-artifact.mjs verify "$artifact" "$source_sha"
+# Read-only preflight preserves pinned host keys and avoids packaging on bad access.
+test -r "$identity"
+ssh -i "$identity" -o IdentitiesOnly=yes -o BatchMode=yes -o StrictHostKeyChecking=yes -o ConnectTimeout=10 "$target" 'test -d /srv && test -w /tmp'
 manifest_sha=$(shasum -a 256 "$artifact/manifest.json" | awk '{print $1}')
 release_id="$source_sha-${manifest_sha:0:12}"
 scratch=$(mktemp -d "${TMPDIR:-/tmp}/portfolio-publish.XXXXXX")
