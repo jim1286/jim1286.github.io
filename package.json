@@ -26,7 +26,10 @@
     "i18n:generate": "node tools/sync-i18n.mjs --write",
     "i18n:check": "node tools/sync-i18n.mjs && node --test tools/sync-i18n.test.mjs",
     "deploy:prepare": "node scripts/static-site-artifact.mjs prepare",
-    "deploy:verify": "node scripts/static-site-artifact.mjs verify"
+    "deploy:verify": "node scripts/static-site-artifact.mjs verify",
+    "release:prepare": "node tools/prepare-hjm-release.mjs --write",
+    "release:prepare:plan": "node tools/prepare-hjm-release.mjs",
+    "check:hjm-release": "pnpm typecheck && pnpm exec node --test scripts/static-site-artifact.test.mjs && pnpm build"
   },
   "dependencies": {
     "@ant-design/icons": "^6.3.4",

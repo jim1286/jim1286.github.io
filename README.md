@@ -64,3 +64,12 @@ Flutter SDK는 runtime의 `.fvmrc`를 따른다. 기존 제품 CI는 유지하�
 
 2026-10-09 앱별 QA 위치·형식 통일 요청으로 [QA 안내](docs/QA.md)를 단일 진입점으로 사용한다.
 실행 범위·검사 명령·도구는 안내에서, 작업별 판정·재현·미확인 범위는 [결과 색인](docs/qa/README.md)에서 찾는다.
+
+## HJM 배포 준비
+
+2026-10-12 사용자 요청으로 제품 버전 상승 전에 `pnpm release:prepare`를 실행한다.
+현재 메이저의 최신 HJM 안정 버전·lockfile을 고정하고 `check:hjm-release`의 웹/앱 검사 후 커밋한다.
+프런트엔드 빌드를 포함하므로 hosted/candidate CI 환경에서 실행한다. 계획은 `pnpm release:prepare:plan`,
+실패 재개는 `pnpm release:prepare --resume`이다. 준비 단계는 push·스토어 제출을 하지 않는다.
+빌드 재시도는 확정한 SHA를 사용하며 최신 버전을 다시 선택하지 않는다.
+[공통 운영 절차](https://github.com/jim1286/app-portfolio/blob/main/docs/STANDARD_OPERATIONS.md#hjm-개발-후보와-앱별-게시-버전).
