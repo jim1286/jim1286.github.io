@@ -125,8 +125,10 @@ export function classifyChanges(changes, readBoth) {
 const git = (args) => execFileSync('git', args, { encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 }).trim();
 
 export function hasExecutedTypecheck(jobs) {
+  // The evidence wrapper succeeds only after execution or validated reuse; its
+  // skipped legacy Typecheck step must not erase this baseline on a later version bump.
   return jobs.some(job => job.conclusion === 'success' && (job.steps ?? []).some(step =>
-    step.conclusion === 'success' && ['Typecheck', 'Changed runtime typecheck (manual dispatch includes regression)'].includes(step.name)));
+    step.conclusion === 'success' && ['Typecheck', 'Typecheck with input evidence', 'Changed runtime typecheck (manual dispatch includes regression)'].includes(step.name)));
 }
 
 async function findPassedAncestor({ repository, workflowFile, token }) {

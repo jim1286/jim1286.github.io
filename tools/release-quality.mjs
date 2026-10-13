@@ -90,6 +90,12 @@ on:
     else block = block.replace(/^(  [\w-]+:\n)/, `$1    if: ${condition}\n`);
     return block.replace(/^(  [\w-]+:\n)/, '$1    needs: release-intent\n');
   }).join('');
+  // A root admission checkout cleaned the nested Diairy checkout on every run
+  // (Oct 14: 15s refetch). Share the consumers' path while retaining checkout's
+  // normal clean/reset; unfamiliar or mixed layouts keep the existing behavior.
+  const checkoutPaths = [...jobs.matchAll(/^      - uses: actions\/checkout@[^\n]+\n(?: {8,}[^\n]*\n)*/gm)]
+    .map(([block]) => block.match(/^          path: ([a-zA-Z0-9_-]+)\s*$/m)?.[1]);
+  const checkoutPath = checkoutPaths.length && checkoutPaths.every(path => path && path === checkoutPaths[0]) ? checkoutPaths[0] : null;
   const receiptStep = paths.some(path => /^(apps|modules)\/(server|web)\/package\.json$/.test(path)) ? `      # The small receipt replaces 40-minute polling jobs in web/server deploys.
       - name: Preserve the original push boundary
         if: github.event_name == 'push'
@@ -103,7 +109,7 @@ on:
   const intent = `  release-intent:
     runs-on: \${{ vars.CI_RUNNER || 'ubuntu-latest' }}
     timeout-minutes: 5
-    outputs:
+${checkoutPath ? `    defaults:\n      run:\n        working-directory: ${checkoutPath}\n` : ''}    outputs:
       run: \${{ steps.intent.outputs.run }}
       heavy: \${{ steps.scope.outputs.heavy }}
       runtimes: \${{ steps.scope.outputs.runtimes }}
@@ -114,11 +120,11 @@ on:
           ref: \${{ github.sha }}
           fetch-depth: 0
           persist-credentials: false
-      # Admission executes repository code too: use the product's exact Node pin,
+${checkoutPath ? `          path: ${checkoutPath}\n` : ''}      # Admission executes repository code too: use the product's exact Node pin,
       # not the hosted runner's changing default (2026-10-08 consumer CI audit).
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020
         with:
-          node-version-file: .nvmrc
+          node-version-file: ${checkoutPath ? checkoutPath + '/' : ''}.nvmrc
       - name: Admit only an increased release version
         id: intent
         run: node tools/release-quality.mjs

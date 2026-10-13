@@ -25,6 +25,10 @@ jobs:
   release-intent:
     runs-on: ${{ vars.CI_RUNNER || 'ubuntu-latest' }}
     timeout-minutes: 5
+    # Share checkout with quality: a workspace-root checkout deletes its nested repository.
+    defaults:
+      run:
+        working-directory: portfolio-site
     outputs:
       run: ${{ steps.intent.outputs.run }}
       heavy: ${{ steps.scope.outputs.heavy }}
@@ -36,11 +40,12 @@ jobs:
           ref: ${{ github.sha }}
           fetch-depth: 0
           persist-credentials: false
+          path: portfolio-site
       # Admission executes repository code too: use the product's exact Node pin,
       # not the hosted runner's changing default (2026-10-08 consumer CI audit).
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020
         with:
-          node-version-file: .nvmrc
+          node-version-file: portfolio-site/.nvmrc
       - name: Admit only an increased release version
         id: intent
         run: node tools/release-quality.mjs
