@@ -107,3 +107,14 @@ The user requested all consumers to follow the published HJM train. Exact depend
 ## HJM 1.15.0 adoption (2026-10-07)
 
 사용자의 릴리스 후 소비 앱 버전 갱신 지시에 따라 공식 npm에 게시된 exact 1.15.0과 중앙 release record를 채택한다. 출처는 `v1.15.0`의 `9aa33e2063dc65d0427697fb5a20b48ab7cba387`이며 카탈로그와 tarball integrity는 중앙 record에서 투사한다. 로컬 미게시 테마 후속 소스를 가져오는 대신 게시된 패키지를 사용해 재현 가능한 설치를 유지한다. 냉각 예외는 무결성을 확인한 exact 버전만 허용하고 자동 만료 정책을 유지한다. 제품의 브랜드 설정을 유지하며 새 선택형 subpath나 peer는 추가하지 않는다. 결과와 검증 한계는 [작업 QA](qa/2026-10-07-hjm-1-15-upgrade.md)에 기록한다.
+
+## HJM 1.20.0 채택 — 2026-10-13
+
+사용자 요청으로 게시 안정판 1.20.0에 맞춘다(커밋된 기존 1.16.0, 다른 세션의 미커밋 1.18.0 채택을 이어받음).
+중앙 release record의 `v1.20.0` tag/source `1d09c876cfd17998a157540fb61680a9dcd8e377`과 npm integrity가
+lock의 integrity와 일치한다. 계약·카탈로그·manifest·pnpm lock을 함께 갱신하고, 선언된 정확한 HJM 냉각 예외만 1.20.0으로 옮겼다.
+1.16→1.20 변경으로 인한 앱 코드 수정은 없었다.
+
+frozen 설치, typecheck, static artifact 관련 테스트, Vite production build 통과(빌드 script의 i18n 1건도 통과). 실제 게시 미실행.
+
+제품 배포 버전 상승·서버 배포는 이 작업의 검증 결과에 포함하지 않는다.
