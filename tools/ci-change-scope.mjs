@@ -24,6 +24,9 @@ import { resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
 
 const MAX_ANCESTORS = 50;
+// Look past carried-over/admission-only successes without restoring the old
+// unbounded per-ancestor API loop. Beyond three candidates, run current checks.
+const MAX_BASELINE_CANDIDATES = 3;
 
 function stable(value) {
   if (Array.isArray(value)) return value.map(stable);
@@ -133,23 +136,22 @@ export function hasExecutedTypecheck(jobs) {
 
 async function findPassedAncestor({ repository, workflowFile, token }) {
   const ancestors = git(['rev-list', '--first-parent', `--max-count=${MAX_ANCESTORS}`, 'HEAD~1']).split('\n').filter(Boolean);
-  // One bounded listing plus one evidence lookup replaces up to 50 serial
-  // network calls. Unknown or skipped history falls back to current typechecks.
-  const url = `https://api.github.com/repos/${repository}/actions/workflows/${encodeURIComponent(workflowFile)}/runs?status=success&per_page=100`;
+  // One bounded listing and at most three evidence reads. A skipped success is
+  // not a baseline, but it must not hide an older real check whose entire diff
+  // to HEAD can still be evaluated (including any intervening source changes).
+  const url = `https://api.github.com/repos/${repository}/actions/workflows/${encodeURIComponent(workflowFile)}/runs?event=push&branch=main&status=success&per_page=100`;
   const response = await fetch(url, { headers: { authorization: `Bearer ${token}`, accept: 'application/vnd.github+json' }, signal: AbortSignal.timeout(30000) });
   if (!response.ok) throw new Error(`GitHub API ${response.status} listing ${workflowFile} runs`);
   const body = await response.json();
-  const passed = new Set((body.workflow_runs ?? []).filter(run => run.event === 'push').map(run => run.head_sha));
-  const closest = ancestors.find(sha => passed.has(sha));
-  if (closest) {
-    const run = (body.workflow_runs ?? []).find(run => run.head_sha === closest && run.event === 'push');
-    // A green admission-only run has not checked its source. Treating that as a
-    // baseline made a following version-only push skip newly changed code.
+  const runs = (body.workflow_runs ?? []).filter(run => run.event === 'push' && run.head_branch === 'main');
+  const candidates = ancestors.filter(sha => runs.some(run => run.head_sha === sha)).slice(0, MAX_BASELINE_CANDIDATES);
+  for (const sha of candidates) {
+    const run = runs.find(run => run.head_sha === sha);
     const jobs = await fetch(`https://api.github.com/repos/${repository}/actions/runs/${run.id}/jobs?per_page=100`, {
       headers: { authorization: `Bearer ${token}`, accept: 'application/vnd.github+json' }, signal: AbortSignal.timeout(30000),
     });
     if (!jobs.ok) throw new Error(`GitHub API ${jobs.status} reading baseline jobs`);
-    if (hasExecutedTypecheck((await jobs.json()).jobs ?? [])) return closest;
+    if (hasExecutedTypecheck((await jobs.json()).jobs ?? [])) return sha;
   }
   return null;
 }
@@ -161,7 +163,7 @@ export async function decideScope(env = process.env) {
   const workflowFile = (env.GITHUB_WORKFLOW_REF ?? '').match(/\.github\/workflows\/([^@]+)@/)?.[1];
   if (!workflowFile || !env.GITHUB_REPOSITORY || !env.GITHUB_TOKEN) return { heavy: true, reason: 'missing workflow identity or token' };
   const base = await findPassedAncestor({ repository: env.GITHUB_REPOSITORY, workflowFile, token: env.GITHUB_TOKEN });
-  if (!base) return { heavy: true, reason: `no passing ${workflowFile} run among the last ${MAX_ANCESTORS} first-parent ancestors` };
+  if (!base) return { heavy: true, reason: `no executed main-push baseline within ${MAX_BASELINE_CANDIDATES} candidates from ${MAX_ANCESTORS} first-parent ancestors (${workflowFile})` };
   const changes = git(['diff', '--name-status', '--no-renames', base, 'HEAD'])
     .split('\n').filter(Boolean)
     .map((line) => { const [status, path] = line.split('\t'); return { status: status[0], path }; });
