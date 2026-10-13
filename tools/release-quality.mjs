@@ -96,6 +96,14 @@ on:
   const checkoutPaths = [...jobs.matchAll(/^      - uses: actions\/checkout@[^\n]+\n(?: {8,}[^\n]*\n)*/gm)]
     .map(([block]) => block.match(/^          path: ([a-zA-Z0-9_-]+)\s*$/m)?.[1]);
   const checkoutPath = checkoutPaths.length && checkoutPaths.every(path => path && path === checkoutPaths[0]) ? checkoutPaths[0] : null;
+  if (checkoutPath) jobs = jobs.replace(/^      - uses: actions\/checkout@[^\n]+\n(?: {8,}[^\n]*\n)*/gm, block => {
+    if (/^          fetch-depth:/m.test(block)) return block;
+    // BurnTok's quality job re-shallowed admission's complete repository, so
+    // the next admission fetched --unshallow again. Retain history on persistent
+    // runners; hosted jobs have separate fresh machines. String '0' is truthy
+    // in the Actions &&/|| expression whereas numeric 0 would select 1.
+    return block.replace(/^(          path: [^\n]+)$/m, "$1\n          fetch-depth: ${{ runner.environment == 'self-hosted' && '0' || '1' }}");
+  });
   const receiptStep = paths.some(path => /^(apps|modules)\/(server|web)\/package\.json$/.test(path)) ? `      # The small receipt replaces 40-minute polling jobs in web/server deploys.
       - name: Preserve the original push boundary
         if: github.event_name == 'push'
