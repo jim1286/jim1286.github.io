@@ -24,7 +24,7 @@ export function category(name) {
 }
 export function summarize(run, jobs) {
   return {
-    schemaVersion: 1, classificationVersion: 2, repository: run.repository?.full_name ?? null,
+    schemaVersion: 1, classificationVersion: 3, repository: run.repository?.full_name ?? null,
     runId: run.id, attempt: run.run_attempt, sha: run.head_sha,
     workflow: run.name, event: run.event, conclusion: run.conclusion,
     // updated_at can include later metadata edits; do not call it completion time.
@@ -43,7 +43,9 @@ export function summarize(run, jobs) {
         // Includes dependency/concurrency/runner delay. API alone cannot separate them.
         preStartSeconds: job.status === 'queued' || job.conclusion === 'skipped' ? null : seconds(job.created_at, job.started_at),
         // Preserve API gaps instead of attributing them to tests or the host scheduler.
-        unattributedSeconds: elapsed !== null && knownSteps.every(step => step.seconds !== null) && recorded <= elapsed ? elapsed - recorded : null,
+        // A completed run can temporarily omit every step (Diairy 38465210017).
+        // With no observed steps, the entire job is not a measured timing gap.
+        unattributedSeconds: elapsed !== null && knownSteps.length > 0 && knownSteps.every(step => step.seconds !== null) && recorded <= elapsed ? elapsed - recorded : null,
         elapsedSeconds: elapsed, categories, steps };
     }),
   };
