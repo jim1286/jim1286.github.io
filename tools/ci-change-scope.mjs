@@ -8,7 +8,7 @@
  * 건너뛴 채 성공으로 끝내야 한다.
  *
  * 규칙은 좁게 둔다. 허용 목록에 든 변경만 건너뛰고, 모르는 것·판정 실패는 전부 돌린다(fail-closed):
- *   - `*.md` 파일(문서·릴리스 기록)
+ *   - 문서 확장자만으로는 생략하지 않는다. Markdown도 웹 콘텐츠·생성기의 입력일 수 있다.
  *   - package.json의 version, pubspec.yaml의 version 한 줄
  *   - `app.json`에서 `expo.version` 한 값만 바뀐 경우(버전 올림). 다른 값이 바뀌었는지는 JSON 비교로 확인한다.
  * `docs/`의 JSON(계약 스키마·HJM 카탈로그)은 넣지 않았다 — 계약·디자인 검사가 읽는 입력이다. 테스트·설정·workflow·
@@ -102,7 +102,8 @@ export function runtimeCheckCommand(contract, ids, script, manifest) {
 export function classifyChanges(changes, readBoth) {
   if (changes.length === 0) return { heavy: true, reason: 'no changed files against the base (unexpected); running everything' };
   for (const { status, path } of changes) {
-    if (path.endsWith('.md')) continue;
+    // Markdown can be executable build/content input. Only a check-specific
+    // input contract can prove irrelevance; a filename suffix cannot (2026-10-14).
     if (/(^|\/)package\.json$/.test(path) && status === 'M') {
       const { before, after } = readBoth(path);
       if (onlyPackageVersionChanged(before, after)) continue;
@@ -116,9 +117,9 @@ export function classifyChanges(changes, readBoth) {
       if (onlyExpoVersionChanged(before, after)) continue;
       return { heavy: true, reason: `${path} changes more than expo.version` };
     }
-    return { heavy: true, reason: `${path} is not a docs-only or version-only change` };
+    return { heavy: true, reason: `${path} is not a version-only change; check-specific evidence required` };
   }
-  return { heavy: false, reason: `only documentation and release versions changed (${changes.length} files)` };
+  return { heavy: false, reason: `only release versions changed (${changes.length} files)` };
 }
 
 const git = (args) => execFileSync('git', args, { encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 }).trim();

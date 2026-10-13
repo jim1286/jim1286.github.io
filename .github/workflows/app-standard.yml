@@ -76,7 +76,7 @@ jobs:
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020
         with:
           node-version-file: portfolio-site/.nvmrc
-      # Markdown·expo.version만 바뀐 push는 검증된 이전 타입 결과를 승계한다(근거는 그 파일 머리 주석).
+      # 버전 값만 바뀐 push는 검증된 이전 타입 결과를 승계한다. Markdown도 제품 입력일 수 있어 확장자만으로 생략하지 않는다.
       - run: corepack enable
       - run: corepack prepare pnpm@11.24.0 --activate
       - run: pnpm install --frozen-lockfile
