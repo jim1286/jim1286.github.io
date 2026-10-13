@@ -12,6 +12,10 @@ export function timingWorkflow(source) {
     const start = jobs[index].index, end = jobs[index + 1]?.index ?? source.length;
     let block = source.slice(start, end);
     if (!/^    steps:\s*$/m.test(block)) continue;
+    // An ECONNRESET while uploading diagnostic JSON made a passed compiler job
+    // fail (Diairy 38464274513). Product checks retain their original failure rules.
+    block = block.replace(/(      - name: Preserve check evidence\n        if: [^\n]+\n)(        uses: actions\/upload-artifact@)/,
+      '$1        continue-on-error: true\n$2');
     if (block.includes('      - name: Summarize observed CI timings\n')) {
       block = block.replace(/(      - name: Summarize observed CI timings\n)        if: [^\n]+\n/,
         "$1        if: ${{ always() && github.ref == 'refs/heads/main' }}\n");
