@@ -103,3 +103,11 @@ jobs:
       - name: Source prerequisites (unchanged runtime checks carried over)
         if: ${{ needs.release-intent.outputs.heavy != 'true' }}
         run: node tools/deployment-preflight.mjs source
+      # Read-only observation must not change the product check result.
+      - name: Summarize observed CI timings
+        if: ${{ always() && github.ref == 'refs/heads/main' }}
+        continue-on-error: true
+        run: node tools/ci-metrics.mjs "$GITHUB_REPOSITORY" "$GITHUB_RUN_ID" "$RUNNER_TEMP/product-check-timing.json"
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          CI_METRICS_SUMMARY: '1'
