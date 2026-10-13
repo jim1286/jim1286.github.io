@@ -50,7 +50,8 @@ export function summarize(run, jobs) {
     }),
   };
 }
-export function collect(repository, runId, api = path => JSON.parse(execFileSync('gh', ['api', path], { encoding: 'utf8' }))) {
+// A delayed API response must not leave the local observer waiting indefinitely.
+export function collect(repository, runId, api = path => JSON.parse(execFileSync('gh', ['api', path], { encoding: 'utf8', timeout: 30000 }))) {
   if (!/^[\w.-]+\/[\w.-]+$/.test(repository) || !/^\d+$/.test(String(runId))) throw new Error('Expected owner/repository and numeric run ID');
   const run = api(`repos/${repository}/actions/runs/${runId}`);
   const jobs = [];
