@@ -153,7 +153,15 @@ ${receiptStep}      - name: Check source prerequisites before setup
 }
 
 export function manualQualityWorkflow(source) {
-  if (source.includes('# inline-manual-quality-v1')) return source;
+  const inline = "(github.event_name == 'workflow_dispatch' && inputs.separate_admission != true)";
+  const prerequisite = `(${inline} || needs.release-intent.result == 'success')`;
+  if (source.includes('# inline-manual-quality-v1')) {
+    // Explicit status functions override Actions' implicit success() check.
+    // Preserve failure propagation even if admission emitted outputs before a
+    // later step/post-hook failed; only the inline manual path may skip it.
+    return source.replace(/^    if: \$\{\{ !cancelled\(\) && .*$/gm, line =>
+      line.includes('needs.release-intent.result') ? line : line.replace('!cancelled() && ', `!cancelled() && ${prerequisite} && `));
+  }
   const jobsAt = source.indexOf('jobs:\n');
   if (jobsAt < 0) return source;
   const blocks = source.slice(jobsAt + 6).split(/(?=^  [\w-]+:\n)/m);
@@ -163,7 +171,6 @@ export function manualQualityWorkflow(source) {
   // validate main + exact SHA and source prerequisites before dependency setup.
   if (!children.length || !children.every(block => setupNode.test(block)) ||
       !source.includes('  workflow_dispatch:\n    inputs:\n')) return source;
-  const inline = "(github.event_name == 'workflow_dispatch' && inputs.separate_admission != true)";
   const guard = `      # inline-manual-quality-v1: dispatch already requests every runtime.
       # Keep the same main/SHA and source validation without a second runner handoff.
       - name: Validate explicit manual quality subject
@@ -183,7 +190,7 @@ export function manualQualityWorkflow(source) {
       .replaceAll("needs.release-intent.outputs.heavy != 'true'", `(!${inline} && needs.release-intent.outputs.heavy != 'true')`);
     // A skipped dependency normally suppresses its child. Override only that
     // implicit status check; cancellation and the original gate still apply.
-    block = block.replace(/^    if: (.*)$/m, (_, condition) => `    if: \${{ !cancelled() && (${condition.replace(/^\$\{\{\s*|\s*\}\}$/g, '')}) }}`);
+    block = block.replace(/^    if: (.*)$/m, (_, condition) => `    if: \${{ !cancelled() && ${prerequisite} && (${condition.replace(/^\$\{\{\s*|\s*\}\}$/g, '')}) }}`);
     return block.replace(setupNode, match => match + guard);
   }).join('');
   const header = source.slice(0, jobsAt + 6).replace('  workflow_dispatch:\n    inputs:\n', `  workflow_dispatch:
