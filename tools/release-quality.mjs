@@ -149,7 +149,51 @@ ${receiptStep}      - name: Check source prerequisites before setup
           GITHUB_TOKEN: \${{ github.token }}
 
 `;
-  return source.slice(0, jobsAt + 6) + intent + jobs;
+  return manualQualityWorkflow(source.slice(0, jobsAt + 6) + intent + jobs);
+}
+
+export function manualQualityWorkflow(source) {
+  if (source.includes('# inline-manual-quality-v1')) return source;
+  const jobsAt = source.indexOf('jobs:\n');
+  if (jobsAt < 0) return source;
+  const blocks = source.slice(jobsAt + 6).split(/(?=^  [\w-]+:\n)/m);
+  const children = blocks.filter(block => /^    needs: release-intent$/m.test(block));
+  const setupNode = /^      - uses: actions\/setup-node@[^\n]+\n(?: {8,}[^\n]*\n)*/m;
+  // Unknown/custom layouts retain the existing gate. Every optimized child must
+  // validate main + exact SHA and source prerequisites before dependency setup.
+  if (!children.length || !children.every(block => setupNode.test(block)) ||
+      !source.includes('  workflow_dispatch:\n    inputs:\n')) return source;
+  const inline = "(github.event_name == 'workflow_dispatch' && inputs.separate_admission != true)";
+  const guard = `      # inline-manual-quality-v1: dispatch already requests every runtime.
+      # Keep the same main/SHA and source validation without a second runner handoff.
+      - name: Validate explicit manual quality subject
+        if: \${{ ${inline} }}
+        run: |
+          node tools/release-quality.mjs
+          node tools/deployment-preflight.mjs source
+`;
+  const changed = blocks.map(block => {
+    if (block.startsWith('  release-intent:\n')) {
+      if (/^    if:/m.test(block)) throw new Error('Review existing admission condition');
+      return block.replace('  release-intent:\n', `  release-intent:\n    if: \${{ !${inline} }}\n`);
+    }
+    if (!/^    needs: release-intent$/m.test(block)) return block;
+    block = block.replaceAll("needs.release-intent.outputs.run == 'true'", `(${inline} || needs.release-intent.outputs.run == 'true')`)
+      .replaceAll("needs.release-intent.outputs.heavy == 'true'", `(${inline} || needs.release-intent.outputs.heavy == 'true')`)
+      .replaceAll("needs.release-intent.outputs.heavy != 'true'", `(!${inline} && needs.release-intent.outputs.heavy != 'true')`);
+    // A skipped dependency normally suppresses its child. Override only that
+    // implicit status check; cancellation and the original gate still apply.
+    block = block.replace(/^    if: (.*)$/m, (_, condition) => `    if: \${{ !cancelled() && (${condition.replace(/^\$\{\{\s*|\s*\}\}$/g, '')}) }}`);
+    return block.replace(setupNode, match => match + guard);
+  }).join('');
+  const header = source.slice(0, jobsAt + 6).replace('  workflow_dispatch:\n    inputs:\n', `  workflow_dispatch:
+    inputs:
+      separate_admission:
+        description: Diagnostic comparison using the previous separate admission job
+        type: boolean
+        default: false
+`);
+  return header + changed;
 }
 
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {

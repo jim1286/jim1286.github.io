@@ -3,6 +3,10 @@ name: App standard quality
 on:
   workflow_dispatch:
     inputs:
+      separate_admission:
+        description: Diagnostic comparison using the previous separate admission job
+        type: boolean
+        default: false
       full_regression:
         description: Run full tests and audits (default runs only the essential gate)
         type: boolean
@@ -23,6 +27,7 @@ env:
 
 jobs:
   release-intent:
+    if: ${{ !(github.event_name == 'workflow_dispatch' && inputs.separate_admission != true) }}
     runs-on: ${{ vars.CI_RUNNER || 'ubuntu-latest' }}
     timeout-minutes: 5
     # Share checkout with quality: a workspace-root checkout deletes its nested repository.
@@ -67,7 +72,7 @@ jobs:
     # 비워 두면 오늘과 동일하다. 켜기 전에 러너 여유 메모리와 이 게이트의 빌드
     # 피크를 비교한다(2026-09-10 실측 Next 피크 2358MB). public 저장소에는
     # 설정하지 않는다 - 포크 PR이 그 머신에서 코드를 실행한다.
-    if: needs.release-intent.outputs.run == 'true' && (needs.release-intent.outputs.heavy == 'true')
+    if: ${{ !cancelled() && (((github.event_name == 'workflow_dispatch' && inputs.separate_admission != true) || needs.release-intent.outputs.run == 'true') && (((github.event_name == 'workflow_dispatch' && inputs.separate_admission != true) || needs.release-intent.outputs.heavy == 'true'))) }}
     runs-on: ${{ vars.CI_RUNNER || 'ubuntu-latest' }}
     timeout-minutes: 30
     defaults:
@@ -83,25 +88,32 @@ jobs:
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020
         with:
           node-version-file: portfolio-site/.nvmrc
+      # inline-manual-quality-v1: dispatch already requests every runtime.
+      # Keep the same main/SHA and source validation without a second runner handoff.
+      - name: Validate explicit manual quality subject
+        if: ${{ (github.event_name == 'workflow_dispatch' && inputs.separate_admission != true) }}
+        run: |
+          node tools/release-quality.mjs
+          node tools/deployment-preflight.mjs source
       # 버전 값만 바뀐 push는 검증된 이전 타입 결과를 승계한다. Markdown도 제품 입력일 수 있어 확장자만으로 생략하지 않는다.
       - run: corepack enable
       - run: corepack prepare pnpm@11.24.0 --activate
       - run: pnpm install --frozen-lockfile
-        if: ${{ needs.release-intent.outputs.heavy == 'true' }}
+        if: ${{ ((github.event_name == 'workflow_dispatch' && inputs.separate_admission != true) || needs.release-intent.outputs.heavy == 'true') }}
         working-directory: portfolio-site
       - name: Check installed prerequisites
-        if: ${{ needs.release-intent.outputs.heavy == 'true' }}
+        if: ${{ ((github.event_name == 'workflow_dispatch' && inputs.separate_admission != true) || needs.release-intent.outputs.heavy == 'true') }}
         run: node tools/deployment-preflight.mjs dependencies
         env:
           CI_RUNTIME_IDS: ${{ needs.release-intent.outputs.runtimes }}
       - name: Changed runtime typecheck (manual dispatch includes regression)
-        if: ${{ needs.release-intent.outputs.heavy == 'true' }}
+        if: ${{ ((github.event_name == 'workflow_dispatch' && inputs.separate_admission != true) || needs.release-intent.outputs.heavy == 'true') }}
         run: node tools/run-quality.mjs check-ci
         env:
           CI_RUNTIME_IDS: ${{ needs.release-intent.outputs.runtimes }}
           CI_FULL_REGRESSION: ${{ github.event_name == 'workflow_dispatch' && inputs.full_regression == true && '1' || '' }}
       - name: Source prerequisites (unchanged runtime checks carried over)
-        if: ${{ needs.release-intent.outputs.heavy != 'true' }}
+        if: ${{ (!(github.event_name == 'workflow_dispatch' && inputs.separate_admission != true) && needs.release-intent.outputs.heavy != 'true') }}
         run: node tools/deployment-preflight.mjs source
       # Read-only observation must not change the product check result.
       - name: Summarize observed CI timings
