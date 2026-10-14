@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
 import { releaseQualityWorkflow } from './release-quality.mjs';
+import { evidenceWorkflow } from './ci-evidence-workflow.mjs';
 import { existsSync, readFileSync } from 'node:fs';
 import { execFile, execFileSync } from 'node:child_process';
 import {
@@ -157,7 +158,6 @@ const nodeFloor = reviewedVersionFloors.node;
 const packageManagerFloor = reviewedVersionFloors.packageManager;
 // 2026-10-09: user removed bot PR automation; scaffold/sync no longer own a Dependabot config.
 const requiredProtectedPaths = [
-  '.github/workflows/quality-gate.yml',
   '.github/CODEOWNERS',
   'app.contract.json',
   'package.json',
@@ -1526,6 +1526,9 @@ export const qualityGateJobs = [
 function makeQualityGateWorkflow(contract) {
   const ports = qualityGateServicePorts(contract);
   const appId = contract.app.id;
+  // Local DB policy (LD, 2026-10-09): one `<app_id>_dev` database serves development, QA and automated tests.
+  // CI used `app_test`, so Spint's e2e guard (which accepts only spint_dev) failed the full gate on 2026-10-14.
+  const database = `${appId.replaceAll('-', '_')}_dev`;
   const jobs = qualityGateJobs;
   const services = `    services:
       postgres:
@@ -1533,10 +1536,10 @@ function makeQualityGateWorkflow(contract) {
         env:
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: postgres
-          POSTGRES_DB: app_test
+          POSTGRES_DB: ${database}
         ports: ['${ports.postgres}:5432']
         options: >-
-          --health-cmd "pg_isready -U postgres -d app_test"
+          --health-cmd "pg_isready -U postgres -d ${database}"
           --health-interval 5s --health-timeout 5s --health-retries 12
       redis:
         image: redis:7
@@ -1600,7 +1603,7 @@ ${when(scoped)}        run: pnpm --recursive --if-present browser:install
 ${checkWhen(scoped || scopedScripts.includes(script), script)}        run: ${['typecheck', 'test', 'build'].includes(script) ? `node tools/ci-change-scope.mjs --run ${script}` : `pnpm ${script}`}
 ${['typecheck', 'test', 'build'].includes(script) && usesScope ? '        env:\n          CI_RUNTIME_IDS: ${{ steps.scope.outputs.runtimes }}\n' : ''}`).join('')}`;
   };
-  return releaseQualityWorkflow(`name: App feedback quality gate (not merge authority)
+  return evidenceWorkflow(releaseQualityWorkflow(`name: App feedback quality gate (not merge authority)
 
 on:
   # Full regression and audits require an explicit opt-in manual run.
@@ -1627,7 +1630,7 @@ concurrency:
 # 동작하게 하려는 것이고, URL이 가리키는 컨테이너는 test job만 띄운다.
 env:
   # Public ephemeral CI fixtures; never production credentials.
-  DATABASE_URL: postgresql://postgres:postgres@127.0.0.1:${ports.postgres}/app_test
+  DATABASE_URL: postgresql://postgres:postgres@127.0.0.1:${ports.postgres}/${database}
   REDIS_URL: redis://127.0.0.1:${ports.redis}/10
   DEVICE_TOKEN_SIGNING_KEY: public-ci-test-signing-key-at-least-32
   LETTER_ENCRYPTION_KEY: AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=
@@ -1650,7 +1653,7 @@ env:
 # 두 job은 서로 기다리지 않는다(needs 없음). 병렬 효과는 그 저장소 러너 수와 VM 슬롯에
 # 달려 있다. 앞의 중앙 생성기 주석(scripts/app-standard.mjs qualityGateJobs)에 분할 근거가 있다.
 jobs:
-${jobs.map(job).join('\n')}`, contract);
+${jobs.map(job).join('\n')}`, contract), contract);
 }
 
 function makeCodeowners(contract) {
@@ -3114,7 +3117,6 @@ async function buildScaffoldFiles(contract) {
   const files = new Map([
     ...previewProjectionSources(contract),
     ['.github/CODEOWNERS', makeCodeowners(contract)],
-    ['.github/workflows/quality-gate.yml', makeQualityGateWorkflow(contract)],
     ['.gitignore', 'node_modules/\n.next/\ndist/\nbuild/\n.expo/\ncoverage/\n.env\n.env.*\n!.env.example\n.DS_Store\n'],
     ['.npmrc', canonicalNpmrcSource],
     ['.nvmrc', `${contract.toolchain.node}\n`],
@@ -3141,7 +3143,14 @@ async function buildScaffoldFiles(contract) {
     ['tools/check-doc-links.mjs', docLinksCore],
     ['tools/check-design-contract.mjs', makeLocalDesignChecker()],
     ['tools/ci-change-scope.mjs', readFileSync(resolve(scriptDirectory, 'ci-change-scope.mjs'), 'utf8')],
+    ['tools/check-evidence.mjs', readFileSync(resolve(scriptDirectory, 'check-evidence.mjs'), 'utf8')],
+    ['tools/ci-product-evidence.mjs', readFileSync(resolve(scriptDirectory, 'ci-product-evidence.mjs'), 'utf8')],
+    ['tools/ci-bound-evidence.mjs', readFileSync(resolve(scriptDirectory, 'ci-bound-evidence.mjs'), 'utf8')],
+    ['tools/ci-evidence-workflow.mjs', readFileSync(resolve(scriptDirectory, 'ci-evidence-workflow.mjs'), 'utf8')],
+    ['tools/ci-metrics.mjs', readFileSync(resolve(scriptDirectory, 'ci-metrics.mjs'), 'utf8')],
     ['tools/deployment-preflight.mjs', readFileSync(resolve(scriptDirectory, 'deployment-preflight.mjs'), 'utf8')],
+    ['tools/prepare-hjm-release.mjs', readFileSync(resolve(scriptDirectory, 'prepare-hjm-release.mjs'), 'utf8')],
+    ['tools/sync-design-system.mjs', readFileSync(resolve(scriptDirectory, 'sync-design-system.mjs'), 'utf8')],
     ['tools/server-release-gate.mjs', readFileSync(resolve(scriptDirectory, 'server-release-gate.mjs'), 'utf8')],
     ['tools/release-quality.mjs', readFileSync(resolve(scriptDirectory, 'release-quality.mjs'), 'utf8')],
     ['tools/ci-resume.mjs', readFileSync(resolve(scriptDirectory, 'ci-resume.mjs'), 'utf8')],
@@ -3903,7 +3912,6 @@ function previewProjectionSources(contract) {
   const workflow = hjmPreviewWorkflow(contract);
   return workflow ? [
     ['tools/hjm-preview.mjs', readFileSync(resolve(scriptDirectory, 'hjm-preview.mjs'), 'utf8')],
-    ['.github/workflows/hjm-preview.yml', workflow],
   ] : [];
 }
 
@@ -3932,11 +3940,15 @@ function bindingProjectionSources(contract, designRelease) {
     ['tools/check-hjm-source.mjs', makeLocalDesignChecker({ runtimeBindings: true })],
     ['tools/check-doc-links.mjs', readFileSync(resolve(scriptDirectory, 'check-doc-links.mjs'), 'utf8')],
     ['tools/ci-change-scope.mjs', readFileSync(resolve(scriptDirectory, 'ci-change-scope.mjs'), 'utf8')],
+    ['tools/check-evidence.mjs', readFileSync(resolve(scriptDirectory, 'check-evidence.mjs'), 'utf8')],
+    ['tools/ci-product-evidence.mjs', readFileSync(resolve(scriptDirectory, 'ci-product-evidence.mjs'), 'utf8')],
+    ['tools/ci-bound-evidence.mjs', readFileSync(resolve(scriptDirectory, 'ci-bound-evidence.mjs'), 'utf8')],
+    ['tools/ci-evidence-workflow.mjs', readFileSync(resolve(scriptDirectory, 'ci-evidence-workflow.mjs'), 'utf8')],
+    ['tools/ci-metrics.mjs', readFileSync(resolve(scriptDirectory, 'ci-metrics.mjs'), 'utf8')],
     ['tools/deployment-preflight.mjs', readFileSync(resolve(scriptDirectory, 'deployment-preflight.mjs'), 'utf8')],
     ['tools/server-release-gate.mjs', readFileSync(resolve(scriptDirectory, 'server-release-gate.mjs'), 'utf8')],
     ['tools/release-quality.mjs', readFileSync(resolve(scriptDirectory, 'release-quality.mjs'), 'utf8')],
     ['tools/json-schema-validator.mjs', readFileSync(resolve(scriptDirectory, 'json-schema-validator.mjs'), 'utf8')],
-    ['.github/workflows/app-standard.yml', bindingWorkflow(contract)],
   ]);
 }
 
@@ -3949,7 +3961,7 @@ function bindingProjectionSources(contract, designRelease) {
 const verbatimProjectionOrigins = new Map([
   ['tools/app-standard-core.mjs', 'scripts/app-standard.mjs'],
   ...['runtime-bindings', 'version-train', 'hjm-source-analysis', 'check-doc-links', 'ci-change-scope', 'server-release-gate',
-    'release-quality', 'ci-resume', 'json-schema-validator', 'hjm-preview'].map(name => [`tools/${name}.mjs`, `scripts/${name}.mjs`]),
+    'release-quality', 'ci-resume', 'json-schema-validator', 'hjm-preview', 'check-evidence', 'ci-product-evidence', 'ci-bound-evidence', 'ci-evidence-workflow', 'ci-metrics'].map(name => [`tools/${name}.mjs`, `scripts/${name}.mjs`]),
 ]);
 // History lookups only mean something in the central checkout. An app's copy of
 // this file resolves defaultWorkspaceRoot to the app itself and must not treat
@@ -4063,12 +4075,16 @@ export function standardProjectionSources(contract, designRelease) {
     ['tools/check-doc-links.mjs', readFileSync(resolve(scriptDirectory, 'check-doc-links.mjs'), 'utf8')],
     ['tools/check-design-contract.mjs', makeLocalDesignChecker()],
     ['tools/ci-change-scope.mjs', readFileSync(resolve(scriptDirectory, 'ci-change-scope.mjs'), 'utf8')],
+    ['tools/check-evidence.mjs', readFileSync(resolve(scriptDirectory, 'check-evidence.mjs'), 'utf8')],
+    ['tools/ci-product-evidence.mjs', readFileSync(resolve(scriptDirectory, 'ci-product-evidence.mjs'), 'utf8')],
+    ['tools/ci-bound-evidence.mjs', readFileSync(resolve(scriptDirectory, 'ci-bound-evidence.mjs'), 'utf8')],
+    ['tools/ci-evidence-workflow.mjs', readFileSync(resolve(scriptDirectory, 'ci-evidence-workflow.mjs'), 'utf8')],
+    ['tools/ci-metrics.mjs', readFileSync(resolve(scriptDirectory, 'ci-metrics.mjs'), 'utf8')],
     ['tools/deployment-preflight.mjs', readFileSync(resolve(scriptDirectory, 'deployment-preflight.mjs'), 'utf8')],
     ['tools/server-release-gate.mjs', readFileSync(resolve(scriptDirectory, 'server-release-gate.mjs'), 'utf8')],
     ['tools/release-quality.mjs', readFileSync(resolve(scriptDirectory, 'release-quality.mjs'), 'utf8')],
     ['tools/ci-resume.mjs', readFileSync(resolve(scriptDirectory, 'ci-resume.mjs'), 'utf8')],
     ['tools/json-schema-validator.mjs', readFileSync(resolve(scriptDirectory, 'json-schema-validator.mjs'), 'utf8')],
-    ['.github/workflows/quality-gate.yml', makeQualityGateWorkflow(contract)],
   ]);
 }
 
@@ -4103,7 +4119,7 @@ export async function syncStandardProjections(appRoot, { write = false, only = [
   // Updating a validator must not require already passing that newer validator.
   // An explicit development-tools-only sync leaves unrelated contract findings
   // visible and never changes product contracts or grants conformance.
-  const developmentTools = new Set(['tools/app-standard-core.mjs', 'tools/hjm-preview.mjs', '.github/workflows/hjm-preview.yml', 'tools/release-quality.mjs', 'tools/server-release-gate.mjs', 'tools/runtime-bindings.mjs', 'tools/run-quality.mjs', 'tools/check-doc-links.mjs']);
+  const developmentTools = new Set(['tools/app-standard-core.mjs', 'tools/hjm-preview.mjs', 'tools/release-quality.mjs', 'tools/server-release-gate.mjs', 'tools/runtime-bindings.mjs', 'tools/run-quality.mjs', 'tools/check-doc-links.mjs']);
   const toolsOnly = Array.isArray(only) && only.length > 0 && only.every(path => developmentTools.has(path));
   if (!validation.ok && !toolsOnly) return { ...validation, appRoot: absoluteRoot };
   if (!idPattern.test(contract.app?.id ?? '') || !/^\d+\.\d+\.\d+$/.test(contract.toolchain?.node ?? '')
@@ -4115,7 +4131,7 @@ export async function syncStandardProjections(appRoot, { write = false, only = [
   const findings = [];
   // Only explicitly introduced central projections may be created during migration.
   // Missing older scaffold files still require repair, and symlinks are rejected.
-  const mayCreate = new Set(['tools/hjm-preview.mjs', '.github/workflows/hjm-preview.yml', 'tools/release-quality.mjs', 'tools/server-release-gate.mjs', canonicalReleaseRelativePath, canonicalCatalogRelativePath, 'tools/ci-change-scope.mjs', 'tools/deployment-preflight.mjs', 'tools/ci-resume.mjs', 'tools/runtime-bindings.mjs', 'tools/version-train.mjs', 'tools/hjm-source-analysis.mjs', 'tools/check-hjm-source.mjs']);
+  const mayCreate = new Set(['tools/ci-metrics.mjs', 'tools/check-evidence.mjs', 'tools/ci-product-evidence.mjs', 'tools/ci-bound-evidence.mjs', 'tools/ci-evidence-workflow.mjs', 'tools/hjm-preview.mjs', 'tools/release-quality.mjs', 'tools/server-release-gate.mjs', canonicalReleaseRelativePath, canonicalCatalogRelativePath, 'tools/ci-change-scope.mjs', 'tools/deployment-preflight.mjs', 'tools/ci-resume.mjs', 'tools/runtime-bindings.mjs', 'tools/version-train.mjs', 'tools/hjm-source-analysis.mjs', 'tools/check-hjm-source.mjs']);
   const readProjection = async (path) => await assertSyncPath(absoluteRoot, path, { allowMissing: mayCreate.has(path) })
     ? readRegularTextFile(resolve(absoluteRoot, path), path) : null;
   const projections = standardProjectionSources(contract, designRelease);
@@ -4478,8 +4494,7 @@ export async function checkAppConformance(appRoot, { now = new Date(), targetSta
   const requiredFiles = bound(contract) ? [...bindingProjectionSources(contract).keys(), ...Object.entries(canonicalDocuments).filter(([key]) => key !== 'decisionsDir').map(([,path]) => path)] : [
     ...previewProjectionSources(contract).map(([path]) => path),
     '.github/CODEOWNERS',
-    '.github/workflows/quality-gate.yml',
-    '.npmrc',
+      '.npmrc',
     '.editorconfig',
     'README.md',
     'package.json',
@@ -4652,9 +4667,8 @@ export async function checkAppConformance(appRoot, { now = new Date(), targetSta
   }
   // Bound apps gate on app-standard.yml; checking only quality-gate.yml left their
   // real gate unchecked once workflow drift became advisory (2026-10-09 review).
+  // 2026-10-14 owner request: generated app tooling must not recreate CI gates.
   const gateWorkflows = [
-    [bound(contract) ? '.github/workflows/app-standard.yml' : '.github/workflows/quality-gate.yml', bound(contract) ? bindingWorkflow(contract) : makeQualityGateWorkflow(contract)],
-    ['.github/workflows/hjm-preview.yml', hjmPreviewWorkflow(contract)],
   ];
   for (const [path, expected] of gateWorkflows) {
     const actual = fileSources.get(path);
