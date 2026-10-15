@@ -71,7 +71,7 @@ OS 최대 접근성 글자와 그 최대값 모사 확대는 설계·추가 검�
 
 | ID | 기준 | 검증 방법 | 상태 | Evidence ID |
 | --- | --- | --- | --- | --- |
-| DESIGN-001 | Portfolio Site의 실제 frontend에서 기본·오류·빈 상태와 접근성, HJM foundation 의미 계약을 검증한다. | light/dark와 큰 글자를 포함한 parity review | pending | EV-003, EV-008, EV-009, EV-010, EV-011, EV-012, EV-1400 |
+| DESIGN-001 | Portfolio Site의 실제 frontend에서 기본·오류·빈 상태와 접근성, HJM foundation 의미 계약을 검증한다. | light/dark·기본 좁은 화면·키보드 parity review(최대 글자 제외) | pending | EV-003, EV-008, EV-009, EV-010, EV-011, EV-012, EV-1400 |
 
 ## 91. Evidence registry
 
