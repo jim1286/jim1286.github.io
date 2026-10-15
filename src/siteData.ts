@@ -29,7 +29,7 @@ export const apps: PortfolioApp[] = [
     id: 'yajalal',
     index: '01',
     name: copy.product001,
-    englishName: 'Yajalal',
+    englishName: 'Today Baseball',
     description: copy.product002,
     icon: '/apps/yajalal.png',
     status: copy.product003,
@@ -37,9 +37,9 @@ export const apps: PortfolioApp[] = [
     // Anonymous GitHub navigation is 404; owner metadata confirms private.
     // Retain the repository URL as historical data, not public navigation.
     sourceAccess: 'private',
-    tags: ['Flutter', 'NestJS', 'KBO'],
+    tags: ['Expo', 'React Native', 'NestJS', 'KBO'],
     githubUrl: 'https://github.com/jim1286/yajalal',
-    iosUrl: 'https://apps.apple.com/kr/app/%EC%95%BC%EC%9E%98%EC%95%8C/id6749580205?uo=4',
+    iosUrl: 'https://apps.apple.com/kr/app/id6749580205',
     androidUrl: 'https://play.google.com/store/apps/details?id=dev.hjm.yajalal&hl=ko',
     featured: true,
   },
