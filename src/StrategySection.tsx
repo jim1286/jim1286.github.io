@@ -1,6 +1,7 @@
 import { Link } from '@hjmds/react/actions';
 import { Card, Icon } from '@hjmds/react/display';
 import { Container, Grid, Section, Stack, Surface, Text } from '@hjmds/react/layout';
+import { CompositionLayout } from '@hjmds/react/screens';
 import { strategyCopy as copy } from './copy';
 
 const development = [
@@ -31,26 +32,24 @@ export default function StrategySection() {
         <Grid columns={{ compact: 1, medium: 2 }} gap={{ compact: 'lg' }} minColumnWidth={{ compact: 280 }}>
           <Card title={copy.developmentStrategyTitle} headingLevel={3} padding="lg" actions={<Link href="/diagrams/development-strategy.html" variant="standalone">{copy.developmentDiagram} <Icon name="chevronEnd" decorative /></Link>}>
             <ol className="strategy-steps">{development.map(([label, detail], index) => <li key={label}>
-              <Stack gap="sm"><Text emphasis="strong">{label}</Text><Text tone="muted">{detail}</Text>{index < development.length - 1 && <Icon name="chevronDown" decorative />}</Stack>
+              <CompositionLayout title={label} description={detail} footer={index < development.length - 1 && <Icon name="chevronDown" decorative />} />
             </li>)}</ol>
           </Card>
           <Card title={copy.marketingStrategyTitle} headingLevel={3} padding="lg" actions={<Link href="/diagrams/marketing-strategy.html" variant="standalone">{copy.marketingDiagram} <Icon name="chevronEnd" decorative /></Link>}>
             {/* Keep the brand inside its operating case study: a second mascot
                 landing would duplicate the product list removed by the user. */}
-            <Surface padding="md" radius="md" tone="sunken"><Stack gap="md">
-              <Text as="p" emphasis="strong">{copy.marketingBrandTitle}</Text>
+            <Surface padding="md" radius="md" tone="sunken"><CompositionLayout title={copy.marketingBrandTitle}>
               <Text as="p">{copy.marketingBrandDetail}</Text>
               <Text as="p" tone="muted">{copy.marketingChannelsDetail}</Text>
               <Text as="p" tone="muted">{copy.marketingBrandBoundary}</Text>
-            </Stack></Surface>
+            </CompositionLayout></Surface>
             <ol className="strategy-steps">{marketing.map(([label, detail], index) => <li key={label}>
-              <Stack gap="sm"><Text emphasis="strong">{label}</Text><Text tone="muted">{detail}</Text>
+              <CompositionLayout title={label} description={detail} footer={index < marketing.length - 1 && <Icon name="chevronDown" decorative />}>
                 {index === 1 && <Grid columns={{ compact: 1, medium: 2 }} gap={{ compact: 'sm' }} minColumnWidth={{ compact: 120 }}>
-                  <Surface padding="md" radius="md" tone="sunken"><Stack gap="sm"><Text emphasis="strong">{copy.marketingSearch}</Text><Text tone="muted">{copy.marketingSearchDetail}</Text></Stack></Surface>
-                  <Surface padding="md" radius="md" tone="sunken"><Stack gap="sm"><Text emphasis="strong">{copy.marketingDiscover}</Text><Text tone="muted">{copy.marketingDiscoverDetail}</Text></Stack></Surface>
+                  <Surface padding="md" radius="md" tone="sunken"><CompositionLayout title={copy.marketingSearch} description={copy.marketingSearchDetail} /></Surface>
+                  <Surface padding="md" radius="md" tone="sunken"><CompositionLayout title={copy.marketingDiscover} description={copy.marketingDiscoverDetail} /></Surface>
                 </Grid>}
-                {index < marketing.length - 1 && <Icon name="chevronDown" decorative />}
-              </Stack>
+              </CompositionLayout>
             </li>)}</ol>
           </Card>
         </Grid>

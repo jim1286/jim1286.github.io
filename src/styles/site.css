@@ -7,7 +7,6 @@ img { display: block; max-width: 100%; }
 .portfolio-host { height: 100vh; height: 100dvh; }
 .portfolio-theme { font-synthesis: none; text-rendering: optimizeLegibility; }
 .site-header, .site-footer { background: var(--hjm-color-bg); padding-block: var(--hjm-space-lg); }
-.header-content { display: flex; align-items: start; justify-content: space-between; gap: var(--hjm-space-md); }
 .header-menu { min-width: 0; }
 .section-padding { padding-block: calc(var(--hjm-space-xl) * 3); }
 .hero-brand-word { color: var(--hjm-color-content-brand); }

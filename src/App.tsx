@@ -6,6 +6,7 @@ import { Container, Grid, Section, Stack, Surface, Text } from '@hjmds/react/lay
 import { Badge, Card, Icon, Statistic, Tag } from '@hjmds/react/display';
 import { Heading } from '@hjmds/react/heading';
 import { Asset } from '@hjmds/react/asset';
+import { TopBar } from '@hjmds/react/top-bar';
 import { ScreenLayout } from '@hjmds/react/screens';
 import { SkipNav } from '@hjmds/react/skip-nav';
 import '@hjmds/react/styles.css';
@@ -61,15 +62,12 @@ function SiteHeader() {
   };
   return <BrandProvider surface="forest"><header className="site-header">
     <Container size="content" gutter="regular">
-      <div className="header-content" onKeyDown={event => {
+      <TopBar leading={<Link href="#top" variant="standalone" tone="neutral" aria-label={copy.home}><Text emphasis="strong">{copy.brandName}</Text></Link>} onKeyDown={event => {
         if (event.key === 'Escape' && compact && open) {
           setOpen(false);
           menu.current?.querySelector('button')?.focus();
         }
-      }}>
-        <Link href="#top" variant="standalone" tone="neutral" aria-label={copy.home}><Text emphasis="strong">{copy.brandName}</Text></Link>
-        {/* A single public disclosure keeps the sticky mobile header small;
-            desktop uses its inline presentation instead of duplicate links. */}
+      }} trailing={
         <Collapsible ref={menu} className="header-menu" trigger={copy.menu} open={open} onOpenChange={setOpen} presentation={compact ? 'disclosure' : 'inline'}>
           <Stack axis={compact ? 'block' : 'inline'} gap="sm" align="center">
         <nav aria-label={copy.navigation}><Stack axis="inline" gap="sm" wrap>
@@ -81,7 +79,7 @@ function SiteHeader() {
         <Link href={`mailto:${developerEmail}`} variant="standalone" tone="neutral">{copy.contact} <ExportOutlined aria-hidden /></Link>
           </Stack>
         </Collapsible>
-      </div>
+      } />
     </Container>
   </header></BrandProvider>;
 }
