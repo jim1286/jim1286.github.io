@@ -1,20 +1,16 @@
 import type { ReactNode } from 'react';
 import { HjmProvider } from '@hjmds/react/provider';
 import { defineHjmDesignProfile } from '@hjmds/design-contracts/design-profile';
-import { fontWeight } from '@hjmds/design-contracts/foundations';
 
 // The site's paper/forest identity is product-owned. Start with neutral contracts,
 // not Showcase artwork/effects; profile roles keep private recipe CSS intact.
 // See docs/DESIGN.md for the marketing-screen composition decision.
+// No heading override: HJM 1.28 caps type at typography.heading 24 and rejects larger profile
+// steps (2026-10-17 user decision removing the display tier); the 52/38/28 editorial scale went.
 const portfolioDesign = defineHjmDesignProfile({
   id: 'portfolio-paper-forest',
   tokens: {
     radius: { sm: 0, md: 12, lg: 20, xl: 24 },
-    heading: {
-      level1: { fontSize: 52, lineHeight: 60, fontWeight: fontWeight.heavy },
-      level2: { fontSize: 38, lineHeight: 46, fontWeight: fontWeight.bold },
-      level3: { fontSize: 28, lineHeight: 36, fontWeight: fontWeight.bold },
-    },
   },
   material: { canvas: null, card: null, surface: null },
   compositions: { collection: 'grid', toolbar: 'inline' },

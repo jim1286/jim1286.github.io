@@ -60,8 +60,10 @@ function SiteHeader() {
     // to the header would make the next Tab disagree with the visible location.
     requestAnimationFrame(() => destination?.focus({ preventScroll: true }));
   };
+  // TopBar owns the inline inset (16). The width-only Container keeps it aligned to the content
+  // column; a gutter here doubled the inset and put the menu trigger 36 from the edge.
   return <BrandProvider surface="forest"><header className="site-header">
-    <Container size="content" gutter="regular">
+    <Container size="content" gutter="none">
       <TopBar leading={<Link href="#top" variant="standalone" tone="neutral" aria-label={copy.home}><Text emphasis="strong">{copy.brandName}</Text></Link>} onKeyDown={event => {
         if (event.key === 'Escape' && compact && open) {
           setOpen(false);

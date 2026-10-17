@@ -21,8 +21,8 @@ minimumReleaseAgeExcludePrune: true
 # HJM 1.27.0: tag 63fdc11b and official tarball integrity verified by central release import.
 # Remove automatically once the release ages past pnpm policy; do not exempt the namespace.
 minimumReleaseAgeExclude:
-  - '@hjmds/design-contracts@1.27.2'
-  - '@hjmds/react@1.27.2'
+  - '@hjmds/design-contracts@1.28.0'
+  - '@hjmds/react@1.28.0'
 
 # Old 1.15 exact exemptions were pruned after lock regeneration.
 # Receipt and failure history: docs/qa/2026-10-08-hjm-adoption.md.
