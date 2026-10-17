@@ -2,13 +2,8 @@
 
 ## 현재 공통 작업 기준
 
-2026-10-12 사용자 요청으로 [루트 최소 작업 규칙](https://github.com/jim1286/app-portfolio/blob/main/AGENTS.md#공통-규격과-최소-작업-규칙)을 적용한다. 제품 규격은 공통으로 유지하며 이전 절차 요구와 충돌하면 이 기준이 우선한다.
-
-- `main`에서 작업하고 경로를 지정해 커밋한다. 임시 브랜치·워크트리를 만들지 않고 다른 세션의 변경을 보존한다.
-- 변경 범위의 타입·빌드·동작을 검사한다. 전체 회귀·문서/형식 감사는 명시적으로 선택하며 CI 성공을 전체 검증으로 확대하지 않는다.
-- 작은 수정은 이유·검사 결과·미확인 범위를 커밋이나 기존 기록에 남긴다. 별도 QA 문서·고정 절 수·중복 승인·과거 자료 전수 정리는 요구하지 않는다.
-- CI·배포 설정은 개발 Mac에서도 수정한다. 배포 버전 준비와 무거운 릴리스 실행은 mac-ci/CI가 맡고 운영 키·러너 경계는 유지한다.
-- 이미 승인된 수정·푸시·재시도는 계속 진행한다. 실제 전송 여부가 불명확하면 먼저 확인해 중복 제출을 막는다. 업로드·심사·공개는 따로 보고한다.
+공통 작업 원칙은 [포트폴리오 AGENTS.md](../../AGENTS.md)를 따른다. 독립 checkout에서는 [중앙 정본](https://github.com/jim1286/app-portfolio/blob/main/AGENTS.md)을 확인한다.
+이 문서는 제품 고유 조건만 추가한다. 2026-10-15 지침 점검에서 반복된 공통 규칙을 참조로 통합했다.
 
 이 저장소는 React/Vite 기반 독립 웹 제품이며 공통 `portfolio-default-v1` 심사 대상이다.
 현재 `app.contract.json`으로 Vite runtime과 공통 검사 명령을 연결했다. 구현 evidence 승격은 별도다. Vite를 Next.js로 허위 선언하거나 기존 제품이라는
@@ -16,7 +11,7 @@
 [ARCHITECTURE](docs/ARCHITECTURE.md), [DESIGN](docs/DESIGN.md), [RELEASE](docs/RELEASE.md)에 기록한다.
 
 - Node는 `.nvmrc`, 패키지 관리자는 `package.json#packageManager`의 exact 버전을 사용한다.
-- 설치는 저장소 루트에서 `pnpm install --frozen-lockfile`, 검사는 `pnpm check`다.
+- 설치는 저장소 루트에서 `pnpm install --frozen-lockfile`, 검사는 변경 범위에 해당하는 `package.json` script를 선택한다. `pnpm check` 전체 실행은 명시적으로 선택한 감사에만 쓴다.
 - 정책 링크는 생성물을 직접 편집하지 않고 Hub 원본 변경 후 `pnpm policy:sync`로 갱신한다.
 - `policy:check`는 Hub 원본과 비교하며 원본이 없으면 실패한다. 독립 CI의
   `policy:check:snapshot`은 저장된 공개 snapshot만 검증하며 Hub 최신 상태를 증명하지 않는다.

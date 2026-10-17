@@ -6,7 +6,7 @@
 
 ## 1. 적용 지침
 
-포트폴리오의 `docs/QA_REPORT_STANDARD.md`(QR), `docs/APP_VISUAL_QUALITY_STANDARD.md`(VQ), `docs/NEW_APP_DEVELOPMENT_GUIDE.md` §12를 따른다. 릴리스 명령·기기 E2E·Release smoke는 `control-plane/app-release-hub/docs/governance/QA_STANDARD.md`를 따른다. 정책 원문을 제품에 복제하지 않는다.
+포트폴리오의 `docs/QA_REPORT_STANDARD.md`(QR), `docs/APP_VISUAL_QUALITY_STANDARD.md`(VQ), `docs/NEW_APP_DEVELOPMENT_GUIDE.md` §12를 따른다. 이 제품은 웹 전용이며 실제 배포·확인은 [릴리스 지침](RELEASE.md)과 [정적 사이트 실행서](../deploy/static-site/README.md)를 따른다. 정책 원문을 제품에 복제하지 않는다.
 
 - 작은 수정은 영향 화면·상태·해당 테마만 확인한다. 첫 출시·공통 테마·탐색 구조·광범위 개편은 VQ 전수 점검을 적용한다.
 - 최대 글자 크기 및 그 최대값을 모사하는 확대 조건은 설계·실행·완료 조건에서 제외한다. 과거 기록은 당시 증거로만 보존한다.
@@ -22,20 +22,19 @@
 
 ## 3. 자동 검사
 
-대상 제품 저장소 루트에서 선언된 패키지 관리자와 도구 버전으로 실행한다. 변경 범위 검사를 기본으로 하고 전체 게이트는 명시적으로 선택하며, 명령의 존재만으로 통과를 주장하지 않는다.
+대상 제품 저장소 루트에서 선언된 패키지 관리자와 도구 버전으로 실행한다. 변경 범위 검사를 기본으로 하고 전체 검사는 명시적으로 선택하며, 명령의 존재만으로 통과를 주장하지 않는다.
 
-```sh
-pnpm check
-pnpm docs:check
-```
+문서 변경은 `pnpm docs:check`, 타입 영향은 `pnpm typecheck`, 정책 링크 변경은
+`node --test scripts/sync-policy-links.test.mjs`처럼 파일을 지정한다. 전체 감사가 명시적으로
+선택된 경우에만 `pnpm check`를 실행한다.
 
-명령 원본은 [package.json](../package.json)과 [앱 계약](../app.contract.json)이다. 전체 게이트가 빌드·DB·외부 환경을 필요로 하면 먼저 자원과 설정을 확인한다. 문서만 바꾸는 작업은 문서·링크 검사로 확인하며 제품 QA를 실행했다고 보고하지 않는다.
+명령 원본은 [package.json](../package.json)과 [앱 계약](../app.contract.json)이다. 선택한 검사가 빌드·외부 환경을 필요로 하면 먼저 자원과 설정을 확인한다. 문서만 바꾸는 작업은 문서·링크 검사로 확인하며 제품 QA를 실행했다고 보고하지 않는다.
 
 ## 4. 사용자 흐름과 탐색 QA
 
-기존 개발 서버·앱·기기에 붙는다. QA 준비를 위해 제품 DB를 새로 만들거나 초기화하지 않는다. Expo 반복 UI 확인은 runtime 루트의 `expo start`, Flutter는 debug 구성을 사용한다. 서버가 있는 제품은 로컬 개발 API와 실제 앱 API 주소·개발 로그인 상태를 확인한다.
+2026-10-17 QA 지침 감사에서 웹 전용 제품에 복사된 Expo·Flutter·native 기기 절차를 제거했다. 기존 개발 웹과 브라우저를 사용하고, 바뀐 페이지·상태·viewport·언어·테마를 확인한다. 이 작업을 위해 DB나 native 기기를 만들지 않는다. 모바일 브라우저 동작을 확인한 경우에도 native 앱 QA로 보고하지 않는다.
 
-iOS는 이미 실행 중인 Device Hub 기기(iPhone 17 Pro · iOS 26.5 기본)를 사용하고 새 기기를 만들거나 추가 부팅하지 않는다. 2026-10-14 사용자 요청으로 Device Hub의 `cua_repl` 화면 확인·조작을 허용한다(과거 연결 시간 초과에 따른 금지 해제). 자동 host 연결이 실패하면 수동 검증 범위와 한계를 기록한다.
+정책 링크를 바꾼 경우 Hub 공개 원본·snapshot·생성물 관계를 확인한다. 로컬 화면, 빌드 artifact, 실제 공개 URL 확인을 각각 구분한다. 실제 게시 후 확인·복구는 [정적 사이트 실행서](../deploy/static-site/README.md)를 따른다.
 
 ExploreQA 실행 adapter는 현재 미구비다. 안내 파일이나 일반 자동 테스트를 탐색 캠페인 완료 증거로 쓰지 않는다. 기존 개발 대상에서 사용자 흐름을 수동으로 검증하고 리포트에 기록한다.
 
@@ -56,4 +55,4 @@ ExploreQA 실행 adapter는 현재 미구비다. 안내 파일이나 일반 자�
 
 ## 6. 완료와 보관
 
-필요한 결과·실패·미확인·후속 조건을 남긴 뒤 링크와 보관 처리를 확인한다. 계약 증거는 소비자와 digest를 함께 갱신하기 전에는 이동·삭제하지 않는다. `planned` 자료와 정리 시점 HEAD는 실제 검사 증거가 아니다. CI·배포 설정은 개발 Mac에서도 수정하며, 배포 버전 준비와 무거운 실행은 mac-ci/CI가 맡는다. 릴리스는 제품 SHA·QA 경로·환경 이름·migration 목록과 필요한 새 OS Release 첫 실행 기록을 mac-ci로 인계한다.
+필요한 결과·실패·미확인·후속 조건을 남긴 뒤 링크와 보관 처리를 확인한다. 계약 증거는 소비자와 digest를 함께 갱신하기 전에는 이동·삭제하지 않는다. `planned` 자료와 정리 시점 HEAD는 실제 검사 증거가 아니다. CI·배포 설정은 개발 Mac에서도 수정하며, 배포 버전 준비와 무거운 실행은 mac-ci/CI가 맡는다. 게시 인계에는 source SHA·artifact 식별자·검사 결과·대상 origin과 복구 조건을 남긴다. native 빌드·새 OS Release 첫 실행·DB migration 자료는 이 웹 제품의 완료 조건이 아니다.

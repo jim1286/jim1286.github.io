@@ -1,7 +1,7 @@
 {
   "schemaVersion": 2,
   "source": "app-release-hub",
-  "sourceDigest": "c1efcb4cc7317eb6e11550da100c1370b1e4248411b7ac488de786a9e1167af4",
+  "sourceDigest": "98bea4cc0b8afffcce99e796cadbd315aeaa86e54ec6971fbdd232137122168d",
   "projection": {
     "origin": "https://policies.jmstudioapps.com",
     "paths": {
@@ -16,6 +16,7 @@
       "spint",
       "taground",
       "unairplane",
+      "utilverse",
       "yajalal"
     ],
     "publications": {
@@ -25,6 +26,7 @@
       "spint": "app-owned",
       "taground": "central",
       "unairplane": "central",
+      "utilverse": "central",
       "yajalal": "central"
     },
     "urls": {
@@ -57,6 +59,11 @@
         "privacyPolicy": "https://policies.jmstudioapps.com/privacy/unairplane",
         "accountDeletion": "https://policies.jmstudioapps.com/privacy/unairplane/delete-account",
         "support": "https://policies.jmstudioapps.com/support/unairplane"
+      },
+      "utilverse": {
+        "privacyPolicy": "https://policies.jmstudioapps.com/privacy/utilverse",
+        "accountDeletion": "https://policies.jmstudioapps.com/privacy/utilverse/delete-account",
+        "support": "https://policies.jmstudioapps.com/support/utilverse"
       },
       "yajalal": {
         "privacyPolicy": "https://policies.jmstudioapps.com/privacy/yajalal",

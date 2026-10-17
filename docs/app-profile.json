@@ -8,9 +8,9 @@
   "schemaPath": "docs/app-contract.schema.json",
   "fieldSemantics": "All fields are normative and hash-pinned by check-standard-assets except human-readable summary and rationale fields, which are informational explanations of the adjacent machine rule. Every version this profile records is a reviewed floor inside its own major train: a consumer must stay on that major and be at or above the value, declared either exactly or through a ~/^ range that cannot leave the train. Exact equality is required only where an external system keys on the literal string, and integrity/tarball fields always describe the one artifact that was reviewed.",
   "conformanceStages": {
-    "governance-scaffold": "draft governance (any product lifecycle except archived); schema, canonical documents, evidence plans, vendored validators, and CI projection are complete, while runtime implementation gates are not yet claimed. The product may be incubating or active in portfolio.json: lifecycle is product state, not a conformance claim",
-    "implementation-conformant": "active governance; all governance checks plus runtime manifests, exact production HJM dependencies, frozen lockfile, canonical HJM Provider theme preference/raw-token guard, verified evidence, and a configured external merge authority pass; unavailable while ci.trustModel.bootstrapStatus is unconfigured",
-    "rehearsal": "not a stage: check-app --target-stage implementation-conformant on a draft-governance app runs the active gate, splits findings into actionable vs blockedByPortfolioAuthority, and reports implementationReady; it never sets stage"
+    "governance-scaffold": "draft governance (any product lifecycle except archived); schema, canonical documents, evidence plans and vendored validators are complete; no quality workflow is generated and runtime implementation conformance is not yet claimed. The product may be incubating or active in portfolio.json: lifecycle is product state, not a conformance claim",
+    "implementation-conformant": "active governance; applicable runtime, dependency, design, acceptance and evidence checks pass under explicit local verification; does not assert GitHub merge eligibility or authorize delivery",
+    "rehearsal": "not a stage: explicit implementation audit on a draft app; all findings are actionable, implementationReady requires no findings, and no stage is granted"
   },
   "templateSources": {
     "product": "docs/templates/PRODUCT.md",
@@ -138,7 +138,7 @@
       ],
       "lockfileResolution": "exact-importer-with-registry-integrity",
       "nativeDesign": "recorded-hjm-train-with-dart-adapter-sources-and-foundation-evidence",
-      "stages": "same-acceptance-evidence-and-central-authority-as-scaffold",
+      "stages": "same-applicable-implementation-and-evidence-checks-as-scaffold",
       "baseline": "portfolio-baseline-and-expiring-declared-exemptions-remain-required"
     }
   },
@@ -176,16 +176,6 @@
     }
   },
   "ci": {
-    "workflowPath": ".github/workflows/quality-gate.yml",
-    "triggers": [
-      "pull_request",
-      "push:main"
-    ],
-    "requiredSteps": [
-      "corepack enable",
-      "pnpm install --frozen-lockfile",
-      "pnpm check"
-    ],
     "actions": {
       "checkout": {
         "version": "7.0.1",
@@ -203,64 +193,19 @@
       }
     },
     "trustModel": {
-      "bootstrapStatus": "unconfigured-no-merge-eligibility",
-      "centralVerifierRepository": null,
-      "codeownerTeam": null,
-      "centralVerifierWorkflowPath": ".github/workflows/app-standard-required.yml",
-      "requiredCheck": "app-standard-required",
-      "centralVerifierExecution": "organization-ruleset-pull-request-and-merge-group-three-fresh-hosted-jobs",
-      "bootstrapApprovedCommit": "0000000000000000000000000000000000000000",
-      "requiredCentralSteps": [
-        "trusted-static-precheck-fresh-runner",
-        "isolated-untrusted-registry-check-corepack-enable-frozen-install-canonical-pnpm-check",
-        "trusted-final-static-recheck-fresh-runner",
-        "event-head-and-approved-standard-sha-reverified-in-each-trusted-job"
-      ],
-      "untrustedQualityIsolation": {
-        "separateHostedRunner": true,
-        "sharesWorkspaceOrArtifactsWithTrustedJobs": false,
-        "trustedFinalJobExecutesAppCode": false
-      },
-      "publicationPrerequisites": [
-        "approve-an-actual-organization-required-workflow-or-verified-github-app-authority-in-a-profile-revision",
-        "publish-central-authority-and-record-the-real-repository",
-        "create-or-transfer-app-repository-into-the-approved-ownership-boundary",
-        "grant-the-recorded-codeowner-team-visible-write-access-when-using-an-organization-ruleset",
-        "install-and-verify-the-approved-external-required-gate",
-        "revise-profile-with-reviewed-nonzero-verifier-commit"
-      ],
-      "localWorkflowRole": "feedback-and-accidental-drift-detection-only",
-      "authoritativeMergeGate": "external-required-workflow-at-immutable-commit",
-      "eligibilitySource": "central-verifier-only",
-      "unverifiedExternalSettingsAction": "not-merge-eligible",
+      "conformanceAuthority": "explicit-local-verification",
+      "mergeEligibility": "not-asserted-by-contract-checks",
+      "automaticQualityGates": false,
       "requiredGeneratedFiles": [
-        ".github/CODEOWNERS",
         ".npmrc"
       ],
       "registryPolicy": {
         "canonicalConfigPath": ".npmrc",
         "defaultRegistry": "https://registry.npmjs.org/",
         "hjmScopeRegistry": "https://registry.npmjs.org/",
-        "nestedConfigsForbidden": true,
-        "centralUserConfigRequired": true
+        "nestedConfigsForbidden": true
       },
-      "protectedPathsSource": "governance.mergePolicy.protectedPaths",
-      "runtimeManifestProtection": "each-declared-runtime-root/package.json",
-      "workspaceManifestProtectionRequired": true,
-      "sharedPackageManifestProtection": "packages/**/package.json",
-      "repositoryPolicyEvidenceRequiredBeforeActive": true,
-      "repositoryPolicyLiveVerification": {
-        "performedBy": "configured-external-authority",
-        "repositoryOwnedEvidenceIsNotAuthority": true,
-        "requiredComparisons": [
-          "repository-and-head-sha",
-          "ruleset-or-branch-protection-no-bypass-state",
-          "codeowner-team-write-access-and-visibility",
-          "required-workflow-source-and-approved-ref",
-          "required-check-result",
-          "live-api-response-digest-vs-evidence"
-        ]
-      }
+      "repositorySettings": "preserve-existing-settings; change-only-with-explicit-authorization"
     }
   },
   "designSystem": {
@@ -366,8 +311,7 @@
         "subject-head-or-artifact-digest",
         "producer-or-verification-authority",
         "human-approval-or-external-attestation-when-applicable"
-      ],
-      "repositoryPolicyLiveReverifiedByCentralGate": true
+      ]
     }
   },
   "waiverPolicy": {

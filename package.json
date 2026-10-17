@@ -6,7 +6,7 @@
   "homepage": "https://jmstudioapps.com/",
   "scripts": {
     "dev": "vite",
-    "build": "pnpm i18n:check && pnpm run policy:check:snapshot && tsc -b && vite build && node scripts/build-locale-pages.mjs",
+    "build": "node tools/sync-i18n.mjs && pnpm run policy:check:snapshot && tsc -b && vite build && node scripts/build-locale-pages.mjs",
     "preview": "vite preview",
     "deploy": "bash deploy/static-site/publish.sh",
     "policy:sync": "node scripts/sync-policy-links.mjs",

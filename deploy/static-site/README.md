@@ -23,13 +23,17 @@
 ```sh
 pnpm install --frozen-lockfile
 pnpm run policy:check
-pnpm check
+pnpm build
 pnpm run deploy:prepare /absolute/empty/artifact <exact-main-source-sha>
 pnpm run deploy:verify /absolute/empty/artifact <exact-main-source-sha>
 pnpm run deploy /absolute/empty/artifact ubuntu@51.79.240.56 /absolute/ssh-key-file <exact-main-source-sha>
 ```
 
-Hub 원본 비교는 접근 가능한 Hub checkout에서 실행한다. 독립 환경의 pnpm check는 공개 snapshot만
+2026-10-17 정책 대조에서 반복 배포에 전체 검사가 묶여 있어 `pnpm check`를 빌드로 교체했다.
+빌드는 언어/정책 입력 정합성·타입·번들·locale 페이지를 만들며 테스트를 실행하지 않는다. 변경한 동작의
+검사는 개발 때 선택하고 같은 소스·범위의 성공을 재사용한다.
+
+Hub 원본 비교는 접근 가능한 Hub checkout에서 실행한다. 독립 환경의 build는 공개 snapshot만
 검사하므로 최신 Hub 원본 증명이 아니며, 원본 접근이 없으면 검증된 snapshot provenance를 먼저 확인한다.
 배포 명령은 이미 검사한 artifact만 게시하며 내부에서 다른 source를 재빌드하지 않는다.
 

@@ -9,10 +9,11 @@
 - 앱 identity와 저장소: `app-portfolio/portfolio.json`
 - 버전, 스토어 상태와 URL: App Release Hub의 release profile 및 store binding
 - 앱 설명: 각 앱 저장소의 최신 README
-- 개인정보처리방침과 지원 문서: `policies.jmstudioapps.com`
+- 개인정보처리방침과 지원 문서: Hub의 제품별 게시 소유권·공개 URL. 중앙 사이트는 `policies.jmstudioapps.com`, 자체 게시 제품은 해당 제품 도메인
 
-정책 본문은 이 저장소에 복제하지 않습니다. 이 사이트는 정책 사이트의 앱별 공식 문서로
-연결하며, 정책의 개정과 배포는 App Release Hub가 관리합니다.
+정책 본문은 이 저장소에 복제하지 않습니다. 이 사이트는 제품별 공식 문서로 연결합니다.
+중앙 게시 정책은 App Release Hub, 자체 게시 정책은 각 제품 저장소가 원문과 게시를 관리합니다.
+2026-10-17 대조에서 모든 정책을 Hub가 게시하는 듯한 설명을 실제 URL 생성 계약과 맞췄습니다.
 
 ## 개발
 
@@ -21,8 +22,9 @@
 ```bash
 pnpm install --frozen-lockfile
 pnpm run dev
-pnpm check
 ```
+
+검사는 변경한 범위의 타입·관련 테스트를 선택합니다. `pnpm check`는 명시적으로 선택하는 전체 감사입니다.
 
 ## 배포
 
@@ -41,9 +43,10 @@ pnpm check
 
 ## 정책 URL 원천
 
-개인정보처리방침·지원·계정삭제 링크는 App Release Hub의 `config/portfolio.json`에서 생성한다.
+개인정보처리방침·지원·계정삭제 링크는 App Release Hub의 `config/portfolio.json`과
+`config/apps/<id>/app.json` 또는 보관된 `retired.json`의 공개 URL·게시 소유권에서 생성한다.
 `pnpm run policy:sync`가 `src/policyLinks.generated.ts`를 다시 만들고, `policy:check`는 Hub 원본과 비교하며 Hub가 없으면 실패합니다.
-독립 CI와 `build`의 `policy:check:snapshot`은 공개 snapshot과 생성물의 일치만 검증하고,
+독립 환경과 `build`의 `policy:check:snapshot`은 공개 snapshot과 생성물의 일치만 검증하고,
 Hub 최신 상태를 확인한 것으로 표시하지 않습니다.
 
 ## 개발·설계 문서
@@ -56,9 +59,10 @@ Hub 최신 상태를 확인한 것으로 표시하지 않습니다.
 ## 공통 개발 계약
 
 `app.contract.json`이 실제 runtime·lockfile·검사 명령과 acceptance/evidence를 연결한다.
-`pnpm install --frozen-lockfile` 후 `pnpm standard:check`로 모든 선언된 runtime의 lint/typecheck/test/build를 실행한다.
-Flutter SDK는 runtime의 `.fvmrc`를 따른다. 기존 제품 CI는 유지하며 공통 피드백 CI를 추가한다.
-계약 작성 상태는 governance-scaffold이며 구현·실기기·외부 required gate 완료를 뜻하지 않는다.
+실제 runtime은 Vite이며 변경한 표면의 타입·관련 테스트·빌드를 선택한다. 전량 `standard:check`는
+명시적으로 요청한 감사에만 사용하고 별도 피드백/품질 CI를 추가하지 않는다(2026-10-14 최소화 지시).
+`build`는 입력 정합성·컴파일·정적 출력 생성이며 단위 테스트를 실행하지 않는다. 계약의 존재나
+정적 검사 통과는 구현·실제 공개 배포 완료의 증거가 아니다.
 
 ## QA 자료 진입점
 

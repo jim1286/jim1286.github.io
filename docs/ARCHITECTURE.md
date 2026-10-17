@@ -49,7 +49,9 @@ source·archive/file digest를 검증해 원자 승격한다. 기존 Pages sourc
 
 ## 검사
 
-`pnpm check`는 i18n·문서 링크·snapshot·단위 검사·production build를 포함한다.
+`pnpm check`는 명시적으로 선택한 전체 감사이며 i18n·문서 링크·snapshot·단위 검사·production build를 포함한다.
+일반 수정은 관련 검사만 선택한다. `build`는 언어/정책 입력 정합성·타입·번들·locale 페이지 생성이며,
+다국어 생성기 테스트를 빌드마다 반복하지 않는다(2026-10-17 최소화 정책 대조).
 정책 sync 테스트는 임시 원본/출력으로 원본 부재·원본 drift·생성물 변조·잘못된 경로를 검증한다.
 브라우저/기기별 UI, 외부 링크 가용성, 공개 배포 결과는 별도 확인 대상이다.
 

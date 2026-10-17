@@ -15,40 +15,7 @@
     "status": "draft",
     "owner": "jimin",
     "reviewedAt": "2026-10-08",
-    "documentVersion": "1.1.0",
-    "mergePolicy": {
-      "authority": "external-required-workflow",
-      "status": "planned",
-      "centralVerifier": {
-        "repository": "https://github.com/example-org/app-standard-authority",
-        "workflowPath": ".github/workflows/app-standard-required.yml",
-        "commit": "0000000000000000000000000000000000000000",
-        "requiredCheck": "app-standard-required",
-        "branch": "main"
-      },
-      "codeownerTeam": "@example-org/app-standard-owners",
-      "protectedPaths": [
-        ".github/workflows/quality-gate.yml",
-        ".github/CODEOWNERS",
-        ".github/dependabot.yml",
-        "app.contract.json",
-        "package.json",
-        ".npmrc",
-        "pnpm-lock.yaml",
-        "pnpm-workspace.yaml",
-        "packages/**/package.json",
-        "apps/mobile/package.json",
-        "apps/web/package.json",
-        "apps/server/package.json",
-        "tools",
-        "docs/app-profile.json",
-        "docs/app-contract.schema.json",
-        "docs/hjm-catalog.snapshot.json",
-        ".github/workflows/app-standard.yml"
-      ],
-      "repositoryPolicyEvidenceId": "EV-006",
-      "eligibilitySource": "central-verifier-only"
-    }
+    "documentVersion": "1.1.0"
   },
   "runtimes": [
     {
@@ -229,10 +196,9 @@
         "id": "QUALITY-001",
         "category": "quality",
         "statement": "고정된 toolchain과 frozen lockfile에서 canonical check가 통과한다.",
-        "verification": "pnpm standard:check 및 기존 제품 CI 결과와 runtime별 evidence 검토",
+        "verification": "명시적으로 선택한 구현 검증의 실제 source/artifact·환경·범위·결과. 외부 승인 workflow 설치는 품질 근거가 아니다.",
         "status": "pending",
         "evidenceIds": [
-          "EV-006",
           "EV-020"
         ]
       },
@@ -297,17 +263,6 @@
         "location": "docs/evidence/planned/security-review.md",
         "status": "planned",
         "owner": "jimin"
-      },
-      {
-        "id": "EV-006",
-        "criterionIds": [
-          "QUALITY-001"
-        ],
-        "type": "repository-policy",
-        "location": "docs/evidence/planned/repository-policy.md",
-        "status": "planned",
-        "owner": "jimin",
-        "note": "Replace this plan with a repository-policy record of protected paths, CODEOWNERS, branch rules, head SHA and the immutable external required workflow. Its repository-local digest proves byte integrity only; the configured central gate must live-reverify the settings before merge eligibility."
       },
       {
         "id": "EV-007",

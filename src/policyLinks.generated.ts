@@ -5,7 +5,7 @@ export const policyPaths = {
   "accountDeletion": "/privacy/{id}/delete-account",
   "support": "/support/{id}"
 } as const;
-export const appsWithPolicy = ["burntok","choose-window","diairy","spint","taground","unairplane","yajalal"] as const;
+export const appsWithPolicy = ["burntok","choose-window","diairy","spint","taground","unairplane","utilverse","yajalal"] as const;
 export const policyUrls = {
   "burntok": {
     "privacyPolicy": "https://burntok.jmstudioapps.com/legal/privacy",
@@ -36,6 +36,11 @@ export const policyUrls = {
     "privacyPolicy": "https://policies.jmstudioapps.com/privacy/unairplane",
     "accountDeletion": "https://policies.jmstudioapps.com/privacy/unairplane/delete-account",
     "support": "https://policies.jmstudioapps.com/support/unairplane"
+  },
+  "utilverse": {
+    "privacyPolicy": "https://policies.jmstudioapps.com/privacy/utilverse",
+    "accountDeletion": "https://policies.jmstudioapps.com/privacy/utilverse/delete-account",
+    "support": "https://policies.jmstudioapps.com/support/utilverse"
   },
   "yajalal": {
     "privacyPolicy": "https://policies.jmstudioapps.com/privacy/yajalal",

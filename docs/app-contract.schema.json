@@ -40,7 +40,7 @@
     },
     "governance": {
       "$ref": "#/$defs/governance",
-      "description": "Document status, owner, review date and the merge authority the app defers to. status draft pairs with lifecycle incubating; active pairs with active/maintenance/retiring."
+      "description": "Document status, owner, review date and version. Incubating uses draft; active/maintenance/retiring may be draft or active; archived uses superseded. Legacy mergePolicy is historical metadata, not a conformance prerequisite or current permission grant."
     },
     "runtimes": {
       "type": "array",
@@ -421,60 +421,6 @@
     },
     {
       "if": {
-        "type": "object",
-        "properties": {
-          "governance": {
-            "type": "object",
-            "properties": {
-              "status": {
-                "enum": [
-                  "active",
-                  "superseded"
-                ]
-              }
-            },
-            "required": [
-              "status"
-            ]
-          }
-        },
-        "required": [
-          "governance"
-        ],
-        "description": "Claiming conformance (governance active/superseded) requires a verified external merge authority; product lifecycle alone does not."
-      },
-      "then": {
-        "type": "object",
-        "properties": {
-          "governance": {
-            "type": "object",
-            "properties": {
-              "mergePolicy": {
-                "type": "object",
-                "properties": {
-                  "status": {
-                    "const": "verified"
-                  },
-                  "centralVerifier": {
-                    "type": "object",
-                    "properties": {
-                      "commit": {
-                        "const": "0000000000000000000000000000000000000000",
-                        "not": {
-                          "const": "0000000000000000000000000000000000000000"
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    {
-      "if": {
         "required": [
           "execution"
         ]
@@ -597,8 +543,7 @@
         "status",
         "owner",
         "reviewedAt",
-        "documentVersion",
-        "mergePolicy"
+        "documentVersion"
       ],
       "properties": {
         "status": {
@@ -695,7 +640,8 @@
         "eligibilitySource": {
           "const": "central-verifier-only"
         }
-      }
+      },
+      "description": "Historical external-authority plan, retained for record compatibility only. Since the 2026-10-14 CI minimization decision it is neither a conformance prerequisite nor proof of current repository permissions."
     },
     "documents": {
       "type": "object",
@@ -947,7 +893,6 @@
             "additionalProperties": false,
             "required": [
               "componentId",
-              "adrPath",
               "evidenceIds"
             ],
             "properties": {
@@ -967,7 +912,30 @@
                   "type": "string",
                   "pattern": "^EV-[0-9]{3,}$"
                 }
+              },
+              "recordPath": {
+                "type": "string",
+                "pattern": "^(?!/)(?!.*(?:^|/)\\.\\.(?:/|$))[A-Za-z0-9._-]+(?:/[A-Za-z0-9._-]+)*\\.md$",
+                "description": "Shared repository-local adoption record (for example docs/DESIGN.md or TASKS.md). Legacy adrPath remains supported; choose exactly one."
               }
+            },
+            "anyOf": [
+              {
+                "required": [
+                  "recordPath"
+                ]
+              },
+              {
+                "required": [
+                  "adrPath"
+                ]
+              }
+            ],
+            "not": {
+              "required": [
+                "recordPath",
+                "adrPath"
+              ]
             }
           }
         }
@@ -2068,7 +2036,6 @@
             "additionalProperties": false,
             "required": [
               "componentId",
-              "adrPath",
               "evidenceIds"
             ],
             "properties": {
@@ -2088,7 +2055,30 @@
                   "type": "string",
                   "pattern": "^EV-[0-9]{3,}$"
                 }
+              },
+              "recordPath": {
+                "type": "string",
+                "pattern": "^(?!/)(?!.*(?:^|/)\\.\\.(?:/|$))[A-Za-z0-9._-]+(?:/[A-Za-z0-9._-]+)*\\.md$",
+                "description": "Shared repository-local adoption record (for example docs/DESIGN.md or TASKS.md). Legacy adrPath remains supported; choose exactly one."
               }
+            },
+            "anyOf": [
+              {
+                "required": [
+                  "recordPath"
+                ]
+              },
+              {
+                "required": [
+                  "adrPath"
+                ]
+              }
+            ],
+            "not": {
+              "required": [
+                "recordPath",
+                "adrPath"
+              ]
             }
           }
         }
@@ -2139,9 +2129,38 @@
         "release": {
           "type": "object",
           "additionalProperties": false,
+          "anyOf": [
+            {
+              "properties": {
+                "trigger": {
+                  "const": "version-file-push"
+                }
+              },
+              "required": [
+                "trigger",
+                "versionManifest"
+              ],
+              "not": {
+                "required": [
+                  "gateWorkflow"
+                ]
+              }
+            },
+            {
+              "properties": {
+                "trigger": {
+                  "enum": [
+                    "version-bump"
+                  ]
+                }
+              },
+              "required": [
+                "gateWorkflow"
+              ]
+            }
+          ],
           "required": [
             "workflow",
-            "gateWorkflow",
             "imageBuildHostId"
           ],
           "properties": {
@@ -2153,15 +2172,24 @@
             },
             "trigger": {
               "type": "string",
-              "enum": ["version-bump"]
+              "enum": [
+                "version-bump",
+                "version-file-push"
+              ]
             },
             "versionManifest": {
               "type": "string",
-              "enum": ["apps/server/package.json", "modules/server/package.json"]
+              "enum": [
+                "apps/server/package.json",
+                "modules/server/package.json"
+              ]
             },
             "imageTransport": {
               "type": "string",
-              "enum": ["archive", "local-daemon"]
+              "enum": [
+                "archive",
+                "local-daemon"
+              ]
             },
             "imageBuildHostId": {
               "type": "string",
@@ -2262,15 +2290,32 @@
             }
           }
         },
-        "trigger": { "const": "version-bump" },
+        "trigger": {
+          "const": "version-bump"
+        },
         "releaseVersions": {
-          "type": "array", "minItems": 1, "uniqueItems": true,
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
           "items": {
-            "type": "object", "additionalProperties": false,
-            "required": ["path", "kind"],
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "path",
+              "kind"
+            ],
             "properties": {
-              "path": { "$ref": "#/$defs/relativePath" },
-              "kind": { "enum": ["expo", "flutter", "server", "web"] }
+              "path": {
+                "$ref": "#/$defs/relativePath"
+              },
+              "kind": {
+                "enum": [
+                  "expo",
+                  "flutter",
+                  "server",
+                  "web"
+                ]
+              }
             }
           }
         },

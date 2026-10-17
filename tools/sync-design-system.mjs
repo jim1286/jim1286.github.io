@@ -199,7 +199,9 @@ export async function syncDesignSystem({ root = resolve(import.meta.dirname, '..
   const example = JSON.parse(before.get(contractPath));
   if (!example?.designSystem?.contracts) throw new Error('Target has no HJM contract');
   example.designSystem.contracts.version = release.version;
-  for (const renderer of example.designSystem.renderers) renderer.version = release.version;
+  // Flutter consumers pin the same semantic contract/catalog without declaring
+  // React renderer packages (designSystem.applicability = native-adapter).
+  for (const renderer of example.designSystem.renderers ?? []) renderer.version = release.version;
   example.designSystem.catalog = { train: release.version, snapshotPath: release.catalog.generatedPath, sha256: release.catalog.sha256 };
   if (release.consumerPolicy) example.designSystem.companionPolicy.version = release.consumerPolicy.version;
   const expected = new Map([[releasePath, json(release)], [catalogPath, catalogText], [contractPath, json(example)]]);
@@ -228,6 +230,23 @@ export async function syncDesignSystem({ root = resolve(import.meta.dirname, '..
       }
     };
     await visit();
+    const workspacePath = 'pnpm-workspace.yaml';
+    const workspace = await readTarget(root, workspacePath);
+    if (workspace !== null) {
+      // Only existing exact HJM cooldown exceptions follow the verified release.
+      // Leaving their old versions makes fresh stable releases fail strict install;
+      // unrelated exceptions and the package-wide cooldown stay unchanged.
+      let inExceptions = false;
+      const updated = workspace.split('\n').map(line => {
+        if (/^minimumReleaseAgeExclude:\s*(?:#.*)?$/.test(line)) inExceptions = true;
+        else if (/^[^\s#]/.test(line)) inExceptions = false;
+        if (!inExceptions) return line;
+        return line.replace(/^(\s+-\s+)(['"]?)(@hjmds\/(?:design-contracts|react|react-native))@[^'"\s]+(['"]?)(\s*(?:#.*)?)$/, (_, prefix, open, name, close, suffix) =>
+          `${prefix}${open}${name}@${release.version}${close}${suffix}`);
+      }).join('\n');
+      before.set(workspacePath, workspace);
+      expected.set(workspacePath, updated);
+    }
   }
   const updates = [...expected].filter(([path, source]) => before.get(path) !== source);
   if (write) {
