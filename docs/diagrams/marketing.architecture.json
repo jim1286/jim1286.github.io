@@ -1,0 +1,159 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "마케팅 · 발견에서 제품 개선까지",
+    "subtitle": "사용 문제에 맞춰 유입 경로와 전달 방식을 선택합니다.",
+    "viewBox": [
+      1000,
+      480
+    ]
+  },
+  "components": [
+    {
+      "id": "problem",
+      "label": "사용 문제·대상",
+      "sublabel": "누구에게 필요한 제품인가",
+      "pos": [
+        30,
+        190
+      ],
+      "size": [
+        180,
+        64
+      ],
+      "type": "external"
+    },
+    {
+      "id": "search",
+      "label": "검색형",
+      "sublabel": "키워드 · 스토어 첫 화면",
+      "pos": [
+        280,
+        80
+      ],
+      "size": [
+        180,
+        64
+      ],
+      "type": "frontend"
+    },
+    {
+      "id": "discovery",
+      "label": "발견형",
+      "sublabel": "생활 이야기 · 앱 소개툰",
+      "pos": [
+        280,
+        300
+      ],
+      "size": [
+        180,
+        64
+      ],
+      "type": "frontend"
+    },
+    {
+      "id": "value",
+      "label": "핵심 가치 전달",
+      "sublabel": "실제 기능 · 공식 링크",
+      "pos": [
+        540,
+        190
+      ],
+      "size": [
+        180,
+        64
+      ],
+      "type": "backend"
+    },
+    {
+      "id": "public",
+      "label": "검수·공개 확인",
+      "sublabel": "준비 / 예약 / 공개",
+      "pos": [
+        790,
+        190
+      ],
+      "size": [
+        180,
+        64
+      ],
+      "type": "cloud"
+    },
+    {
+      "id": "measure",
+      "label": "반응 관측",
+      "sublabel": "스토어 · 콘텐츠 피드백",
+      "pos": [
+        790,
+        350
+      ],
+      "size": [
+        180,
+        64
+      ],
+      "type": "database"
+    },
+    {
+      "id": "improve",
+      "label": "제품·설명 개선",
+      "sublabel": "문제의 원인에 반영",
+      "pos": [
+        540,
+        350
+      ],
+      "size": [
+        180,
+        64
+      ],
+      "type": "backend"
+    }
+  ],
+  "connections": [
+    {
+      "from": "problem",
+      "to": "search",
+      "fromSide": "top",
+      "toSide": "left",
+      "route": "orthogonal-v"
+    },
+    {
+      "from": "problem",
+      "to": "discovery",
+      "fromSide": "bottom",
+      "toSide": "left",
+      "route": "orthogonal-v"
+    },
+    {
+      "from": "search",
+      "to": "value",
+      "fromSide": "right",
+      "toSide": "top",
+      "route": "orthogonal-h"
+    },
+    {
+      "from": "discovery",
+      "to": "value",
+      "fromSide": "right",
+      "toSide": "bottom",
+      "route": "orthogonal-h"
+    },
+    {
+      "from": "value",
+      "to": "public",
+      "variant": "emphasis"
+    },
+    {
+      "from": "public",
+      "to": "measure",
+      "fromSide": "bottom",
+      "toSide": "top"
+    },
+    {
+      "from": "measure",
+      "to": "improve",
+      "variant": "emphasis"
+    }
+  ],
+  "cards": []
+}

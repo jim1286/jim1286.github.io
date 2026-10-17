@@ -16,6 +16,14 @@ version: "1.1.0"
 
 2026-10-18 사용자 요청으로 현재 운영·개발 중인 앱 7개와 개발 중단 프로젝트를 분리했다. 모펀·태그라운드는 앱 목록 아래의 별도 영역에 보존하며 상단 앱 수에서 제외한다. 오늘야구 아이콘은 Expo 제품의 현재 브랜드 원본을 사용한다. 스토어 공개 상태는 이번 변경에서 새로 판정하지 않았다.
 
+## 2026-10-18 개발자 포트폴리오 개편
+
+한 페이지에 정보가 몰려 읽기 어렵다는 사용자 요청으로 소개·앱 프로젝트·개발 흐름·디자인 시스템·지침 구조·마케팅 전략·지원의 7개 주제 탭으로 나눴다. 기존 `#apps`, `#discontinued`, `#strategy`, `#legal`, `#developer` 링크는 관련 탭으로 연결한다.
+
+공통 이력서·포트폴리오(2026-10-12)의 확인된 Hubble·ExploreQA 경험과 AI 협업 내용을 편집했다. 이력서 원본·내부 근거·전화번호·비공개 인적정보는 게시하지 않는다. 회사 AI 모듈 개발과 제품 연동의 기여 경계를 유지한다. 디자인·지침은 현재 중앙 AGENTS와 HJM 선택·브랜드 경계 및 문서 체계 지도를 대조했다. 마케팅은 중앙 정책과 Hub `marketing/GUIDE.md`의 현재 일상툰·앱 소개툰 운영을 설명하며 중단된 릴스 제작과 미측정 성과를 주장하지 않는다.
+
+도식 편집 원본은 `docs/diagrams/`에 있으며 게시 HTML과 SVG 미리보기는 `public/diagrams/`에 둔다. Archify 2.11 renderer로 생성한 도식이며 HTML은 테마·내보내기를 제공한다. SVG는 같은 도식의 geometry와 CSS를 담은 light 미리보기다. 이전 두 전략 HTML은 기존 외부 링크를 위해 보존한다.
+
 ## 데이터 책임
 
 | 내용 | 원천 | 갱신·검증 |
@@ -93,3 +101,8 @@ version: "1.1.0"
   ]
 }
 -->
+
+마케팅 탭의 dots 활용안은 조사 → 소재·편성 → 사람 검수 → 승인된 게시 → 반응 요약의 도입 구상으로 표시한다. 실제 예약·게시 자동화나 성과를 주장하지 않는다. 기능 참고: https://learn.chatgpt.com/docs/dots 및 /docs/dots/tasks-and-memory.
+Utilverse 아이콘은 현재 mobile app.json이 참조하는 assets/images/icon.png 원본으로 교체했다. public/apps/sources.json에 출처와 SHA-256을 기록한다.
+
+번뚝 Android 링크 누락은 siteData의 androidUrl을 보완했다. 2026-10-18 Google Play 공개 페이지에서 번뚝·IAHJM·설치 버튼을 확인했다: https://play.google.com/store/apps/details?id=app.burntok.mobile&hl=ko

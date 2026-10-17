@@ -1,0 +1,132 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "ExploreQA 대상 연결부터 결과 공유까지",
+    "subtitle": "웹 URL · 앱 시뮬레이터 · 프로세스 PID와 창",
+    "viewBox": [
+      940,
+      420
+    ]
+  },
+  "components": [
+    {
+      "id": "target",
+      "type": "external",
+      "label": "검사 대상 연결",
+      "sublabel": "웹 URL / 시뮬 / PID·창",
+      "pos": [
+        40,
+        95
+      ],
+      "size": [
+        190,
+        65
+      ]
+    },
+    {
+      "id": "persona",
+      "type": "backend",
+      "label": "페르소나·목표",
+      "sublabel": "검사 목적 / 기대 동작",
+      "pos": [
+        350,
+        95
+      ],
+      "size": [
+        190,
+        65
+      ]
+    },
+    {
+      "id": "actions",
+      "type": "frontend",
+      "label": "AI 탐색과 실행",
+      "sublabel": "관찰 / 행동 / 실제 조작",
+      "pos": [
+        660,
+        95
+      ],
+      "size": [
+        190,
+        65
+      ]
+    },
+    {
+      "id": "evidence",
+      "type": "database",
+      "label": "검증 근거 수집",
+      "sublabel": "화면 / 행동 / 오류·로그",
+      "pos": [
+        660,
+        255
+      ],
+      "size": [
+        190,
+        65
+      ]
+    },
+    {
+      "id": "judge",
+      "type": "backend",
+      "label": "근거 기반 판정",
+      "sublabel": "제품 결함 / 도구 실패",
+      "pos": [
+        350,
+        255
+      ],
+      "size": [
+        190,
+        65
+      ]
+    },
+    {
+      "id": "report",
+      "type": "external",
+      "label": "업무 메시지 공유",
+      "sublabel": "검사 결과 / 재현 근거",
+      "pos": [
+        40,
+        255
+      ],
+      "size": [
+        190,
+        65
+      ]
+    }
+  ],
+  "connections": [
+    {
+      "from": "target",
+      "to": "persona",
+      "variant": "emphasis"
+    },
+    {
+      "from": "persona",
+      "to": "actions",
+      "variant": "emphasis"
+    },
+    {
+      "from": "actions",
+      "to": "evidence",
+      "fromSide": "bottom",
+      "toSide": "top",
+      "variant": "emphasis"
+    },
+    {
+      "from": "evidence",
+      "to": "judge",
+      "fromSide": "left",
+      "toSide": "right",
+      "variant": "emphasis"
+    },
+    {
+      "from": "judge",
+      "to": "report",
+      "fromSide": "left",
+      "toSide": "right",
+      "variant": "emphasis"
+    }
+  ],
+  "cards": []
+}

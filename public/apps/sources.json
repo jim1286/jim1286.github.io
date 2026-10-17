@@ -25,7 +25,7 @@
   },
   "utilverse": {
     "source": "apps/utilverse/apps/mobile/assets/images/icon.png",
-    "sha256": "898bb28e1fb1ef98084445def4ed462deb63ade63da53f08f1c167892195bad1"
+    "sha256": "02a759bdb5b31606b99ba3b46c16f7a46ef556478b343849ebd77edcd84da6fe"
   },
   "mofun": {
     "source": "control-plane/app-release-hub/config/apps/mofun/assets/icon.png",

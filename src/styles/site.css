@@ -1,28 +1,28 @@
-/* HJM owns control/type/card geometry. These rules place the product's page
-   sections and brand assets; semantic paint is provided by BrandProvider. */
+/* Product-level editorial layout. HJM owns typography, tabs, card geometry,
+   controls and focus behavior; brand colors enter through BrandProvider. */
 html { scroll-behavior: smooth; }
 body { margin: 0; min-width: 320px; }
 * { box-sizing: border-box; }
 img { display: block; max-width: 100%; }
 .portfolio-host { height: 100vh; height: 100dvh; }
 .portfolio-theme { font-synthesis: none; text-rendering: optimizeLegibility; }
-.site-header, .site-footer { background: var(--hjm-color-bg); padding-block: var(--hjm-space-lg); }
-.header-menu { min-width: 0; }
-.section-padding { padding-block: calc(var(--hjm-space-xl) * 3); }
-.hero-brand-word { color: var(--hjm-color-content-brand); }
-.developer-photo-wrap { display: grid; gap: var(--hjm-space-sm); max-width: 440px; }
-/* The user-selected portrait keeps its original framing; a forced cover crop
-   would remove part of the face or shoulders from the approved photograph. */
-.developer-photo { width: 100%; height: auto; border-radius: var(--hjm-radius-lg); }
-.developer-facts { margin: 0; display: grid; gap: var(--hjm-space-md); }
-.developer-facts > div { display: flex; align-items: baseline; flex-wrap: wrap; gap: var(--hjm-space-md); }
-.developer-facts dt { min-width: 90px; }
-.developer-facts dd { margin: 0; min-width: 0; overflow-wrap: anywhere; }
-.strategy-steps { margin: 0; padding-inline-start: var(--hjm-space-lg); display: grid; gap: var(--hjm-space-lg); }
-@media (max-width: 599px) {
-  .section-padding { padding-block: calc(var(--hjm-space-xl) * 2); }
+.site-header { background: var(--hjm-color-bg); border-bottom: 1px solid var(--hjm-color-border); }
+.tabs-bar { position: sticky; top: 0; z-index: 2; background: var(--hjm-color-bg); padding-block: var(--hjm-space-sm); border-bottom: 1px solid var(--hjm-color-border); }
+#panel-start, #discontinued { scroll-margin-block-start: 80px; }
+.panel-wrap { padding-block: var(--hjm-space-xl) calc(var(--hjm-space-xl) * 2); }
+.panel-intro { max-width: 760px; padding-block: var(--hjm-space-md); }
+.intro-grid { display: grid; grid-template-columns: minmax(0, 1.65fr) minmax(260px, 1fr); gap: var(--hjm-space-lg); align-items: stretch; }
+/* The profile is a user-selected image. Preserve the full photo's aspect ratio. */
+.profile-photo { width: 100%; max-width: 240px; height: auto; border-radius: var(--hjm-radius-md); }
+.diagram-scroll { overflow-x: auto; max-width: 100%; }
+.diagram-image { width: 100%; min-width: 740px; max-width: none; height: auto; }
+.diagram-mobile-hint { display: none; }
+.site-footer { padding-block: var(--hjm-space-xl); border-top: 1px solid var(--hjm-color-border); }
+@media (max-width: 799px) {
+  .intro-grid { grid-template-columns: minmax(0, 1fr); }
+  .header-storybook { display: none; }
+  .diagram-mobile-hint { display: block; }
+  .panel-wrap { padding-block: var(--hjm-space-md) var(--hjm-space-xl); }
 }
-/* At 320px a fixed 140px menu split the developer's name; only the product
-   wrapper width adapts, while Collapsible keeps its public control geometry. */
-@media (max-width: 799px) { .header-menu { width: clamp(108px, 35vw, 140px); flex-shrink: 0; } }
+@media (max-width: 399px) { .header-role { display: none; } }
 @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }

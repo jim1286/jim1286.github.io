@@ -72,6 +72,7 @@ export const apps: PortfolioApp[] = [
     githubUrl: 'https://github.com/jim1286/BurnTok',
     webUrl: 'https://burntok.jmstudioapps.com/',
     iosUrl: 'https://apps.apple.com/kr/app/id6810606625',
+    androidUrl: 'https://play.google.com/store/apps/details?id=app.burntok.mobile&hl=ko',
   },
   {
     id: 'unairplane',

@@ -1,0 +1,176 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "Hubble 제품 모듈과 실행 책임",
+    "subtitle": "런처 · 제품 UI · API · AI 모듈 · 공통 계약",
+    "viewBox": [
+      940,
+      480
+    ]
+  },
+  "components": [
+    {
+      "id": "launcher",
+      "type": "backend",
+      "label": "Avalonia 런처 + Core",
+      "sublabel": "서비스 시작 / 대기 / 종료",
+      "pos": [
+        350,
+        40
+      ],
+      "size": [
+        190,
+        65
+      ]
+    },
+    {
+      "id": "ui",
+      "type": "frontend",
+      "label": "제품 UI",
+      "sublabel": "React / 라벨 편집·조회",
+      "pos": [
+        40,
+        195
+      ],
+      "size": [
+        190,
+        65
+      ]
+    },
+    {
+      "id": "api",
+      "type": "backend",
+      "label": "제품 백엔드",
+      "sublabel": "FastAPI / 업무 로직",
+      "pos": [
+        350,
+        195
+      ],
+      "size": [
+        190,
+        65
+      ]
+    },
+    {
+      "id": "ai",
+      "type": "backend",
+      "label": "AI 학습·추론 모듈",
+      "sublabel": "별도 담당 / 소켓 연동",
+      "pos": [
+        660,
+        195
+      ],
+      "size": [
+        190,
+        65
+      ]
+    },
+    {
+      "id": "contract",
+      "type": "messagebus",
+      "label": "공통 통신 계약",
+      "sublabel": "Socket 이벤트 / API 타입",
+      "pos": [
+        350,
+        340
+      ],
+      "size": [
+        190,
+        65
+      ]
+    },
+    {
+      "id": "data",
+      "type": "database",
+      "label": "제품 데이터·파일",
+      "sublabel": "편집 원본 / 저장·조회",
+      "pos": [
+        660,
+        340
+      ],
+      "size": [
+        190,
+        65
+      ]
+    }
+  ],
+  "connections": [
+    {
+      "from": "launcher",
+      "to": "ui",
+      "fromSide": "bottom",
+      "toSide": "top",
+      "via": [
+        [
+          445,
+          145
+        ],
+        [
+          135,
+          145
+        ]
+      ],
+      "variant": "emphasis"
+    },
+    {
+      "from": "launcher",
+      "to": "api",
+      "fromSide": "bottom",
+      "toSide": "top",
+      "variant": "emphasis"
+    },
+    {
+      "from": "launcher",
+      "to": "ai",
+      "fromSide": "bottom",
+      "toSide": "top",
+      "via": [
+        [
+          445,
+          145
+        ],
+        [
+          755,
+          145
+        ]
+      ],
+      "variant": "emphasis"
+    },
+    {
+      "from": "ui",
+      "to": "api",
+      "variant": "emphasis"
+    },
+    {
+      "from": "api",
+      "to": "ai",
+      "label": "Socket",
+      "variant": "emphasis"
+    },
+    {
+      "from": "contract",
+      "to": "api",
+      "fromSide": "top",
+      "toSide": "bottom",
+      "variant": "dashed"
+    },
+    {
+      "from": "api",
+      "to": "data",
+      "fromSide": "right",
+      "toSide": "left",
+      "via": [
+        [
+          600,
+          227.5
+        ],
+        [
+          600,
+          372.5
+        ]
+      ]
+    }
+  ],
+  "cards": []
+}

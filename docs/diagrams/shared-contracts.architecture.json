@@ -1,0 +1,186 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "여러 앱을 위한 공통 개발 구조",
+    "subtitle": "독립 제품 저장소 + 공통 계약과 렌더러 + 제품별 검증",
+    "viewBox": [
+      1040,
+      590
+    ]
+  },
+  "components": [
+    {
+      "id": "ui",
+      "type": "frontend",
+      "label": "제품 UI",
+      "sublabel": "React / React Native",
+      "pos": [
+        40,
+        100
+      ],
+      "size": [
+        190,
+        65
+      ]
+    },
+    {
+      "id": "appcore",
+      "type": "backend",
+      "label": "제품 app-core",
+      "sublabel": "Query / 표시·상태",
+      "pos": [
+        300,
+        100
+      ],
+      "size": [
+        190,
+        65
+      ]
+    },
+    {
+      "id": "domain",
+      "type": "backend",
+      "label": "순수 domain",
+      "sublabel": "계산 / 규칙 / 상태",
+      "pos": [
+        560,
+        100
+      ],
+      "size": [
+        190,
+        65
+      ]
+    },
+    {
+      "id": "hjm",
+      "type": "frontend",
+      "label": "HJM 디자인 시스템",
+      "sublabel": "토큰 / 동작 / 렌더러",
+      "pos": [
+        40,
+        270
+      ],
+      "size": [
+        190,
+        65
+      ]
+    },
+    {
+      "id": "contract",
+      "type": "messagebus",
+      "label": "제품 API 계약",
+      "sublabel": "OpenAPI / TS / Zod",
+      "pos": [
+        300,
+        270
+      ],
+      "size": [
+        190,
+        65
+      ]
+    },
+    {
+      "id": "server",
+      "type": "backend",
+      "label": "제품 API / Worker",
+      "sublabel": "권한 / 저장 / 비동기",
+      "pos": [
+        560,
+        270
+      ],
+      "size": [
+        190,
+        65
+      ]
+    },
+    {
+      "id": "db",
+      "type": "database",
+      "label": "제품 데이터",
+      "sublabel": "DB / Queue / Files",
+      "pos": [
+        820,
+        270
+      ],
+      "size": [
+        180,
+        65
+      ]
+    },
+    {
+      "id": "qa",
+      "type": "backend",
+      "label": "검사·QA",
+      "sublabel": "타입 / 계약 / 실행",
+      "pos": [
+        300,
+        440
+      ],
+      "size": [
+        190,
+        65
+      ]
+    },
+    {
+      "id": "delivery",
+      "type": "cloud",
+      "label": "릴리스 전달",
+      "sublabel": "검증 근거 / 후속 확인",
+      "pos": [
+        560,
+        440
+      ],
+      "size": [
+        190,
+        65
+      ]
+    }
+  ],
+  "connections": [
+    {
+      "from": "ui",
+      "to": "appcore",
+      "variant": "emphasis"
+    },
+    {
+      "from": "appcore",
+      "to": "domain",
+      "variant": "emphasis"
+    },
+    {
+      "from": "hjm",
+      "to": "ui",
+      "fromSide": "top",
+      "toSide": "bottom"
+    },
+    {
+      "from": "appcore",
+      "to": "contract",
+      "fromSide": "bottom",
+      "toSide": "top"
+    },
+    {
+      "from": "contract",
+      "to": "server",
+      "variant": "emphasis"
+    },
+    {
+      "from": "server",
+      "to": "db"
+    },
+    {
+      "from": "contract",
+      "to": "qa",
+      "fromSide": "bottom",
+      "toSide": "top",
+      "variant": "dashed"
+    },
+    {
+      "from": "qa",
+      "to": "delivery",
+      "variant": "dashed"
+    }
+  ],
+  "cards": []
+}

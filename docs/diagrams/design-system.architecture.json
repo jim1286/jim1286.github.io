@@ -1,0 +1,119 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "HJM · 공통 구조와 제품의 경계",
+    "subtitle": "토큰과 동작 계약을 공유하고 플랫폼별 렌더러로 연결합니다.",
+    "viewBox": [
+      960,
+      470
+    ]
+  },
+  "components": [
+    {
+      "id": "contracts",
+      "type": "messagebus",
+      "label": "디자인 계약",
+      "sublabel": "토큰 · recipe · 동작",
+      "pos": [
+        40,
+        70
+      ],
+      "size": [
+        180,
+        64
+      ]
+    },
+    {
+      "id": "web",
+      "type": "frontend",
+      "label": "React 렌더러",
+      "sublabel": "웹 UI",
+      "pos": [
+        300,
+        70
+      ],
+      "size": [
+        180,
+        64
+      ]
+    },
+    {
+      "id": "native",
+      "type": "frontend",
+      "label": "React Native 렌더러",
+      "sublabel": "네이티브 UI",
+      "pos": [
+        300,
+        235
+      ],
+      "size": [
+        180,
+        64
+      ]
+    },
+    {
+      "id": "compose",
+      "type": "backend",
+      "label": "공통 화면·구성",
+      "sublabel": "레이아웃 · 상태 · 상호작용",
+      "pos": [
+        590,
+        150
+      ],
+      "size": [
+        240,
+        64
+      ]
+    },
+    {
+      "id": "brand",
+      "type": "external",
+      "label": "제품의 연결",
+      "sublabel": "데이터 · 문구 · 브랜드 · 권한",
+      "pos": [
+        590,
+        315
+      ],
+      "size": [
+        240,
+        64
+      ]
+    }
+  ],
+  "connections": [
+    {
+      "to": "web",
+      "from": "contracts"
+    },
+    {
+      "to": "native",
+      "fromSide": "bottom",
+      "toSide": "left",
+      "route": "orthogonal-v",
+      "from": "contracts"
+    },
+    {
+      "to": "compose",
+      "fromSide": "right",
+      "toSide": "top",
+      "route": "orthogonal-h",
+      "from": "web"
+    },
+    {
+      "to": "compose",
+      "fromSide": "right",
+      "toSide": "bottom",
+      "route": "orthogonal-h",
+      "from": "native"
+    },
+    {
+      "to": "compose",
+      "fromSide": "top",
+      "toSide": "bottom",
+      "variant": "emphasis",
+      "from": "brand"
+    }
+  ],
+  "cards": []
+}

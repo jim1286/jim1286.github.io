@@ -1,0 +1,108 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "지침은 정본에서 구현과 기록으로",
+    "subtitle": "공통 원칙 → 영역별 정본 → 제품별 연결 → 변경 근거",
+    "viewBox": [
+      1000,
+      370
+    ]
+  },
+  "components": [
+    {
+      "id": "entry",
+      "type": "external",
+      "label": "공통 작업 원칙",
+      "sublabel": "AGENTS.md · 탐색 진입점",
+      "pos": [
+        40,
+        90
+      ],
+      "size": [
+        200,
+        64
+      ]
+    },
+    {
+      "id": "owner",
+      "type": "messagebus",
+      "label": "영역별 정본",
+      "sublabel": "UI · 인증 · API · 배포",
+      "pos": [
+        290,
+        90
+      ],
+      "size": [
+        200,
+        64
+      ]
+    },
+    {
+      "id": "product",
+      "type": "backend",
+      "label": "제품별 설계·구현",
+      "sublabel": "공통 규격 + 제품의 조건",
+      "pos": [
+        540,
+        90
+      ],
+      "size": [
+        200,
+        64
+      ]
+    },
+    {
+      "id": "evidence",
+      "type": "database",
+      "label": "변경 근거",
+      "sublabel": "코드 · 검사 · 운영 상태",
+      "pos": [
+        790,
+        90
+      ],
+      "size": [
+        180,
+        64
+      ]
+    },
+    {
+      "id": "guide",
+      "type": "frontend",
+      "label": "사용 지침·공개 타입",
+      "sublabel": "설치 버전과 실제 구현 대조",
+      "pos": [
+        290,
+        235
+      ],
+      "size": [
+        200,
+        64
+      ]
+    }
+  ],
+  "connections": [
+    {
+      "from": "entry",
+      "to": "owner",
+      "variant": "emphasis"
+    },
+    {
+      "from": "owner",
+      "to": "product",
+      "variant": "emphasis"
+    },
+    {
+      "from": "product",
+      "to": "evidence",
+      "variant": "emphasis"
+    },
+    {
+      "from": "owner",
+      "to": "guide",
+      "fromSide": "bottom",
+      "toSide": "top"
+    }
+  ],
+  "cards": []
+}

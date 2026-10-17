@@ -1,0 +1,145 @@
+{
+  "schema_version": 1,
+  "diagram_type": "workflow",
+  "meta": {
+    "title": "AI와 공통 라이브러리를 활용한 개발 워크플로우",
+    "subtitle": "요구와 완료 기준부터 공통 구현 재사용 · 변경 검토 · 배포 후 확인까지"
+  },
+  "lanes": [
+    {
+      "id": "plan",
+      "label": "문제와 공통 기반"
+    },
+    {
+      "id": "build",
+      "label": "AI 협업과 변경 확인"
+    },
+    {
+      "id": "qa",
+      "label": "제품 검증과 릴리스 전달"
+    }
+  ],
+  "nodes": [
+    {
+      "id": "idea",
+      "lane": "plan",
+      "col": 0,
+      "type": "external",
+      "label": "아이디어",
+      "sublabel": "사용 흐름"
+    },
+    {
+      "id": "design",
+      "lane": "plan",
+      "col": 2,
+      "type": "backend",
+      "label": "설계·계약",
+      "sublabel": "완료 기준"
+    },
+    {
+      "id": "reuse",
+      "lane": "plan",
+      "col": 5,
+      "type": "frontend",
+      "label": "공통 재사용",
+      "sublabel": "HJM / API"
+    },
+    {
+      "id": "implement",
+      "lane": "build",
+      "col": 5,
+      "type": "backend",
+      "label": "AI 협업",
+      "sublabel": "탐색·구현"
+    },
+    {
+      "id": "review",
+      "lane": "build",
+      "col": 2,
+      "type": "security",
+      "label": "변경 검토",
+      "sublabel": "의도·경계"
+    },
+    {
+      "id": "checks",
+      "lane": "build",
+      "col": 0,
+      "type": "backend",
+      "label": "범위 검사",
+      "sublabel": "변경한 핵심 동작"
+    },
+    {
+      "id": "device",
+      "lane": "qa",
+      "col": 0,
+      "type": "frontend",
+      "label": "동작 확인",
+      "sublabel": "관련 화면·기기"
+    },
+    {
+      "id": "evidence",
+      "lane": "qa",
+      "col": 2,
+      "type": "database",
+      "label": "근거 기록",
+      "sublabel": "재현·결과"
+    },
+    {
+      "id": "handoff",
+      "lane": "qa",
+      "col": 5,
+      "type": "cloud",
+      "label": "릴리스 전달",
+      "sublabel": "배포 후 확인"
+    }
+  ],
+  "edges": [
+    {
+      "from": "idea",
+      "to": "design",
+      "variant": "emphasis"
+    },
+    {
+      "from": "design",
+      "to": "reuse",
+      "variant": "emphasis"
+    },
+    {
+      "from": "reuse",
+      "to": "implement",
+      "variant": "emphasis",
+      "fromSide": "bottom",
+      "toSide": "top",
+      "route": "drop"
+    },
+    {
+      "from": "implement",
+      "to": "review",
+      "variant": "emphasis"
+    },
+    {
+      "from": "review",
+      "to": "checks",
+      "variant": "emphasis"
+    },
+    {
+      "from": "checks",
+      "to": "device",
+      "variant": "emphasis",
+      "fromSide": "left",
+      "toSide": "left",
+      "route": "return-left"
+    },
+    {
+      "from": "device",
+      "to": "evidence",
+      "variant": "emphasis"
+    },
+    {
+      "from": "evidence",
+      "to": "handoff",
+      "variant": "emphasis"
+    }
+  ],
+  "cards": []
+}
