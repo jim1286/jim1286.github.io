@@ -14,7 +14,7 @@ import { AndroidFilled, AppleFilled, ArrowUpOutlined, ExportOutlined, GithubOutl
 import { BrandProvider } from './BrandProvider';
 import StrategySection from './StrategySection';
 import { siteCopy as copy, appCopy } from './copy';
-import { apps, legalDocuments, portfolioSummary, storybookUrl, type PortfolioApp } from './siteData';
+import { apps, discontinuedApps, legalDocuments, portfolioSummary, storybookUrl, type PortfolioApp } from './siteData';
 import './styles/site.css';
 
 const developerEmail = 'jimin1286@gmail.com';
@@ -40,6 +40,16 @@ function AppLinks({ app }: { app: PortfolioApp }) {
 
 function ProductIcon({ app }: { app: PortfolioApp }) {
   return <Asset descriptor={{ kind: 'image', size: 'large', shape: 'rounded', decorative: true }}><img src={app.icon} alt="" /></Asset>;
+}
+
+function ProductCard({ app }: { app: PortfolioApp }) {
+  return <Card title={<>{app.name}{app.englishName !== app.name && <Text as="small" variant="caption" tone="muted" layoutStyle={{ marginInlineStart: 12 }}> {app.englishName}</Text>}</>} description={app.description} leading={<ProductIcon app={app} />} tone={app.featured ? 'accent' : 'default'} padding="lg" actions={app.statusTone === 'archived' ? undefined : <AppLinks app={app} />}>
+                  <Stack gap="sm">
+                    <Text variant="caption" fontRole="code" tone="muted">{copy.appIndex(app.index)}</Text>
+                    <Badge variant={app.statusTone === 'live' ? 'filled' : 'outline'}>{app.status}</Badge>
+                    {app.tags.length > 0 && <Stack axis="inline" gap="xs" wrap aria-label={appCopy.technologies(app.name)}>{app.tags.map(tag => <Tag key={tag}>{tag}</Tag>)}</Stack>}
+                  </Stack>
+                </Card>;
 }
 
 function SiteHeader() {
@@ -123,16 +133,18 @@ export default function App() {
             <Text as="p" variant="caption" fontRole="code" tone="muted">{copy.appsIndex}</Text>
             <Section id="apps" tabIndex={-1} title={copy.appsTitle} description={copy.appsDescription}>
               <Grid columns={{ compact: 1, medium: 2 }} gap={{ compact: 'lg' }} minColumnWidth={{ compact: 280 }}>
-                {apps.map(app => <Card key={app.id} title={<>{app.name}{app.englishName !== app.name && <Text as="small" variant="caption" tone="muted" layoutStyle={{ marginInlineStart: 12 }}> {app.englishName}</Text>}</>} description={app.description} leading={<ProductIcon app={app} />} tone={app.featured ? 'accent' : 'default'} padding="lg" actions={<AppLinks app={app} />}>
-                  <Stack gap="sm">
-                    <Text variant="caption" fontRole="code" tone="muted">{copy.appIndex(app.index)}</Text>
-                    <Badge variant={app.statusTone === 'live' ? 'filled' : 'outline'}>{app.status}</Badge>
-                    <Stack axis="inline" gap="xs" wrap aria-label={appCopy.technologies(app.name)}>{app.tags.map(tag => <Tag key={tag}>{tag}</Tag>)}</Stack>
-                  </Stack>
-                </Card>)}
+                {apps.map(app => <ProductCard key={app.id} app={app} />)}
               </Grid>
             </Section>
           </Stack></Container></div>
+
+          <div className="section-padding"><Container size="content" gutter="regular">
+            <Section id="discontinued" tabIndex={-1} title={copy.discontinuedTitle} description={copy.discontinuedDescription}>
+              <Grid columns={{ compact: 1, medium: 2 }} gap={{ compact: 'lg' }} minColumnWidth={{ compact: 280 }}>
+                {discontinuedApps.map(app => <ProductCard key={app.id} app={app} />)}
+              </Grid>
+            </Section>
+          </Container></div>
 
           <StrategySection />
 

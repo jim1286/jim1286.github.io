@@ -12,8 +12,8 @@
     "sha256": "17589ccbd82530d6e0c6b891cf97dbc05b19ee2746bbe1bd45fc5410cb0cb05c"
   },
   "yajalal": {
-    "source": "apps/yajalal/modules/app/assets/icons/launcher.png",
-    "sha256": "194b93f4443084087159de9c48a6d106382ca77d4e46d16d9adbfe1bf95406b0"
+    "source": "apps/yajalal/modules/mobile/assets/brand/today-baseball-icon.png",
+    "sha256": "8141d32df4af4b4011446dbad3d77133fdbf54addef1c3a9b51840ddad3d36a7"
   },
   "diairy": {
     "source": "apps/diairy/packages/assets/brand/generated/v4/icon-1024.png",
@@ -26,5 +26,9 @@
   "utilverse": {
     "source": "apps/utilverse/apps/mobile/assets/images/icon.png",
     "sha256": "898bb28e1fb1ef98084445def4ed462deb63ade63da53f08f1c167892195bad1"
+  },
+  "mofun": {
+    "source": "control-plane/app-release-hub/config/apps/mofun/assets/icon.png",
+    "sha256": "db9a0ac5817a5858c33210cc46d5b8a04adeb26fefb534ffa9ea8276b64387df"
   }
 }

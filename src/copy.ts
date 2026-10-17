@@ -13,6 +13,7 @@ export const siteCopy = {
   browse: catalog.page018, github: catalog.page019, summary: catalog.page020, summaryIndex: catalog.page021,
   appsCount: catalog.page022, storesCount: catalog.page023, platformsCount: catalog.page024,
   appsIndex: catalog.page037, appsTitle: catalog.page038, appsDescription: catalog.appsDescription,
+  discontinuedTitle: catalog.discontinuedTitle, discontinuedDescription: catalog.discontinuedDescription,
   web: catalog.page043, appStore: catalog.page044, googlePlay: catalog.page045, source: catalog.page046, privateSource: catalog.privateSource,
   legalIndex: catalog.page047, legalTitle: catalog.page048, legalDescription: catalog.legalDescription,
   privacy: catalog.page051, deletion: catalog.page052, support: catalog.page053, legalNote: catalog.page054,

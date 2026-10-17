@@ -74,23 +74,8 @@ export const apps: PortfolioApp[] = [
     iosUrl: 'https://apps.apple.com/kr/app/id6810606625',
   },
   {
-    id: 'taground',
-    index: '04',
-    name: copy.product013,
-    englishName: 'Taground',
-    description: copy.product014,
-    icon: '/apps/taground.png',
-    status: copy.product015,
-    // Central retirement tombstone makes this an archived portfolio entry,
-    // not a currently developed product. See the HJM adoption QA report.
-    statusTone: 'archived',
-    sourceAccess: 'archived',
-    tags: ['Expo', 'NestJS', 'PostgreSQL'],
-    githubUrl: 'https://github.com/jim1286/taground',
-  },
-  {
     id: 'unairplane',
-    index: '05',
+    index: '04',
     name: copy.product016,
     englishName: 'Unairplane',
     description: copy.product017,
@@ -104,7 +89,7 @@ export const apps: PortfolioApp[] = [
     androidUrl: 'https://play.google.com/store/apps/details?id=com.hjm.unairplane',
   },
   {
-    id: 'diairy', index: '06', name: 'Diairy', englishName: 'Diairy',
+    id: 'diairy', index: '05', name: 'Diairy', englishName: 'Diairy',
     description: copy.diairyDescription, icon: '/apps/diairy.png',
     status: copy.diairyStatus, statusTone: 'live', sourceAccess: 'private',
     tags: ['React Native', 'Next.js', 'NestJS'],
@@ -114,7 +99,7 @@ export const apps: PortfolioApp[] = [
     androidUrl: 'https://play.google.com/store/apps/details?id=com.jimin.diairy',
   },
   {
-    id: 'spint', index: '07', name: 'Spint', englishName: 'Spint',
+    id: 'spint', index: '06', name: 'Spint', englishName: 'Spint',
     description: copy.spintDescription, icon: '/apps/spint.png',
     status: copy.spintStatus, statusTone: 'live', sourceAccess: 'private',
     tags: ['Expo', 'React Native', 'NestJS'],
@@ -122,13 +107,40 @@ export const apps: PortfolioApp[] = [
     iosUrl: 'https://apps.apple.com/kr/app/id6816477162',
   },
   {
-    id: 'utilverse', index: '08', name: 'Utilverse', englishName: 'Utilverse',
+    id: 'utilverse', index: '07', name: 'Utilverse', englishName: 'Utilverse',
     description: copy.utilverseDescription, icon: '/apps/utilverse.png',
     // An implemented product and a GitHub checkout do not prove store publication.
     // The portfolio catalog still marks this product incubating.
     status: copy.developmentStatus, statusTone: 'development', sourceAccess: 'private',
     tags: ['Expo', 'React Native', 'NestJS'],
     githubUrl: 'https://github.com/jim1286/utilverse',
+  },
+];
+
+
+// Development-stopped products remain visible as history, outside the active catalog
+// and its summary counts (owner request, 2026-10-18).
+export const discontinuedApps: PortfolioApp[] = [
+  {
+    id: 'mofun', index: '08', name: copy.mofunName, englishName: 'Mofun',
+    description: copy.mofunDescription, icon: '/apps/mofun.png',
+    status: copy.discontinuedStatus, statusTone: 'archived', sourceAccess: 'archived',
+    tags: [], githubUrl: 'https://github.com/jim1286/mofun',
+  },
+  {
+    id: 'taground',
+    index: '09',
+    name: copy.product013,
+    englishName: 'Taground',
+    description: copy.product014,
+    icon: '/apps/taground.png',
+    status: copy.discontinuedStatus,
+    // Central retirement tombstone makes this an archived portfolio entry,
+    // not a currently developed product. See the HJM adoption QA report.
+    statusTone: 'archived',
+    sourceAccess: 'archived',
+    tags: ['Expo', 'NestJS', 'PostgreSQL'],
+    githubUrl: 'https://github.com/jim1286/taground',
   },
 ];
 
