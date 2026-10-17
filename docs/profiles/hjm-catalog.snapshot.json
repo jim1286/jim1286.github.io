@@ -1,12 +1,12 @@
 {
-  "$id": "hjm.catalog-snapshot/1.24.0",
-  "designSystemVersion": "1.24.0",
+  "$id": "hjm.catalog-snapshot/1.27.0",
+  "designSystemVersion": "1.27.0",
   "source": {
     "repository": "https://github.com/jim1286/hjm-design-system.git",
-    "tag": "v1.24.0",
-    "commit": "aabf9f4593e5e46b72f525345304622653659e25",
+    "tag": "v1.27.0",
+    "commit": "63fdc11b688772c1c2d0d8ec400db62f64b0569f",
     "sourcePath": "packages/design-contracts/dist/catalog.js",
-    "contentSha256": "7ae2a72fe7bf19e4da72c8bf493f4623e0f42233cb69dd3759b03e2694dca441"
+    "contentSha256": "28472402ea27aea2541773ad57b35210494ae116f252f98ce422c29dfa40bab3"
   },
   "components": [
     { "id": "accordion", "status": "stable" },
@@ -56,6 +56,7 @@
     { "id": "icon", "status": "stable" },
     { "id": "icon-button", "status": "stable" },
     { "id": "image", "status": "stable" },
+    { "id": "image-choice-group", "status": "beta" },
     { "id": "layout", "status": "stable" },
     { "id": "link", "status": "stable" },
     { "id": "list", "status": "stable" },

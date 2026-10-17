@@ -10,11 +10,6 @@ const portfolioDesign = defineHjmDesignProfile({
   id: 'portfolio-paper-forest',
   tokens: {
     radius: { sm: 0, md: 12, lg: 20, xl: 24 },
-    fontFamily: {
-      ui: ['Pretendard', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'sans-serif'],
-      display: ['Pretendard', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'sans-serif'],
-      reading: ['Pretendard', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'sans-serif'],
-    },
     heading: {
       level1: { fontSize: 52, lineHeight: 60, fontWeight: fontWeight.heavy },
       level2: { fontSize: 38, lineHeight: 46, fontWeight: fontWeight.bold },
