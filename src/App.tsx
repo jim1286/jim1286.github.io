@@ -35,12 +35,14 @@ function tabForHash(hash: string) {
 function ExternalLink({ href, children, label }: { href: string; children: ReactNode; label?: string }) {
   return <Link href={href} aria-label={label} target="_blank" rel="noreferrer noopener" variant="standalone" tone="neutral">{children}</Link>;
 }
+// The panel Stack owns the gap above and below; the reading measure is a layout-only width
+// (2026-10-18: replaced the .panel-intro wrapper's ad-hoc padding).
 function Intro({ eyebrow, title, description }: { eyebrow: string; title: string; description: string }) {
-  return <div className="panel-intro"><Stack gap="md">
+  return <Stack gap="md" layoutStyle={{ maxWidth: 760 }}>
     <Text variant="caption" fontRole="code" tone="muted">{eyebrow}</Text>
     <Heading level="level1">{title}</Heading>
     <Text as="p" variant="bodyLarge" tone="muted">{description}</Text>
-  </Stack></div>;
+  </Stack>;
 }
 function Notes({ items }: { items: { title: string; body: string }[] }) {
   return <Grid columns={{ compact: 1, medium: 2 }} gap={{ compact: 'md' }} minColumnWidth={{ compact: 260 }}>
@@ -89,7 +91,8 @@ function ProductCard({ app }: { app: PortfolioApp }) {
 }
 function AboutPanel() {
   return <Stack gap="xl">
-    <div className="intro-grid">
+    {/* HJM Grid owns the responsive two-column split (was a product CSS grid). */}
+    <Grid columns={{ compact: 1, medium: 2 }} gap={{ compact: 'lg' }} minColumnWidth={{ compact: 260 }}>
       <BrandProvider surface="forest"><Surface padding="xl" radius="lg"><Stack gap="xl">
         <Text variant="caption" fontRole="code" tone="muted">{c.aboutEyebrow}</Text>
         <Heading level="level1">{c.aboutTitle}</Heading>
@@ -104,7 +107,7 @@ function AboutPanel() {
           <Link href={`mailto:${developerEmail}`} variant="standalone"><MailOutlined aria-hidden /> {siteCopy.contact}</Link>
         </Stack>
       </Card>
-    </div>
+    </Grid>
     <Section title={c.aboutExperience} description={c.aboutExperienceDescription}>
       <Stack gap="lg">
         <Card title={c.hubbleTitle} description={c.hubbleCategory} headingLevel={3} padding="lg">
