@@ -1,118 +1,821 @@
 {
-  "$id": "hjm.catalog-snapshot/1.28.1",
-  "designSystemVersion": "1.28.1",
+  "$id": "hjm.catalog-snapshot/1.30.0",
+  "designSystemVersion": "1.30.0",
   "source": {
     "repository": "https://github.com/jim1286/hjm-design-system.git",
-    "tag": "v1.28.1",
-    "commit": "d80246f82ea81e766720fb38228e760b03c41dea",
+    "tag": "v1.30.0",
+    "commit": "1384408a23a9456c12e3fc6c2aa2d40e656b3e26",
     "sourcePath": "packages/design-contracts/dist/catalog.js",
-    "contentSha256": "28472402ea27aea2541773ad57b35210494ae116f252f98ce422c29dfa40bab3"
+    "contentSha256": "3592be17a2d0a71a3508d199bde3c724c461d7e83d473477be8e45af93499a9c"
   },
   "components": [
-    { "id": "accordion", "status": "stable" },
-    { "id": "affix", "status": "stable" },
-    { "id": "agreement", "status": "stable" },
-    { "id": "alert-dialog", "status": "stable" },
-    { "id": "anchor", "status": "stable" },
-    { "id": "aspect-ratio", "status": "stable" },
-    { "id": "asset", "status": "stable" },
-    { "id": "auth-provider-button", "status": "stable" },
-    { "id": "auth-screen-layout", "status": "stable" },
-    { "id": "avatar", "status": "stable" },
-    { "id": "badge", "status": "stable" },
-    { "id": "bottom-cta", "status": "stable" },
-    { "id": "bottom-info", "status": "stable" },
-    { "id": "bottom-navigation", "status": "stable" },
-    { "id": "breadcrumb", "status": "stable" },
-    { "id": "button", "status": "stable" },
-    { "id": "calendar", "status": "stable" },
-    { "id": "card", "status": "stable" },
-    { "id": "carousel", "status": "stable" },
-    { "id": "chart", "status": "beta" },
-    { "id": "checkbox", "status": "stable" },
-    { "id": "checkbox-group", "status": "stable" },
-    { "id": "chip", "status": "stable" },
-    { "id": "collapsible", "status": "stable" },
-    { "id": "color-picker", "status": "stable" },
-    { "id": "combobox", "status": "stable" },
-    { "id": "command-palette", "status": "stable" },
-    { "id": "container", "status": "stable" },
-    { "id": "context-menu", "status": "stable" },
-    { "id": "counter-badge", "status": "stable" },
-    { "id": "data-table", "status": "stable" },
-    { "id": "date-picker", "status": "stable" },
-    { "id": "date-range-picker", "status": "stable" },
-    { "id": "description-list", "status": "stable" },
-    { "id": "design-system-provider", "status": "stable" },
-    { "id": "dialog", "status": "stable" },
-    { "id": "divider", "status": "stable" },
-    { "id": "empty-state", "status": "stable" },
-    { "id": "field", "status": "stable" },
-    { "id": "file-picker", "status": "stable" },
-    { "id": "floating-action-button", "status": "stable" },
-    { "id": "form", "status": "stable" },
-    { "id": "grid", "status": "stable" },
-    { "id": "heading", "status": "stable" },
-    { "id": "icon", "status": "stable" },
-    { "id": "icon-button", "status": "stable" },
-    { "id": "image", "status": "stable" },
-    { "id": "image-choice-group", "status": "beta" },
-    { "id": "layout", "status": "stable" },
-    { "id": "link", "status": "stable" },
-    { "id": "list", "status": "stable" },
-    { "id": "list-row", "status": "stable" },
-    { "id": "load-more", "status": "stable" },
-    { "id": "masonry", "status": "stable" },
-    { "id": "mentions", "status": "stable" },
-    { "id": "menu", "status": "stable" },
-    { "id": "menubar", "status": "stable" },
-    { "id": "notice", "status": "stable" },
-    { "id": "number-field", "status": "stable" },
-    { "id": "otp-field", "status": "stable" },
-    { "id": "pagination", "status": "stable" },
-    { "id": "password-field", "status": "stable" },
-    { "id": "popover", "status": "stable" },
-    { "id": "progress", "status": "stable" },
-    { "id": "qrcode", "status": "stable" },
-    { "id": "radio", "status": "stable" },
-    { "id": "radio-group", "status": "stable" },
-    { "id": "result", "status": "stable" },
-    { "id": "search-field", "status": "stable" },
-    { "id": "section", "status": "stable" },
-    { "id": "segmented-control", "status": "stable" },
-    { "id": "select", "status": "stable" },
-    { "id": "sheet", "status": "stable" },
-    { "id": "side-panel", "status": "stable" },
-    { "id": "sidebar", "status": "stable" },
-    { "id": "skeleton", "status": "stable" },
-    { "id": "skip-nav", "status": "stable" },
-    { "id": "slider", "status": "stable" },
-    { "id": "spinner", "status": "stable" },
-    { "id": "splitter", "status": "stable" },
-    { "id": "stack", "status": "stable" },
-    { "id": "statistic", "status": "stable" },
-    { "id": "steps", "status": "stable" },
-    { "id": "surface", "status": "stable" },
-    { "id": "switch", "status": "stable" },
-    { "id": "tabs", "status": "stable" },
-    { "id": "tag", "status": "stable" },
-    { "id": "tags-input", "status": "stable" },
-    { "id": "text", "status": "stable" },
-    { "id": "text-area", "status": "stable" },
-    { "id": "text-format", "status": "stable" },
-    { "id": "thinking-orb", "status": "stable" },
-    { "id": "timeline", "status": "stable" },
-    { "id": "toast", "status": "stable" },
-    { "id": "toggle-group", "status": "stable" },
-    { "id": "tooltip", "status": "stable" },
-    { "id": "top", "status": "stable" },
-    { "id": "top-bar", "status": "stable" },
-    { "id": "tour", "status": "stable" },
-    { "id": "transfer-list", "status": "stable" },
-    { "id": "tree", "status": "stable" },
-    { "id": "upload-item", "status": "stable" },
-    { "id": "virtual-list", "status": "stable" },
-    { "id": "visually-hidden", "status": "stable" },
-    { "id": "watermark", "status": "stable" }
+    {
+      "id": "accordion",
+      "status": "stable",
+      "name": "Accordion",
+      "companions": []
+    },
+    {
+      "id": "affix",
+      "status": "stable",
+      "name": "Affix",
+      "companions": []
+    },
+    {
+      "id": "agreement",
+      "status": "stable",
+      "name": "Agreement",
+      "companions": []
+    },
+    {
+      "id": "alert-dialog",
+      "status": "stable",
+      "name": "AlertDialog",
+      "companions": []
+    },
+    {
+      "id": "anchor",
+      "status": "stable",
+      "name": "Anchor",
+      "companions": []
+    },
+    {
+      "id": "aspect-ratio",
+      "status": "stable",
+      "name": "AspectRatio",
+      "companions": []
+    },
+    {
+      "id": "asset",
+      "status": "stable",
+      "name": "Asset",
+      "companions": [
+        "AssetGroup"
+      ]
+    },
+    {
+      "id": "auth-provider-button",
+      "status": "stable",
+      "name": "AuthProviderButton",
+      "companions": []
+    },
+    {
+      "id": "auth-screen",
+      "status": "stable",
+      "name": "AuthScreenLayout",
+      "companions": [
+        "AuthScreenHero",
+        "AuthScreenFooter"
+      ]
+    },
+    {
+      "id": "avatar",
+      "status": "stable",
+      "name": "Avatar",
+      "companions": [
+        "AvatarGroup"
+      ]
+    },
+    {
+      "id": "badge",
+      "status": "stable",
+      "name": "Badge",
+      "companions": []
+    },
+    {
+      "id": "bottom-cta",
+      "status": "stable",
+      "name": "BottomCTA",
+      "companions": []
+    },
+    {
+      "id": "bottom-info",
+      "status": "stable",
+      "name": "BottomInfo",
+      "companions": []
+    },
+    {
+      "id": "bottom-navigation",
+      "status": "stable",
+      "name": "BottomNavigation",
+      "companions": []
+    },
+    {
+      "id": "breadcrumb",
+      "status": "stable",
+      "name": "Breadcrumb",
+      "companions": []
+    },
+    {
+      "id": "button",
+      "status": "stable",
+      "name": "Button",
+      "companions": [
+        "ClipboardButton"
+      ]
+    },
+    {
+      "id": "calendar",
+      "status": "stable",
+      "name": "Calendar",
+      "companions": []
+    },
+    {
+      "id": "card",
+      "status": "stable",
+      "name": "Card",
+      "companions": []
+    },
+    {
+      "id": "carousel",
+      "status": "stable",
+      "name": "Carousel",
+      "companions": []
+    },
+    {
+      "id": "chart",
+      "status": "beta",
+      "name": "Chart",
+      "companions": [
+        "LineChart",
+        "BarChart",
+        "PieChart",
+        "RadarChart",
+        "ScatterChart",
+        "Sparkline",
+        "ChartLegend"
+      ]
+    },
+    {
+      "id": "chat-message",
+      "status": "stable",
+      "name": "ChatMessage",
+      "companions": []
+    },
+    {
+      "id": "chat-screen",
+      "status": "stable",
+      "name": "ChatScreen",
+      "companions": []
+    },
+    {
+      "id": "checkbox",
+      "status": "stable",
+      "name": "Checkbox",
+      "companions": []
+    },
+    {
+      "id": "checkbox-group",
+      "status": "stable",
+      "name": "CheckboxGroup",
+      "companions": []
+    },
+    {
+      "id": "chip",
+      "status": "stable",
+      "name": "Chip",
+      "companions": []
+    },
+    {
+      "id": "collapsible",
+      "status": "stable",
+      "name": "Collapsible",
+      "companions": [
+        "CollapsibleMarker"
+      ]
+    },
+    {
+      "id": "color-picker",
+      "status": "stable",
+      "name": "ColorPicker",
+      "companions": []
+    },
+    {
+      "id": "combobox",
+      "status": "stable",
+      "name": "Combobox",
+      "companions": []
+    },
+    {
+      "id": "command-palette",
+      "status": "stable",
+      "name": "CommandPalette",
+      "companions": []
+    },
+    {
+      "id": "comment-thread-row",
+      "status": "stable",
+      "name": "CommentThreadRow",
+      "companions": []
+    },
+    {
+      "id": "comment-thread-screen",
+      "status": "stable",
+      "name": "CommentThreadScreen",
+      "companions": []
+    },
+    {
+      "id": "composition-layout",
+      "status": "stable",
+      "name": "CompositionLayout",
+      "companions": []
+    },
+    {
+      "id": "container",
+      "status": "stable",
+      "name": "Container",
+      "companions": []
+    },
+    {
+      "id": "context-menu",
+      "status": "stable",
+      "name": "ContextMenu",
+      "companions": []
+    },
+    {
+      "id": "counter-badge",
+      "status": "stable",
+      "name": "CounterBadge",
+      "companions": []
+    },
+    {
+      "id": "data-table",
+      "status": "stable",
+      "name": "DataTable",
+      "companions": [
+        "Table",
+        "LineScore",
+        "MatrixTable",
+        "ComparisonTable"
+      ]
+    },
+    {
+      "id": "date-picker",
+      "status": "stable",
+      "name": "DatePicker",
+      "companions": []
+    },
+    {
+      "id": "date-range-picker",
+      "status": "stable",
+      "name": "DateRangePicker",
+      "companions": []
+    },
+    {
+      "id": "description-list",
+      "status": "stable",
+      "name": "DescriptionList",
+      "companions": []
+    },
+    {
+      "id": "design-system-provider",
+      "status": "stable",
+      "name": "DesignSystemProvider",
+      "companions": []
+    },
+    {
+      "id": "dialog",
+      "status": "stable",
+      "name": "Dialog",
+      "companions": [
+        "OverlayStackProvider"
+      ]
+    },
+    {
+      "id": "divider",
+      "status": "stable",
+      "name": "Divider",
+      "companions": []
+    },
+    {
+      "id": "editor-screen",
+      "status": "stable",
+      "name": "EditorScreen",
+      "companions": []
+    },
+    {
+      "id": "empty-state",
+      "status": "stable",
+      "name": "EmptyState",
+      "companions": []
+    },
+    {
+      "id": "field",
+      "status": "stable",
+      "name": "Field",
+      "companions": [
+        "TextField"
+      ]
+    },
+    {
+      "id": "file-picker",
+      "status": "stable",
+      "name": "FilePicker",
+      "companions": []
+    },
+    {
+      "id": "floating-action-button",
+      "status": "stable",
+      "name": "FloatingActionButton",
+      "companions": []
+    },
+    {
+      "id": "form",
+      "status": "stable",
+      "name": "Form",
+      "companions": []
+    },
+    {
+      "id": "grid",
+      "status": "stable",
+      "name": "Grid",
+      "companions": []
+    },
+    {
+      "id": "heading",
+      "status": "stable",
+      "name": "Heading",
+      "companions": []
+    },
+    {
+      "id": "icon",
+      "status": "stable",
+      "name": "Icon",
+      "companions": []
+    },
+    {
+      "id": "icon-button",
+      "status": "stable",
+      "name": "IconButton",
+      "companions": [
+        "ClipboardIconButton"
+      ]
+    },
+    {
+      "id": "icon-tile",
+      "status": "stable",
+      "name": "IconTile",
+      "companions": []
+    },
+    {
+      "id": "image",
+      "status": "stable",
+      "name": "Image",
+      "companions": []
+    },
+    {
+      "id": "image-choice-group",
+      "status": "beta",
+      "name": "ImageChoiceGroup",
+      "companions": []
+    },
+    {
+      "id": "layout",
+      "status": "stable",
+      "name": "Layout",
+      "companions": []
+    },
+    {
+      "id": "link",
+      "status": "stable",
+      "name": "Link",
+      "companions": []
+    },
+    {
+      "id": "list",
+      "status": "stable",
+      "name": "List",
+      "companions": [
+        "CollectionRail"
+      ]
+    },
+    {
+      "id": "list-detail-screen",
+      "status": "stable",
+      "name": "ListDetailScreen",
+      "companions": []
+    },
+    {
+      "id": "list-row",
+      "status": "stable",
+      "name": "ListRow",
+      "companions": []
+    },
+    {
+      "id": "load-more",
+      "status": "stable",
+      "name": "LoadMore",
+      "companions": []
+    },
+    {
+      "id": "masonry",
+      "status": "stable",
+      "name": "Masonry",
+      "companions": []
+    },
+    {
+      "id": "media-selection-screen",
+      "status": "stable",
+      "name": "MediaSelectionScreen",
+      "companions": []
+    },
+    {
+      "id": "mentions",
+      "status": "stable",
+      "name": "Mentions",
+      "companions": []
+    },
+    {
+      "id": "menu",
+      "status": "stable",
+      "name": "Menu",
+      "companions": []
+    },
+    {
+      "id": "menubar",
+      "status": "stable",
+      "name": "Menubar",
+      "companions": []
+    },
+    {
+      "id": "message-composer",
+      "status": "stable",
+      "name": "MessageComposer",
+      "companions": []
+    },
+    {
+      "id": "moderation-screen",
+      "status": "stable",
+      "name": "ModerationScreen",
+      "companions": []
+    },
+    {
+      "id": "notice",
+      "status": "stable",
+      "name": "Notice",
+      "companions": []
+    },
+    {
+      "id": "notification-inbox-screen",
+      "status": "stable",
+      "name": "NotificationInboxScreen",
+      "companions": []
+    },
+    {
+      "id": "notification-item",
+      "status": "stable",
+      "name": "NotificationItem",
+      "companions": []
+    },
+    {
+      "id": "notification-row",
+      "status": "stable",
+      "name": "NotificationRow",
+      "companions": []
+    },
+    {
+      "id": "number-field",
+      "status": "stable",
+      "name": "NumberField",
+      "companions": []
+    },
+    {
+      "id": "onboarding-screen",
+      "status": "stable",
+      "name": "OnboardingScreen",
+      "companions": []
+    },
+    {
+      "id": "otp-field",
+      "status": "stable",
+      "name": "OtpField",
+      "companions": []
+    },
+    {
+      "id": "pagination",
+      "status": "stable",
+      "name": "Pagination",
+      "companions": []
+    },
+    {
+      "id": "password-field",
+      "status": "stable",
+      "name": "PasswordField",
+      "companions": []
+    },
+    {
+      "id": "permission-screen",
+      "status": "stable",
+      "name": "PermissionScreen",
+      "companions": []
+    },
+    {
+      "id": "photo-source-sheet",
+      "status": "stable",
+      "name": "PhotoSourceSheet",
+      "companions": []
+    },
+    {
+      "id": "popover",
+      "status": "stable",
+      "name": "Popover",
+      "companions": []
+    },
+    {
+      "id": "profile-screen",
+      "status": "stable",
+      "name": "ProfileScreen",
+      "companions": []
+    },
+    {
+      "id": "profile-summary",
+      "status": "stable",
+      "name": "ProfileSummary",
+      "companions": []
+    },
+    {
+      "id": "progress",
+      "status": "stable",
+      "name": "Progress",
+      "companions": []
+    },
+    {
+      "id": "qr-code",
+      "status": "stable",
+      "name": "QRCode",
+      "companions": []
+    },
+    {
+      "id": "radio",
+      "status": "stable",
+      "name": "Radio",
+      "companions": []
+    },
+    {
+      "id": "radio-group",
+      "status": "stable",
+      "name": "RadioGroup",
+      "companions": []
+    },
+    {
+      "id": "result",
+      "status": "stable",
+      "name": "Result",
+      "companions": []
+    },
+    {
+      "id": "screen-layout",
+      "status": "stable",
+      "name": "ScreenLayout",
+      "companions": []
+    },
+    {
+      "id": "search-field",
+      "status": "stable",
+      "name": "SearchField",
+      "companions": []
+    },
+    {
+      "id": "search-screen",
+      "status": "stable",
+      "name": "SearchScreen",
+      "companions": []
+    },
+    {
+      "id": "section",
+      "status": "stable",
+      "name": "Section",
+      "companions": []
+    },
+    {
+      "id": "segmented-control",
+      "status": "stable",
+      "name": "SegmentedControl",
+      "companions": []
+    },
+    {
+      "id": "select",
+      "status": "stable",
+      "name": "Select",
+      "companions": [
+        "NativeSelect"
+      ]
+    },
+    {
+      "id": "settings-screen",
+      "status": "stable",
+      "name": "SettingsScreen",
+      "companions": []
+    },
+    {
+      "id": "sheet",
+      "status": "stable",
+      "name": "Sheet",
+      "companions": []
+    },
+    {
+      "id": "side-panel",
+      "status": "stable",
+      "name": "SidePanel",
+      "companions": []
+    },
+    {
+      "id": "sidebar",
+      "status": "stable",
+      "name": "Sidebar",
+      "companions": []
+    },
+    {
+      "id": "skeleton",
+      "status": "stable",
+      "name": "Skeleton",
+      "companions": []
+    },
+    {
+      "id": "skip-nav",
+      "status": "stable",
+      "name": "SkipNav",
+      "companions": []
+    },
+    {
+      "id": "slider",
+      "status": "stable",
+      "name": "Slider",
+      "companions": []
+    },
+    {
+      "id": "spinner",
+      "status": "stable",
+      "name": "Spinner",
+      "companions": []
+    },
+    {
+      "id": "splitter",
+      "status": "stable",
+      "name": "Splitter",
+      "companions": []
+    },
+    {
+      "id": "stack",
+      "status": "stable",
+      "name": "Stack",
+      "companions": []
+    },
+    {
+      "id": "statistic",
+      "status": "stable",
+      "name": "Statistic",
+      "companions": [
+        "StatisticGroup"
+      ]
+    },
+    {
+      "id": "steps",
+      "status": "stable",
+      "name": "Steps",
+      "companions": []
+    },
+    {
+      "id": "surface",
+      "status": "stable",
+      "name": "Surface",
+      "companions": []
+    },
+    {
+      "id": "switch",
+      "status": "stable",
+      "name": "Switch",
+      "companions": []
+    },
+    {
+      "id": "tabs",
+      "status": "stable",
+      "name": "Tabs",
+      "companions": [
+        "TabPanel"
+      ]
+    },
+    {
+      "id": "tag",
+      "status": "stable",
+      "name": "Tag",
+      "companions": []
+    },
+    {
+      "id": "tags-input",
+      "status": "stable",
+      "name": "TagsInput",
+      "companions": []
+    },
+    {
+      "id": "text",
+      "status": "stable",
+      "name": "Text",
+      "companions": [
+        "StatusText"
+      ]
+    },
+    {
+      "id": "text-area",
+      "status": "stable",
+      "name": "TextArea",
+      "companions": []
+    },
+    {
+      "id": "text-format",
+      "status": "stable",
+      "name": "TextFormat",
+      "companions": []
+    },
+    {
+      "id": "thinking-orb",
+      "status": "stable",
+      "name": "ThinkingOrb",
+      "companions": []
+    },
+    {
+      "id": "timeline",
+      "status": "stable",
+      "name": "Timeline",
+      "companions": []
+    },
+    {
+      "id": "toast",
+      "status": "stable",
+      "name": "Toast",
+      "companions": [
+        "ToastProvider",
+        "ToastRegion"
+      ]
+    },
+    {
+      "id": "toggle-group",
+      "status": "stable",
+      "name": "ToggleGroup",
+      "companions": []
+    },
+    {
+      "id": "tooltip",
+      "status": "stable",
+      "name": "Tooltip",
+      "companions": []
+    },
+    {
+      "id": "top",
+      "status": "stable",
+      "name": "Top",
+      "companions": []
+    },
+    {
+      "id": "top-bar",
+      "status": "stable",
+      "name": "TopBar",
+      "companions": [
+        "NavigationBar",
+        "TopBarAction"
+      ]
+    },
+    {
+      "id": "tour",
+      "status": "stable",
+      "name": "Tour",
+      "companions": []
+    },
+    {
+      "id": "transfer-list",
+      "status": "stable",
+      "name": "TransferList",
+      "companions": []
+    },
+    {
+      "id": "tree",
+      "status": "stable",
+      "name": "Tree",
+      "companions": []
+    },
+    {
+      "id": "upload-item",
+      "status": "stable",
+      "name": "UploadItem",
+      "companions": []
+    },
+    {
+      "id": "virtual-list",
+      "status": "stable",
+      "name": "VirtualList",
+      "companions": []
+    },
+    {
+      "id": "visually-hidden",
+      "status": "stable",
+      "name": "VisuallyHidden",
+      "companions": []
+    },
+    {
+      "id": "watermark",
+      "status": "stable",
+      "name": "Watermark",
+      "companions": []
+    }
   ]
 }
