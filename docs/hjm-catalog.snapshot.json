@@ -1,12 +1,12 @@
 {
-  "$id": "hjm.catalog-snapshot/1.30.0",
-  "designSystemVersion": "1.30.0",
+  "$id": "hjm.catalog-snapshot/1.31.0",
+  "designSystemVersion": "1.31.0",
   "source": {
     "repository": "https://github.com/jim1286/hjm-design-system.git",
-    "tag": "v1.30.0",
-    "commit": "1384408a23a9456c12e3fc6c2aa2d40e656b3e26",
+    "tag": "v1.31.0",
+    "commit": "b3f6472e2a2b1dcf0c7fc999338233fcce2d290c",
     "sourcePath": "packages/design-contracts/dist/catalog.js",
-    "contentSha256": "3592be17a2d0a71a3508d199bde3c724c461d7e83d473477be8e45af93499a9c"
+    "contentSha256": "08b346b502efb617e428dd2ecec52eeab697df698f94d725e8a59ea8915b8541"
   },
   "components": [
     {
@@ -98,7 +98,9 @@
       "id": "bottom-navigation",
       "status": "stable",
       "name": "BottomNavigation",
-      "companions": []
+      "companions": [
+        "BottomNavigationInsetProvider"
+      ]
     },
     {
       "id": "breadcrumb",
@@ -145,6 +147,12 @@
         "Sparkline",
         "ChartLegend"
       ]
+    },
+    {
+      "id": "chat-date-separator",
+      "status": "beta",
+      "name": "ChatDateSeparator",
+      "companions": []
     },
     {
       "id": "chat-message",
@@ -278,7 +286,8 @@
       "status": "stable",
       "name": "Dialog",
       "companions": [
-        "OverlayStackProvider"
+        "OverlayStackProvider",
+        "ImmersiveOverlay"
       ]
     },
     {
@@ -417,7 +426,9 @@
       "id": "media-selection-screen",
       "status": "stable",
       "name": "MediaSelectionScreen",
-      "companions": []
+      "companions": [
+        "MediaSelectionCell"
+      ]
     },
     {
       "id": "mentions",
@@ -447,7 +458,9 @@
       "id": "moderation-screen",
       "status": "stable",
       "name": "ModerationScreen",
-      "companions": []
+      "companions": [
+        "ModerationForm"
+      ]
     },
     {
       "id": "notice",
@@ -489,6 +502,12 @@
       "id": "otp-field",
       "status": "stable",
       "name": "OtpField",
+      "companions": []
+    },
+    {
+      "id": "page-indicator",
+      "status": "beta",
+      "name": "PageIndicator",
       "companions": []
     },
     {
@@ -791,6 +810,12 @@
       "id": "tree",
       "status": "stable",
       "name": "Tree",
+      "companions": []
+    },
+    {
+      "id": "typing-indicator",
+      "status": "beta",
+      "name": "TypingIndicator",
       "companions": []
     },
     {

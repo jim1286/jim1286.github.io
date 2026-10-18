@@ -217,3 +217,10 @@ HJM 1.30.0을 채택하고 7개 탭 전체를 설치 버전 SELECTION과 대조�
 ScreenLayout footer는 하단 고정이라 페이지 끝 footer를 대신하지 않음), 기술 도식 이미지, 헤더의 GitHub·Storybook
 외부 목적지 링크(도구성 행동이 아닌 이동), BrandProvider의 paper/forest 팔레트.
 확인: `pnpm build` 통과, 로컬 `vite preview`에서 데스크톱 소개·앱 탭과 375px 폭 가로 넘침 없음. 공개 배포는 하지 않았다.
+
+## 2026-10-18 HJM 1.31.0 채택
+
+HJM 1.31.0을 채택하고 새 API(Card `onActivate`+`actions`, ScreenLayout `titleLeading`·`loadingIndicator`, Text `color`·`numeric`,
+Tabs `indicator`, PageIndicator 등)를 7개 탭과 대조했다. 이 사이트에는 해당 API가 닫는 앱 우회·공백 기록이 없어 화면 코드는
+바꾸지 않았다. 상단 헤더의 TopBar는 1.30 기록대로 정적 문서 스크롤 chrome이라 유지한다.
+확인: `pnpm typecheck`, `pnpm build` 통과. 브라우저 화면 확인과 공개 배포는 하지 않았다.
