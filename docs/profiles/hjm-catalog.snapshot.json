@@ -1,12 +1,12 @@
 {
-  "$id": "hjm.catalog-snapshot/1.31.0",
-  "designSystemVersion": "1.31.0",
+  "$id": "hjm.catalog-snapshot/1.32.0",
+  "designSystemVersion": "1.32.0",
   "source": {
     "repository": "https://github.com/jim1286/hjm-design-system.git",
-    "tag": "v1.31.0",
-    "commit": "b3f6472e2a2b1dcf0c7fc999338233fcce2d290c",
+    "tag": "v1.32.0",
+    "commit": "9084c453ec11b71b3ce8570bc1e98dd3be9998a4",
     "sourcePath": "packages/design-contracts/dist/catalog.js",
-    "contentSha256": "08b346b502efb617e428dd2ecec52eeab697df698f94d725e8a59ea8915b8541"
+    "contentSha256": "d7e6459c41a85922861be3a31c50eafa5abd6a9fff4c2cf274506c6538b2d9d6"
   },
   "components": [
     {
@@ -158,7 +158,9 @@
       "id": "chat-message",
       "status": "stable",
       "name": "ChatMessage",
-      "companions": []
+      "companions": [
+        "MediaAlbumPageStatus"
+      ]
     },
     {
       "id": "chat-screen",
