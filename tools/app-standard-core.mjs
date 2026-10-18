@@ -1039,47 +1039,10 @@ function validateWaivers(waivers, findings, now = new Date()) {
 // 배포는 계약이 선언한 경로·게이트·준비 판정을 저장소 파일에서 다시 읽어 대조한다.
 // 선언만으로 통과시키지 않는 이유: 이 블록의 값은 모두 다른 파일에도 존재하고,
 // 둘이 어긋나면 배포가 조용히 잘못된 commit·주소를 향한다(docs/deployment/VPS_PROVISIONING.md VP-06).
-// qualityGate declares port overrides and the explicitly selected feedback cadence.
-function validateQualityGate(contract, findings) {
-  const qualityGate = contract?.qualityGate;
-  if (qualityGate === undefined) return;
-  if (bound(contract) && (qualityGate.servicePorts !== undefined || qualityGate.mode !== undefined)) {
-    // runtime-bindings 게이트는 service container를 띄우지 않는다.
-    addFinding(findings, 'QUALITY_GATE_PORTS_UNUSED', 'contract.qualityGate', 'A runtime-bindings gate starts no service containers, so qualityGate.servicePorts has no effect.');
-    return;
-  }
-  if (!assertObject(qualityGate, 'contract.qualityGate', findings)) return;
-  assertKeys(qualityGate, new Set(['servicePorts', 'mode', 'trigger', 'releaseVersions']), 'contract.qualityGate', findings);
-  if (qualityGate.mode !== undefined && !['full', 'fast'].includes(qualityGate.mode))
-    addFinding(findings, 'QUALITY_GATE_MODE_INVALID', 'contract.qualityGate.mode', 'Quality gate mode must be full or fast.');
-  if (qualityGate.trigger !== undefined || qualityGate.releaseVersions !== undefined) {
-    const entries = qualityGate.releaseVersions;
-    if (qualityGate.trigger !== 'version-bump' || !Array.isArray(entries) || entries.length === 0 ||
-        entries.some(entry => !isPlainObject(entry) || !['expo', 'flutter', 'server', 'web'].includes(entry.kind) ||
-          typeof entry.path !== 'string' || !/^[A-Za-z0-9_-][A-Za-z0-9_./-]*$/.test(entry.path) || entry.path.split('/').includes('..')) ||
-        (Array.isArray(entries) && new Set(entries.map(entry => entry?.path)).size !== entries.length)) {
-      addFinding(findings, 'QUALITY_RELEASE_TRIGGER_INVALID', 'contract.qualityGate', 'Version-triggered quality requires distinct safe version paths and expo/flutter/server/web kinds.');
-    }
-  }
-  if (qualityGate.servicePorts === undefined) return;
-  if (!assertObject(qualityGate.servicePorts, 'contract.qualityGate.servicePorts', findings)) return;
-  assertKeys(qualityGate.servicePorts, new Set(['postgres', 'redis']), 'contract.qualityGate.servicePorts', findings);
-  const { postgres, redis } = qualityGate.servicePorts;
-  for (const [key, port] of [['postgres', postgres], ['redis', redis]]) {
-    // 1024 미만은 러너가 root가 아니면 바인딩되지 않고, 32768 이상은 커널의 ephemeral 범위와 겹친다.
-    if (!Number.isInteger(port) || port < 1024 || port > 32767) {
-      addFinding(findings, 'QUALITY_GATE_PORT_INVALID', `contract.qualityGate.servicePorts.${key}`, 'An explicit gate service port must be an integer in 1024-32767, below the kernel ephemeral range.');
-    }
-  }
-  if (Number.isInteger(postgres) && postgres === redis) {
-    addFinding(findings, 'QUALITY_GATE_PORT_DUPLICATE', 'contract.qualityGate.servicePorts', 'The postgres and redis host ports must differ.');
-  }
-}
-
 function validateDeployment(deployment, findings) {
   if (deployment === undefined) return;
   if (!assertObject(deployment, 'contract.deployment', findings)) return;
-  assertKeys(deployment, new Set(['model', 'target', 'release', 'readiness', 'runnerHost']), 'contract.deployment', findings);
+  assertKeys(deployment, new Set(['model', 'target', 'release', 'readiness']), 'contract.deployment', findings);
   if (deployment.model !== 'single-vps-v1') {
     addFinding(findings, 'DEPLOYMENT_MODEL_UNSUPPORTED', 'contract.deployment.model', 'deployment.model must equal "single-vps-v1".');
   }
@@ -1114,13 +1077,6 @@ function validateDeployment(deployment, findings) {
       }
     }
   }
-  const ports = Array.isArray(deployment.runnerHost?.servicePorts) ? deployment.runnerHost.servicePorts : [];
-  for (const [index, port] of ports.entries()) {
-    // 1024 미만은 러너가 root가 아니면 바인딩되지 않고, 러너 포트는 컨테이너가 잡는 공개 포트다.
-    if (!Number.isInteger(port) || port < 1024 || port > 65535) {
-      addFinding(findings, 'DEPLOYMENT_SERVICE_PORT_INVALID', `contract.deployment.runnerHost.servicePorts[${index}]`, 'CI service ports must be integers in 1024-65535.');
-    }
-  }
 }
 
 export function validateAppContract(contract, { now = new Date(), targetStage, designRelease } = {}) {
@@ -1131,7 +1087,6 @@ export function validateAppContract(contract, { now = new Date(), targetStage, d
     '$schema',
     'execution',
     'deployment',
-    'qualityGate',
     'contractVersion',
     'profile',
     'app',
@@ -1220,7 +1175,6 @@ export function validateAppContract(contract, { now = new Date(), targetStage, d
   );
   validateI18n(contract.i18n, findings);
   validateRelease(contract.release, contract.runtimes, findings);
-  validateQualityGate(contract, findings);
   validateDeployment(contract.deployment, findings);
   validateWaivers(contract.waivers, findings, now);
   validateAcceptance(contract.acceptance, contract.waivers, findings);
@@ -1371,7 +1325,7 @@ function makeQaReadme(contract) {
     + `## ExploreQA를 선택한 경우의 연결 항목\n\n`
     + `| 항목 | 역할 |\n| --- | --- |\n`
     + `| \`exploreqa.toml\` | provider와 보고서·페르소나 경로 |\n`
-    + `| \`provider.py\` 또는 TOML provider | 제품 adapter·기존 세션·실행 안내 |\n`
+    + `| provider 설정·앱 소유 adapter | 선택한 실행에 필요한 기존 세션·실행 안내. 구현 방식은 제품별로 다를 수 있음 |\n`
     + `| 개발 URL 또는 native session JSON | 이미 실행 중인 대상에 attach |\n`
     + `| \`personas.json\`·\`lanes.json\` | 탐색 목표·허용 행동·세션/기기 연결 |\n`
     + `| \`run.sh\` | 선택한 로컬 QA의 진입점. 자동 CI 연결 의무 없음 |\n`
@@ -3788,7 +3742,6 @@ export async function checkDeploymentContract(appRoot, contract, findings) {
     deployment.target?.deployScriptPath,
     deployment.target?.bootstrapScriptPath,
     deployment.release?.workflow,
-    deployment.release?.gateWorkflow,
   ].filter(hasText);
   const sources = new Map();
   for (const relativePath of new Set(declaredPaths)) {
@@ -3796,50 +3749,18 @@ export async function checkDeploymentContract(appRoot, contract, findings) {
     if (source !== null) sources.set(relativePath, source);
   }
   const deployWorkflow = sources.get(deployment.release?.workflow);
-  const gateWorkflow = sources.get(deployment.release?.gateWorkflow);
   const workflowPath = deployment.release?.workflow;
-  const versionTriggered = deployment.release?.trigger === 'version-bump';
-  if (gateWorkflow && deployWorkflow && (!versionTriggered || /^  workflow_run:/m.test(deployWorkflow))) {
-    // GitHub은 workflow_run을 **워크플로 이름 문자열**로 연결한다. 파일 경로가 아니다.
-    // 게이트의 name:을 바꾸면 배포가 실패하지 않고 조용히 트리거되지 않는다.
-    const gateName = gateWorkflow.match(/^name:[ \t]*(\S.*?)[ \t]*$/m)?.[1];
-    const subscription = deployWorkflow.match(/workflows:[ \t]*\[([^\]]*)\]/)?.[1] ?? '';
-    const subscribed = [...subscription.matchAll(/'([^']*)'|"([^"]*)"/g)].map((match) => match[1] ?? match[2]);
-    if (!hasText(gateName)) {
-      addFinding(findings, 'DEPLOYMENT_GATE_NAME_UNREADABLE', deployment.release.gateWorkflow, 'The declared gate workflow must start a top-level name: line that workflow_run can subscribe to.');
-    } else if (!subscribed.includes(gateName)) {
-      addFinding(findings, 'DEPLOYMENT_GATE_SUBSCRIPTION_MISMATCH', workflowPath, `The deployment workflow must subscribe to workflow_run workflows: ['${gateName}'], the current name: of ${deployment.release.gateWorkflow}.`);
-    }
-  }
   if (!deployWorkflow) return;
-  if (deployment.release?.trigger === 'version-file-push') {
-    try {
-      for (const error of directDeploymentErrors(yamlParser(appRoot).parse(deployWorkflow), deployment.release)) {
-        addFinding(findings, 'DEPLOYMENT_DIRECT_SOURCE_INVALID', workflowPath, error);
-      }
-    } catch (error) {
-      addFinding(findings, 'DEPLOYMENT_WORKFLOW_INVALID', workflowPath, error.message);
+  if (deployment.release?.trigger !== 'version-file-push') {
+    addFinding(findings, 'DEPLOYMENT_TRIGGER_UNSUPPORTED', workflowPath, 'Deployment supports direct version-file pushes only; quality-workflow-triggered deployment is retired.');
+    return;
+  }
+  try {
+    for (const error of directDeploymentErrors(yamlParser(appRoot).parse(deployWorkflow), deployment.release)) {
+      addFinding(findings, 'DEPLOYMENT_DIRECT_SOURCE_INVALID', workflowPath, error);
     }
-  } else if (versionTriggered) {
-    // A completed quality event carries its original push boundary in a run-bound
-    // receipt. Retain push compatibility while consumers migrate without polling.
-    const gateFile = deployment.release.gateWorkflow.split('/').at(-1);
-    const manifest = deployment.release.versionManifest;
-    if (!manifest || !deployWorkflow.includes(`node tools/server-release-gate.mjs ${manifest} ${gateFile}`) ||
-        !deployWorkflow.includes('needs.release-gate.outputs.deploy') ||
-        !(deployWorkflow.includes('github.sha') && /^  push:/m.test(deployWorkflow) ||
-          /^  workflow_run:/m.test(deployWorkflow) && deployWorkflow.includes('github.event.workflow_run.head_sha') &&
-          deployWorkflow.includes("workflow_run.conclusion == 'success'") && deployWorkflow.includes('needs.release-gate.outputs.source-sha'))) {
-      addFinding(findings, 'DEPLOYMENT_VERSION_GATE_MISSING', workflowPath, 'Version-triggered deployment requires the shared version/quality gate, exact checked source SHA, and dependent image job.');
-    }
-  } else {
-    // workflow_run의 GITHUB_SHA는 기본 브랜치 tip이다. 검사받은 commit은 head_sha뿐이다.
-    if (!deployWorkflow.includes('github.event.workflow_run.head_sha')) {
-      addFinding(findings, 'DEPLOYMENT_SHA_PROVENANCE_MISSING', workflowPath, 'The deployment workflow must resolve the release from github.event.workflow_run.head_sha; GITHUB_SHA is the default-branch tip, not the checked commit.');
-    }
-    if (!/workflow_run\.conclusion[ \t]*==[ \t]*'success'/.test(deployWorkflow)) {
-      addFinding(findings, 'DEPLOYMENT_GATE_CONCLUSION_UNCHECKED', workflowPath, "The deployment workflow must require github.event.workflow_run.conclusion == 'success'; completed also fires on failure and cancellation.");
-    }
+  } catch (error) {
+    addFinding(findings, 'DEPLOYMENT_WORKFLOW_INVALID', workflowPath, error.message);
   }
   // 이미지 신원과 전송 무결성. 이게 없으면 어떤 바이트가 운영에 올라갔는지 사후에 모른다.
   if (!/image inspect/.test(deployWorkflow) || !deployWorkflow.includes('{{.Id}}')) {
@@ -3859,20 +3780,6 @@ export async function checkDeploymentContract(appRoot, contract, findings) {
   if (!deployWorkflow.includes('StrictHostKeyChecking=yes') || !deployWorkflow.includes('UserKnownHostsFile')) {
     addFinding(findings, 'DEPLOYMENT_HOST_KEY_UNPINNED', workflowPath, 'The deployment workflow must pin the server host key (StrictHostKeyChecking=yes with an explicit UserKnownHostsFile).');
   }
-  // servicePorts는 선언이 아니라 게이트 워크플로의 실제 service container 매핑에서 다시 읽는다.
-  // 선언만 믿으면 러너 호스트를 공유하는 앱들의 충돌 검사가 거짓 값으로 통과한다.
-  if (gateWorkflow && isPlainObject(deployment.runnerHost)) {
-    // GitHub Actions service containers publish host ports in either the flow form
-    // (ports: ['5432:5432']) or a block sequence (ports:\n  - 5433:5432). Read both.
-    const boundPorts = [...gateWorkflow.matchAll(/^[ \t]*ports:[ \t]*(?:\[([^\]\r\n]*)\][ \t]*)?$((?:\r?\n[ \t]*-[ \t]*[^\r\n]+)*)/gm)]
-      .flatMap((match) => [...`${match[1] ?? ''}\n${match[2] ?? ''}`.matchAll(/(\d{1,5}):\d{1,5}/g)])
-      .map((match) => Number(match[1]));
-    const declared = Array.isArray(deployment.runnerHost.servicePorts) ? deployment.runnerHost.servicePorts : [];
-    const sorted = (ports) => [...new Set(ports)].sort((left, right) => left - right);
-    if (JSON.stringify(sorted(declared)) !== JSON.stringify(sorted(boundPorts))) {
-      addFinding(findings, 'DEPLOYMENT_SERVICE_PORTS_DRIFT', 'contract.deployment.runnerHost.servicePorts', `runnerHost.servicePorts must list the host ports ${deployment.release.gateWorkflow} really publishes: ${JSON.stringify(sorted(boundPorts))}.`);
-    }
-  }
   // imageBuildHostId도 선언이 아니라 배포 워크플로의 runs-on에서 파생한다. 이 값을 믿고
   // 넘기면 "운영 호스트에서 빌드하지 않는다"는 규격이 문서상으로만 지켜진다.
   if (hasText(deployment.release?.imageBuildDecisionAdrPath)) {
@@ -3885,13 +3792,7 @@ export async function checkDeploymentContract(appRoot, contract, findings) {
       }
     }
   }
-  // Version-gated workflows have a small intent job before the image job. Its CI_RUNNER
-  // is not the image build host; inspect the job that actually handles Docker images.
-  const imageJob = versionTriggered
-    ? deployWorkflow.split(/(?=^  [\w-]+:[ \t]*$)/m).find(block => /docker (?:build|buildx build|image inspect)/.test(block)) ?? ''
-    : deployWorkflow;
-  const runsOn = imageJob.match(/^[ \t]*runs-on:[ \t]*(.+?)[ \t]*$/m)?.[1];
-  if (versionTriggered && !hasText(runsOn)) addFinding(findings, 'DEPLOYMENT_BUILD_HOST_UNRESOLVED', workflowPath, 'Version-triggered deployment must declare the image job runner.');
+  const runsOn = deployWorkflow.match(/^[ \t]*runs-on:[ \t]*(.+?)[ \t]*$/m)?.[1];
   if (hasText(runsOn) && isPlainObject(deployment.release)) {
     let buildHost;
     // Quota fallback is now explicit in the contract. Accept only the bounded DEPLOY_RUNNER

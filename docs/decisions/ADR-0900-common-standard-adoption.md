@@ -2,6 +2,8 @@
 
 상태: accepted · 결정일: 2026-09-09 · 소유자: jimin
 
+2026-10-17 상태 정리: runtime 계약 채택은 유지한다. 이 ADR 당시의 `.github/workflows/app-standard.yml` 자동 실행과 전체 lint/typecheck/test/build 의무는 2026-10-14 CI 최소화 결정으로 대체됐다. 현재 검사 범위는 포트폴리오 AGENTS.md의 변경 범위 원칙을 따른다.
+
 ## 배경과 결정
 
 사용자의 전체 제품 표준 이관 요청에 따라 `portfolio-default-v1` 계약을 채택한다.
@@ -18,8 +20,8 @@
 - Node·pnpm 고정, 실제 importer/version/integrity 대조, manifest·entrypoint 소유 경계 검증.
 - 중앙 HJM release record·catalog·foundation evidence 계약. Flutter는 Dart adapter source와 의미 대응 검증을 요구한다.
 - canonical 4문서와 acceptance/evidence를 연결하며 계획을 verified로 바꾸지 않는다.
-- `pnpm standard:check`는 계약·문서 검사 후 각 runtime의 준비·lint·typecheck·test·build를 실패 전파 방식으로 실행한다.
-- 기존 제품 검사·배포 workflow를 유지하고 `.github/workflows/app-standard.yml`을 추가한다.
+- `pnpm standard:check`는 계약·문서 검사 후 각 runtime 명령을 실패 전파 방식으로 실행한다. 자동 실행 의무와 실행 범위는 현재 공통 지침이 정한다.
+- 당시 구현은 기존 제품 검사·배포 workflow를 유지하고 `.github/workflows/app-standard.yml`을 추가했다. 해당 workflow는 2026-10-14 최소화 결정에서 제거됐다.
 
 ## 검증과 한계
 

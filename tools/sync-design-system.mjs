@@ -30,6 +30,8 @@ function catalogDeclarations(source) {
     ['watermarkRecipe', './watermark.js'],
     ['colorPickerRecipe', './color-picker.js'],
     ['masonryRecipe', './masonry.js'],
+    // HJM 1.27 hoists the ImageChoiceGroup recipe import the same way (2026-10-17).
+    ['imageChoiceRecipe', './image-choice.js'],
     ['virtualListRecipe', './virtual-list.js'],
     ['qrCodeRecipe', './qr-code-recipe.js'],
     ['thinkingOrbRecipe', './thinking-orb-recipe.js'],
@@ -73,11 +75,16 @@ export function buildRelease({ version, packages, catalogSource, versionSource, 
   // Evaluate only data declarations without host capabilities or dynamic code creation.
   const catalogDefinition = catalogDeclarations(catalogSource);
   const entries = JSON.parse(runInNewContext(
-    `${catalogDefinition.replace(/^export /gm, '')}\nJSON.stringify(componentCatalog.map(({name,status}) => ({name,status})))`,
+    `${catalogDefinition.replace(/^export /gm, '')}\nJSON.stringify(componentCatalog.map(({name,status,id,label,companions}) => ({name,status,id,label,companions})))`,
     Object.create(null), { timeout: 1000, contextCodeGeneration: { strings: false, wasm: false } },
   ));
+  // Preserve pre-registration snapshots byte-for-byte; newer trains carry their own symbol ownership.
+  const hasRegistration = entries.some(entry => entry.label !== undefined || entry.id !== undefined || entry.companions !== undefined);
   const components = entries.filter(({ status }) => status !== 'planned' && status !== 'deprecated')
-    .map(({ name, status }) => ({ id: name.replace(/([a-z0-9])([A-Z])/g, '$1-$2').toLowerCase(), status }))
+    .map(({ name, status, id, companions }) => ({
+      id: id ?? (hasRegistration ? name.replace(/([a-z0-9])([A-Z])/g, '$1-$2').replace(/([A-Z])([A-Z][a-z])/g, '$1-$2') : name.replace(/([a-z0-9])([A-Z])/g, '$1-$2')).toLowerCase(),
+      status, ...(hasRegistration ? { name, companions: companions ?? [] } : {}),
+    }))
     .sort((a, b) => a.id.localeCompare(b.id, 'en'));
   if (components.length === 0 || new Set(components.map(({ id }) => id)).size !== components.length
     || components.some(({ id, status }) => !/^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$/.test(id) || !['stable', 'beta'].includes(status))) {
@@ -216,7 +223,37 @@ export async function syncDesignSystem({ root = resolve(import.meta.dirname, '..
         if (entry.name.startsWith('.') || ['node_modules', 'vendor', 'dist', 'build', 'coverage'].includes(entry.name)) continue;
         const path = directory ? `${directory}/${entry.name}` : entry.name;
         if (entry.isDirectory()) await visit(path);
-        else if (entry.name === 'package.json') {
+        else if (entry.name === 'pnpm-workspace.yaml') {
+          // Only existing exact HJM cooldown exceptions follow the verified release.
+          // Leaving their old versions makes fresh stable releases fail strict install;
+          // unrelated exceptions and the package-wide cooldown stay unchanged. Nested
+          // workspaces count too when an existing runtime binding still installs independently.
+          const workspace = await readTarget(root, path);
+          // The lockfile still pins the previous release until pnpm re-resolves it, and pnpm verifies
+          // existing entries before resolving. Dropping the previous exception while that release is
+          // itself inside the cooldown made the upgrade impossible (utilverse 1.27.0 -> 1.27.1,
+          // 2026-10-17). Keep it only while this workspace's lockfile references it; the next import
+          // after the install removes it.
+          const lockPath = path.includes('/') ? `${path.slice(0, path.lastIndexOf('/'))}/pnpm-lock.yaml` : 'pnpm-lock.yaml';
+          const lockfile = await readTarget(root, lockPath) ?? '';
+          let inExceptions = false;
+          const seen = new Set();
+          const updated = workspace.split('\n').flatMap(line => {
+            if (/^minimumReleaseAgeExclude:\s*(?:#.*)?$/.test(line)) inExceptions = true;
+            else if (/^[^\s#]/.test(line)) inExceptions = false;
+            if (!inExceptions) return [line];
+            const match = /^(\s+-\s+)(['"]?)(@hjmds\/(?:design-contracts|react|react-native))@([^'"\s]+)(['"]?)(\s*(?:#.*)?)$/.exec(line);
+            if (!match) return [line];
+            const [, prefix, open, name, version, close, suffix] = match;
+            const entry = version => `${prefix}${open}${name}@${version}${close}${suffix}`;
+            const lines = [];
+            if (!seen.has(`${name}@${release.version}`)) { seen.add(`${name}@${release.version}`); lines.push(entry(release.version)); }
+            if (version !== release.version && !seen.has(`${name}@${version}`) && lockfile.includes(`${name}@${version}`)) { seen.add(`${name}@${version}`); lines.push(entry(version)); }
+            return lines;
+          }).join('\n');
+          before.set(path, workspace);
+          expected.set(path, updated);
+        } else if (entry.name === 'package.json') {
           const source = await readTarget(root, path);
           const manifest = JSON.parse(source);
           let changed = false;
@@ -230,23 +267,6 @@ export async function syncDesignSystem({ root = resolve(import.meta.dirname, '..
       }
     };
     await visit();
-    const workspacePath = 'pnpm-workspace.yaml';
-    const workspace = await readTarget(root, workspacePath);
-    if (workspace !== null) {
-      // Only existing exact HJM cooldown exceptions follow the verified release.
-      // Leaving their old versions makes fresh stable releases fail strict install;
-      // unrelated exceptions and the package-wide cooldown stay unchanged.
-      let inExceptions = false;
-      const updated = workspace.split('\n').map(line => {
-        if (/^minimumReleaseAgeExclude:\s*(?:#.*)?$/.test(line)) inExceptions = true;
-        else if (/^[^\s#]/.test(line)) inExceptions = false;
-        if (!inExceptions) return line;
-        return line.replace(/^(\s+-\s+)(['"]?)(@hjmds\/(?:design-contracts|react|react-native))@[^'"\s]+(['"]?)(\s*(?:#.*)?)$/, (_, prefix, open, name, close, suffix) =>
-          `${prefix}${open}${name}@${release.version}${close}${suffix}`);
-      }).join('\n');
-      before.set(workspacePath, workspace);
-      expected.set(workspacePath, updated);
-    }
   }
   const updates = [...expected].filter(([path, source]) => before.get(path) !== source);
   if (write) {

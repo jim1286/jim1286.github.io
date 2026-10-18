@@ -81,6 +81,18 @@ export async function prepareHjmRelease({ root = process.cwd(), write = false, r
   const manifest = JSON.parse(await readFile(join(root, 'package.json'), 'utf8'));
   if (!/^pnpm@\d+\.\d+\.\d+$/.test(manifest.packageManager ?? '')) throw new Error('A pinned pnpm packageManager is required');
   if (!manifest.scripts?.['check:hjm-release']) throw new Error('Product must define check:hjm-release for its affected web/native surfaces');
+  // Existing runtime bindings may declare independent installation roots.
+  // Install each declared lockfile; a standard root workspace uses the default below.
+  const installRoots = manifest.hjmRelease?.installRoots ?? ['.'];
+  if (!Array.isArray(installRoots) || !installRoots.length || new Set(installRoots).size !== installRoots.length
+    || installRoots.some(path => typeof path !== 'string' || (path !== '.' && !/^[\w-]+(?:\/[\w-]+)*$/.test(path))))
+    throw new Error('Invalid HJM installRoots');
+  for (const directory of installRoots) {
+    if (await realpath(join(root, directory)) !== join(root, directory)) throw new Error('HJM install root must not be a symlink');
+    await readFile(join(root, directory, 'package.json'));
+    git(root, ['ls-files', '--error-unmatch', '--', join(directory, 'pnpm-lock.yaml')]);
+  }
+  const lockPaths = installRoots.map(directory => join(directory, 'pnpm-lock.yaml'));
   // HJM token generation may legitimately update tracked product CSS. Products
   // explicitly name those outputs; arbitrary build side effects remain excluded.
   const generatedPaths = manifest.hjmRelease?.generatedPaths ?? [];
@@ -99,6 +111,9 @@ export async function prepareHjmRelease({ root = process.cwd(), write = false, r
       return { action: 'already-prepared', version: previous.version, sourceSha: previous.sourceSha };
     }
     state = previous;
+    // Pre-installRoots checkpoints were root-only; retain their resume semantics.
+    if (JSON.stringify(state.installRoots ?? ['.']) !== JSON.stringify(installRoots))
+      throw new Error('HJM installRoots changed since preparation; preserve pinned inputs');
     assertOwnedChanges(root, state);
     if (JSON.stringify(await hashes(root, state.paths)) !== JSON.stringify(state.hashes))
       throw new Error('Preparation files changed since the last checkpoint; preserve edits and inspect before resuming');
@@ -113,18 +128,23 @@ export async function prepareHjmRelease({ root = process.cwd(), write = false, r
     const bundle = await loadRelease(selection.version);
     if (bundle.release.version !== selection.version) throw new Error('Resolved HJM differs from selected stable version');
     const plan = await syncDesignSystem({ appRoot: root, version: selection.version, loadRelease: async () => bundle });
-    if (!write) return { action: 'plan', ...selection, paths: [...plan.updates.map(x => x.path), 'pnpm-lock.yaml', ...generatedPaths], checks: manifest.scripts['check:hjm-release'] };
+    const uncovered = plan.updates.filter(({ path }) => path.endsWith('package.json')
+      && !installRoots.some(directory => directory === '.' || path.startsWith(`${directory}/`)));
+    if (uncovered.length) throw new Error(`HJM consumers outside installRoots: ${uncovered.map(x => x.path).join(', ')}`);
+    if (!write) return { action: 'plan', ...selection, installRoots, paths: [...plan.updates.map(x => x.path), ...lockPaths, ...generatedPaths], checks: manifest.scripts['check:hjm-release'] };
     // Save the exact artifact record before the first mutation. Retry never
     // queries latest again, even when the registry has published another version.
     state = { schemaVersion: 1, ...selection, baseSha: git(root, ['rev-parse', 'HEAD']), phase: 'selected', bundle,
-      generatedPaths, paths: [...new Set([...plan.updates.map(x => x.path), 'pnpm-lock.yaml', ...generatedPaths])] };
+      installRoots, generatedPaths, paths: [...new Set([...plan.updates.map(x => x.path), ...lockPaths, ...generatedPaths])] };
     state.hashes = await hashes(root, state.paths);
     await saveState(stateFile, state);
   }
   try {
     assertOwnedChanges(root, state);
-    const actualPnpm = pnpmVersion(root);
-    if (actualPnpm !== manifest.packageManager.slice(5)) throw new Error('pnpm does not match packageManager');
+    for (const directory of installRoots) {
+      const actualPnpm = pnpmVersion(join(root, directory));
+      if (actualPnpm !== manifest.packageManager.slice(5)) throw new Error('pnpm does not match packageManager');
+    }
     if (state.phase === 'selected') {
       await syncDesignSystem({ appRoot: root, version: state.version, write: true, loadRelease: async () => state.bundle });
       state.phase = 'imported';
@@ -132,12 +152,14 @@ export async function prepareHjmRelease({ root = process.cwd(), write = false, r
       await saveState(stateFile, state);
     }
     if (state.phase === 'imported') {
-      await execute('pnpm', ['install', '--lockfile-only', '--ignore-scripts'], root);
+      for (const directory of installRoots)
+        await execute('pnpm', ['install', '--lockfile-only', '--ignore-scripts'], join(root, directory));
       state.phase = 'locked';
       state.hashes = await hashes(root, state.paths);
       await saveState(stateFile, state);
     }
-    await execute('pnpm', ['install', '--frozen-lockfile'], root);
+    for (const directory of installRoots)
+      await execute('pnpm', ['install', '--frozen-lockfile'], join(root, directory));
     const inputPaths = state.paths.filter(path => !state.generatedPaths.includes(path));
     const inputs = await hashes(root, inputPaths);
     await execute('pnpm', ['run', 'check:hjm-release'], root);

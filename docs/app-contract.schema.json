@@ -96,9 +96,6 @@
     },
     "deployment": {
       "$ref": "#/$defs/deployment"
-    },
-    "qualityGate": {
-      "$ref": "#/$defs/qualityGate"
     }
   },
   "allOf": [
@@ -2139,43 +2136,21 @@
               "required": [
                 "trigger",
                 "versionManifest"
-              ],
-              "not": {
-                "required": [
-                  "gateWorkflow"
-                ]
-              }
-            },
-            {
-              "properties": {
-                "trigger": {
-                  "enum": [
-                    "version-bump"
-                  ]
-                }
-              },
-              "required": [
-                "gateWorkflow"
               ]
             }
           ],
           "required": [
             "workflow",
+            "trigger",
+            "versionManifest",
             "imageBuildHostId"
           ],
           "properties": {
             "workflow": {
               "$ref": "#/$defs/workflowPath"
             },
-            "gateWorkflow": {
-              "$ref": "#/$defs/workflowPath"
-            },
             "trigger": {
-              "type": "string",
-              "enum": [
-                "version-bump",
-                "version-file-push"
-              ]
+              "const": "version-file-push"
             },
             "versionManifest": {
               "type": "string",
@@ -2239,29 +2214,6 @@
               }
             }
           }
-        },
-        "runnerHost": {
-          "type": "object",
-          "additionalProperties": false,
-          "required": [
-            "id",
-            "servicePorts"
-          ],
-          "properties": {
-            "id": {
-              "type": "string",
-              "pattern": "^(?:github-hosted|[a-z0-9]+(?:-[a-z0-9]+)*)$",
-              "maxLength": 63
-            },
-            "servicePorts": {
-              "type": "array",
-              "maxItems": 16,
-              "uniqueItems": true,
-              "items": {
-                "type": "integer"
-              }
-            }
-          }
         }
       }
     },
@@ -2269,94 +2221,6 @@
       "type": "string",
       "maxLength": 240,
       "pattern": "^\\.github/workflows/[A-Za-z0-9][A-Za-z0-9._-]*\\.yml$"
-    },
-    "qualityGate": {
-      "type": "object",
-      "additionalProperties": false,
-      "properties": {
-        "servicePorts": {
-          "type": "object",
-          "additionalProperties": false,
-          "required": [
-            "postgres",
-            "redis"
-          ],
-          "properties": {
-            "postgres": {
-              "type": "integer"
-            },
-            "redis": {
-              "type": "integer"
-            }
-          }
-        },
-        "trigger": {
-          "const": "version-bump"
-        },
-        "releaseVersions": {
-          "type": "array",
-          "minItems": 1,
-          "uniqueItems": true,
-          "items": {
-            "type": "object",
-            "additionalProperties": false,
-            "required": [
-              "path",
-              "kind"
-            ],
-            "properties": {
-              "path": {
-                "$ref": "#/$defs/relativePath"
-              },
-              "kind": {
-                "enum": [
-                  "expo",
-                  "flutter",
-                  "server",
-                  "web"
-                ]
-              }
-            }
-          }
-        },
-        "mode": {
-          "enum": [
-            "full",
-            "fast"
-          ],
-          "description": "Fast push/PR feedback omits full build and E2E; manual dispatch includes them. Default full. See NEW_APP_DEVELOPMENT_GUIDE."
-        }
-      }
-    },
-    "trainSpecifier57": {
-      "type": "string",
-      "description": "Exact version or ~/^ range inside the 57.x train; the reviewed floor is enforced by the standard checker.",
-      "pattern": "^[~^]?57\\.(?:0|[1-9][0-9]*)\\.(?:0|[1-9][0-9]*)$"
-    },
-    "trainSpecifier16": {
-      "type": "string",
-      "description": "Exact version or ~/^ range inside the 16.x train; the reviewed floor is enforced by the standard checker.",
-      "pattern": "^[~^]?16\\.(?:0|[1-9][0-9]*)\\.(?:0|[1-9][0-9]*)$"
-    },
-    "trainSpecifier12": {
-      "type": "string",
-      "description": "Exact version or ~/^ range inside the 12.x train; the reviewed floor is enforced by the standard checker.",
-      "pattern": "^[~^]?12\\.(?:0|[1-9][0-9]*)\\.(?:0|[1-9][0-9]*)$"
-    },
-    "trainSpecifier24": {
-      "type": "string",
-      "description": "Exact version or ~/^ range inside the 24.x train; the reviewed floor is enforced by the standard checker.",
-      "pattern": "^[~^]?24\\.(?:0|[1-9][0-9]*)\\.(?:0|[1-9][0-9]*)$"
-    },
-    "trainSpecifier11": {
-      "type": "string",
-      "description": "Exact version or ~/^ range inside the 11.x train; the reviewed floor is enforced by the standard checker.",
-      "pattern": "^[~^]?11\\.(?:0|[1-9][0-9]*)\\.(?:0|[1-9][0-9]*)$"
-    },
-    "trainSpecifier": {
-      "type": "string",
-      "description": "Exact version or ~/^ range bounded by one major train. Which train, and the reviewed floor inside it, are enforced by the standard checker (scripts/version-train.mjs).",
-      "pattern": "^[~^]?(?:0|[1-9][0-9]*)\\.(?:0|[1-9][0-9]*)\\.(?:0|[1-9][0-9]*)$"
     }
   }
 }

@@ -352,14 +352,5 @@
   "waivers": [],
   "execution": {
     "model": "runtime-bindings-v1"
-  },
-  "qualityGate": {
-    "trigger": "version-bump",
-    "releaseVersions": [
-      {
-        "path": "package.json",
-        "kind": "web"
-      }
-    ]
   }
 }
