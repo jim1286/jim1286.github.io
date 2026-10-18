@@ -82,21 +82,21 @@
     "rationale": null,
     "contracts": {
       "package": "@hjmds/design-contracts",
-      "version": "1.32.1"
+      "version": "1.33.2"
     },
     "renderers": [
       {
         "kind": "web",
         "package": "@hjmds/react",
-        "version": "1.32.1"
+        "version": "1.33.2"
       }
     ],
     "versionPolicy": "exact-and-aligned",
     "adoptionPolicy": "stable-default",
     "catalog": {
-      "train": "1.32.1",
+      "train": "1.33.2",
       "snapshotPath": "docs/hjm-catalog.snapshot.json",
-      "sha256": "3f9c48e41e71d8449964ed6458d66fb00f8d6679a96eecffa84a5423b155ef23"
+      "sha256": "c5df069ea9a257d49d021b78a6d3c88fe6a7baf2ec011320e84b55f991a89b11"
     },
     "companionPolicy": {
       "id": "hjm-consumer-policy",
