@@ -11,6 +11,21 @@ version: "1.1.0"
 
 # Portfolio Site 검사·배포
 
+## 1.2.0 아이콘 최신화 공개 배포 — 2026-10-21
+
+현재 앱 설정 원본에 맞춘 7개 아이콘 중 공개 사이트에 남아 있던 번뚝·다에리·Spint·선택의창·비행중
+5개 이미지를 갱신했다. 관련 원본 경로와 공개 반영 확인 기준은 [앱 자산 안내](APP_ASSETS.md)를 따른다.
+개발 체크아웃의 미커밋 화면·테마 변경은 보존하고 배포 소스에 포함하지 않았다.
+
+mac-ci의 clean main에서 버전을 1.2.0으로 준비하고 Node 24.20.0·pnpm 11.24.0과 게시 HJM 1.37.2로
+빌드했다. source는 `4f22b83b875d9a8dca8f6f187829c85e8d83a073`이며 정적 artifact 137개 파일을 검증했다.
+mac-ci에서 기존 SSH 관리 경로와 publisher로 게시했고, 공개 137개 경로의 HTTP 200·SHA-256이
+artifact manifest와 일치한다. 사이트 아이콘 7개도 현재 제품 원본과 일치한다.
+
+- Release: `/srv/portfolio-site/releases/4f22b83b875d9a8dca8f6f187829c85e8d83a073-963b6bbe4a56`
+- 전송 archive SHA-256: `28c1722948d95506577ccab12d34f99c1c7d47be727a809dd143713020338c0d`
+- 이전 정상 배포는 publisher의 previous 참조로 보존했다. 앱·서버·DB 배포는 이번 정적 게시에 포함하지 않는다.
+
 ## 자체 도메인 운영 — 2026-10-09
 
 현재 기본 공개 origin은 https://jmstudioapps.com, www는 메인으로 308 이동한다.
