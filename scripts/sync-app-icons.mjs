@@ -8,10 +8,10 @@ const portfolio = resolve(root, '../..');
 // follow each product's current launcher configuration, rather than old site assets.
 const sources = {
   burntok: 'apps/burntok/apps/mobile/assets/release-hub/icon.ios-opaque.png',
-  unairplane: 'apps/unairplane/assets/release-hub/icon.ios-opaque.png',
+  unairplane: 'apps/unairplane/apps/mobile/assets/release-hub/icon.ios-opaque.png',
   'choose-window': 'apps/choose-window/apps/mobile/assets/icon.png',
   yajalal: 'apps/yajalal/apps/mobile/assets/brand/today-baseball-icon.png',
-  diairy: 'apps/diairy/packages/assets/brand/generated/v4/icon-1024.png',
+  diairy: 'apps/diairy/packages/assets/brand/generated/v5/icon-1024.png',
   spint: 'apps/spint/apps/mobile/assets/release-hub/icon.ios-opaque.png',
   utilverse: 'apps/utilverse/apps/mobile/assets/images/icon.png',
 };

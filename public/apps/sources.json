@@ -1,34 +1,30 @@
 {
   "burntok": {
     "source": "apps/burntok/apps/mobile/assets/release-hub/icon.ios-opaque.png",
-    "sha256": "6d0716d1ebb52ad2f7041225d9cb2025150ed8ae369a4b01e4ed06c364e766cb"
+    "sha256": "82e728f2c237780d3bd73b683bb260f3ad1f42dd572f445a4d82bc712e18e8e4"
   },
   "unairplane": {
-    "source": "apps/unairplane/assets/release-hub/icon.ios-opaque.png",
-    "sha256": "2098fe809c58bc000c3396060af092a4b2c60154b4321ebce115360f1e41551d"
+    "source": "apps/unairplane/apps/mobile/assets/release-hub/icon.ios-opaque.png",
+    "sha256": "5dd781ce5cd4d238ca2393a0437b50e9b70a12d422883b8dc84dd89f004d8095"
   },
   "choose-window": {
     "source": "apps/choose-window/apps/mobile/assets/icon.png",
-    "sha256": "17589ccbd82530d6e0c6b891cf97dbc05b19ee2746bbe1bd45fc5410cb0cb05c"
+    "sha256": "6f90432fb8db2ef2ed5f74ad459268b074868839c92b89c7ec484c9f3e0afc11"
   },
   "yajalal": {
     "source": "apps/yajalal/apps/mobile/assets/brand/today-baseball-icon.png",
     "sha256": "8141d32df4af4b4011446dbad3d77133fdbf54addef1c3a9b51840ddad3d36a7"
   },
   "diairy": {
-    "source": "apps/diairy/packages/assets/brand/generated/v4/icon-1024.png",
-    "sha256": "315bb645130624828ccd0443334795cfb5cedef1869b3cf343467e62d67c1e6d"
+    "source": "apps/diairy/packages/assets/brand/generated/v5/icon-1024.png",
+    "sha256": "1ac4534c144a871334e1c35caf1e49eb7e16011f223949d895064ddd069bade6"
   },
   "spint": {
     "source": "apps/spint/apps/mobile/assets/release-hub/icon.ios-opaque.png",
-    "sha256": "008eaa49dcbc2ab26ad106dcc99229c59aed6d321a6d068273e5dd1b3b064f08"
+    "sha256": "2584f0e78f68b796f96aa5c6d3379883ffbe3ec555106da8d26407fd550f3378"
   },
   "utilverse": {
     "source": "apps/utilverse/apps/mobile/assets/images/icon.png",
     "sha256": "02a759bdb5b31606b99ba3b46c16f7a46ef556478b343849ebd77edcd84da6fe"
-  },
-  "mofun": {
-    "source": "control-plane/app-release-hub/config/apps/mofun/assets/icon.png",
-    "sha256": "db9a0ac5817a5858c33210cc46d5b8a04adeb26fefb534ffa9ea8276b64387df"
   }
 }
