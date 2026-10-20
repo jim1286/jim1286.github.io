@@ -22,7 +22,7 @@
     "standard:check": "node tools/run-quality.mjs check",
     "contract:check": "node tools/check-app-contract.mjs",
     "design:check": "node tools/check-design-contract.mjs",
-    "typecheck": "node tools/sync-i18n.mjs && tsc -b --pretty false",
+    "typecheck": "node tools/sync-i18n.mjs && node tools/hjm-typecheck.mjs --project tsconfig.app.json && tsc --noEmit -p tsconfig.node.json --pretty false",
     "i18n:generate": "node tools/sync-i18n.mjs --write",
     "i18n:check": "node tools/sync-i18n.mjs && node --test tools/sync-i18n.test.mjs",
     "deploy:prepare": "node scripts/static-site-artifact.mjs prepare",
@@ -33,18 +33,18 @@
   },
   "dependencies": {
     "@ant-design/icons": "^6.3.4",
-    "react": "^19.1.0",
-    "react-dom": "^19.1.0",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1",
     "@hjmds/design-contracts": "1.34.0",
     "@hjmds/react": "1.34.0"
   },
   "devDependencies": {
-    "@types/react": "^19.1.8",
-    "@types/react-dom": "^19.1.6",
-    "@vitejs/plugin-react": "^4.6.0",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "@vitejs/plugin-react": "^6.1.2",
     "gh-pages": "^6.3.0",
     "typescript": "~7.0.2",
-    "vite": "^7.0.4",
+    "vite": "^8.3.4",
     "yaml": "2.9.1"
   },
   "engines": {

@@ -55,7 +55,7 @@ const execFileAsync = promisify(execFile);
 
 const contractVersion = 1;
 const standardVersion = '1.0.0';
-const canonicalProfileSha256 = 'c7d3e39adcdae1d45b0810426ee079643618148cc51f4bf77066e8a2fe06d2df';
+const canonicalProfileSha256 = '5a7b1ea979e4cd78ec817425a569a147c2eefe19db1f5ff6f7bdc5b1cfec76b1';
 const idPattern = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 const semverIdentifier = '(?:(?:0|[1-9]\\d*)|(?:\\d*[A-Za-z-][0-9A-Za-z-]*))';
 const semverPattern = new RegExp(`^(?:0|[1-9]\\d*)\\.(?:0|[1-9]\\d*)\\.(?:0|[1-9]\\d*)(?:-${semverIdentifier}(?:\\.${semverIdentifier})*)?(?:\\+[0-9A-Za-z-]+(?:\\.[0-9A-Za-z-]+)*)?$`);
@@ -523,8 +523,7 @@ function validateDesignSystem(designSystem, runtimes, acceptance, app, governanc
   const runtimeKinds = new Set(Array.isArray(runtimes) ? runtimes.map(({ kind }) => kind) : []);
   const hasFrontend = runtimeKinds.has('mobile') || runtimeKinds.has('web');
   const nativeAdapter = designSystem.applicability === 'native-adapter';
-  if (nativeAdapter && (!hasFrontend || runtimes.some((r) => ['mobile', 'web'].includes(r.kind) && r.framework !== 'flutter')))
-    addFinding(findings, 'DESIGN_ADAPTER_INVALID', 'contract.designSystem', 'Native adapter is only for Flutter frontend runtimes.');
+  if (nativeAdapter) addFinding(findings, 'DESIGN_ADAPTER_INVALID', 'contract.designSystem', 'Native adapter support is retired; use the active renderer contract.');
   if (!hasFrontend) {
     assertKeys(designSystem, new Set(['applicability', 'rationale']), 'contract.designSystem', findings);
     if (designSystem.applicability !== 'not_applicable') {
@@ -702,7 +701,7 @@ function validateDesignSystem(designSystem, runtimes, acceptance, app, governanc
     });
   }
 
-  if (nativeAdapter) return; // Same version, catalog and foundation evidence; Dart sources are checked by the binding.
+
   if (!Array.isArray(designSystem.renderers)) {
     addFinding(findings, 'DESIGN_RENDERERS_REQUIRED', 'contract.designSystem.renderers', 'designSystem.renderers must be an array.');
     return;
@@ -804,7 +803,7 @@ function validateI18n(i18n, findings) {
 
 function validateRelease(release, runtimes, findings) {
   if (!assertObject(release, 'contract.release', findings)) return;
-  assertKeys(release, new Set(['targets', 'releaseHub', 'rationale']), 'contract.release', findings);
+  assertKeys(release, new Set(['targets', 'releaseHub', 'rationale', 'workflows']), 'contract.release', findings);
   const allowedTargets = new Set(['app-store', 'google-play', 'web', 'server']);
   if (!Array.isArray(release.targets) || release.targets.length === 0) {
     addFinding(findings, 'RELEASE_TARGETS_REQUIRED', 'contract.release.targets', 'release.targets must be a non-empty array.');
@@ -849,6 +848,47 @@ function validateRelease(release, runtimes, findings) {
     }
     assertText(release.rationale, 'contract.release.rationale', findings);
   }
+  validateReleaseWorkflows(release.workflows, releaseTargets, findings);
+}
+
+// 2026-10-17 사용자 결정: 모든 앱의 웹·서버·모바일 배포는 수동 dispatch 또는 배포 버전이
+// 바뀌었거나 아직 배포되지 않았을 때만 실행하고, 앱마다 배포 큐 하나(deployment)를 공유한다.
+// 2026-10-12/14 게이트 제거가 버전 판정까지 함께 없애 의존성만 바꾼 push도 배포됐기 때문이다.
+// 표면별 선언 하나에 trigger·manifest·큐를 모아 web/server/mobile을 같은 방식으로 검사한다.
+const RELEASE_WORKFLOW_SURFACE_TARGETS = { mobile: ['app-store', 'google-play'], web: ['web'], server: ['server'] };
+function validateReleaseWorkflows(workflows, releaseTargets, findings) {
+  if (workflows === undefined) return;
+  if (!Array.isArray(workflows) || workflows.length === 0) {
+    addFinding(findings, 'RELEASE_WORKFLOWS_INVALID', 'contract.release.workflows', 'release.workflows must be a non-empty array when present.');
+    return;
+  }
+  const seen = new Set();
+  workflows.forEach((entry, index) => {
+    const path = `contract.release.workflows[${index}]`;
+    if (!assertObject(entry, path, findings)) return;
+    assertKeys(entry, new Set(['surface', 'workflow', 'versionManifest', 'trigger', 'concurrency']), path, findings);
+    const manifestNames = entry.surface === 'mobile' ? ['app.json'] : ['package.json'];
+    if (!Object.hasOwn(RELEASE_WORKFLOW_SURFACE_TARGETS, entry.surface)) {
+      addFinding(findings, 'RELEASE_WORKFLOW_SURFACE_INVALID', `${path}.surface`, 'surface must be mobile, web or server.');
+    } else if (!RELEASE_WORKFLOW_SURFACE_TARGETS[entry.surface].some(target => releaseTargets.has(target))) {
+      addFinding(findings, 'RELEASE_WORKFLOW_WITHOUT_TARGET', `${path}.surface`, `A ${entry.surface} workflow requires a matching release target.`);
+    }
+    if (typeof entry.workflow !== 'string' || !/^\.github\/workflows\/[A-Za-z0-9][A-Za-z0-9._-]*\.yml$/.test(entry.workflow)) {
+      addFinding(findings, 'RELEASE_WORKFLOW_PATH_INVALID', `${path}.workflow`, 'workflow must be a .github/workflows/*.yml path.');
+    } else if (seen.has(entry.workflow)) {
+      addFinding(findings, 'RELEASE_WORKFLOW_DUPLICATE', `${path}.workflow`, `${entry.workflow} is declared twice.`);
+    } else seen.add(entry.workflow);
+    if (typeof entry.versionManifest !== 'string' || entry.versionManifest.split('/').includes('..')
+        || !manifestNames.includes(entry.versionManifest.split('/').at(-1))) {
+      addFinding(findings, 'RELEASE_WORKFLOW_MANIFEST_INVALID', `${path}.versionManifest`, `A ${entry.surface} version manifest must be a relative ${manifestNames.join(' or ')} path.`);
+    }
+    if (entry.trigger !== 'version-change') {
+      addFinding(findings, 'RELEASE_WORKFLOW_TRIGGER_INVALID', `${path}.trigger`, 'Release workflows run only on dispatch or a changed/unreleased version (trigger "version-change").');
+    }
+    if (entry.concurrency !== 'deployment') {
+      addFinding(findings, 'RELEASE_WORKFLOW_CONCURRENCY_INVALID', `${path}.concurrency`, 'Every release surface queues in the one per-app concurrency group "deployment".');
+    }
+  });
 }
 
 function validateAcceptance(acceptance, waivers, findings) {
@@ -1306,7 +1346,7 @@ function makePackageJson(contract) {
     scripts: contract.toolchain.scripts,
     // Direct deployment validation parses workflow structure from the tool owner's
     // root; a server package's parser is not a root tool dependency.
-    ...(contract.deployment?.release?.trigger === 'version-file-push'
+    ...(contract.deployment || contract.release?.workflows?.length
       ? { devDependencies: { yaml: '2.9.0' } } : {}),
   }, null, 2)}\n`;
 }
@@ -1440,16 +1480,17 @@ if (result.mode === 'rehearsal') {
 `;
 }
 
-// One symbol-to-catalog mapping serves both directions: the generated checker's
-// "imported beta must be declared" gate and the central "declared beta must be
-// imported" check. The catalog snapshot keeps only IDs (its SHA is pinned in every
-// app contract), so export names cannot come from there without re-pinning apps.
-function componentIdFromSymbol(symbol) {
+// Published snapshots own canonical IDs and companion symbols. Optional extensions intentionally do not
+// inherit the base contract's maturity. Keep legacy aliases only while apps still pin pre-registration trains.
+function componentIdFromSymbol(symbol, components = []) {
+  const owner = components.find(entry => entry.name === symbol || entry.companions?.includes(symbol));
+  if (owner) return owner.id;
   if (symbol === 'HjmProvider' || symbol === 'HjmNativeProvider') return 'design-system-provider';
-  // The native renderer exports TextField for the catalog's shared Field recipe.
-  if (symbol === 'TextField') return 'field';
-  if (symbol === 'TabPanel') return 'tabs';
-  if (symbol === 'ToastProvider' || symbol === 'ToastRegion') return 'toast';
+  if (!components.some(entry => entry.name)) {
+    if (symbol === 'TextField') return 'field';
+    if (symbol === 'TabPanel') return 'tabs';
+    if (symbol === 'ToastProvider' || symbol === 'ToastRegion') return 'toast';
+  }
   return symbol
     .replace(/([a-z0-9])([A-Z])/g, '$1-$2')
     .replace(/([A-Z])([A-Z][a-z])/g, '$1-$2')
@@ -2368,9 +2409,9 @@ function sourceAnalysis(runtime, runtimeRoot, codeSources, rendererPackage, prov
   });
 }
 
-async function verifyFrontendSources(contract, catalogMaturity) {
+async function verifyFrontendSources(contract, catalogMaturity, catalogComponents) {
     for (const runtime of contract.runtimes || []) {
-      if (!['mobile', 'web'].includes(runtime.kind) || runtime.framework === 'flutter') continue;
+      if (!['mobile', 'web'].includes(runtime.kind)) continue;
       const runtimeRoot = resolve(appRoot, runtime.root);
       let sourceFiles = [];
       try { sourceFiles = await collectSourceFiles(runtimeRoot); } catch { add(runtime.root, 'frontend runtime source root is missing'); }
@@ -2456,7 +2497,7 @@ async function verifyFrontendSources(contract, catalogMaturity) {
           // Renderer hooks and ID helpers are functions, not catalog components.
           // An alias rendered as JSX still goes through inspectRenderedTags below.
           if (/^[a-z]/.test(exportedSymbol)) continue;
-          const componentId = componentIdFromSymbol(exportedSymbol);
+          const componentId = componentIdFromSymbol(exportedSymbol, catalogComponents);
           const maturity = catalogMaturity.get(componentId);
           const runtimeSupport = {
             'bottom-cta': ['mobile'],
@@ -2476,7 +2517,7 @@ async function verifyFrontendSources(contract, catalogMaturity) {
         }
         const inspectRenderedTags = (localSymbol, exportedSymbol, renderedTags) => {
           if (renderedTags.length > 0) {
-            const componentId = componentIdFromSymbol(exportedSymbol);
+            const componentId = componentIdFromSymbol(exportedSymbol, catalogComponents);
             const maturity = catalogMaturity.get(componentId);
             const runtimeSupport = {
               'bottom-cta': ['mobile'],
@@ -2551,7 +2592,7 @@ try {
 if (contract && runtimeBindings) {
   try {
     const catalog = JSON.parse(await readFile(resolve(appRoot, contract.designSystem.catalog.snapshotPath), 'utf8'));
-    await verifyFrontendSources(contract, new Map(catalog.components.map(({ id, status }) => [id, status])));
+    await verifyFrontendSources(contract, new Map(catalog.components.map(({ id, status }) => [id, status])), catalog.components);
   } catch (error) { add('runtime source inspection', error.message); }
 } else if (contract) {
   const frontendRuntimes = (contract.runtimes || []).filter((runtime) => ['mobile', 'web'].includes(runtime.kind));
@@ -2679,13 +2720,15 @@ if (contract && runtimeBindings) {
 
   if (contract.designSystem?.adoptionPolicy !== 'stable-default') add('contract.designSystem.adoptionPolicy', 'must be stable-default');
   let catalogMaturity = new Map();
+  let catalogComponents = [];
   try {
     const catalogSource = await readFile(resolve(appRoot, contract.designSystem.catalog.snapshotPath), 'utf8');
     const catalogDigest = createHash('sha256').update(catalogSource).digest('hex');
     if (catalogDigest !== contract.designSystem.catalog.sha256) add('contract.designSystem.catalog.sha256', 'catalog snapshot bytes do not match the pinned SHA-256');
     const catalog = JSON.parse(catalogSource);
     if (catalog.designSystemVersion !== contract.designSystem.catalog.train) add('contract.designSystem.catalog.train', 'catalog snapshot train mismatch');
-    catalogMaturity = new Map((catalog.components || []).map((component) => [component.id, component.status]));
+    catalogComponents = catalog.components || [];
+    catalogMaturity = new Map(catalogComponents.map((component) => [component.id, component.status]));
   } catch (error) {
     add('contract.designSystem.catalog.snapshotPath', error.message);
   }
@@ -2735,7 +2778,7 @@ if (contract && runtimeBindings) {
         }
       }
     }
-    await verifyFrontendSources(contract, catalogMaturity);
+    await verifyFrontendSources(contract, catalogMaturity, catalogComponents);
   }
   }
 }
@@ -3733,6 +3776,84 @@ export function directDeploymentErrors(workflow, release) {
   return errors;
 }
 
+// 공용 버전 판정을 처음 담은 Hub 태그(v1.4.0: 웹·서버용 version-change-decision action과
+// 버전 미변경·기출시 버전을 건너뛰는 모바일 plan). 이전 태그(v1.3.0)의 모바일 plan은 항상
+// release를 반환해 app.json·pubspec.yaml의 버전 외 변경도 스토어 제출을 시작했다(2026-10-17 감사).
+export const HUB_VERSION_DECISION_MIN = [1, 4, 0];
+const VERSION_MANIFEST_NAMES = new Set(['package.json', 'app.json']);
+
+// 선언한 모든 release workflow를 같은 정적 규칙으로 읽는다. 배포 CI에 붙는 게이트가 아니라
+// 계약 검사기의 파일 대조다(2026-10-14 CI 최소화 결정과 양립).
+export function releaseWorkflowErrors(workflow, entry) {
+  const errors = [];
+  const event = workflow?.on;
+  if (!event || typeof event !== 'object' || !Object.hasOwn(event, 'workflow_dispatch')) {
+    errors.push('Keep workflow_dispatch as the explicit manual release path.');
+  }
+  const push = event?.push;
+  if (!push || !Array.isArray(push.branches) || push.branches.length !== 1 || push.branches[0] !== 'main'
+      || !Array.isArray(push.paths) || !push.paths.includes(entry.versionManifest)
+      || Object.hasOwn(event ?? {}, 'workflow_run')) {
+    errors.push(`Trigger on main pushes of ${entry.versionManifest}; release workflows must not depend on workflow_run.`);
+  }
+  const concurrency = workflow?.concurrency;
+  if (!isPlainObject(concurrency) || concurrency.group !== 'deployment' || concurrency['cancel-in-progress'] !== false
+      || concurrency.queue !== 'max') {
+    errors.push('Queue in the per-app top-level concurrency group "deployment" with cancel-in-progress: false and queue: max.');
+  }
+  const jobs = Object.values(workflow?.jobs ?? {}).filter(isPlainObject);
+  const hubRefs = [...jobs.map(job => job.uses), ...jobs.flatMap(job => (job.steps ?? []).map(step => step?.uses))]
+    .filter(uses => typeof uses === 'string' && /(?:^|\/)app-release-hub\//.test(uses))
+    .map(uses => uses.match(/@v(\d+)\.(\d+)\.(\d+)$/)?.slice(1).map(Number) ?? null);
+  const atLeast = version => version && HUB_VERSION_DECISION_MIN.reduce(
+    (result, minimum, index) => result ?? (version[index] === minimum ? null : version[index] > minimum), null) !== false;
+  if (!hubRefs.length || hubRefs.some(version => !atLeast(version))) {
+    errors.push(`Delegate the changed/unreleased version decision to Release Hub pinned at @v${HUB_VERSION_DECISION_MIN.join('.')} or later; a path filter alone also fires on dependency edits.`);
+  }
+  // 판정 action을 호출만 하고 결과를 쓰지 않으면 경로 필터만 있는 것과 같다.
+  if (entry.surface !== 'mobile' && !jobs.some(job => typeof job.if === 'string' && /outputs\.deploy\b/.test(job.if))) {
+    errors.push('Gate the deploy job on the Hub version-change-decision output (needs.<job>.outputs.deploy).');
+  }
+  if (entry.surface !== 'mobile') errors.push(...directDeploymentErrors(workflow, entry).filter(error => !error.startsWith('Declare the version manifest')));
+  return errors;
+}
+
+export async function checkReleaseWorkflows(appRoot, contract, findings) {
+  const entries = Array.isArray(contract.release?.workflows) ? contract.release.workflows.filter(isPlainObject) : [];
+  // Same contract as checkBindings: a missing app-local yaml parser is a finding, not a crash
+  // (spint and utilverse lacked the devDependency on 2026-10-17 and the check aborted).
+  let parser;
+  try { parser = yamlParser(appRoot); } catch (error) {
+    if (entries.length) addFinding(findings, 'RUNTIME_PARSER_MISSING', 'package.json', `Install the declared frozen tooling dependencies: ${error.message}`);
+    return;
+  }
+  const declared = new Set(entries.map(entry => entry.workflow));
+  for (const entry of entries) {
+    if (!hasText(entry.workflow)) continue;
+    const source = await checkRequiredFile(appRoot, entry.workflow, findings);
+    if (source === null) continue;
+    try {
+      for (const error of releaseWorkflowErrors(parser.parse(source), entry)) {
+        addFinding(findings, 'RELEASE_WORKFLOW_INVALID', entry.workflow, error);
+      }
+    } catch (error) {
+      addFinding(findings, 'RELEASE_WORKFLOW_UNREADABLE', entry.workflow, error.message);
+    }
+  }
+  // 선언하지 않은 배포 workflow는 위 검사를 조용히 피한다(2026-10-17 감사: 웹·서버 6개 중 2개만 검사).
+  let names = [];
+  try { names = (await readdir(resolve(appRoot, '.github/workflows'))).filter(name => name.endsWith('.yml')); } catch { return; }
+  for (const name of names) {
+    const path = `.github/workflows/${name}`;
+    if (declared.has(path)) continue;
+    let paths;
+    try { paths = parser.parse(await readFile(resolve(appRoot, path), 'utf8'))?.on?.push?.paths; } catch { continue; }
+    if (Array.isArray(paths) && paths.some(item => typeof item === 'string' && VERSION_MANIFEST_NAMES.has(item.split('/').at(-1)))) {
+      addFinding(findings, 'RELEASE_WORKFLOW_UNDECLARED', path, 'A workflow triggered by a version manifest push delivers a release; declare it in contract.release.workflows.');
+    }
+  }
+}
+
 export async function checkDeploymentContract(appRoot, contract, findings) {
   const deployment = contract.deployment;
   if (!isPlainObject(deployment)) return;
@@ -3751,16 +3872,12 @@ export async function checkDeploymentContract(appRoot, contract, findings) {
   const deployWorkflow = sources.get(deployment.release?.workflow);
   const workflowPath = deployment.release?.workflow;
   if (!deployWorkflow) return;
-  if (deployment.release?.trigger !== 'version-file-push') {
-    addFinding(findings, 'DEPLOYMENT_TRIGGER_UNSUPPORTED', workflowPath, 'Deployment supports direct version-file pushes only; quality-workflow-triggered deployment is retired.');
-    return;
-  }
-  try {
-    for (const error of directDeploymentErrors(yamlParser(appRoot).parse(deployWorkflow), deployment.release)) {
-      addFinding(findings, 'DEPLOYMENT_DIRECT_SOURCE_INVALID', workflowPath, error);
-    }
-  } catch (error) {
-    addFinding(findings, 'DEPLOYMENT_WORKFLOW_INVALID', workflowPath, error.message);
+  // trigger·version manifest·큐는 release.workflows의 server 선언 하나가 소유하고
+  // checkReleaseWorkflows가 web·mobile과 같은 방식으로 검사한다. 여기서는 연결만 확인한다.
+  const declared = Array.isArray(contract.release?.workflows)
+    && contract.release.workflows.some(entry => entry?.surface === 'server' && entry.workflow === workflowPath);
+  if (!declared) {
+    addFinding(findings, 'DEPLOYMENT_WORKFLOW_UNDECLARED', workflowPath, 'Declare the deployment workflow in contract.release.workflows with surface "server".');
   }
   // 이미지 신원과 전송 무결성. 이게 없으면 어떤 바이트가 운영에 올라갔는지 사후에 모른다.
   if (!/image inspect/.test(deployWorkflow) || !deployWorkflow.includes('{{.Id}}')) {
@@ -3861,7 +3978,7 @@ function blankComments(source) {
     .replace(/(^|[^:\\])(\/\/[^\n]*)/g, (_match, prefix, comment) => prefix + blank(comment));
 }
 
-export function declaredBetaUsage(files) {
+export function declaredBetaUsage(files, catalogComponents = []) {
   const escape = (name) => name.replace(/\$/g, '\\$');
   const wordPattern = (name, flags = 'g') => new RegExp(`(?<![\\w$.])${escape(name)}(?![\\w$])`, flags);
   const parsed = files.map(({ path, source }) => {
@@ -3877,7 +3994,7 @@ export function declaredBetaUsage(files) {
         const [exported, local] = text.split(/\s+as\s+/).map((part) => part.trim());
         // Hooks name their component (useToast -> toast); other lowercase helpers map to no catalog ID.
         const symbol = /^use[A-Z]/.test(exported) ? exported.slice(3) : exported;
-        if (/^[A-Z]/.test(symbol)) locals.push({ local: local || exported, componentId: componentIdFromSymbol(symbol) });
+        if (/^[A-Z]/.test(symbol)) locals.push({ local: local || exported, componentId: componentIdFromSymbol(symbol, catalogComponents) });
       }
     }
     const declarations = [...body.matchAll(/^(export\s+(default\s+)?)?(?:async\s+)?(?:function\*?|const|let|var|class)\s+([A-Za-z_$][\w$]*)/gm)]
@@ -3904,16 +4021,15 @@ export function declaredBetaUsage(files) {
   return used;
 }
 
-async function checkDeclaredBetaUsage(appRoot, contract, findings) {
+async function checkDeclaredBetaUsage(appRoot, contract, findings, catalogComponents) {
   const designSystem = contract.designSystem;
-  // Flutter adapters render no @hjmds package; their Dart sources are bound separately.
   if (designSystem?.applicability !== 'frontend' || !Array.isArray(designSystem.optionalBetaAdoptions)) return;
   const declared = designSystem.optionalBetaAdoptions
     .map((adoption, index) => ({ componentId: adoption?.componentId, index }))
     .filter(({ componentId }) => typeof componentId === 'string');
   if (declared.length === 0) return;
   const roots = (Array.isArray(contract.runtimes) ? contract.runtimes : [])
-    .filter((runtime) => ['mobile', 'web'].includes(runtime?.kind) && runtime.framework !== 'flutter' && validRelativePath(runtime.root))
+    .filter((runtime) => ['mobile', 'web'].includes(runtime?.kind) && validRelativePath(runtime.root))
     .map((runtime) => resolve(appRoot, runtime.root))
     .filter((root) => isInside(appRoot, root));
   if (roots.length === 0) return;
@@ -3924,7 +4040,7 @@ async function checkDeclaredBetaUsage(appRoot, contract, findings) {
   if (paths.size === 0) return;
   const files = [];
   for (const path of paths) files.push({ path, source: await readFile(path, 'utf8') });
-  const used = declaredBetaUsage(files);
+  const used = declaredBetaUsage(files, catalogComponents);
   for (const { componentId, index } of declared) {
     if (!used.has(componentId)) {
       addFinding(findings, 'OPTIONAL_BETA_ADOPTION_UNUSED', `contract.designSystem.optionalBetaAdoptions[${index}].componentId`,
@@ -4248,7 +4364,8 @@ export async function checkAppConformance(appRoot, { now = new Date(), targetSta
     }
   }
   await checkDeploymentContract(absoluteRoot, contract, findings);
-  await checkDeclaredBetaUsage(absoluteRoot, contract, findings);
+  await checkReleaseWorkflows(absoluteRoot, contract, findings);
+  await checkDeclaredBetaUsage(absoluteRoot, contract, findings, designRelease.catalog.components);
   const resolvedTargetStage = implementationGate ? 'implementation-conformant' : 'governance-scaffold';
   const sourceChecker = bound(contract) ? 'tools/check-hjm-source.mjs' : 'tools/check-design-contract.mjs';
   if (implementationGate

@@ -1,7 +1,5 @@
 // Framework adapters for the shared v1 contract. No product-ID exceptions.
-import { readFile, lstat, copyFile, realpath, stat } from 'node:fs/promises';
-import { homedir } from 'node:os';
-import { constants } from 'node:fs';
+import { readFile, lstat } from 'node:fs/promises';
 import { resolve, relative, dirname, basename } from 'node:path';
 import { createRequire } from 'node:module';
 import { spawn, execFile } from 'node:child_process';
@@ -9,11 +7,9 @@ import { promisify } from 'node:util';
 const execFileAsync = promisify(execFile);
 import { pathToFileURL } from 'node:url';
 
-// lint 역할은 2026-10-06 사용자 결정(CI·로컬 시간)으로 뺐다. Flutter의 typecheck는 `flutter analyze`를 그대로 쓰되
-// flutter_lints·lint 규칙 없이 돌려 타입·컴파일 오류만 본다(analysis_options.yaml은 생성물 제외용으로만 남는다).
 export const bindingRoles = ['typecheck', 'test', 'build'];
 const frameworks = { expo: ['mobile', 'expo'], nextjs: ['web', 'next'], vite: ['web', 'vite'],
-  nestjs: ['server', '@nestjs/core'], node: ['server', null], flutter: ['mobile', null] };
+  nestjs: ['server', '@nestjs/core'], node: ['server', null] };
 export const bound = (contract) => contract?.execution?.model === 'runtime-bindings-v1';
 const safePath = (path) => typeof path === 'string' && (path === '.' || (path.split('/').every((part) => part !== '.' && part !== '..') && /^[A-Za-z0-9._-][A-Za-z0-9._-]*(?:\/[A-Za-z0-9._-]+)*$/.test(path)));
 const fail = (findings, code, path, message) => findings.push({ code, path, message });
@@ -35,17 +31,14 @@ export function validateBindings(contract, findings) {
     const b = runtime.binding;
     if (!b || !safePath(b.manifest) || !safePath(b.lockfile) || !Array.isArray(b.entryPoints) || !b.entryPoints.length
       || b.entryPoints.some((p) => !safePath(p))) fail(findings, 'RUNTIME_BINDING_INVALID', path, 'Manifest, frozen lockfile and real entry points are required.');
-    if (runtime.framework === 'flutter' && b?.manifest !== 'pubspec.yaml') fail(findings, 'RUNTIME_MANIFEST_INVALID', path, 'Flutter must bind pubspec.yaml.');
-    if (runtime.framework !== 'flutter' && b?.manifest !== 'package.json') fail(findings, 'RUNTIME_MANIFEST_INVALID', path, 'JS runtimes must bind package.json.');
-    if (b?.prepare && (!Array.isArray(b.prepare) || !['pnpm', 'dart'].includes(b.prepare[0]) || b.prepare.some((arg) => typeof arg !== 'string' || /[\n\r\0]/.test(arg))))
+
+    if (b?.manifest !== 'package.json') fail(findings, 'RUNTIME_MANIFEST_INVALID', path, 'JS runtimes must bind package.json.');
+    if (b?.prepare && (!Array.isArray(b.prepare) || !['pnpm'].includes(b.prepare[0]) || b.prepare.some((arg) => typeof arg !== 'string' || /[\n\r\0]/.test(arg))))
       fail(findings, 'RUNTIME_PREPARE_INVALID', path, 'Preparation must be explicit argv.');
-    for (const fixture of Array.isArray(b?.fixtures) ? b.fixtures : []) {
-      if (runtime.framework !== 'flutter' || fixture.source !== '.env.example' || !/^\.env(?:\.(?:development|production|test))?$/.test(fixture.target))
-        fail(findings, 'RUNTIME_FIXTURE_INVALID', path, 'Only Flutter example environment assets may be initialized without overwriting existing files.');
-    }
+    if (b?.fixtures?.length) fail(findings, 'RUNTIME_FIXTURE_INVALID', path, 'Runtime fixture initialization is retired.');
     for (const role of bindingRoles) {
       const argv = b?.checks?.[role];
-      if (!Array.isArray(argv) || !argv.length || !['pnpm', 'flutter', 'dart', 'node'].includes(argv[0])
+      if (!Array.isArray(argv) || !argv.length || !['pnpm', 'node'].includes(argv[0])
         || argv.some((arg) => typeof arg !== 'string' || /[\n\r\0]/.test(arg))
         || argv.some((arg) => ['--if-present', '--passWithNoTests', '--watch', '--fix', '-e', '--eval'].includes(arg))) {
         fail(findings, 'RUNTIME_CHECK_INVALID', `${path}.binding.checks.${role}`, 'Every runtime needs explicit non-optional, non-mutating argv checks.');
@@ -108,7 +101,7 @@ export async function checkBindings(root, contract, findings, release, { impleme
       const manifestText = await readFile(manifestPath, 'utf8');
       const lock = yaml.parse(await readFile(lockPath, 'utf8'));
       for (const entry of runtime.binding.entryPoints) await regular(root, relative(root, resolve(cwd, entry)));
-      if (runtime.framework !== 'flutter') {
+
         const manifest = JSON.parse(manifestText);
         const packageName = frameworks[runtime.framework]?.[1];
         const importerId = relative(dirname(lockPath), cwd) || '.';
@@ -145,56 +138,8 @@ export async function checkBindings(root, contract, findings, release, { impleme
               throw new Error(`Missing, optional, mutating or vacuous ${role} script: ${argv[2]}`);
           }
         }
-      } else {
-        const manifest = yaml.parse(manifestText);
-        if (manifest.dependencies?.flutter?.sdk !== 'flutter' || !lock.sdks?.flutter) throw new Error('Flutter manifest/lock must declare Flutter');
-        const pin = JSON.parse(await readFile(await regular(root, relative(root, resolve(cwd, '.fvmrc'))), 'utf8'));
-        if (pin.flutter !== runtime.frameworkVersion) throw new Error('Flutter SDK pin differs from runtime contract');
-        try {
-          const releaseConfig = JSON.parse(await readFile(await regular(root, '.release-hub/app.json'), 'utf8'));
-          if (releaseConfig.flutter?.version && releaseConfig.flutter.version !== pin.flutter) throw new Error('Flutter SDK pin differs from release tooling');
-        } catch (error) { if (error.code !== 'ENOENT') throw error; }
-        if (!runtime.binding.designSources?.length) throw new Error('Flutter design adapter sources must be bound, not marked exempt');
-        for (const entry of runtime.binding.designSources) await regular(root, relative(root, resolve(cwd, entry)));
-      }
-    } catch (error) { fail(findings, 'RUNTIME_BINDING_MISMATCH', label, error.message); }
-  }
-}
 
-export async function initializeFixtureAssets(root, runtime, {
-  credentialsRoot = process.env.HJM_CREDENTIALS_ROOT ?? resolve(homedir(), 'Developer/HJM-Credentials'),
-} = {}) {
-  const cwd = await regular(root, runtime.root, true);
-  for (const fixture of runtime.binding.fixtures ?? []) {
-    if (runtime.framework !== 'flutter' || fixture.source !== '.env.example' || !/^\.env(?:\.(?:development|production|test))?$/.test(fixture.target))
-      throw new Error('Unsupported fixture mapping');
-    const source = await regular(root, relative(root, resolve(cwd, fixture.source)));
-    const target = resolve(cwd, fixture.target);
-    try { await copyFile(source, target, constants.COPYFILE_EXCL); }
-    catch (error) {
-      if (error.code !== 'EEXIST') throw error;
-      if (fixture.target !== '.env' || !(await lstat(target)).isSymbolicLink()) {
-        await regular(root, relative(root, target));
-        continue;
-      }
-      // 2026-10-07 credential centralization (security/README.md) left `.env` as a link
-      // to the app's private body under HJM-Credentials. Accept exactly that link; every
-      // other contract/fixture symlink stays forbidden. Copying the body back into the
-      // checkout was rejected because it recreates the duplicate the move removed.
-      // The contract app ID, not the checkout folder name, identifies the owner (worktrees).
-      const appId = JSON.parse(await readFile(resolve(root, 'app.contract.json'), 'utf8')).app?.id;
-      if (typeof appId !== 'string' || !/^[a-z][a-z0-9-]*$/.test(appId)) {
-        throw new Error('A valid app ID is required for centralized environment input');
-      }
-      const expected = resolve(await realpath(credentialsRoot), 'apps', appId, 'runtime/local.env');
-      const resolvedTarget = await realpath(target);
-      const targetStat = await stat(resolvedTarget);
-      if (resolvedTarget !== expected || !targetStat.isFile()
-        || (targetStat.mode & 0o077) !== 0
-        || (process.getuid && targetStat.uid !== process.getuid())) {
-        throw new Error('Environment link must resolve to this app\'s private centralized credentials');
-      }
-    }
+    } catch (error) { fail(findings, 'RUNTIME_BINDING_MISMATCH', label, error.message); }
   }
 }
 
@@ -237,11 +182,7 @@ export async function runBoundQuality(root, role, options = {}) {
   if (role === 'check') await run([process.execPath, 'tools/check-doc-links.mjs', ...(strict ? [] : ['--changed'])], root);
   for (const runtime of selectedRuntimes) {
     const cwd = await regular(root, runtime.root, true);
-    if (runtime.framework === 'flutter') {
-      const sdk = JSON.parse((await execFileAsync('flutter', ['--version', '--machine'], { cwd, maxBuffer: 1024 * 1024 })).stdout);
-      if (sdk.frameworkVersion !== runtime.frameworkVersion) throw new Error(`Use Flutter ${runtime.frameworkVersion}; current ${sdk.frameworkVersion}`);
-    }
-    await initializeFixtureAssets(root, runtime);
+
     if (runtime.binding.prepare) { console.log(`[${runtime.id}] prepare`); await run(runtime.binding.prepare, cwd); }
   }
   for (const { runtime, target } of steps) {

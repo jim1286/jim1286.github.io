@@ -10,7 +10,8 @@ import { defineHjmDesignProfile } from '@hjmds/design-contracts/design-profile';
 const portfolioDesign = defineHjmDesignProfile({
   id: 'portfolio-paper-forest',
   tokens: {
-    radius: { sm: 0, md: 12, lg: 20, xl: 24 },
+    // Keep HJM's small radius: a zero override made shared badges/tags square (2026-10-19 UI review).
+    radius: { md: 12, lg: 20, xl: 24 },
   },
   material: { canvas: null, card: null, surface: null },
   compositions: { collection: 'grid', toolbar: 'inline' },
@@ -21,7 +22,7 @@ const portfolioDesign = defineHjmDesignProfile({
 // secondary ink keeps the brand while meeting 4.5:1 for small product text.
 const palettes = {
   paper: { light: {
-    bg: '#f4f2ea', surface: '#ffffff', surfaceAlt: '#edece4', surfaceAccent: '#e9eddc',
+    bg: '#ffffff', surface: '#ffffff', surfaceAlt: '#f4f6f4', surfaceAccent: '#eaf1eb',
     border: '#cbcec5', borderControl: '#65736b', text: '#12291f', textBody: '#12291f',
     textMuted: '#627068', textSub: '#627068', primary: '#173e2e',
     contentBrand: '#173e2e', onPrimary: '#ffffff',

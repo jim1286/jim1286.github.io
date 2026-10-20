@@ -961,9 +961,6 @@
         },
         {
           "$ref": "#/$defs/designSystemNotApplicable"
-        },
-        {
-          "$ref": "#/$defs/designSystemNativeAdapter"
         }
       ]
     },
@@ -1066,6 +1063,15 @@
             "string",
             "null"
           ]
+        },
+        "workflows": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 8,
+          "description": "Every repository workflow that delivers a release surface. Each runs only on workflow_dispatch or a main push of its version manifest, delegates the changed/unreleased version decision to a pinned Release Hub ref, and queues in the shared per-app deployment concurrency group. See DEPLOYMENT_POLICY §4.",
+          "items": {
+            "$ref": "#/$defs/releaseWorkflow"
+          }
         }
       }
     },
@@ -1672,8 +1678,7 @@
             "nextjs",
             "vite",
             "nestjs",
-            "node",
-            "flutter"
+            "node"
           ]
         },
         "frameworkVersion": {
@@ -1697,8 +1702,7 @@
           "properties": {
             "manifest": {
               "enum": [
-                "package.json",
-                "pubspec.yaml"
+                "package.json"
               ]
             },
             "lockfile": {
@@ -1886,201 +1890,6 @@
         }
       ]
     },
-    "designSystemNativeAdapter": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": [
-        "applicability",
-        "rationale",
-        "contracts",
-        "versionPolicy",
-        "adoptionPolicy",
-        "catalog",
-        "companionPolicy",
-        "requiredFoundations",
-        "optionalBetaAdoptions"
-      ],
-      "properties": {
-        "applicability": {
-          "const": "native-adapter"
-        },
-        "rationale": {
-          "type": "string",
-          "minLength": 1
-        },
-        "contracts": {
-          "type": "object",
-          "additionalProperties": false,
-          "required": [
-            "package",
-            "version"
-          ],
-          "properties": {
-            "package": {
-              "const": "@hjmds/design-contracts"
-            },
-            "version": {
-              "type": "string",
-              "pattern": "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)$"
-            }
-          }
-        },
-        "versionPolicy": {
-          "const": "exact-and-aligned"
-        },
-        "adoptionPolicy": {
-          "const": "stable-default"
-        },
-        "catalog": {
-          "type": "object",
-          "additionalProperties": false,
-          "required": [
-            "train",
-            "snapshotPath",
-            "sha256"
-          ],
-          "properties": {
-            "train": {
-              "type": "string",
-              "pattern": "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)$"
-            },
-            "snapshotPath": {
-              "const": "docs/hjm-catalog.snapshot.json"
-            },
-            "sha256": {
-              "type": "string",
-              "pattern": "^[a-f0-9]{64}$"
-            }
-          }
-        },
-        "companionPolicy": {
-          "type": "object",
-          "additionalProperties": false,
-          "required": [
-            "id",
-            "version",
-            "status",
-            "discoveryUrl"
-          ],
-          "properties": {
-            "id": {
-              "const": "hjm-consumer-policy"
-            },
-            "version": {
-              "type": "string",
-              "pattern": "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)$"
-            },
-            "status": {
-              "const": "informational-next-release-pending"
-            },
-            "discoveryUrl": {
-              "const": "https://github.com/jim1286/hjm-design-system/blob/main/packages/design-contracts/docs/consumer-policy.md"
-            }
-          }
-        },
-        "requiredFoundations": {
-          "type": "array",
-          "minItems": 0,
-          "maxItems": 5,
-          "uniqueItems": true,
-          "items": {
-            "type": "object",
-            "additionalProperties": false,
-            "required": [
-              "componentId",
-              "maturity",
-              "rationaleId",
-              "evidenceGate",
-              "evidenceIds"
-            ],
-            "properties": {
-              "componentId": {
-                "enum": [
-                  "design-system-provider",
-                  "text",
-                  "icon",
-                  "stack",
-                  "container"
-                ]
-              },
-              "maturity": {
-                "const": "beta"
-              },
-              "rationaleId": {
-                "const": "HJM-FOUNDATION-CORE-001"
-              },
-              "evidenceGate": {
-                "const": "planned-in-draft-verified-before-active"
-              },
-              "evidenceIds": {
-                "type": "array",
-                "minItems": 1,
-                "uniqueItems": true,
-                "items": {
-                  "type": "string",
-                  "pattern": "^EV-[0-9]{3,}$"
-                }
-              }
-            }
-          },
-          "description": "Bridge for foundations the pinned HJM catalog still marks beta (HJM consumer-policy §2.1). The checker requires exactly those; HJM 1.5.0 promoted all five, so a 1.5 pin requires []."
-        },
-        "optionalBetaAdoptions": {
-          "type": "array",
-          "uniqueItems": true,
-          "items": {
-            "type": "object",
-            "additionalProperties": false,
-            "required": [
-              "componentId",
-              "evidenceIds"
-            ],
-            "properties": {
-              "componentId": {
-                "type": "string",
-                "pattern": "^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$"
-              },
-              "adrPath": {
-                "type": "string",
-                "pattern": "^docs/decisions/ADR-(?!0000)[0-9]{4}-[a-z0-9]+(?:-[a-z0-9]+)*\\.md$"
-              },
-              "evidenceIds": {
-                "type": "array",
-                "minItems": 1,
-                "uniqueItems": true,
-                "items": {
-                  "type": "string",
-                  "pattern": "^EV-[0-9]{3,}$"
-                }
-              },
-              "recordPath": {
-                "type": "string",
-                "pattern": "^(?!/)(?!.*(?:^|/)\\.\\.(?:/|$))[A-Za-z0-9._-]+(?:/[A-Za-z0-9._-]+)*\\.md$",
-                "description": "Shared repository-local adoption record (for example docs/DESIGN.md or TASKS.md). Legacy adrPath remains supported; choose exactly one."
-              }
-            },
-            "anyOf": [
-              {
-                "required": [
-                  "recordPath"
-                ]
-              },
-              {
-                "required": [
-                  "adrPath"
-                ]
-              }
-            ],
-            "not": {
-              "required": [
-                "recordPath",
-                "adrPath"
-              ]
-            }
-          }
-        }
-      }
-    },
     "deployment": {
       "type": "object",
       "additionalProperties": false,
@@ -2126,38 +1935,13 @@
         "release": {
           "type": "object",
           "additionalProperties": false,
-          "anyOf": [
-            {
-              "properties": {
-                "trigger": {
-                  "const": "version-file-push"
-                }
-              },
-              "required": [
-                "trigger",
-                "versionManifest"
-              ]
-            }
-          ],
           "required": [
             "workflow",
-            "trigger",
-            "versionManifest",
             "imageBuildHostId"
           ],
           "properties": {
             "workflow": {
               "$ref": "#/$defs/workflowPath"
-            },
-            "trigger": {
-              "const": "version-file-push"
-            },
-            "versionManifest": {
-              "type": "string",
-              "enum": [
-                "apps/server/package.json",
-                "modules/server/package.json"
-              ]
             },
             "imageTransport": {
               "type": "string",
@@ -2186,7 +1970,8 @@
             "imageBuildAvailableMb": {
               "type": "integer"
             }
-          }
+          },
+          "description": "single-vps-v1 image and host facts for the server workflow. Its trigger, version manifest and queue are declared once in release.workflows (surface server)."
         },
         "readiness": {
           "type": "object",
@@ -2221,6 +2006,95 @@
       "type": "string",
       "maxLength": 240,
       "pattern": "^\\.github/workflows/[A-Za-z0-9][A-Za-z0-9._-]*\\.yml$"
+    },
+    "trainSpecifier57": {
+      "type": "string",
+      "description": "Exact version or ~/^ range inside the 57.x train; the reviewed floor is enforced by the standard checker.",
+      "pattern": "^[~^]?57\\.(?:0|[1-9][0-9]*)\\.(?:0|[1-9][0-9]*)$"
+    },
+    "trainSpecifier16": {
+      "type": "string",
+      "description": "Exact version or ~/^ range inside the 16.x train; the reviewed floor is enforced by the standard checker.",
+      "pattern": "^[~^]?16\\.(?:0|[1-9][0-9]*)\\.(?:0|[1-9][0-9]*)$"
+    },
+    "trainSpecifier12": {
+      "type": "string",
+      "description": "Exact version or ~/^ range inside the 12.x train; the reviewed floor is enforced by the standard checker.",
+      "pattern": "^[~^]?12\\.(?:0|[1-9][0-9]*)\\.(?:0|[1-9][0-9]*)$"
+    },
+    "trainSpecifier24": {
+      "type": "string",
+      "description": "Exact version or ~/^ range inside the 24.x train; the reviewed floor is enforced by the standard checker.",
+      "pattern": "^[~^]?24\\.(?:0|[1-9][0-9]*)\\.(?:0|[1-9][0-9]*)$"
+    },
+    "trainSpecifier11": {
+      "type": "string",
+      "description": "Exact version or ~/^ range inside the 11.x train; the reviewed floor is enforced by the standard checker.",
+      "pattern": "^[~^]?11\\.(?:0|[1-9][0-9]*)\\.(?:0|[1-9][0-9]*)$"
+    },
+    "trainSpecifier": {
+      "type": "string",
+      "description": "Exact version or ~/^ range bounded by one major train. Which train, and the reviewed floor inside it, are enforced by the standard checker (scripts/version-train.mjs).",
+      "pattern": "^[~^]?(?:0|[1-9][0-9]*)\\.(?:0|[1-9][0-9]*)\\.(?:0|[1-9][0-9]*)$"
+    },
+    "releaseWorkflow": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "surface",
+        "workflow",
+        "versionManifest",
+        "trigger",
+        "concurrency"
+      ],
+      "properties": {
+        "surface": {
+          "enum": [
+            "mobile",
+            "web",
+            "server"
+          ]
+        },
+        "workflow": {
+          "$ref": "#/$defs/workflowPath"
+        },
+        "versionManifest": {
+          "type": "string",
+          "maxLength": 240,
+          "pattern": "^(?:[A-Za-z0-9_-][A-Za-z0-9_.-]*/)*(?:package\\.json|app\\.json)$"
+        },
+        "trigger": {
+          "const": "version-change"
+        },
+        "concurrency": {
+          "const": "deployment"
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "surface": {
+                "const": "mobile"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "versionManifest": {
+                "pattern": "(?:^|/)(?:app\\.json)$"
+              }
+            }
+          },
+          "else": {
+            "properties": {
+              "versionManifest": {
+                "pattern": "(?:^|/)package\\.json$"
+              }
+            }
+          }
+        }
+      ]
     }
   }
 }

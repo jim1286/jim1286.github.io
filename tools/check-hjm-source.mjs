@@ -1214,7 +1214,7 @@ function sourceAnalysis(runtime, runtimeRoot, codeSources, rendererPackage, prov
 
 async function verifyFrontendSources(contract, catalogMaturity) {
     for (const runtime of contract.runtimes || []) {
-      if (!['mobile', 'web'].includes(runtime.kind) || runtime.framework === 'flutter') continue;
+      if (!['mobile', 'web'].includes(runtime.kind)) continue;
       const runtimeRoot = resolve(appRoot, runtime.root);
       let sourceFiles = [];
       try { sourceFiles = await collectSourceFiles(runtimeRoot); } catch { add(runtime.root, 'frontend runtime source root is missing'); }

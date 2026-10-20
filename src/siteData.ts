@@ -53,7 +53,7 @@ export const apps: PortfolioApp[] = [
     status: copy.product007,
     statusTone: 'live',
     sourceAccess: 'private',
-    tags: ['Flutter', 'Maps', 'Mobility'],
+    tags: ['Expo', 'React Native', 'Maps'],
     githubUrl: 'https://github.com/jim1286/choose_window',
     iosUrl: 'https://apps.apple.com/kr/app/%EC%84%A0%ED%83%9D%EC%9D%98%EC%B0%BD/id6759096524?uo=4',
     androidUrl: 'https://play.google.com/store/apps/details?id=dev.hjm.choosewindow&hl=ko',
@@ -135,7 +135,7 @@ export const discontinuedApps: PortfolioApp[] = [
     englishName: 'Taground',
     description: copy.product014,
     icon: '/apps/taground.png',
-    status: copy.discontinuedStatus,
+    status: copy.absorbedStatus,
     // Central retirement tombstone makes this an archived portfolio entry,
     // not a currently developed product. See the HJM adoption QA report.
     statusTone: 'archived',
@@ -204,5 +204,15 @@ export const legalDocuments: LegalDocument[] = [
     privacyUrl: policyUrl('spint', 'privacyPolicy'),
     deletionUrl: policyUrl('spint', 'accountDeletion'),
     supportUrl: policyUrl('spint', 'support'),
+  },
+  {
+    id: 'unairplane', index: '06', name: '비행중 · Unairplane', note: copy.unairplaneLegalNote,
+    privacyUrl: policyUrl('unairplane', 'privacyPolicy'),
+    supportUrl: policyUrl('unairplane', 'support'),
+  },
+  {
+    id: 'utilverse', index: '07', name: 'Utilverse', note: copy.utilverseLegalNote,
+    privacyUrl: policyUrl('utilverse', 'privacyPolicy'),
+    supportUrl: policyUrl('utilverse', 'support'),
   },
 ];

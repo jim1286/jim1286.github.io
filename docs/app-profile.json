@@ -127,8 +127,7 @@
         "nextjs",
         "vite",
         "nestjs",
-        "node",
-        "flutter"
+        "node"
       ],
       "uniqueIdsAndRoots": true,
       "requiredChecks": [

@@ -118,3 +118,11 @@ lock의 integrity와 일치한다. 계약·카탈로그·manifest·pnpm lock을 
 frozen 설치, typecheck, static artifact 관련 테스트, Vite production build 통과(빌드 script의 i18n 1건도 통과). 실제 게시 미실행.
 
 제품 배포 버전 상승·서버 배포는 이 작업의 검증 결과에 포함하지 않는다.
+
+## 2026-10-19 라이브러리 업데이트
+
+사용자의 포트폴리오 의존성 갱신 요청으로 manifest와 lock을 함께 갱신했다. 주요 변경: vite ^8.3.4.
+
+Vitest 5의 Vite 필수 peer를 실제 검사 소비처에 devDependency로 선언한다. Node 타입은 지원 Node 계열에 맞추고 native 라이브러리는 Expo SDK의 조합을 우선한다. TypeScript compiler API 소비와 SDK peer 검토 없이 TypeScript 7을 강제하지 않는다. 기존 앱 버전·배포·스토어 제출 상태는 이 작업에서 올리지 않는다.
+
+검증 결과·설치 가능한 버전 선택 근거·미완료 항목은 [중앙 업데이트 기록](https://github.com/jim1286/app-portfolio/blob/main/docs/design/LIBRARY_UPDATE_2026-10-19.md)에 구분한다. 현재 기록은 로컬 작업이며 해당 중앙 Git URL의 원격 게시를 뜻하지 않는다.

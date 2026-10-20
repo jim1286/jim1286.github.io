@@ -6,12 +6,13 @@ body { margin: 0; min-width: 320px; }
 img { display: block; max-width: 100%; }
 .portfolio-host { height: 100vh; height: 100dvh; }
 .portfolio-theme { font-synthesis: none; text-rendering: optimizeLegibility; }
-.site-header { background: var(--hjm-color-bg); border-bottom: 1px solid var(--hjm-color-border); }
-.tabs-bar { position: sticky; top: 0; z-index: 2; background: var(--hjm-color-bg); padding-block: var(--hjm-space-sm); border-bottom: 1px solid var(--hjm-color-border); }
+.site-header { background: var(--hjm-color-bg); }
+.tabs-bar { position: sticky; top: 0; z-index: 2; background: var(--hjm-color-bg); padding-block: var(--hjm-space-sm); }
 #panel-start, #discontinued { scroll-margin-block-start: 80px; }
-.panel-wrap { padding-block: var(--hjm-space-xl) calc(var(--hjm-space-xl) * 2); }
+/* The topic body owns symmetric outer spacing (2026-10-20: mobile measured 16px above / 24px below). */
+.panel-wrap { padding-block: var(--hjm-space-xl); }
 /* The profile is a user-selected image. Preserve the full photo's aspect ratio. */
-.profile-photo { width: 100%; max-width: 240px; height: auto; border-radius: var(--hjm-radius-md); }
+.profile-photo { width: 100%; max-width: 160px; height: auto; border-radius: var(--hjm-radius-md); }
 .diagram-scroll { overflow-x: auto; max-width: 100%; }
 .diagram-image { width: 100%; min-width: 740px; max-width: none; height: auto; }
 .diagram-mobile-hint { display: none; }
@@ -19,7 +20,30 @@ img { display: block; max-width: 100%; }
 @media (max-width: 799px) {
   .header-storybook { display: none; }
   .diagram-mobile-hint { display: block; }
-  .panel-wrap { padding-block: var(--hjm-space-md) var(--hjm-space-xl); }
+  .panel-wrap { padding-block: var(--hjm-space-md); }
 }
 @media (max-width: 399px) { .header-role { display: none; } }
 @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+
+/* SVG is the process content; public HJM tokens follow the product theme. */
+.process-diagram { overflow-x: auto; max-width: 100%; }
+.process-diagram svg { display: block; width: 100%; min-width: 640px; max-width: 740px; margin-inline: auto; height: auto; font-family: inherit; }
+
+.area-flow { display: block; width: 100%; max-width: 360px; height: auto; margin-inline: auto; font-family: inherit; }
+
+/* Chapter spacing is editorial placement; HJM owns every component's internals. */
+.chapter-block { padding-block: var(--hjm-space-lg); }
+.chapter-next { padding-block: var(--hjm-space-xl); }
+.hero-title { white-space: pre-line; }
+@media (min-width: 800px) {
+  .panel-wrap { padding-block: 48px; }
+  .chapter-block { padding-block: 24px; }
+}
+
+/* Preserve directory branches as text; contain horizontal scrolling in the tree. */
+.workspace-tree { max-width: 100%; overflow-x: auto; margin: 0; padding-block: var(--hjm-space-md); color: var(--hjm-color-text); line-height: 1.85; font-size: 14px; tab-size: 4; }
+.workspace-tree code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+
+/* Architecture labels keep a readable size; overflow belongs to each diagram. */
+.architecture-scroll { max-width: 100%; overflow-x: auto; overscroll-behavior-inline: contain; }
+.architecture-map { display: block; width: 100%; min-width: 760px; max-width: 1000px; height: auto; margin-inline: auto; font-family: inherit; }

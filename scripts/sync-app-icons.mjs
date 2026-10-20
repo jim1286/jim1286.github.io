@@ -9,8 +9,8 @@ const portfolio = resolve(root, '../..');
 const sources = {
   burntok: 'apps/burntok/apps/mobile/assets/release-hub/icon.ios-opaque.png',
   unairplane: 'apps/unairplane/assets/release-hub/icon.ios-opaque.png',
-  'choose-window': 'apps/choose-window/assets/icons/launcher.png',
-  yajalal: 'apps/yajalal/modules/app/assets/icons/launcher.png',
+  'choose-window': 'apps/choose-window/apps/mobile/assets/icon.png',
+  yajalal: 'apps/yajalal/apps/mobile/assets/brand/today-baseball-icon.png',
   diairy: 'apps/diairy/packages/assets/brand/generated/v4/icon-1024.png',
   spint: 'apps/spint/apps/mobile/assets/release-hub/icon.ios-opaque.png',
   utilverse: 'apps/utilverse/apps/mobile/assets/images/icon.png',

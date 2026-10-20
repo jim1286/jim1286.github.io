@@ -8,11 +8,11 @@
     "sha256": "2098fe809c58bc000c3396060af092a4b2c60154b4321ebce115360f1e41551d"
   },
   "choose-window": {
-    "source": "apps/choose-window/assets/icons/launcher.png",
+    "source": "apps/choose-window/apps/mobile/assets/icon.png",
     "sha256": "17589ccbd82530d6e0c6b891cf97dbc05b19ee2746bbe1bd45fc5410cb0cb05c"
   },
   "yajalal": {
-    "source": "apps/yajalal/modules/mobile/assets/brand/today-baseball-icon.png",
+    "source": "apps/yajalal/apps/mobile/assets/brand/today-baseball-icon.png",
     "sha256": "8141d32df4af4b4011446dbad3d77133fdbf54addef1c3a9b51840ddad3d36a7"
   },
   "diairy": {
