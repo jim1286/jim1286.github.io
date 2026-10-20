@@ -12,11 +12,11 @@ importers:
         specifier: ^6.3.4
         version: 6.3.4(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
       '@hjmds/design-contracts':
-        specifier: 1.37.0
-        version: 1.37.0
+        specifier: 1.37.1
+        version: 1.37.1
       '@hjmds/react':
-        specifier: 1.37.0
-        version: 1.37.0(@hjmds/design-contracts@1.37.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
+        specifier: 1.37.1
+        version: 1.37.1(@hjmds/design-contracts@1.37.1)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
       react:
         specifier: ^19.3.1
         version: 19.3.1
@@ -221,12 +221,12 @@ packages:
     cpu: [x64]
     os: [win32]
 
-  '@hjmds/design-contracts@1.37.0':
-    resolution: {integrity: sha512-Qyt2krPul/MPixvjIHdxt2JxyKgEBdwbtyweaffbIK+4YSYMMg2I6vSd8wpQvuo6nnY5uWmxvbV/AlkwNUAqvg==}
+  '@hjmds/design-contracts@1.37.1':
+    resolution: {integrity: sha512-e7Fr10xN/2gjSbwBgbt6f5XPgxeiEkSQ54neBqx/RoUIAeMB6CsBd7+YR929vFpoCz0g+6kejSwdNQeFEPCVpw==}
     engines: {node: '>=20'}
 
-  '@hjmds/react@1.37.0':
-    resolution: {integrity: sha512-TnsINOGlavU0OtvK6zXldvsai5qrruO8/5a+ApLZQWEgAQkAOeJdf+WwXgguXy8V6eTZ8Zp7XXN5rQ8dVTH4Lw==}
+  '@hjmds/react@1.37.1':
+    resolution: {integrity: sha512-klPcupVEsHMuKsdw/5BbfvXq0y6HufU4OxJEeauiHqKDctrxHKUAqT0+xXJOV9evbVA6w01hd1hq0R7HBskRpA==}
     peerDependencies:
       '@blobatar/react': 2.7.0
       '@dnd-kit/dom': 0.5.0
@@ -1004,11 +1004,11 @@ snapshots:
   '@esbuild/win32-x64@0.28.2':
     optional: true
 
-  '@hjmds/design-contracts@1.37.0': {}
+  '@hjmds/design-contracts@1.37.1': {}
 
-  '@hjmds/react@1.37.0(@hjmds/design-contracts@1.37.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)':
+  '@hjmds/react@1.37.1(@hjmds/design-contracts@1.37.1)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)':
     dependencies:
-      '@hjmds/design-contracts': 1.37.0
+      '@hjmds/design-contracts': 1.37.1
       react: 19.3.1
       react-dom: 19.3.1(react@19.3.1)
 
