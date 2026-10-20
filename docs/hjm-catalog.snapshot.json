@@ -1,12 +1,12 @@
 {
-  "$id": "hjm.catalog-snapshot/1.34.0",
-  "designSystemVersion": "1.34.0",
+  "$id": "hjm.catalog-snapshot/1.35.1",
+  "designSystemVersion": "1.35.1",
   "source": {
     "repository": "https://github.com/jim1286/hjm-design-system.git",
-    "tag": "v1.34.0",
-    "commit": "4c0022973ffaa6471e8afd13c35ef17853d559ef",
+    "tag": "v1.35.1",
+    "commit": "d9f59c1bd831d71bb9d1268dde57e29c6e2b4553",
     "sourcePath": "packages/design-contracts/dist/catalog.js",
-    "contentSha256": "d7e6459c41a85922861be3a31c50eafa5abd6a9fff4c2cf274506c6538b2d9d6"
+    "contentSha256": "709a25a2401305af575b5d352ae78b3c791b6428cd4532c1d66ce428f30964f6"
   },
   "components": [
     {
@@ -113,7 +113,8 @@
       "status": "stable",
       "name": "Button",
       "companions": [
-        "ClipboardButton"
+        "ClipboardButton",
+        "ButtonLink"
       ]
     },
     {
@@ -126,7 +127,9 @@
       "id": "card",
       "status": "stable",
       "name": "Card",
-      "companions": []
+      "companions": [
+        "QuoteCard"
+      ]
     },
     {
       "id": "carousel",
@@ -184,7 +187,9 @@
       "id": "chip",
       "status": "stable",
       "name": "Chip",
-      "companions": []
+      "companions": [
+        "ShortcutRail"
+      ]
     },
     {
       "id": "collapsible",
@@ -397,7 +402,8 @@
       "status": "stable",
       "name": "List",
       "companions": [
-        "CollectionRail"
+        "CollectionRail",
+        "ListSeparator"
       ]
     },
     {
@@ -668,7 +674,9 @@
       "id": "spinner",
       "status": "stable",
       "name": "Spinner",
-      "companions": []
+      "companions": [
+        "PendingContent"
+      ]
     },
     {
       "id": "splitter",
@@ -752,6 +760,12 @@
       "id": "thinking-orb",
       "status": "stable",
       "name": "ThinkingOrb",
+      "companions": []
+    },
+    {
+      "id": "time-picker",
+      "status": "stable",
+      "name": "TimePicker",
       "companions": []
     },
     {

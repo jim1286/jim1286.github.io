@@ -26,6 +26,8 @@ function catalogDeclarations(source) {
   // used only by recipeRegistry; importing or stubbing recipes would widen the evaluator.
   // HJM 1.9 adds the Web-only Affix, Watermark and ColorPicker recipes the same way (2026-09-30).
   const recipeImports = new Map([
+    // HJM 1.35 adds this exact recipe import before catalog data.
+    ['timePickerRecipe', './time-picker.js'],
     ['affixRecipe', './affix.js'],
     ['watermarkRecipe', './watermark.js'],
     ['colorPickerRecipe', './color-picker.js'],
