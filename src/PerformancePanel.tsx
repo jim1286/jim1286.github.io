@@ -32,10 +32,10 @@ const appName = (id: string) => products.find(app => app.id === id)?.name ?? id;
 const formatValue = (metric: Metric, value: number) => metric === 'revenue' ? money.format(value) : number.format(value);
 function sourceLabel(series: MetricSeries) {
   const scopes = { android: c.performancePlayScope, 'ios-kr-banner': c.performanceIosBanner, 'admob-account': c.performanceAccountScope, 'ga4-all': c.performanceGa4Scope, 'ios-observed': c.performanceIosObserved, 'android-observed': c.performanceAndroidObserved,
-    'apple-store-all': c.performanceAppleStoreScope, 'play-store-all': c.performancePlayStoreScope, 'play-installed-all': c.performancePlayInstalledScope, 'play-active-all': c.performancePlayActiveScope, 'ga4-ios': c.performanceGa4IosScope };
+    'apple-store-all': c.performanceAppleStoreScope, 'play-store-all': c.performancePlayStoreScope, 'play-installed-all': c.performancePlayInstalledScope, 'play-active-all': c.performancePlayActiveScope, 'ga4-ios': c.performanceGa4IosScope, 'ga4-ios-app': c.performanceGa4NativeIosScope, 'ga4-android-app': c.performanceGa4NativeAndroidScope };
   return `${series.source} · ${scopes[series.scope]} · ${series.timeZone ?? c.performanceUnknownZone}`;
 }
-const sourceKey = (series: MetricSeries): string => series.source === 'GA4' && series.scope === 'ga4-ios' ? 'GA4-iOS' : series.source;
+const sourceKey = (series: MetricSeries): string => series.source === 'GA4' ? series.scope === 'ga4-ios' ? 'GA4-iOS' : series.scope === 'ga4-ios-app' ? 'GA4-iOS-app' : series.scope === 'ga4-android-app' ? 'GA4-Android-app' : 'GA4' : series.source;
 const unitLabel = (series: MetricSeries) => series.unit === 'views' ? c.performanceViewsUnit : series.unit === 'devices' ? c.performanceDevicesUnit : c.performancePeopleUnit;
 function metricSummary(app: string, metric: Metric) {
   const series = forApp(app, metric);
@@ -50,7 +50,8 @@ function metricSummary(app: string, metric: Metric) {
 function coreSummary(app: string, metric: Metric) {
   const pick = (matches: (series: MetricSeries) => boolean) => newestSeries(metricSeries
     .filter(series => series.app === app && series.metric === metric && series.points.length > 0 && matches(series)));
-  const ios = pick(series => metric === 'visitors' ? series.source === 'App Store Connect' : series.scope.includes('ios'));
+  // Platform=iOS excludes web; prefer it to the broader OS=iOS population.
+  const ios = ((metric === 'dau' || metric === 'new') ? pick(series => series.scope === 'ga4-ios-app') : undefined) ?? pick(series => metric === 'visitors' ? series.source === 'App Store Connect' : series.scope.includes('ios'));
   const android = pick(series => metric === 'visitors' ? series.source === 'Google Play' : metric === 'dau' || metric === 'new' ? series.source === 'Google Play' || series.scope.includes('android') : series.scope.includes('android'));
   const entries = metric === 'visitors'
     ? [{ label: 'Play', series: android }, { label: 'App Store', series: ios }]
@@ -85,7 +86,7 @@ function Trends({ app }: { app: string | null }) {
   const { environment } = useHjmTheme();
   const [metric, setMetric] = useState<Metric>('dau');
   const [period, setPeriod] = useState('month');
-  const [source, setSource] = useState<string>(app ? (forApp(app, 'dau') ? sourceKey(forApp(app, 'dau')!) : 'GA4') : 'GA4-iOS');
+  const [source, setSource] = useState<string>(metricSeries.some(item => item.scope === 'ga4-ios-app' && (!app || item.app === app)) ? 'GA4-iOS-app' : app ? (forApp(app, 'dau') ? sourceKey(forApp(app, 'dau')!) : 'GA4') : 'GA4-iOS');
   const candidates = metricSeries.filter(item => item.metric === metric && (app === null ? item.app !== null && products.some(product => product.id === item.app) : item.app === app));
   const sources = [...new Set(candidates.filter(item => item.points.length).map(sourceKey))];
   const activeSource = sources.includes(source) ? source : sources[0];
@@ -102,12 +103,11 @@ function Trends({ app }: { app: string | null }) {
     values: valuesForDates(item, dates), color: resolveDatavizSeriesColor(environment.theme, index) }));
   const hasValues = series.some(item => valuesForDates(item, dates).some(value => value !== null));
   return <Card title={c.performanceTrend} headingLevel={2} padding="lg"><Stack gap="md">
-    <Text variant="caption" tone="muted">{c.performanceSnapshotNote}</Text>
     <Tabs id="performance-metric" label={c.performanceKeyMetrics} value={metric} onValueChange={value => setMetric(value as Metric)}
       indicator="solid" items={metrics.map(item => ({ id: item.id, label: item.label }))} renderPanels={false} />
     <Stack axis="inline" gap="md" wrap>
     {sources.length > 1 && <SegmentedControl label={c.performanceSource} value={activeSource} onValueChange={setSource} presentation="pills"
-      items={sources.map(value => ({ value, label: value === 'GA4-iOS' ? c.performanceGa4IosSource : value === 'GA4' ? c.performanceGa4Source : value === 'App Store Connect' ? c.performanceAppleSource : metric === 'visitors' ? c.performancePlayVisitorsSource : c.performancePlaySource }))} />}
+      items={sources.map(value => ({ value, label: value === 'GA4-iOS-app' ? c.performanceGa4NativeIosSource : value === 'GA4-Android-app' ? c.performanceGa4NativeAndroidSource : value === 'GA4-iOS' ? c.performanceGa4IosSource : value === 'GA4' ? c.performanceGa4Source : value === 'App Store Connect' ? c.performanceAppleSource : metric === 'visitors' ? c.performancePlayVisitorsSource : c.performancePlaySource }))} />}
     <SegmentedControl label={c.performancePeriod} value={period} onValueChange={setPeriod} presentation="pills"
       items={[{ value: 'week', label: c.performanceWeek }, { value: 'month', label: c.performanceMonth }, { value: 'all', label: c.performanceAllPeriod }]} />
     </Stack>
@@ -121,11 +121,12 @@ function Trends({ app }: { app: string | null }) {
         <ChartLegend items={chartSeries.map(({ id, label, color }) => ({ id, label, color }))} />
         <Collapsible trigger={c.performanceCollectionNotes}><Stack gap="sm">
           {[...new Set(series.map(sourceLabel))].map(label => <Text key={label} variant="caption" tone="muted">{label}</Text>)}
-          <Text as="p" variant="caption" tone="muted">{metric === 'revenue' ? c.performanceRevenueCaveat : metric === 'visitors' ? c.performanceVisitorsCaveat : activeSource === 'GA4-iOS' ? c.performanceGa4IosCaveat : activeSource === 'GA4' ? c.performanceGa4Caveat : c.performanceUsersCaveat}</Text>
+          <Text as="p" variant="caption" tone="muted">{metric === 'revenue' ? c.performanceRevenueCaveat : metric === 'visitors' ? c.performanceVisitorsCaveat : activeSource === 'GA4-iOS-app' || activeSource === 'GA4-Android-app' ? c.performanceGa4NativeCaveat : activeSource === 'GA4-iOS' ? c.performanceGa4IosCaveat : activeSource === 'GA4' ? c.performanceGa4Caveat : c.performanceUsersCaveat}</Text>
           <Text as="p" variant="caption" tone="muted">{c.performanceGapNote}</Text>
         </Stack></Collapsible>
       </Stack> : <EmptyState density="compact" title={c.performanceMissing} description={c.performanceMissingBody} />}
     </TabPanel>
+    <Text variant="caption" tone="muted">{c.performanceSnapshotNote}</Text>
     {/* The daily chart stays above the platform summary even on narrow screens. */}
     {app && <StatisticGroup label={c.performanceOverview} presentation="surface" descriptor={{ columns: 2, items: [
       coreSummary(app, 'dau'), coreSummary(app, 'new'),
