@@ -109,7 +109,7 @@ function AboutPanel() {
   return <Stack gap="xl">
     <div className="chapter-block">
       <Grid columns={{ compact: 1, medium: 2 }} gap={{ compact: 'lg' }}>
-        <BrandProvider surface="forest"><Surface padding="xl" radius="lg"><Stack gap="xl">
+        <BrandProvider><Surface padding="xl" radius="lg"><Stack gap="xl">
           <Text variant="caption" fontRole="code" tone="muted">{c.heroRole}</Text>
           <Heading level="level1"><span className="hero-title">{c.heroTitle}</span></Heading>
           <Text as="p" variant="bodyLarge" tone="muted">{c.heroBody}</Text>
@@ -289,7 +289,7 @@ function MarketingDetails() {
   return <Stack gap="xl">
     <MarketingFlow />
     <Notes items={[{ title: c.marketingSearchTitle, body: c.marketingSearchBody }, { title: c.marketingDiscoveryTitle, body: c.marketingDiscoveryBody }]} />
-    <BrandProvider surface="forest"><Card title={c.marketingPosliTitle} headingLevel={3} padding="xl" tone="sunken" actions={<Stack axis="inline" gap="md" wrap>
+    <BrandProvider><Card title={c.marketingPosliTitle} headingLevel={3} padding="xl" tone="sunken" actions={<Stack axis="inline" gap="md" wrap>
       <ExternalLink href="https://www.instagram.com/posli.makes/">{c.marketingInstagram} ↗</ExternalLink>
       <ExternalLink href="https://www.threads.net/@posli.makes">{c.marketingThreads} ↗</ExternalLink>
     </Stack>}><Stack gap="md"><Text as="p">{c.marketingPosliBody}</Text><Text as="p" tone="muted">{c.marketingPosliBoundary}</Text></Stack></Card></BrandProvider>
@@ -345,7 +345,7 @@ export default function App() {
     <div className="portfolio-host"><ScreenLayout title={siteCopy.home} contentInset="none" layoutStyle={{ maxWidth: 'none' }} header={
       <header className="site-header"><Container size="content" gutter="none"><TopBar
         leading={<Link href="#about" aria-label={siteCopy.home} variant="standalone" tone="neutral"><Text emphasis="strong">{c.portfolioName}</Text><span className="header-role"><Text variant="caption" tone="muted"> / {c.portfolioRole}</Text></span></Link>}
-        trailing={<Stack axis="inline" gap="md"><ExternalLink href="https://github.com/jim1286"><GithubOutlined aria-hidden /> {siteCopy.github}</ExternalLink><span className="header-storybook"><ExternalLink href={storybookUrl}>{siteCopy.storybook} ↗</ExternalLink></span></Stack>}
+        trailing={<Stack axis="inline" gap="xxs"><ExternalLink href="https://github.com/jim1286"><GithubOutlined aria-hidden /> {siteCopy.github}</ExternalLink><span className="header-storybook"><ExternalLink href={storybookUrl}>{siteCopy.storybook} ↗</ExternalLink></span></Stack>}
       /></Container></header>
     }>
       <div id="main" tabIndex={-1}>
