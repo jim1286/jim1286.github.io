@@ -10,6 +10,7 @@ import { ClientContracts } from '../ClientContracts';
 import { ServerContracts } from '../ServerContracts';
 import { SystemArchitecture } from '../SystemArchitecture';
 import { Collapsible } from '@hjmds/react/collapsible';
+import { GuideSection, MarketingSection, QaSection } from './sections';
 import { ARCH_VIEWS, CODE_VIEWS, type ArchEdge, type ArchNode, type ArchNodeType, type ArchView } from './archData';
 
 const c = getCopy();
@@ -23,8 +24,10 @@ const KINDS: Record<ArchNodeType, string> = {
 type Box = [number, number, number, number];
 
 export const archHref = (viewId: string) => `${ROUTE_PREFIX}${viewId}`;
+// Links from the removed operations and QA tabs open the view that now holds their content.
+const LEGACY_HASHES: Record<string, string> = { '#operations': 'ci', '#workflow': 'ci', '#strategy': 'ci', '#guidance': 'guide', '#marketing': 'marketing', '#qa': 'qa' };
 function viewFromHash(hash: string) {
-  const id = hash.startsWith(ROUTE_PREFIX) ? hash.slice(ROUTE_PREFIX.length) : 'overview';
+  const id = hash.startsWith(ROUTE_PREFIX) ? hash.slice(ROUTE_PREFIX.length) : LEGACY_HASHES[hash] ?? 'overview';
   return ARCH_VIEWS[id] ? id : 'overview';
 }
 
@@ -208,6 +211,12 @@ export function DrillArchitecture() {
   const table = view.table;
 
   const crumbs = <Breadcrumb label={c.archBreadcrumbLabel} items={chain.map((v, i) => i === chain.length - 1 ? { id: v.id, label: v.crumb } : { id: v.id, label: v.crumb, destination: { kind: 'internal', href: archHref(v.id) } })} />;
+  if (view.section) return <Section title={c.archSectionTitle} description={c.archSectionIntro}><Stack gap="lg">
+    {crumbs}
+    <Card title={view.title} headingLevel={3} padding="lg">
+      {view.section === 'guide' ? <GuideSection /> : view.section === 'marketing' ? <MarketingSection /> : <QaSection />}
+    </Card>
+  </Stack></Section>;
   if (view.code) return <Section title={c.archSectionTitle} description={c.archSectionIntro}><Stack gap="lg">
     {crumbs}
     <SystemArchitecture stage={view.code} />

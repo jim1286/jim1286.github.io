@@ -1,4 +1,3 @@
-import { ArchitectureDiagram, type ArchitectureLayout } from './ArchitectureDiagram';
 import { useEffect, useLayoutEffect, useState, type ReactNode } from 'react';
 import { HjmProvider } from '@hjmds/react/provider';
 import { Link } from '@hjmds/react/actions';
@@ -9,7 +8,7 @@ import { Asset } from '@hjmds/react/asset';
 import { TopBar } from '@hjmds/react/top-bar';
 import { ScreenLayout } from '@hjmds/react/screens';
 import { SkipNav } from '@hjmds/react/skip-nav';
-import { Tabs, TabPanel, Steps } from '@hjmds/react/navigation';
+import { Tabs, TabPanel } from '@hjmds/react/navigation';
 import { Collapsible } from '@hjmds/react/collapsible';
 import { AndroidFilled, AppleFilled, ExportOutlined, GithubOutlined, MailOutlined } from '@ant-design/icons';
 import '@hjmds/react/styles.css';
@@ -19,17 +18,14 @@ import { siteCopy, appCopy } from './copy';
 import { apps, discontinuedApps, legalDocuments, portfolioSummary, storybookUrl, type PortfolioApp } from './siteData';
 import './styles/site.css';
 import { EvolutionHistory } from './EvolutionHistory';
-import { DevelopmentFlow, WorkflowMap } from './WorkflowMap';
-import { ModuleGuides } from './ModuleGuides';
-import { AreaFlow, MarketingFlow } from './FlowDiagram';
 import { DrillArchitecture } from './architecture/DrillArchitecture';
+import { ExternalLink, Notes } from './shared';
 
 const c = getCopy();
 const developerEmail = 'jimin1286@gmail.com';
 const tabItems = [
   { id: 'about', label: c.navOverview }, { id: 'structure', label: c.navStructure },
-  { id: 'design', label: c.navArchitecture }, { id: 'operations', label: c.navOperations },
-  { id: 'qa', label: c.navQa }, { id: 'apps', label: c.navProducts },
+  { id: 'design', label: c.navArchitecture }, { id: 'apps', label: c.navProducts },
   { id: 'history', label: c.historyNav }, { id: 'support', label: c.navContact },
 ];
 // Preserve links already shared by the single-page portfolio. Hash changes also
@@ -37,11 +33,9 @@ const tabItems = [
 function tabForHash(hash: string) {
   // Sub-routes such as #design/arch/ci keep their topic; the panel reads the rest of the path.
   const id = hash.slice(1).split('/')[0];
-  const aliases: Record<string, string> = { top: 'about', main: 'about', developer: 'about', discontinued: 'apps', workflow: 'operations', strategy: 'operations', legal: 'support', guidelines: 'design', marketing: 'operations', guidance: 'operations' };
+  // 2026-10-21: operations and QA moved into the design drill-down; their old links open it.
+  const aliases: Record<string, string> = { top: 'about', main: 'about', developer: 'about', discontinued: 'apps', legal: 'support', guidelines: 'design', operations: 'design', workflow: 'design', strategy: 'design', marketing: 'design', guidance: 'design', qa: 'design' };
   return aliases[id] ?? (tabItems.some(item => item.id === id) ? id : 'about');
-}
-function ExternalLink({ href, children, label }: { href: string; children: ReactNode; label?: string }) {
-  return <Link href={href} aria-label={label} target="_blank" rel="noreferrer noopener" variant="standalone" tone="neutral">{children}</Link>;
 }
 // The panel Stack owns the gap above and below; the reading measure is a layout-only width
 // (2026-10-18: replaced the .panel-intro wrapper's ad-hoc padding).
@@ -51,13 +45,6 @@ function Intro({ eyebrow, title, description }: { eyebrow: string; title: string
     <Heading level="level1">{title}</Heading>
     <Text as="p" variant="bodyLarge" tone="muted">{description}</Text>
   </Stack>;
-}
-function Notes({ items }: { items: { title: string; body: string }[] }) {
-  return <Grid columns={{ compact: 1, medium: 2 }} gap={{ compact: 'md' }} minColumnWidth={{ compact: 260 }}>
-    {items.map((item, index) => <Card key={item.title} title={item.title} headingLevel={3} padding="lg" tone="sunken">
-      <Stack gap="md"><Text variant="caption" fontRole="code" tone="muted">{String(index + 1).padStart(2, '0')}</Text><Text as="p" tone="muted">{item.body}</Text></Stack>
-    </Card>)}
-  </Grid>;
 }
 function Diagram({ name, title, caption }: { name: string; title: string; caption: string }) {
   return <Card title={title} headingLevel={2} padding="lg" actions={<ExternalLink href={`/diagrams/${name}.html?theme=light`}>{c.diagramOpen} <ExportOutlined aria-hidden /></ExternalLink>}>
@@ -153,7 +140,7 @@ function WorkCases() {
   </Stack></Section>;
 }
 function AppsPanel() {
-  return <Stack gap="xl"><Intro eyebrow="05 / PRODUCTS" title={c.productsTitle} description={c.productsIntro} />
+  return <Stack gap="xl"><Intro eyebrow="03 / PRODUCTS" title={c.productsTitle} description={c.productsIntro} />
     <div className="chapter-block"><WorkCases /></div>
     <div className="chapter-block"><Section title={c.personalProducts} description={c.personalProductsBody}>
       <Grid columns={{ compact: 1, medium: 2 }} gap={{ compact: 'lg' }} minColumnWidth={{ compact: 280 }}>{apps.map(app => <ProductCard key={app.id} app={app} />)}</Grid>
@@ -179,132 +166,23 @@ function StructurePanel() {
     <ChapterNext href="#design" label={c.nextDesign} />
   </Stack>;
 }
-function ReadingSteps({ current, onChange, steps }: { current:string; onChange:(id:string)=>void; steps:{id:string;label:string}[] }) {
-  // This cursor locates an explanation, not task completion or measured reading progress.
-  return <Steps descriptor={{steps,currentStepId:current,navigationMode:"free"}} onStepPress={onChange}
-    statusLabels={{pending:c.designStepPending,current:c.designStepCurrent,complete:c.designStepComplete,error:c.designStepError}}
-    renderMark={(_,position)=>position}
-    composeAccessibleName={({position,total,label})=>c.designStepName.replace('{position}',String(position)).replace('{total}',String(total)).replace('{label}',label)} />;
-}
-function ReadingFlow({ title, flow, caption }: { title:string; flow:string; caption:string }) {
-  const steps = flow.split('→').map(step => step.trim());
-  const layout: ArchitectureLayout = {
-    // Size the canvas to the final node so empty space does not trail the flow.
-    height: 35 + (steps.length - 1) * 120 + 60 + 20,
-    points: steps.map((_, i) => [330, 35 + i * 120]), regions: [],
-    edges: steps.slice(1).map((_, i) => ({path:`M450 ${95+i*120}V${155+i*120}`,label:'',x:0,y:0})),
-  };
-  return <ArchitectureDiagram title={title} caption={caption} diagramKey="operations" layout={layout}
-    boxes={steps.map((step,i)=>({id:String(i),title:step,detail:''}))} />;
-}
 function DesignPanel() {
   // 2026-10-21: the code-structure stages moved into the drill-down (code-* views) so the
   // tab has one way to navigate; the former five-step list duplicated it.
   return <Stack gap="xl">
     <Intro eyebrow="02 / SYSTEM ARCHITECTURE" title={c.designTopTitle} description={c.designTopIntro} />
     <div className="chapter-block"><DrillArchitecture /></div>
-    <ChapterNext href="#operations" label={c.nextOperations} />
-  </Stack>;
-}
-// Successful or unavailable checks can go straight to the report; only failures
-// enter the repair loop. A linear diagram incorrectly implied every QA run failed.
-function QaFlow() {
-  const layout: ArchitectureLayout = {
-    height: 850, points: [[330,35],[330,205],[330,375],[60,575],[60,735],[600,575]], regions: [],
-    edges: [
-      {path:'M450 121V205',label:'',x:0,y:0},
-      {path:'M450 291V375',label:'',x:0,y:0},
-      {path:'M450 461V515H720V575',label:c.qaDirectPath,x:660,y:502},
-      {path:'M450 515H180V575',label:c.qaFailurePath,x:240,y:502,dashed:true},
-      {path:'M180 661V735',label:'',x:0,y:0,dashed:true},
-      {path:'M300 778H490V461',label:c.qaRetryPath,x:490,y:700,dashed:true},
-    ],
-  };
-  return <ArchitectureDiagram title={c.qaFlowTitle} caption={c.qaFlowCaption} diagramKey="qa" layout={layout} legend={c.qaDiagramLegend}
-    boxes={[[c.qaStep1,c.qaDetail1],[c.qaStep2,c.qaDetail2],[c.qaStep3,c.qaDetail3],[c.qaStep4,c.qaDetail4],[c.qaStep5,c.qaDetail5],[c.qaStep6,c.qaDetail6]].map(([title,detail],i)=>({id:String(i),title,detail}))} />;
-}
-const operationsReadingSteps = [
-  {id:'release',label:c.opsReadingRelease}, {id:'observe',label:c.opsReadingObserve},
-  {id:'recover',label:c.opsReadingRecover}, {id:'improve',label:c.opsReadingImprove},
-];
-function OperationsPanel() {
-  const [current,setCurrent] = useState(["#marketing", "#guidance"].includes(window.location.hash) ? "improve" : "release");
-  return <Stack gap="xl"><Intro eyebrow="03 / OPERATIONS" title={c.operationsTitle} description={c.operationsIntro} />
-    <ReadingSteps current={current} onChange={setCurrent} steps={operationsReadingSteps} />
-    {current === "release" && <div className="chapter-block"><Stack gap="lg">
-      <Section title={c.opsReading1Title} description={c.opsReading1Intro}><Stack gap="lg">
-        <ReadingFlow title={c.opsReleaseTitle} flow={c.opsReading1Flow} caption={c.opsReleaseBody} />
-      </Stack></Section>
-    </Stack></div>}
-    {current === "observe" && <div className="chapter-block"><Stack gap="lg">
-      <Section title={c.opsReading2Title} description={c.opsReading2Intro}><Stack gap="lg">
-        <ReadingFlow title={c.opsObserveTitle} flow={c.opsReading2Flow} caption={c.opsObserveBody} />
-      </Stack></Section>
-    </Stack></div>}
-    {current === "recover" && <div className="chapter-block"><Stack gap="lg">
-      <Section title={c.opsReading3Title} description={c.opsReading3Intro}><Stack gap="lg">
-        <ReadingFlow title={c.opsRetryTitle} flow={c.opsReading3Flow} caption={c.opsRetryBody} />
-        <Card title={c.opsRecoveryTitle} headingLevel={3} padding="lg"><Text as="p" tone="muted">{c.opsRecoveryBody}</Text></Card>
-      </Stack></Section>
-    </Stack></div>}
-    {current === "improve" && <div className="chapter-block"><Stack gap="lg">
-      <Section title={c.opsReading4Title} description={c.opsReading4Intro}><Stack gap="lg">
-        <ReadingFlow title={c.operationsLoop} flow={c.opsReading4Flow} caption={c.opsReading4Caption} />
-        <Card title={c.operationsGuide} headingLevel={3} padding="lg"><Stack gap="lg">
-          <Text as="p" tone="muted">{c.operationsGuideBody}</Text>
-          <Collapsible trigger={c.developmentDetail}><DevelopmentFlow /></Collapsible>
-          <Collapsible trigger={c.moduleSupplement}><ModuleGuides /></Collapsible>
-          <Collapsible trigger={c.operationsGuideExpand} defaultOpen={window.location.hash === "#guidance"}><WorkflowMap /></Collapsible>
-        </Stack></Card>
-        <Card title={c.operationsMarketing} headingLevel={3} padding="lg"><Stack gap="lg">
-          <Text as="p" tone="muted">{c.operationsMarketingBody}</Text>
-          <Collapsible trigger={c.operationsMarketingExpand} defaultOpen={window.location.hash === '#marketing'}><MarketingDetails /></Collapsible>
-        </Stack></Card>
-      </Stack></Section>
-    </Stack></div>}
-    <ChapterNext href="#qa" label={c.nextQa} />
-  </Stack>;
-}
-function QaPanel() {
-  return <Stack gap="xl"><Intro eyebrow="04 / QUALITY ASSURANCE" title={c.qaTitle} description={c.qaIntro} />
-    <div className="chapter-block"><Section title={c.qaScopeTitle}><Notes items={[
-      { title:c.qaUiTitle,body:c.qaUiBody }, { title:c.qaLogicTitle,body:c.qaLogicBody },
-      { title:c.qaJourneyTitle,body:c.qaJourneyBody }, { title:c.qaNativeTitle,body:c.qaNativeBody },
-    ]} /></Section></div>
-    <QaFlow />
-    <Card title={c.qaExploreTitle} headingLevel={2} padding="lg"><Text as="p" tone="muted">{c.qaExploreBody}</Text></Card>
-    <Card title={c.workflowQaTitle} headingLevel={2} padding="lg" tone="raised"><Text as="p" tone="muted">{c.workflowQaBody}</Text></Card>
-    <Card title={c.qaEvidenceTitle} headingLevel={2} padding="lg"><Text as="p" tone="muted">{c.qaEvidenceBody}</Text></Card>
     <ChapterNext href="#apps" label={c.nextProducts} />
   </Stack>;
 }
-function MarketingDetails() {
-  return <Stack gap="xl">
-    <MarketingFlow />
-    <Notes items={[{ title: c.marketingSearchTitle, body: c.marketingSearchBody }, { title: c.marketingDiscoveryTitle, body: c.marketingDiscoveryBody }]} />
-    <BrandProvider><Card title={c.marketingPosliTitle} headingLevel={3} padding="xl" tone="sunken" actions={<Stack axis="inline" gap="md" wrap>
-      <ExternalLink href="https://www.instagram.com/posli.makes/">{c.marketingInstagram} ↗</ExternalLink>
-      <ExternalLink href="https://www.threads.net/@posli.makes">{c.marketingThreads} ↗</ExternalLink>
-    </Stack>}><Stack gap="md"><Text as="p">{c.marketingPosliBody}</Text><Text as="p" tone="muted">{c.marketingPosliBoundary}</Text></Stack></Card></BrandProvider>
-    <Notes items={[{ title: c.marketingStoryTitle, body: c.marketingStoryBody }, { title: c.marketingMeasureTitle, body: c.marketingMeasureBody }, { title: c.marketingImproveTitle, body: c.marketingImproveBody }]} />
-    <Section title={c.dotsTitle}><Stack gap="lg">
-      <div><Tag>{c.dotsLabel}</Tag></div>
-      <Text as="p" tone="muted">{c.dotsIntro}</Text>
-      <Card padding="lg" tone="sunken"><AreaFlow title={c.dotsTitle} flow={c.dotsFlow} /></Card>
-      <Notes items={[{ title: c.dotsResearchTitle, body: c.dotsResearchBody }, { title: c.dotsPlanTitle, body: c.dotsPlanBody }, { title: c.dotsLearnTitle, body: c.dotsLearnBody }]} />
-      <Text as="p" variant="caption" tone="muted">{c.dotsBoundary}</Text>
-      <ExternalLink href="https://learn.chatgpt.com/docs/dots">{c.dotsSource} ↗</ExternalLink>
-    </Stack></Section>
-  </Stack>;
-}
 function HistoryPanel() {
-  return <Stack gap="xl"><Intro eyebrow="06 / EVOLUTION LOG" title={c.historyTitle} description={c.historyIntro} />
+  return <Stack gap="xl"><Intro eyebrow="04 / EVOLUTION LOG" title={c.historyTitle} description={c.historyIntro} />
     <EvolutionHistory />
     <ChapterNext href="#support" label={c.nextContact} />
   </Stack>;
 }
 function SupportPanel() {
-  return <Stack gap="xl"><Intro eyebrow="07 / CONTACT" title={c.contactNewTitle} description={c.contactNewIntro} />
+  return <Stack gap="xl"><Intro eyebrow="05 / CONTACT" title={c.contactNewTitle} description={c.contactNewIntro} />
     <Card title={c.contactTitle} headingLevel={2} padding="xl" actions={<Link href={`mailto:${developerEmail}`} variant="standalone"><MailOutlined aria-hidden /> {developerEmail}</Link>} />
     <Section title={c.contactPolicies}><Collapsible trigger={c.contactPoliciesExpand}><Grid columns={{ compact: 1, medium: 2 }} gap={{ compact: 'md' }} minColumnWidth={{ compact: 260 }}>
       {legalDocuments.map(document => <Card key={document.id} title={document.name} description={document.note} headingLevel={3} padding="lg" actions={<Stack axis="inline" gap="sm" wrap>
@@ -316,7 +194,7 @@ function SupportPanel() {
     <Text variant="caption" tone="muted">{siteCopy.legalNote}</Text>
   </Stack>;
 }
-const panels: Record<string, ReactNode> = { about: <AboutPanel />, structure: <StructurePanel />, apps: <AppsPanel />, operations: <OperationsPanel />, qa: <QaPanel />, design: <DesignPanel />, history: <HistoryPanel />, support: <SupportPanel /> };
+const panels: Record<string, ReactNode> = { about: <AboutPanel />, structure: <StructurePanel />, apps: <AppsPanel />, design: <DesignPanel />, history: <HistoryPanel />, support: <SupportPanel /> };
 export default function App() {
   const [hash, setHash] = useState(() => window.location.hash);
   const active = tabForHash(hash);

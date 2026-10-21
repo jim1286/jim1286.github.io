@@ -16,6 +16,8 @@ export type ArchView = {
   id: string; parent: string | null; title: string; crumb: string; hint: string;
   /** Code-structure views render the role diagrams from SystemArchitecture instead of a node map. */
   code?: ArchCodeStage;
+  /** Page views carry content moved from the former operations and QA tabs. */
+  section?: 'guide' | 'marketing' | 'qa';
   nodes: ArchNode[]; edges: ArchEdge[]; boundaries: { label: string; wraps: string[] }[]; cards: ArchCard[];
   table?: { title: string; rows: ArchTableRow[] };
 };
@@ -1309,3 +1311,17 @@ for (const view of Object.values(ARCH_VIEWS)) {
   }
 }
 ARCH_VIEWS.std.nodes.find(node => node.id === 'hjm')!.drill = 'code-state';
+
+// Former operations and QA tabs (removed 2026-10-21). Guides and QA hang under the dev Mac,
+// where that work happens; marketing hangs under the overview.
+const pageView = (id: string, section: 'guide' | 'marketing' | 'qa', title: string, crumb: string, parent: string): ArchView =>
+  ({ id, section, parent, title, crumb, hint: c.archPageHint, nodes: [], edges: [], boundaries: [], cards: [] });
+Object.assign(ARCH_VIEWS, {
+  guide: pageView('guide', 'guide', c.operationsGuide, c.archGuideCrumb, 'dev'),
+  qa: pageView('qa', 'qa', c.qaTitle, c.navQa, 'dev'),
+  marketing: pageView('marketing', 'marketing', c.operationsMarketing, c.archMarketingCrumb, 'overview'),
+});
+ARCH_VIEWS.overview.nodes.push({ id: 'marketing', type: 'external', x: 40, y: 40, w: 190, label: c.archOverviewMarketingLabel, sub: c.archOverviewMarketingSub, detail: c.archOverviewMarketingDetail, drill: 'marketing' });
+ARCH_VIEWS.dev.nodes.push({ id: 'guide', type: 'frontend', x: 900, y: 400, w: 200, label: c.archDevGuideLabel, sub: c.archDevGuideSub, drill: 'guide' });
+ARCH_VIEWS.dev.nodes.find(node => node.id === 'checks')!.drill = 'qa';
+ARCH_VIEWS.std.nodes.push({ id: 'guide', type: 'frontend', x: 900, y: 60, w: 220, label: c.archStdGuideLabel, sub: c.archStdGuideSub, drill: 'guide' });
