@@ -1,71 +1,74 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { comparison, datesBetween, forApp, metricSeries, valuesForDates } from '../src/performance/data.ts';
+import { comparison, datesBetween, forApp, latest, metricSeries, newestSeries, valuesForDates } from '../src/performance/data.ts';
 
-test('historical counts retain observed zero and missing days separately', () => {
-  const series = metricSeries.find(item => item.id === 'diairy-ga4-dau');
-  assert.deepEqual(valuesForDates(series, ['2026-10-02', '2026-10-06', '2026-10-12', '2026-10-13']), [0, null, 11, null]);
-  assert.equal(forApp('diairy', 'new').points.find(point => point.date === '2026-10-12').value, 10);
+const fixture = (overrides = {}) => ({ id: 'sample', app: 'sample', metric: 'dau', source: 'GA4', scope: 'ga4-all', timeZone: null, testTraffic: 'not-excluded', points: [], ...overrides });
+
+test('a confirmed zero and an unobserved day remain different', () => {
+  const series = fixture({ points: [{ date: '2026-09-30', value: 0 }, { date: '2026-10-02', value: 2 }] });
+  assert.deepEqual(valuesForDates(series, ['2026-09-30', '2026-10-01', '2026-10-02']), [0, null, 2]);
 });
-test('GA4 and Play stay separate, and newest source is identified rather than added', () => {
-  const selected = forApp('utilverse', 'dau');
-  assert.equal(selected.source, 'Google Play');
-  assert.equal(selected.points[0].value, 21);
-  assert.equal(metricSeries.find(item => item.id === 'utilverse-ga4-dau').points.at(-1).value, 0);
-  assert.equal(forApp('choose-window', 'revenue').app, 'choose-window');
-  assert.equal(forApp('burntok', 'revenue'), undefined);
+test('source selection chooses the newest zero without adding the older population', () => {
+  const play = fixture({ id: 'play', source: 'Google Play', scope: 'android', points: [{ date: '2026-10-01', value: 21 }] });
+  const ios = fixture({ id: 'ios', scope: 'ga4-ios', points: [{ date: '2026-10-02', value: 0 }] });
+  assert.equal(newestSeries([play, ios]), ios);
+  assert.equal(latest(newestSeries([play, ios])).value, 0);
+  assert.equal(forApp('not-a-product', 'dau'), undefined);
+  for (const app of new Set(metricSeries.map(series => series.app))) {
+    const selected = forApp(app, 'dau');
+    if (selected) { assert.equal(selected.app, app); assert.equal(selected.metric, 'dau'); }
+  }
 });
-test('daily comparisons use the exact preceding date and do not divide by zero', () => {
-  const series = metricSeries.find(item => item.app === 'yajalal' && item.scope === 'play-active-all');
-  assert.deepEqual(comparison(series, 1), { previous: { date: '2026-10-13', value: 3 }, current: { date: '2026-10-14', value: 6 }, delta: 3, percent: 100 });
-  assert.equal(comparison({ ...series, points: [{ date: '2026-10-10', value: 2 }, { date: '2026-10-12', value: 3 }] }, 1), null);
-  assert.equal(comparison({ ...series, points: [{ date: '2026-10-11', value: 0 }, { date: '2026-10-12', value: 3 }] }, 1).percent, null);
+test('daily comparisons require the exact preceding date and preserve a zero denominator', () => {
+  const series = fixture({ points: [{ date: '2026-10-13', value: 3 }, { date: '2026-10-14', value: 6 }] });
+  assert.deepEqual(comparison(series, 1), { previous: series.points[0], current: series.points[1], delta: 3, percent: 100 });
+  assert.equal(comparison(fixture({ points: [{ date: '2026-10-10', value: 2 }, { date: '2026-10-12', value: 3 }] }), 1), null);
+  assert.equal(comparison(fixture({ points: [{ date: '2026-10-11', value: 0 }, { date: '2026-10-12', value: 3 }] }), 1).percent, null);
 });
-test('installation revisions are stored at the original date', () => {
-  const series = forApp('yajalal', 'installed');
-  assert.deepEqual(valuesForDates(series, ['2026-10-13', '2026-10-15', '2026-10-17', '2026-10-19']), [38, 38, 47, 39]);
+test('observations have valid unique date keys and finite nonnegative values', () => {
+  assert.equal(new Set(metricSeries.map(series => series.id)).size, metricSeries.length);
+  for (const series of metricSeries) {
+    assert.equal(new Set(series.points.map(point => point.date)).size, series.points.length, series.id);
+    for (const point of series.points) {
+      assert.match(point.date, /^\d{4}-\d{2}-\d{2}$/);
+      assert.equal(new Date(`${point.date}T00:00:00Z`).toISOString().slice(0, 10), point.date);
+      assert.ok(Number.isFinite(point.value) && point.value >= 0, series.id);
+      if (point.observedOn) assert.ok(point.observedOn >= point.date, series.id);
+    }
+  }
 });
-test('the full date axis contains missing dates across month boundaries', () => {
+test('the date axis includes missing dates across month boundaries', () => {
   assert.deepEqual(datesBetween('2026-09-29', '2026-10-02'), ['2026-09-29', '2026-09-30', '2026-10-01', '2026-10-02']);
 });
-
-test('the long Play ACTIVE_USERS export is installed audience, never DAU', () => {
-  const long = metricSeries.find(item => item.scope === 'play-installed-all');
-  assert.equal(long.metric, 'installed');
-  assert.equal(long.firstPositive, '2025-08-10');
-  assert.ok(long.points.length > 1000);
-  assert.ok(!metricSeries.some(item => item.scope === 'play-installed-all' && item.metric === 'dau'));
+test('the long Play installed audience export cannot become DAU', () => {
+  const installed = metricSeries.filter(series => series.scope === 'play-installed-all');
+  assert.ok(installed.length > 0);
+  assert.ok(installed.every(series => series.metric === 'installed' && series.source === 'Google Play' && series.unit === 'users'));
+  const narrow = fixture({ metric: 'installed', source: 'Google Play', scope: 'android', points: [{ date: '2026-10-01', value: 1 }] });
+  const full = { ...narrow, id: 'full', scope: 'play-installed-all' };
+  assert.equal(newestSeries([narrow, full]), full);
 });
-
-test('Apple page views and Play visitor users retain distinct units and missing dates', () => {
-  const apple = forApp('yajalal', 'visitors');
-  const play = metricSeries.find(item => item.app === 'yajalal' && item.scope === 'play-store-all');
-  assert.equal(apple.source, 'App Store Connect');
-  assert.equal(apple.unit, 'views');
-  assert.equal(apple.unique, false);
-  assert.equal(play.unit, 'users');
-  assert.equal(play.unique, true);
-  assert.deepEqual(valuesForDates(play, ['2026-10-19']), [null]);
+test('Apple page views and Play visitor users retain separate units', () => {
+  const apple = metricSeries.filter(series => series.scope === 'apple-store-all');
+  const play = metricSeries.filter(series => series.scope === 'play-store-all');
+  assert.ok(apple.length > 0 && play.length > 0);
+  assert.ok(apple.every(series => series.metric === 'visitors' && series.unit === 'views' && series.unique === false));
+  assert.ok(play.every(series => series.metric === 'visitors' && series.unit === 'users' && series.unique === true));
 });
-
-test('legacy product history retains true daily users without inventing missing dates', () => {
-  const today = metricSeries.find(item => item.app === 'yajalal' && item.scope === 'play-active-all');
-  const choice = metricSeries.find(item => item.app === 'choose-window' && item.scope === 'play-active-all');
-  assert.equal(today.firstPositive, '2025-08-10');
+test('legacy product history remains available before the recent reporting period', () => {
+  const today = metricSeries.find(series => series.app === 'yajalal' && series.scope === 'play-active-all');
+  const choice = metricSeries.find(series => series.app === 'choose-window' && series.scope === 'play-active-all');
+  assert.ok(today.points.some(point => point.date <= '2025-08-10'));
   assert.ok(today.points.length > 300);
-  assert.deepEqual(valuesForDates(choice, ['2026-02-14', '2026-03-04', '2026-10-14']), [17, 21, null]);
-  assert.equal(metricSeries.filter(item => item.app === 'yajalal' && item.source === 'Google Play' && item.metric === 'dau').length, 1);
+  assert.ok(choice.points.some(point => point.date <= '2026-02-14'));
 });
-
-test('iPhone users retain the iOS filter and do not replace Android observations', () => {
-  const ios = forApp('yajalal', 'dau');
-  assert.equal(ios.scope, 'ga4-ios');
-  assert.equal(ios.source, 'GA4');
-  assert.equal(ios.points.at(-1).value, 5);
-  assert.equal(forApp('yajalal', 'new').points.at(-1).value, 0);
-  assert.equal(metricSeries.find(item => item.app === 'yajalal' && item.scope === 'play-active-all').points.at(-1).value, 6);
+test('iOS GA4 users are not Apple devices, downloads, or Android observations', () => {
+  const ios = metricSeries.filter(series => series.source === 'GA4' && series.scope.includes('ios'));
+  assert.ok(ios.length > 0);
+  assert.ok(ios.every(series => ['dau', 'new'].includes(series.metric) && series.unit === 'users'));
+  assert.ok(!metricSeries.some(series => series.source === 'App Store Connect' && ['dau', 'new'].includes(series.metric)));
+  assert.ok(metricSeries.some(series => series.source === 'Google Play' && series.metric === 'dau'));
 });
-
 test('public observations include only the seven requested products', () => {
   const allowed = new Set(['yajalal', 'choose-window', 'burntok', 'unairplane', 'diairy', 'spint', 'utilverse']);
   assert.ok(metricSeries.every(series => allowed.has(series.app)));

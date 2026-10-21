@@ -23,7 +23,6 @@ export type MetricSeries = {
   points: Observation[];
 };
 export const capturedAt = [storeCapturedAt, iosCapturedAt].sort((a, b) => Date.parse(b) - Date.parse(a))[0];
-export const periodEnd = '2026-10-20';
 const october = (values: [number, number][]): Observation[] => values.map(([day, value]) => ({ date: `2026-10-${String(day).padStart(2, '0')}`, value }));
 export const metricSeries: MetricSeries[] = [
   { id: 'yajalal-installed', app: 'yajalal', metric: 'installed', source: 'Google Play', scope: 'android', timeZone: null, testTraffic: 'not-excluded',
@@ -35,6 +34,9 @@ export const metricSeries: MetricSeries[] = [
   ...storeSeries,
   ...iosSeries,
 ];
+// New observations advance the date axis automatically. The corpus is nonempty
+// and collection omits the current incomplete day.
+export const periodEnd = metricSeries.flatMap(series => series.points.map(point => point.date)).sort().at(-1)!;
 // Account-wide ad totals are retained in research only: their app scope has not
 // been proven to exclude the products omitted from this public dashboard.
 
@@ -60,9 +62,13 @@ export function comparison(series: MetricSeries, days: number) {
   const delta = current.value - previous.value;
   return { previous, current, delta, percent: previous.value === 0 ? null : delta / previous.value * 100 };
 }
+export function newestSeries(candidates: readonly MetricSeries[]) {
+  // The full-country stock export covers the retained KR snapshot's same date.
+  // Preserve both provenance series and prefer the broader stock observation.
+  return [...candidates].sort((a, b) => (latest(b)?.date ?? '').localeCompare(latest(a)?.date ?? '') || Number(b.scope === 'play-installed-all') - Number(a.scope === 'play-installed-all'))[0];
+}
 export function forApp(app: string, metric: Metric) {
-  // Choose one actual source's latest observation; never splice GA4 and Play
-  // into one series or sum OS-level, rounded revenue display values.
-  return metricSeries.filter(series => series.app === app && series.metric === metric)
-    .sort((a, b) => (latest(b)?.date ?? '').localeCompare(latest(a)?.date ?? ''))[0];
+  // Source populations remain separate: select a snapshot without adding users
+  // or joining observations from different provider definitions.
+  return newestSeries(metricSeries.filter(series => series.app === app && series.metric === metric));
 }
