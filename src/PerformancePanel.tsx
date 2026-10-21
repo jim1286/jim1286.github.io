@@ -8,7 +8,6 @@ import { EmptyState } from '@hjmds/react/feedback';
 import { Heading } from '@hjmds/react/heading';
 import { Grid, Section, Stack, Text } from '@hjmds/react/layout';
 import { Tabs, TabPanel } from '@hjmds/react/navigation';
-import { SegmentedControl } from '@hjmds/react/selection';
 import { ChartLegend, LineChart } from '@hjmds/react/chart';
 import { useHjmTheme } from '@hjmds/react/provider';
 import { resolveDatavizSeriesColor } from '@hjmds/design-contracts/dataviz';
@@ -89,7 +88,14 @@ function Trends({ app }: { app: string | null }) {
   const [selectedSeries, setSelectedSeries] = useState<string | null>(null);
   const [source, setSource] = useState<string>(metricSeries.some(item => item.scope === 'ga4-ios-app' && (!app || item.app === app)) ? 'GA4-iOS-app' : app ? (forApp(app, 'dau') ? sourceKey(forApp(app, 'dau')!) : 'GA4') : 'GA4-iOS');
   const candidates = metricSeries.filter(item => item.metric === metric && (app === null ? item.app !== null && products.some(product => product.id === item.app) : item.app === app));
-  const sources = [...new Set(candidates.filter(item => item.points.length).map(sourceKey))];
+  const allSources = [...new Set(candidates.filter(item => item.points.length).map(sourceKey))];
+  // Native app populations are the primary user comparison. Keep older OS/web
+  // aggregates in provenance rather than offering overlapping definitions as peers.
+  const nativeSources = allSources.filter(value => value === 'GA4-iOS-app' || value === 'GA4-Android-app');
+  const platformSources = allSources.filter(value => value === 'GA4-iOS' || value === 'Google Play');
+  const sources = metric === 'dau' || metric === 'new'
+    ? nativeSources.length ? nativeSources : platformSources.length ? platformSources : allSources
+    : allSources;
   const activeSource = sources.includes(source) ? source : sources[0];
   // GA4 active users and Play DAU have distinct definitions: source selection
   // changes the whole plot rather than joining incompatible observations.
@@ -117,10 +123,10 @@ function Trends({ app }: { app: string | null }) {
         const label = value === 'GA4-iOS-app' ? c.performanceGa4NativeIosSource : value === 'GA4-Android-app' ? c.performanceGa4NativeAndroidSource : value === 'GA4-iOS' ? c.performanceGa4IosSource : value === 'GA4' ? c.performanceGa4Source : value === 'App Store Connect' ? c.performanceAppleSource : metric === 'visitors' ? c.performancePlayVisitorsSource : c.performancePlaySource;
         return { id: value, label, textValue: label };
       })} />}
-    <SegmentedControl label={c.performancePeriod} value={period} onValueChange={setPeriod} presentation="pills"
-      items={[{ value: 'week', label: c.performanceWeek }, { value: 'month', label: c.performanceMonth }, { value: 'all', label: c.performanceAllPeriod }]} />
+    <Tabs id="performance-period" panelMode="dynamic" label={c.performancePeriod} value={period} onValueChange={setPeriod} indicator="solid" renderPanels={false}
+      items={[{ id: 'week', label: c.performanceWeek }, { id: 'month', label: c.performanceMonth }, { id: 'all', label: c.performanceAllPeriod }]} />
     </Stack>
-    <TabPanel tabsId="performance-metric" activeValue={metric} value={metric} mode="keyed" key={metric}><Stack gap="md">
+    <TabPanel tabsId="performance-metric" activeValue={metric} value={metric} mode="keyed" key={metric}><TabPanel tabsId="performance-period" activeValue={period} mode="dynamic"><Stack gap="md">
       {hasValues ? <Stack gap="md">
         <Text variant="caption" tone="muted">{dateLabel(start)} — {dateLabel(periodEnd)} · {metric === 'revenue' ? c.performanceRevenueUnit : unitLabel(series[0])}</Text>
         <LineChart categories={dates.map(date => date.slice(start.slice(0, 4) === periodEnd.slice(0, 4) ? 5 : 2).replaceAll('-', '.'))}
@@ -134,11 +140,11 @@ function Trends({ app }: { app: string | null }) {
         selectedId={selectedId} onSelect={chartSeries.length > 1 ? setSelectedSeries : undefined} />
       {chartSeries.length > 1 && <Text as="p" variant="caption" tone="muted">{c.performanceChartSelectionHint}</Text>}
         <Collapsible trigger={c.performanceCollectionNotes}><Stack gap="sm">
-          {[...new Set(series.map(sourceLabel))].map(label => <Text key={label} variant="caption" tone="muted">{label}</Text>)}
+          {[...new Set(candidates.map(sourceLabel))].map(label => <Text key={label} variant="caption" tone="muted">{label}</Text>)}
           <Text as="p" variant="caption" tone="muted">{metric === 'revenue' ? c.performanceRevenueCaveat : metric === 'visitors' ? c.performanceVisitorsCaveat : activeSource === 'GA4-iOS-app' || activeSource === 'GA4-Android-app' ? c.performanceGa4NativeCaveat : activeSource === 'GA4-iOS' ? c.performanceGa4IosCaveat : activeSource === 'GA4' ? c.performanceGa4Caveat : c.performanceUsersCaveat}</Text>
           <Text as="p" variant="caption" tone="muted">{c.performanceGapNote}</Text>
         </Stack></Collapsible>
-    </Stack></TabPanel>
+    </Stack></TabPanel></TabPanel>
     <Text variant="caption" tone="muted">{c.performanceSnapshotNote}</Text>
     {/* The daily chart stays above the platform summary even on narrow screens. */}
     {app && <StatisticGroup label={c.performanceOverview} presentation="surface" descriptor={{ columns: 2, items: [
