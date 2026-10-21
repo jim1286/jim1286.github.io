@@ -18,6 +18,7 @@ import { siteCopy, appCopy } from './copy';
 import { apps, discontinuedApps, legalDocuments, portfolioSummary, storybookUrl, type PortfolioApp } from './siteData';
 import './styles/site.css';
 import { EvolutionHistory } from './EvolutionHistory';
+import { PerformancePanel } from './PerformancePanel';
 import { DrillArchitecture } from './architecture/DrillArchitecture';
 import { ExternalLink, Notes } from './shared';
 
@@ -26,7 +27,7 @@ const developerEmail = 'jimin1286@gmail.com';
 const tabItems = [
   { id: 'about', label: c.navOverview }, { id: 'structure', label: c.navStructure },
   { id: 'design', label: c.navArchitecture }, { id: 'apps', label: c.navProducts },
-  { id: 'history', label: c.historyNav }, { id: 'support', label: c.navContact },
+  { id: 'performance', label: c.performanceNav }, { id: 'history', label: c.historyNav }, { id: 'support', label: c.navContact },
 ];
 // Preserve links already shared by the single-page portfolio. Hash changes also
 // restore the right panel on browser Back/Forward and locale direct entry.
@@ -176,13 +177,13 @@ function DesignPanel() {
   </Stack>;
 }
 function HistoryPanel() {
-  return <Stack gap="xl"><Intro eyebrow="04 / EVOLUTION LOG" title={c.historyTitle} description={c.historyIntro} />
+  return <Stack gap="xl"><Intro eyebrow="05 / EVOLUTION LOG" title={c.historyTitle} description={c.historyIntro} />
     <EvolutionHistory />
     <ChapterNext href="#support" label={c.nextContact} />
   </Stack>;
 }
 function SupportPanel() {
-  return <Stack gap="xl"><Intro eyebrow="05 / CONTACT" title={c.contactNewTitle} description={c.contactNewIntro} />
+  return <Stack gap="xl"><Intro eyebrow="06 / CONTACT" title={c.contactNewTitle} description={c.contactNewIntro} />
     <Card title={c.contactTitle} headingLevel={2} padding="xl" actions={<Link href={`mailto:${developerEmail}`} variant="standalone"><MailOutlined aria-hidden /> {developerEmail}</Link>} />
     <Section title={c.contactPolicies}><Collapsible trigger={c.contactPoliciesExpand}><Grid columns={{ compact: 1, medium: 2 }} gap={{ compact: 'md' }} minColumnWidth={{ compact: 260 }}>
       {legalDocuments.map(document => <Card key={document.id} title={document.name} description={document.note} headingLevel={3} padding="lg" actions={<Stack axis="inline" gap="sm" wrap>
@@ -194,7 +195,7 @@ function SupportPanel() {
     <Text variant="caption" tone="muted">{siteCopy.legalNote}</Text>
   </Stack>;
 }
-const panels: Record<string, ReactNode> = { about: <AboutPanel />, structure: <StructurePanel />, apps: <AppsPanel />, design: <DesignPanel />, history: <HistoryPanel />, support: <SupportPanel /> };
+const panels: Record<string, ReactNode> = { about: <AboutPanel />, structure: <StructurePanel />, apps: <AppsPanel />, design: <DesignPanel />, performance: <PerformancePanel />, history: <HistoryPanel />, support: <SupportPanel /> };
 export default function App() {
   const [hash, setHash] = useState(() => window.location.hash);
   const active = tabForHash(hash);

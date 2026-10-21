@@ -59,3 +59,14 @@ JavaScript는 path/query/hash를 보존하며 새 도메인으로 이동하고, 
 GitHub 응답은 HTTP 200 안내(알 수 없는 경로는 404 안내)이며 서버 301/308이 아니다. 새 기본 deploy는 VPS publisher다.
 과거 .published 산출물·main의 Git 이력은 유지하며 운영용 branch를 새로 만들지 않는다.
 결과: [QA 리포트](../../docs/qa/2026-10-09-owned-domain-deployment.md).
+
+## 개발 Mac 자격증명으로 mac-ci 게시 (2026-10-21)
+
+관리 키 정본은 개발 Mac의 `HJM-Credentials/apps/diairy/ovh/ovh_airy_ed25519`이며,
+이 키로 위 VPS와 `/srv/portfolio-site` 접근을 실제 확인했다. mac-ci에 비밀키를 복제하지 않는다.
+mac-ci의 깨끗한 main checkout을 정확한 source SHA로 fast-forward하여 빌드·artifact 준비를 수행한다.
+개발 Mac의 작업 전용 ssh-agent에 기존 키를 추가하고 `ssh -A mac-ci`로 해당 실행에만 전달한다.
+mac-ci에는 대응하는 **공개키만** 임시 파일로 전달해 기존 publisher의 key-file 인수로 지정한다.
+OpenSSH는 공개키와 일치하는 전달 agent로 서명하므로 기존 SSH 게시 경로와 artifact 검사를 유지한다.
+작업 완료 뒤 전용 agent와 본 작업의 임시 공개키·artifact만 정리한다. 중앙 자격증명 원문은
+소스·로그·작업 기록에 넣지 않는다. 이 절은 일별 오전9시 성과·발전 이력 게시에도 적용한다.
