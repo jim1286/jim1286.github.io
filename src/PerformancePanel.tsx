@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { MarketingPanel } from './MarketingPanel';
-import { marketingObservations } from './performance/marketing';
+import { marketingAccounts } from './performance/marketingAccount';
 import { Select, StatisticGroup, Timeline } from '@hjmds/react';
 import { Link } from '@hjmds/react/actions';
 import { Badge, Card, Tag } from '@hjmds/react/display';
@@ -185,7 +185,7 @@ export function PerformancePanel() {
     <Stack gap="sm">
       <Stack axis="inline" align="center" justify="between" gap="md" wrap>
         <Heading level="level1">{c.performanceTitle}</Heading>
-        <Stack axis="inline" gap="xs" wrap><Tag>{`${c.performanceCaptured} ${collectedLabel(selected === 'marketing' ? marketingObservations.map(item => item.observedAt).sort((a,b) => Date.parse(b) - Date.parse(a))[0] : capturedAt)} KST`}</Tag><Tag>{c.performanceSnapshot}</Tag></Stack>
+        <Stack axis="inline" gap="xs" wrap><Tag>{`${c.performanceCaptured} ${collectedLabel(selected === 'marketing' ? marketingAccounts.map(item => item.observedAt).sort((a,b) => Date.parse(b) - Date.parse(a))[0] : capturedAt)} KST`}</Tag><Tag>{c.performanceSnapshot}</Tag></Stack>
       </Stack>
       <Text as="p" variant="caption" tone="muted">{c.performanceIntro}</Text>
     </Stack>

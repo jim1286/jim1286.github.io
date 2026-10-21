@@ -1,5 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { marketingAccounts } from '../src/performance/marketingAccount.ts';
 import { latestMarketingPosts, marketingObservations } from '../src/performance/marketing.ts';
 
 test('a later cumulative post snapshot replaces its predecessor without adding or filling nulls', () => {
@@ -18,5 +19,20 @@ test('public marketing observations preserve actual dates, units and public post
     assert.ok(['www.instagram.com', 'www.threads.com'].includes(url.hostname));
     assert.equal(url.search, '');
     for (const value of Object.values(item.metrics)) assert.ok(value === null || (Number.isFinite(value) && value >= 0));
+  }
+});
+
+test('account summaries preserve unknown period boundaries and actual daily points', () => {
+  for (const account of marketingAccounts) {
+    assert.equal(account.periodDates, null);
+    assert.ok(Number.isFinite(Date.parse(account.observedAt)));
+    for (const points of Object.values(account.daily)) {
+      assert.equal(new Set(points.map(point => point.date)).size, points.length);
+      if (!account.chartRange) assert.equal(points.length, 0);
+      for (const point of points) {
+        assert.ok(Number.isFinite(point.value));
+        assert.ok(point.date >= account.chartRange.start && point.date <= account.chartRange.end);
+      }
+    }
   }
 });
