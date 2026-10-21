@@ -1,4 +1,6 @@
 import { useState } from 'react';
+import { MarketingPanel } from './MarketingPanel';
+import { marketingObservations } from './performance/marketing';
 import { StatisticGroup, Timeline } from '@hjmds/react';
 import { Link } from '@hjmds/react/actions';
 import { Badge, Card, Tag } from '@hjmds/react/display';
@@ -25,7 +27,7 @@ const metrics: { id: Metric; label: string }[] = [{ id: 'dau', label: c.performa
 const number = new Intl.NumberFormat('ko-KR', { maximumFractionDigits: 1 });
 const money = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' });
 const dateLabel = (date: string) => date.replaceAll('-', '.');
-const collectedLabel = new Date(capturedAt).toLocaleString('ko-KR', { timeZone: 'Asia/Seoul', hour12: false });
+const collectedLabel = (at: string) => new Date(at).toLocaleString('ko-KR', { timeZone: 'Asia/Seoul', hour12: false });
 const appName = (id: string) => products.find(app => app.id === id)?.name ?? id;
 const formatValue = (metric: Metric, value: number) => metric === 'revenue' ? money.format(value) : number.format(value);
 function sourceLabel(series: MetricSeries) {
@@ -171,24 +173,24 @@ function Milestones({ app }: { app: string }) {
 }
 export function PerformancePanel() {
   const route = window.location.hash.split('/')[1];
-  const selected = products.some(app => app.id === route) ? route : 'all';
+  const selected = route === 'marketing' || products.some(app => app.id === route) ? route : 'all';
   return <Stack gap="lg">
     <Stack gap="sm">
       <Stack axis="inline" align="center" justify="between" gap="md" wrap>
         <Heading level="level1">{c.performanceTitle}</Heading>
-        <Stack axis="inline" gap="xs" wrap><Tag>{`${c.performanceCaptured} ${collectedLabel} KST`}</Tag><Tag>{c.performanceSnapshot}</Tag></Stack>
+        <Stack axis="inline" gap="xs" wrap><Tag>{`${c.performanceCaptured} ${collectedLabel(selected === 'marketing' ? marketingObservations.map(item => item.observedAt).sort((a,b) => Date.parse(b) - Date.parse(a))[0] : capturedAt)} KST`}</Tag><Tag>{c.performanceSnapshot}</Tag></Stack>
       </Stack>
       <Text as="p" variant="caption" tone="muted">{c.performanceIntro}</Text>
     </Stack>
     <Tabs id="performance-products" label={c.performanceProductSelect} value={selected} onValueChange={value => { window.location.hash = value === 'all' ? 'performance' : `performance/${value}`; }}
-      overflow="scroll" indicator="solid" items={[{ id: 'all', label: c.performanceAll }, ...products.map(app => ({ id: app.id, label: app.name }))]} renderPanels={false} />
+      overflow="scroll" indicator="solid" items={[{ id: 'all', label: c.performanceAll }, { id: 'marketing', label: c.performanceMarketing }, ...products.map(app => ({ id: app.id, label: app.name }))]} renderPanels={false} />
     <TabPanel tabsId="performance-products" value={selected} activeValue={selected} mode="keyed" key={selected}>
-      {selected === 'all' ? <Overview /> : <Stack gap="xl">
+      {selected === 'all' ? <Overview /> : selected === 'marketing' ? <MarketingPanel /> : <Stack gap="xl">
         <Trends app={selected} />
         {['utilverse', 'spint'].includes(selected) && <Badge variant="outline">{c.performanceClosedTestNote}</Badge>}
         <Milestones app={selected} />
       </Stack>}
     </TabPanel>
-    <Text as="p" tone="muted" variant="caption">{c.performanceDefinitions}</Text>
+    <Text as="p" tone="muted" variant="caption">{selected === 'marketing' ? c.performanceMarketingAttribution : c.performanceDefinitions}</Text>
   </Stack>;
 }
