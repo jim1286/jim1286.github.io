@@ -1,5 +1,6 @@
 // Public, aggregate observations only. Provenance and revisions are documented in
 // docs/PERFORMANCE.md; account totals must never be assigned to an individual app.
+import { webCapturedAt, webSeries } from './webHistory.ts';
 import { platformCapturedAt, platformSeries } from './platformHistory.ts';
 import { iosCapturedAt, iosSeries } from './iosHistory.ts';
 import { historicalSeries } from './history.ts';
@@ -11,7 +12,7 @@ export type MetricSeries = {
   app: string | null;
   metric: Metric;
   source: 'Google Play' | 'AdMob' | 'GA4' | 'App Store Connect';
-  scope: 'android' | 'ios-kr-banner' | 'admob-account' | 'ga4-all' | 'ios-observed' | 'android-observed' | 'apple-store-all' | 'play-store-all' | 'play-installed-all' | 'play-active-all' | 'ga4-ios' | 'ga4-ios-app' | 'ga4-android-app';
+  scope: 'android' | 'ios-kr-banner' | 'admob-account' | 'ga4-all' | 'ios-observed' | 'android-observed' | 'apple-store-all' | 'play-store-all' | 'play-installed-all' | 'play-active-all' | 'ga4-ios' | 'ga4-ios-app' | 'ga4-android-app' | 'ga4-web';
   timeZone: string | null;
   currency?: 'USD';
   estimated?: boolean;
@@ -23,7 +24,7 @@ export type MetricSeries = {
   testTraffic: 'not-excluded' | 'closed-test';
   points: Observation[];
 };
-export const capturedAt = [storeCapturedAt, iosCapturedAt, platformCapturedAt].sort((a, b) => Date.parse(b) - Date.parse(a))[0];
+export const capturedAt = [storeCapturedAt, iosCapturedAt, platformCapturedAt, webCapturedAt].sort((a, b) => Date.parse(b) - Date.parse(a))[0];
 const october = (values: [number, number][]): Observation[] => values.map(([day, value]) => ({ date: `2026-10-${String(day).padStart(2, '0')}`, value }));
 export const metricSeries: MetricSeries[] = [
   { id: 'yajalal-installed', app: 'yajalal', metric: 'installed', source: 'Google Play', scope: 'android', timeZone: null, testTraffic: 'not-excluded',
@@ -35,6 +36,7 @@ export const metricSeries: MetricSeries[] = [
   ...storeSeries,
   ...iosSeries,
   ...platformSeries,
+  ...webSeries,
 ];
 // New observations advance the date axis automatically. The corpus is nonempty
 // and collection omits the current incomplete day.

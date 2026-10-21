@@ -31,10 +31,10 @@ const appName = (id: string) => products.find(app => app.id === id)?.name ?? id;
 const formatValue = (metric: Metric, value: number) => metric === 'revenue' ? money.format(value) : number.format(value);
 function sourceLabel(series: MetricSeries) {
   const scopes = { android: c.performancePlayScope, 'ios-kr-banner': c.performanceIosBanner, 'admob-account': c.performanceAccountScope, 'ga4-all': c.performanceGa4Scope, 'ios-observed': c.performanceIosObserved, 'android-observed': c.performanceAndroidObserved,
-    'apple-store-all': c.performanceAppleStoreScope, 'play-store-all': c.performancePlayStoreScope, 'play-installed-all': c.performancePlayInstalledScope, 'play-active-all': c.performancePlayActiveScope, 'ga4-ios': c.performanceGa4IosScope, 'ga4-ios-app': c.performanceGa4NativeIosScope, 'ga4-android-app': c.performanceGa4NativeAndroidScope };
+    'apple-store-all': c.performanceAppleStoreScope, 'play-store-all': c.performancePlayStoreScope, 'play-installed-all': c.performancePlayInstalledScope, 'play-active-all': c.performancePlayActiveScope, 'ga4-ios': c.performanceGa4IosScope, 'ga4-ios-app': c.performanceGa4NativeIosScope, 'ga4-android-app': c.performanceGa4NativeAndroidScope, 'ga4-web': c.performanceGa4WebScope };
   return `${series.source} · ${scopes[series.scope]} · ${series.timeZone ?? c.performanceUnknownZone}`;
 }
-const sourceKey = (series: MetricSeries): string => series.source === 'GA4' ? series.scope === 'ga4-ios' ? 'GA4-iOS' : series.scope === 'ga4-ios-app' ? 'GA4-iOS-app' : series.scope === 'ga4-android-app' ? 'GA4-Android-app' : 'GA4' : series.source;
+const sourceKey = (series: MetricSeries): string => series.source === 'GA4' ? series.scope === 'ga4-web' ? 'GA4-Web' : series.scope === 'ga4-ios' ? 'GA4-iOS' : series.scope === 'ga4-ios-app' ? 'GA4-iOS-app' : series.scope === 'ga4-android-app' ? 'GA4-Android-app' : 'GA4' : series.source;
 const unitLabel = (series: MetricSeries) => series.unit === 'views' ? c.performanceViewsUnit : series.unit === 'devices' ? c.performanceDevicesUnit : c.performancePeopleUnit;
 function metricSummary(app: string, metric: Metric) {
   const series = forApp(app, metric);
@@ -86,16 +86,13 @@ function Trends({ app }: { app: string | null }) {
   const [metric, setMetric] = useState<Metric>('dau');
   const [period, setPeriod] = useState('month');
   const [selectedSeries, setSelectedSeries] = useState<string | null>(null);
-  const [source, setSource] = useState<string>(metricSeries.some(item => item.scope === 'ga4-ios-app' && (!app || item.app === app)) ? 'GA4-iOS-app' : app ? (forApp(app, 'dau') ? sourceKey(forApp(app, 'dau')!) : 'GA4') : 'GA4-iOS');
+  const [source, setSource] = useState<string>('GA4');
   const candidates = metricSeries.filter(item => item.metric === metric && (app === null ? item.app !== null && products.some(product => product.id === item.app) : item.app === app));
   const allSources = [...new Set(candidates.filter(item => item.points.length).map(sourceKey))];
-  // Compare native platforms alongside the explicitly separate combined report.
-  // The broader OS=iOS snapshots remain provenance when native app data exists.
-  const nativeSources = allSources.filter(value => value === 'GA4-iOS-app' || value === 'GA4-Android-app');
-  const platformSources = allSources.filter(value => value === 'GA4-iOS' || value === 'Google Play');
+  // Platform views follow the user's four categories. Missing native/web data
+  // stays missing; OS=iOS and Play observations remain separately qualified provenance.
   const sources = metric === 'dau' || metric === 'new'
-    ? nativeSources.length ? [...allSources.filter(value => value === 'GA4'), ...nativeSources] : platformSources.length ? [...allSources.filter(value => value === 'GA4'), ...platformSources] : allSources
-    : allSources;
+    ? ['GA4', 'GA4-Web', 'GA4-iOS-app', 'GA4-Android-app'] : allSources;
   const activeSource = sources.includes(source) ? source : sources[0];
   // GA4 active users and Play DAU have distinct definitions: source selection
   // changes the whole plot rather than joining incompatible observations.
@@ -120,7 +117,7 @@ function Trends({ app }: { app: string | null }) {
     {sources.length > 1 && <Select accessibilityLabel={c.performanceSource} selectedKey={activeSource} onSelectionChange={value => { if (value) setSource(value); }}
       placeholder={c.performanceSource} emptySelectionLabel={c.performanceSource} disallowEmptySelection
       items={sources.map(value => {
-        const label = value === 'GA4-iOS-app' ? c.performanceGa4NativeIosSource : value === 'GA4-Android-app' ? c.performanceGa4NativeAndroidSource : value === 'GA4-iOS' ? c.performanceGa4IosSource : value === 'GA4' ? c.performanceGa4CombinedSource : value === 'App Store Connect' ? c.performanceAppleSource : metric === 'visitors' ? c.performancePlayVisitorsSource : c.performancePlaySource;
+        const label = value === 'GA4-Web' ? c.performanceGa4WebSource : value === 'GA4-iOS-app' ? c.performanceGa4NativeIosSource : value === 'GA4-Android-app' ? c.performanceGa4NativeAndroidSource : value === 'GA4-iOS' ? c.performanceGa4IosSource : value === 'GA4' ? c.performanceGa4CombinedSource : value === 'App Store Connect' ? c.performanceAppleSource : metric === 'visitors' ? c.performancePlayVisitorsSource : c.performancePlaySource;
         return { id: value, label, textValue: label };
       })} />}
     <Tabs id="performance-period" panelMode="dynamic" label={c.performancePeriod} value={period} onValueChange={setPeriod} indicator="solid" renderPanels={false}
@@ -142,7 +139,7 @@ function Trends({ app }: { app: string | null }) {
       {chartSeries.length > 1 && <Text as="p" variant="caption" tone="muted">{c.performanceChartSelectionHint}</Text>}
         <Collapsible trigger={c.performanceCollectionNotes}><Stack gap="sm">
           {[...new Set(candidates.map(sourceLabel))].map(label => <Text key={label} variant="caption" tone="muted">{label}</Text>)}
-          <Text as="p" variant="caption" tone="muted">{metric === 'revenue' ? c.performanceRevenueCaveat : metric === 'visitors' ? c.performanceVisitorsCaveat : activeSource === 'GA4-iOS-app' || activeSource === 'GA4-Android-app' ? c.performanceGa4NativeCaveat : activeSource === 'GA4-iOS' ? c.performanceGa4IosCaveat : activeSource === 'GA4' ? c.performanceGa4Caveat : c.performanceUsersCaveat}</Text>
+          <Text as="p" variant="caption" tone="muted">{metric === 'revenue' ? c.performanceRevenueCaveat : metric === 'visitors' ? c.performanceVisitorsCaveat : activeSource === 'GA4-Web' ? c.performanceGa4WebCaveat : activeSource === 'GA4-iOS-app' || activeSource === 'GA4-Android-app' ? c.performanceGa4NativeCaveat : activeSource === 'GA4-iOS' ? c.performanceGa4IosCaveat : activeSource === 'GA4' ? c.performanceGa4Caveat : c.performanceUsersCaveat}</Text>
           <Text as="p" variant="caption" tone="muted">{c.performanceGapNote}</Text>
         </Stack></Collapsible>
     </Stack></TabPanel></TabPanel>
