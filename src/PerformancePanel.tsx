@@ -86,6 +86,7 @@ function Trends({ app }: { app: string | null }) {
   const { environment } = useHjmTheme();
   const [metric, setMetric] = useState<Metric>('dau');
   const [period, setPeriod] = useState('month');
+  const [selectedSeries, setSelectedSeries] = useState<string | null>(null);
   const [source, setSource] = useState<string>(metricSeries.some(item => item.scope === 'ga4-ios-app' && (!app || item.app === app)) ? 'GA4-iOS-app' : app ? (forApp(app, 'dau') ? sourceKey(forApp(app, 'dau')!) : 'GA4') : 'GA4-iOS');
   const candidates = metricSeries.filter(item => item.metric === metric && (app === null ? item.app !== null && products.some(product => product.id === item.app) : item.app === app));
   const sources = [...new Set(candidates.filter(item => item.points.length).map(sourceKey))];
@@ -101,7 +102,9 @@ function Trends({ app }: { app: string | null }) {
   const chartSeries = series.map((item, index) => ({ id: item.id,
     label: `${item.app ? appName(item.app) : c.performanceAccountScope}${item.testTraffic === 'closed-test' ? ` · ${c.performanceClosedTest}` : ''}${item.source === 'AdMob' && item.app ? ` · ${item.scope === 'ios-kr-banner' ? c.performanceIosBanner : item.scope === 'android-observed' ? c.performanceAndroidObserved : c.performanceIosObserved}` : ''}`,
     values: valuesForDates(item, dates), color: resolveDatavizSeriesColor(environment.theme, index) }));
-  const hasValues = series.some(item => valuesForDates(item, dates).some(value => value !== null));
+  const selectedId = chartSeries.some(item => item.id === selectedSeries) ? selectedSeries : null;
+  const visibleSeries = selectedId ? chartSeries.filter(item => item.id === selectedId) : chartSeries;
+  const hasValues = visibleSeries.some(item => item.values.some(value => value !== null));
   return <Card title={c.performanceTrend} headingLevel={2} padding="lg"><Stack gap="md">
     <Tabs id="performance-metric" label={c.performanceKeyMetrics} value={metric} onValueChange={value => setMetric(value as Metric)}
       indicator="solid" items={metrics.map(item => ({ id: item.id, label: item.label }))} renderPanels={false} />
@@ -117,21 +120,25 @@ function Trends({ app }: { app: string | null }) {
     <SegmentedControl label={c.performancePeriod} value={period} onValueChange={setPeriod} presentation="pills"
       items={[{ value: 'week', label: c.performanceWeek }, { value: 'month', label: c.performanceMonth }, { value: 'all', label: c.performanceAllPeriod }]} />
     </Stack>
-    <TabPanel tabsId="performance-metric" activeValue={metric} value={metric} mode="keyed" key={metric}>
+    <TabPanel tabsId="performance-metric" activeValue={metric} value={metric} mode="keyed" key={metric}><Stack gap="md">
       {hasValues ? <Stack gap="md">
         <Text variant="caption" tone="muted">{dateLabel(start)} — {dateLabel(periodEnd)} · {metric === 'revenue' ? c.performanceRevenueUnit : unitLabel(series[0])}</Text>
         <LineChart categories={dates.map(date => date.slice(start.slice(0, 4) === periodEnd.slice(0, 4) ? 5 : 2).replaceAll('-', '.'))}
-          series={chartSeries}
+          series={visibleSeries}
           accessibilityLabel={`${app ? appName(app) : c.performanceAll} ${metrics.find(item => item.id === metric)!.label} ${c.performanceTrend}`}
-          formatValue={value => formatValue(metric, value)} missingLabel={c.performanceMissing} height={chartRecipe.heights.tall} curve="linear" area={false} showAxis missingConnection="none" />
-        <ChartLegend items={chartSeries.map(({ id, label, color }) => ({ id, label, color }))} />
+          formatValue={value => formatValue(metric, value)} missingLabel={c.performanceMissing} height={chartRecipe.heights.tall} curve="linear" area={false} showAxis missingConnection="bridge" />
+        <Text as="p" variant="caption" tone="muted">{c.performanceChartGuide}</Text>
+
+      </Stack> : <EmptyState density="compact" title={c.performanceMissing} description={c.performanceMissingBody} />}
+      <ChartLegend items={chartSeries.map(({ id, label, color, values }) => ({ id, label, color, value: `${values.filter(value => value !== null).length}/${dates.length}${c.performanceDaysUnit}` }))}
+        selectedId={selectedId} onSelect={chartSeries.length > 1 ? setSelectedSeries : undefined} />
+      {chartSeries.length > 1 && <Text as="p" variant="caption" tone="muted">{c.performanceChartSelectionHint}</Text>}
         <Collapsible trigger={c.performanceCollectionNotes}><Stack gap="sm">
           {[...new Set(series.map(sourceLabel))].map(label => <Text key={label} variant="caption" tone="muted">{label}</Text>)}
           <Text as="p" variant="caption" tone="muted">{metric === 'revenue' ? c.performanceRevenueCaveat : metric === 'visitors' ? c.performanceVisitorsCaveat : activeSource === 'GA4-iOS-app' || activeSource === 'GA4-Android-app' ? c.performanceGa4NativeCaveat : activeSource === 'GA4-iOS' ? c.performanceGa4IosCaveat : activeSource === 'GA4' ? c.performanceGa4Caveat : c.performanceUsersCaveat}</Text>
           <Text as="p" variant="caption" tone="muted">{c.performanceGapNote}</Text>
         </Stack></Collapsible>
-      </Stack> : <EmptyState density="compact" title={c.performanceMissing} description={c.performanceMissingBody} />}
-    </TabPanel>
+    </Stack></TabPanel>
     <Text variant="caption" tone="muted">{c.performanceSnapshotNote}</Text>
     {/* The daily chart stays above the platform summary even on narrow screens. */}
     {app && <StatisticGroup label={c.performanceOverview} presentation="surface" descriptor={{ columns: 2, items: [

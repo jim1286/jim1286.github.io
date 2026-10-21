@@ -43,8 +43,9 @@ function AccountPerformance({ platform }: { platform: MarketingPlatform }) {
       <Tabs id="marketing-account-metric" label={c.performanceMarketingDaily} value={metric} onValueChange={value => setMetric(value as AccountMarketingMetric)} items={options} renderPanels={false} />
       <LineChart categories={dates.map(date => date.slice(5).replace('-', '.'))}
         series={[{ id: metric, label, color: resolveDatavizSeriesColor(environment.theme, 0), values: dates.map(date => values.get(date) ?? null) }]}
-        accessibilityLabel={`${platform} ${c.performanceMarketingDaily} ${label}`} height={240} curve="linear" area={false} showAxis missingConnection="none"
+        accessibilityLabel={`${platform} ${c.performanceMarketingDaily} ${label}`} height={240} curve="linear" area={false} showAxis missingConnection="bridge"
         formatValue={value => count.format(value)} missingLabel={c.performanceMissing} />
+      <Text as="p" variant="caption" tone="muted">{c.performanceChartGuide}</Text>
     </>}
     <StatisticGroup label={c.performanceMarketingAccount} density="compact" descriptor={{ columns: 2, items }} />
     <Text as="p" variant="caption" tone="muted">{account.chartRange ? `${account.chartRange.start} — ${account.chartRange.end} · ${dates.length}일. ${c.performanceMarketingThreadsRange}` : c.performanceMarketingNoDaily}</Text>

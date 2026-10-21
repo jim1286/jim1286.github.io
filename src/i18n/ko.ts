@@ -1851,7 +1851,7 @@ export const ko = {
 "performanceRevenueCaveat": "AdMob 예상 수익의 반올림 표시값입니다. US$0.00은 정확한 무수익을 뜻하지 않습니다. 통합 그래프도 대상 앱의 관측된 OS·광고 범위만 표시합니다. 제외 제품이 섞일 수 있는 계정 전체 합계는 게시하지 않습니다. 반올림 일별 값을 합산하지 않습니다.",
 "performanceUsersCaveat": "활성 사용자는 해당 날짜에 앱을 사용한 사용자입니다. 설치 사용자는 설치 보유 지표이며 신규 다운로드가 아닙니다. 앱 간 사용자는 중복될 수 있고 테스트·내부 유입 제외 여부는 확인되지 않았습니다.",
 "performanceMissingBody": "선택한 기간에 확인된 일별 관측값이 없습니다. 다른 기간이나 출처를 선택해 주세요.",
-"performanceGapNote": "관측하지 못한 날짜는 비워 둡니다. 빈 날짜를 0으로 채우거나 이어 그리지 않습니다.",
+"performanceGapNote": "미수집 날짜의 값은 비워 두고 0이나 추정값으로 채우지 않습니다. 관측 사이의 옅은 점선은 흐름을 읽는 안내이며 그 날짜의 실제 값을 뜻하지 않습니다.",
 "performanceOverview": "핵심 성과 개요",
 "performanceByApp": "앱별 핵심 성과",
 "performanceSnapshotNote": "플랫폼·스토어별 최신 확보값입니다. 각 기준일과 집계 범위를 함께 읽어 주세요.",
@@ -1940,4 +1940,7 @@ export const ko = {
   "performanceMarketingWindowNote": "최근 30일은 제공 화면의 기간 이름입니다. 정확한 시작·종료일과 오늘 포함 여부는 표시되지 않았습니다. 현재 팔로워 수는 수집 시점 기준입니다.",
   "performanceMarketingThreadsRange": "기간 조회수는 공식 표시값이며, 조회한 사람은 일별 값을 합산하지 않습니다. 반응의 미표시 날짜는 비워 둡니다.",
   "performanceMarketingPosts": "게시물별 관측도 보기",
+  "performanceChartGuide": "실선·점은 실제 관측값, 옅은 점선은 미수집 구간의 연결 안내입니다.",
+  "performanceChartSelectionHint": "범례에서 앱을 누르면 해당 앱만 표시합니다. 다시 누르면 전체를 봅니다. 숫자는 확보한 날짜 수입니다.",
+  "performanceDaysUnit": "일",
 } as const;
