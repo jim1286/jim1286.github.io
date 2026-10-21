@@ -16,9 +16,8 @@ const layouts: Record<string, ArchitectureLayout> = {
   overall: { height: 760, points: [[90,100],[570,100],[570,330],[90,330],[90,560],[570,560]],
     regions: [{x:30,y:25,w:360,h:690,title:c.architectureLabel1},{x:510,y:25,w:360,h:690,title:c.architectureLabel2}],
     edges: [edge('M210 186V330',c.architectureLabel3,210,258),edge('M210 416V560',c.architectureLabel4,210,488),edge('M570 143H330',c.architectureLabel5,450,129,true),edge('M570 373H470V164H330',c.architectureLabel6,470,290,true),edge('M570 603H430V179H330',c.architectureLabel7,430,510,true)] },
-  client: {height:650,points:[[150,70],[510,70],[150,310],[510,310],[150,490],[510,490]],
-    regions:[{x:90,y:20,w:720,h:170,title:c.architectureLabel8},{x:90,y:265,w:720,h:360,title:c.architectureLabel9}],
-    edges:[edge('M270 156V220H450V265','',0,0),edge('M630 156V220H450',c.architectureLabel10,450,242)]},
+  client: {height:650,points:[[40,60],[700,60],[370,60],[370,260],[40,460],[700,460]],
+    regions:[], edges:[]},
   server: {height:900, points:[[330,50],[330,245],[30,455],[330,455],[630,455],[630,710],[330,710]], regions:[],
     edges:[edge('M450 136V245',c.architectureLabel11,450,195),
       edge('M330 288H150V455',c.architectureLabel12,150,390),
@@ -264,10 +263,15 @@ export function buildLegacyViews(): Record<string, ArchView> {
     views.push(geometryView({ id, parent, title: s.title, crumb, hint: `${stage.intro} ${s.caption}`, w: 240, h: 86, boxes: s.boxes, edges: edges ?? s.edges, regions: s.regions, drills, cards }));
   };
   stageView('code-overall', 'overview', overallStage, 0, 'overall', c.archCodeCrumb, { '0': 'code-client', '1': 'code-hjm', '2': 'code-hub', '3': 'code-server', '5': 'code-exploreqa' }, roleCards(overallStage.roles));
-  // The original routes ended on the shared-layer region; a node map needs a node, so both
-  // entries point at the shared screen model they consume.
-  stageView('code-client', 'code-overall', clientStage, 0, 'client', c.designStepClient, { '0': 'code-client-web', '1': 'code-client-app', '2': 'code-hjm', '5': 'code-change' }, roleCards(clientStage.roles),
-    [{ d: 'M270 156V232H600V310' }, { d: 'M630 156V310', label: layouts.client.edges[1].label }]);
+  // These are consumption dependencies, not a sequential pipeline through every package.
+  stageView('code-client', 'code-overall', clientStage, 0, 'client', c.designStepClient, { '0': 'code-client-web', '1': 'code-client-app', '2': 'code-hjm', '5': 'code-change' }, roleCards(clientStage.roles), [
+    { d: 'M280 103H370', label: c.archClientUiDependency, at: [325, 90] },
+    { d: 'M700 103H610', label: c.archClientUiDependency, at: [655, 90] },
+    { d: 'M160 146V303H370', label: c.archClientModelDependency, at: [160, 225] },
+    { d: 'M820 146V303H610', label: c.archClientModelDependency, at: [820, 225] },
+    { d: 'M400 346V503H280', label: c.archClientContractDependency, at: [400, 420] },
+    { d: 'M580 346V503H700', label: c.archClientAdapterDependency, at: [580, 420] },
+  ]);
   stageView('code-server', 'code-overall', serverStage, 0, 'server', c.designStepServer, { '0': 'code-server-flow', '1': 'code-change' }, roleCards(serverStage.roles));
   stageView('code-hjm', 'code-overall', stateStage, 0, 'state-0', stateStage.roles[0].name, {}, roleCards([stateStage.roles[0]]));
   stageView('code-hub', 'code-overall', stateStage, 1, 'state-1', stateStage.roles[1].name, {}, roleCards([stateStage.roles[1]]));

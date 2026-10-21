@@ -27,7 +27,6 @@ img { display: block; max-width: 100%; }
 
 /* Chapter spacing is editorial placement; HJM owns every component's internals. */
 .chapter-block { padding-block: var(--hjm-space-lg); }
-.chapter-next { padding-block: var(--hjm-space-xl); }
 .hero-title { white-space: pre-line; }
 @media (min-width: 800px) {
   .panel-wrap { padding-block: 48px; }

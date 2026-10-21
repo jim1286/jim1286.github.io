@@ -1,5 +1,18 @@
 # 발전 이력의 근거와 조사 범위
 
+## 2026-10-21 갱신 — 최근 구현의 선택 검토
+
+기존 72개에 주요 변경 6개를 더해 78개로 정리했다. 10월 19일 이후 현재 로컬 checkout의 최근 커밋에서 후보를 고르고 아래 원본의 구현·설계 기록을 대조했다. 전체 ref·모든 diff를 다시 전수 조사하거나 운영·스토어·기기 상태를 새로 검증한 작업은 아니다. 기존 2026-10-19 전수 추출 범위와 구분한다.
+
+| 항목 | 원본 | 확인 범위 |
+| --- | --- | --- |
+| 선택 표시·표면 | HJM `035799a5` — component-recipes.ts, colors.ts, 각 렌더러 | solid 탭·brand 선택과 기본 표면의 계약 |
+| 카드 곁그림·보조 정보 | HJM `035799a5` changeset / Diairy `e2193ed` DESIGN | CompositionLayout 슬롯과 제품 채택 |
+| 편지 전체 페이지 | Diairy `e2193ed` LetterPageLayout·reply 경로 | 상단 배경·스크롤·답장 경로 |
+| 탑승권 사진 입력 | Unairplane `79cba8c` BoardingPassScannerScreen | 카메라/보관함·취소/오류 때 이전 결과 보존 |
+| DB baseline 통합 | Spint `c7010b4` docs/design/SERVER.md §16 | 설계 기록과 migration diff. DB 상태를 새로 조회하지 않음 |
+| 네이티브 의존성 경계 | Diairy `3d617ac`, Utilverse `05f7f1e`, Choose Window `7b412ed` | 공개 export·반사 생성자 보존 설정. 새 바이너리·기기 실행 미검증 |
+
 ## 최신 확장 — Git 전체 ref 조사
 
 2026-10-19 후속 요청으로 **72개 주요 항목 / 8개 주제**로 확장했다. 기존 36개에 36개를 더했으며 삭제 복구·위젯·Expo 이관의 근거도 보강했다. 13개 저장소의 5,044개 커밋을 추출·분류한 범위와 수동 검토의 차이는 [Git 조사 기록](history-audit/README.md)에 적었다. Taground는 사용자 설명에 따라 Spint 흡수 관계로 정리하되 실제 코드 이식과 구분한다. 모펀 원격 보관 저장소도 이번에는 확인했다.

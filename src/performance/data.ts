@@ -1,6 +1,7 @@
 // Public, aggregate observations only. Provenance and revisions are documented in
 // docs/PERFORMANCE.md; account totals must never be assigned to an individual app.
 import { webCapturedAt, webSeries } from './webHistory.ts';
+import { combinedCapturedAt, combinedSeries } from './combinedHistory.ts';
 import { platformCapturedAt, platformSeries } from './platformHistory.ts';
 import { iosCapturedAt, iosSeries } from './iosHistory.ts';
 import { historicalSeries } from './history.ts';
@@ -24,7 +25,7 @@ export type MetricSeries = {
   testTraffic: 'not-excluded' | 'closed-test';
   points: Observation[];
 };
-export const capturedAt = [storeCapturedAt, iosCapturedAt, platformCapturedAt, webCapturedAt].sort((a, b) => Date.parse(b) - Date.parse(a))[0];
+export const capturedAt = [storeCapturedAt, iosCapturedAt, platformCapturedAt, webCapturedAt, combinedCapturedAt].sort((a, b) => Date.parse(b) - Date.parse(a))[0];
 const october = (values: [number, number][]): Observation[] => values.map(([day, value]) => ({ date: `2026-10-${String(day).padStart(2, '0')}`, value }));
 export const metricSeries: MetricSeries[] = [
   { id: 'yajalal-installed', app: 'yajalal', metric: 'installed', source: 'Google Play', scope: 'android', timeZone: null, testTraffic: 'not-excluded',
@@ -32,7 +33,10 @@ export const metricSeries: MetricSeries[] = [
   { id: 'utilverse-dau', app: 'utilverse', metric: 'dau', source: 'Google Play', scope: 'android', timeZone: null, testTraffic: 'closed-test', points: october([[14, 21]]) },
   { id: 'utilverse-installed', app: 'utilverse', metric: 'installed', source: 'Google Play', scope: 'android', timeZone: null, testTraffic: 'closed-test', points: october([[16, 19], [17, 18], [18, 18], [19, 17]]) },
   { id: 'choose-revenue', app: 'choose-window', metric: 'revenue', source: 'AdMob', scope: 'ios-kr-banner', timeZone: 'Asia/Seoul', currency: 'USD', estimated: true, testTraffic: 'not-excluded', points: october([[20, 0]]) },
-  ...historicalSeries,
+  // Fresh Date-only reports retain verified history under the same series ID;
+  // the earlier snapshot must not become a second line for the same population.
+  ...historicalSeries.filter(series => !combinedSeries.some(current => current.id === series.id)),
+  ...combinedSeries,
   ...storeSeries,
   ...iosSeries,
   ...platformSeries,

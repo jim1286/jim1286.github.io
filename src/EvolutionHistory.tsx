@@ -10,6 +10,12 @@ const c = getCopy();
 // Record dates are not release dates. Evidence and audit boundaries live in
 // docs/EVOLUTION_HISTORY_SOURCES.md; private repository links stay off the public page.
 const entries = [
+  { topic: 'design', id: 'strongselection', date: '2026-10-21', status: c.evolutionStrongselectionProduct, title: c.evolutionStrongselectionTitle, why: c.evolutionStrongselectionWhy, change: c.evolutionStrongselectionChange, result: c.evolutionStrongselectionResult, evidence: c.evolutionStrongselectionEvidence },
+  { topic: 'design', id: 'postcardslots', date: '2026-10-21', status: c.evolutionPostcardslotsProduct, title: c.evolutionPostcardslotsTitle, why: c.evolutionPostcardslotsWhy, change: c.evolutionPostcardslotsChange, result: c.evolutionPostcardslotsResult, evidence: c.evolutionPostcardslotsEvidence },
+  { topic: 'clients', id: 'letterpages', date: '2026-10-21', status: c.evolutionLetterpagesProduct, title: c.evolutionLetterpagesTitle, why: c.evolutionLetterpagesWhy, change: c.evolutionLetterpagesChange, result: c.evolutionLetterpagesResult, evidence: c.evolutionLetterpagesEvidence },
+  { topic: 'clients', id: 'boardingphoto', date: '2026-10-20', status: c.evolutionBoardingphotoProduct, title: c.evolutionBoardingphotoTitle, why: c.evolutionBoardingphotoWhy, change: c.evolutionBoardingphotoChange, result: c.evolutionBoardingphotoResult, evidence: c.evolutionBoardingphotoEvidence },
+  { topic: 'data', id: 'dbbaseline', date: '2026-10-20', status: c.evolutionDbbaselineProduct, title: c.evolutionDbbaselineTitle, why: c.evolutionDbbaselineWhy, change: c.evolutionDbbaselineChange, result: c.evolutionDbbaselineResult, evidence: c.evolutionDbbaselineEvidence },
+  { topic: 'quality', id: 'nativecompat', date: '2026-10-21', status: c.evolutionNativecompatProduct, title: c.evolutionNativecompatTitle, why: c.evolutionNativecompatWhy, change: c.evolutionNativecompatChange, result: c.evolutionNativecompatResult, evidence: c.evolutionNativecompatEvidence },
   { topic: 'data', id: 'jobs', date: '2026-10-18', status: c.historyDocsCode, title: c.historyJobsTitle, why: c.historyJobsWhy, change: c.historyJobsChange, result: c.historyJobsResult, evidence: c.historyJobsEvidence },
   { topic: 'ops', id: 'flutter', date: '2026-10-18', status: c.historyRetired, title: c.historyFlutterTitle, why: c.historyFlutterWhy, change: c.historyFlutterChange, result: c.historyFlutterResult, evidence: c.historyFlutterEvidence },
   { topic: 'design', id: 'screens', date: '2026-10-15', status: c.historyAdopted, title: c.historyScreensTitle, why: c.historyScreensWhy, change: c.historyScreensChange, result: c.historyScreensResult, evidence: c.historyScreensEvidence },
@@ -102,7 +108,7 @@ export function EvolutionHistory() {
   return <Stack gap="xl">
     <Text as="p" variant="caption" tone="muted">{c.historyNotice}</Text>
     <Tabs id="evolution-topics" label={c.historyTopicLabel} value={topic} onValueChange={setTopic}
-      indicator="filled" items={topics.map(item => ({ id: item.id, label: `${item.label} · ${entries.filter(entry => entry.topic === item.id).length}` }))} renderPanels={false} />
+      indicator="solid" items={topics.map(item => ({ id: item.id, label: `${item.label} · ${entries.filter(entry => entry.topic === item.id).length}` }))} renderPanels={false} />
     <TabPanel tabsId="evolution-topics" value={topic} activeValue={topic} mode="keyed" key={topic}>
       <Stack gap="xl">
         <Stack gap="sm"><Heading level="level2">{selected.label}</Heading><Text as="p" tone="muted">{selected.description}</Text></Stack>

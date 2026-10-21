@@ -85,12 +85,6 @@ function ProductCard({ app }: { app: PortfolioApp }) {
     </Stack>
   </Card>;
 }
-function ChapterNext({ href, label }: { href: string; label: string }) {
-  return <div className="chapter-next"><Stack gap="sm">
-    <Text variant="caption" tone="muted">{c.nextLabel}</Text>
-    <Link href={href} variant="standalone" tone="neutral">{label}</Link>
-  </Stack></div>;
-}
 function AboutPanel() {
   const journey = [[c.journey1, c.journey1Body], [c.journey2, c.journey2Body], [c.journey3, c.journey3Body], [c.journey4, c.journey4Body]];
   return <Stack gap="xl">
@@ -122,7 +116,7 @@ function AboutPanel() {
       </Grid>
     </Section></div>
     <Surface padding="xl" tone="sunken" radius="lg"><Stack gap="md"><Heading level="level2">{c.overviewAi}</Heading><Text as="p" tone="muted">{c.overviewAiBody}</Text></Stack></Surface>
-    <ChapterNext href="#structure" label={c.nextStructure} />
+
   </Stack>;
 }
 function WorkCases() {
@@ -149,7 +143,7 @@ function AppsPanel() {
     <Section id="discontinued" tabIndex={-1} title={c.pastProducts} description={c.discontinuedDescription}>
       <Collapsible trigger={c.discontinuedTitle} defaultOpen={window.location.hash === '#discontinued'}><Grid columns={{ compact: 1, medium: 2 }} gap={{ compact: 'lg' }}>{discontinuedApps.map(app => <ProductCard key={app.id} app={app} />)}</Grid></Collapsible>
     </Section>
-    <ChapterNext href="#performance" label={c.performanceNav} />
+
   </Stack>;
 }
 function StructurePanel() {
@@ -164,7 +158,7 @@ function StructurePanel() {
       {title:c.structureRepoTitle,body:c.structureRepoBody}, {title:c.structureSharedTitle,body:c.structureSharedBody},
       {title:c.structureRulesTitle,body:c.structureRulesBody}, {title:c.structureLifecycleTitle,body:c.structureLifecycleBody},
     ]} /></Section>
-    <ChapterNext href="#design" label={c.nextDesign} />
+
   </Stack>;
 }
 function DesignPanel() {
@@ -173,13 +167,13 @@ function DesignPanel() {
   return <Stack gap="xl">
     <Intro eyebrow="02 / SYSTEM ARCHITECTURE" title={c.designTopTitle} description={c.designTopIntro} />
     <div className="chapter-block"><DrillArchitecture /></div>
-    <ChapterNext href="#apps" label={c.nextProducts} />
+
   </Stack>;
 }
 function HistoryPanel() {
   return <Stack gap="xl"><Intro eyebrow="05 / EVOLUTION LOG" title={c.historyTitle} description={c.historyIntro} />
     <EvolutionHistory />
-    <ChapterNext href="#support" label={c.nextContact} />
+
   </Stack>;
 }
 function SupportPanel() {
@@ -221,7 +215,7 @@ export default function App() {
       /></Container></header>
     }>
       <div id="main" tabIndex={-1}>
-        <div className="tabs-bar"><Container size="content" gutter="regular"><Tabs id="portfolio-tabs" overflow="scroll" indicator="filled" label={c.portfolioTabs} value={active} onValueChange={value => { window.location.hash = value; }} items={tabItems} renderPanels={false} /></Container></div>
+        <div className="tabs-bar"><Container size="content" gutter="regular"><Tabs id="portfolio-tabs" overflow="scroll" indicator="underline" label={c.portfolioTabs} value={active} onValueChange={value => { window.location.hash = value; }} items={tabItems} renderPanels={false} /></Container></div>
         <div className="panel-wrap" id="panel-start"><Container size="content" gutter="regular">
           <TabPanel tabsId="portfolio-tabs" activeValue={active} value={active} mode="keyed" key={`${active}:${hash}`}>{panels[active]}</TabPanel>
         </Container></div>

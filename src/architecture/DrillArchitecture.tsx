@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState, type KeyboardEvent, type MouseEvent } from 'react';
+import { useEffect, useMemo, useState, type KeyboardEvent } from 'react';
 import { Link } from '@hjmds/react/actions';
 import { Breadcrumb } from '@hjmds/react/breadcrumb';
 import { DataTable } from '@hjmds/react/data-table';
@@ -105,7 +105,6 @@ function ArchCanvas({ view, onDetail }: { view: ArchView; onDetail: (node: ArchN
   const full = useMemo(() => viewBoxOf(view), [view]);
   const [box, setBox] = useState<Box>(() => pendingEntry ? [full[0] + full[2] * 0.3, full[1] + full[3] * 0.3, full[2] * 0.4, full[3] * 0.4] : full);
   const [hover, setHover] = useState<string | null>(null);
-  const busy = useRef(false);
   const byId = useMemo(() => Object.fromEntries(view.nodes.map(n => [n.id, n])), [view]);
   const H = view.h ?? DEFAULT_H;
 
@@ -123,16 +122,6 @@ function ArchCanvas({ view, onDetail }: { view: ArchView; onDetail: (node: ArchN
     return keep;
   }, [hover, view]);
 
-  async function drill(event: MouseEvent, node: ArchNode) {
-    if (event.metaKey || event.ctrlKey || event.shiftKey || event.button !== 0) return;
-    event.preventDefault();
-    if (busy.current || !node.drill) return;
-    busy.current = true;
-    const w = node.w * 2.2, h = w / (box[2] / box[3]);
-    await animateBox(setBox, box, [node.x + node.w / 2 - w / 2, node.y + H / 2 - h / 2, w, h], 320);
-    pendingEntry = true;
-    window.location.hash = archHref(node.drill);
-  }
   const detailKey = (event: KeyboardEvent, node: ArchNode) => {
     if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); onDetail(node); }
   };
@@ -180,9 +169,8 @@ function ArchCanvas({ view, onDetail }: { view: ArchView; onDetail: (node: ArchN
         </>;
         const common = { className: `arch-node${n.drill ? ' is-drill' : ''}${dim ? ' is-dim' : ''}`, 'data-type': n.type,
           onMouseEnter: () => setHover(n.id), onMouseLeave: () => setHover(null), onFocus: () => setHover(n.id), onBlur: () => setHover(null) };
-        return n.drill
-          ? <a key={n.id} href={archHref(n.drill)} aria-label={c.archEnterAction.replace('{name}', n.label)} onClick={event => void drill(event, n)} {...common}>{body}</a>
-          : <g key={n.id} role="button" tabIndex={0} aria-label={c.archDetailAction.replace('{name}', n.label)} onClick={() => onDetail(n)} onKeyDown={event => detailKey(event, n)} {...common}>{body}</g>;
+        // Keep the product description available before following a shared design reference.
+        return <g key={n.id} role="button" tabIndex={0} aria-label={c.archDetailAction.replace('{name}', n.label)} onClick={() => onDetail(n)} onKeyDown={event => detailKey(event, n)} {...common}>{body}</g>;
       })}
       {view.edges.map((e, i) => {
         if (!e.label) return null;
@@ -237,6 +225,9 @@ export function DrillArchitecture() {
     <SidePanel open={detail !== null} onOpenChange={open => { if (!open) setDetail(null); }} title={detail?.label ?? ''} description={detail ? `${KINDS[detail.type]} · ${detail.sub}` : undefined} closeLabel={c.archPanelClose} edge="end" size="regular">
       {detail && <Stack gap="lg">
         {detail.detail && <Text as="p">{detail.detail}</Text>}
+        {detail.drill && <Link href={archHref(detail.drill)} variant="standalone" onClick={event => {
+          if (!event.metaKey && !event.ctrlKey && !event.shiftKey && !event.altKey && event.button === 0) pendingEntry = true;
+        }}>{(view.id.startsWith('app-') ? c.archSharedDesignAction : c.archViewAction).replace('{name}', ARCH_VIEWS[detail.drill].title)}</Link>}
         {[[c.archPanelIncoming, view.edges.filter(e => e.to === detail.id).map(e => linkText(e, e.from))], [c.archPanelOutgoing, view.edges.filter(e => e.from === detail.id).map(e => linkText(e, e.to))]]
           .filter(([, items]) => items.length > 0)
           .map(([title, items]) => <Stack key={title as string} gap="xs">
