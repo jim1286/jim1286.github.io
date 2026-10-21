@@ -1938,6 +1938,6 @@ export const ko = {
   "performanceMarketingDaily": "일별 채널 추이",
   "performanceMarketingNoDaily": "Instagram은 최근 30일 기간 집계만 제공해 일별 추이를 표시하지 않습니다.",
   "performanceMarketingWindowNote": "최근 30일은 제공 화면의 기간 이름입니다. 정확한 시작·종료일과 오늘 포함 여부는 표시되지 않았습니다. 현재 팔로워 수는 수집 시점 기준입니다.",
-  "performanceMarketingThreadsRange": "차트 제공 기간: 2026.09.26–10.20 · 25일. 기간 조회수는 공식 표시값이며, 조회한 사람은 일별 값을 합산하지 않습니다. 반응의 미표시 날짜는 비워 둡니다.",
+  "performanceMarketingThreadsRange": "기간 조회수는 공식 표시값이며, 조회한 사람은 일별 값을 합산하지 않습니다. 반응의 미표시 날짜는 비워 둡니다.",
   "performanceMarketingPosts": "게시물별 관측도 보기",
 } as const;

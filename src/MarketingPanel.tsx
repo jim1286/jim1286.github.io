@@ -47,7 +47,7 @@ function AccountPerformance({ platform }: { platform: MarketingPlatform }) {
         formatValue={value => count.format(value)} missingLabel={c.performanceMissing} />
     </>}
     <StatisticGroup label={c.performanceMarketingAccount} density="compact" descriptor={{ columns: 2, items }} />
-    <Text as="p" variant="caption" tone="muted">{account.chartRange ? c.performanceMarketingThreadsRange : c.performanceMarketingNoDaily}</Text>
+    <Text as="p" variant="caption" tone="muted">{account.chartRange ? `${account.chartRange.start} — ${account.chartRange.end} · ${dates.length}일. ${c.performanceMarketingThreadsRange}` : c.performanceMarketingNoDaily}</Text>
     <Collapsible trigger={c.performanceMarketingNotes}><Text as="p" variant="caption" tone="muted">{c.performanceMarketingWindowNote}</Text></Collapsible>
   </Stack></Card>;
 }
