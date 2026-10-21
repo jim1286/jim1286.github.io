@@ -15,7 +15,7 @@ import { DataTable } from '@hjmds/react/data-table';
 import { Collapsible } from '@hjmds/react/collapsible';
 import { getCopy } from './i18n';
 import { apps } from './siteData';
-import { accountRevenueTotal, capturedAt, comparison, datesBetween, forApp, latest, metricSeries, periodEnd, valuesForDates, type Metric, type MetricSeries } from './performance/data';
+import { capturedAt, comparison, datesBetween, forApp, latest, metricSeries, periodEnd, valuesForDates, type Metric, type MetricSeries } from './performance/data';
 
 const c = getCopy();
 // Outcome reporting covers the seven active products; archived products and the
@@ -30,18 +30,20 @@ const appName = (id: string) => products.find(app => app.id === id)?.name ?? id;
 const formatValue = (metric: Metric, value: number) => metric === 'revenue' ? money.format(value) : number.format(value);
 function sourceLabel(series: MetricSeries) {
   const scopes = { android: c.performancePlayScope, 'ios-kr-banner': c.performanceIosBanner, 'admob-account': c.performanceAccountScope, 'ga4-all': c.performanceGa4Scope, 'ios-observed': c.performanceIosObserved, 'android-observed': c.performanceAndroidObserved,
-    'apple-store-all': c.performanceAppleStoreScope, 'play-store-all': c.performancePlayStoreScope, 'play-installed-all': c.performancePlayInstalledScope, 'play-active-all': c.performancePlayActiveScope };
+    'apple-store-all': c.performanceAppleStoreScope, 'play-store-all': c.performancePlayStoreScope, 'play-installed-all': c.performancePlayInstalledScope, 'play-active-all': c.performancePlayActiveScope, 'ga4-ios': c.performanceGa4IosScope };
   return `${series.source} · ${scopes[series.scope]} · ${series.timeZone ?? c.performanceUnknownZone}`;
 }
+const sourceKey = (series: MetricSeries): string => series.source === 'GA4' && series.scope === 'ga4-ios' ? 'GA4-iOS' : series.source;
 const unitLabel = (series: MetricSeries) => series.unit === 'views' ? c.performanceViewsUnit : series.unit === 'devices' ? c.performanceDevicesUnit : c.performancePeopleUnit;
 function metricSummary(app: string, metric: Metric) {
   const series = forApp(app, metric);
   const point = series && latest(series);
-  const label = metric === 'visitors' && series?.source === 'App Store Connect' ? c.performanceProductPageViews : metrics.find(item => item.id === metric)?.label ?? c.performanceInstalled;
+  const baseLabel = metric === 'visitors' && series?.source === 'App Store Connect' ? c.performanceProductPageViews : metrics.find(item => item.id === metric)?.label ?? c.performanceInstalled;
+  const label = series && (metric === 'dau' || metric === 'new') ? `${baseLabel} · ${series.scope === 'ga4-ios' ? 'iOS' : series.source === 'Google Play' ? 'Android' : c.performanceCombinedOs}` : baseLabel;
   if (!point || !series) return { id: metric, label, value: '—', hint: c.performanceMissing };
   const diff = metric !== 'revenue' ? comparison(series, 1) : null;
   const delta = diff ? `${c.performancePreviousDay} ${diff.delta > 0 ? '+' : ''}${number.format(diff.delta)}${diff.percent === null ? '' : ` (${diff.percent > 0 ? '+' : ''}${number.format(diff.percent)}%)`}` : '';
-  return { id: metric, label, value: formatValue(metric, point.value), suffix: metric === 'revenue' ? undefined : unitLabel(series), hint: `${dateLabel(point.date)} · ${metric === 'revenue' ? `${sourceLabel(series)} · ${c.performanceEstimatedRounded}` : series.source}${point.provisional ? ` · ${c.performanceProvisional}` : ''}${delta ? ` · ${delta}` : ''}` };
+  return { id: metric, label, value: formatValue(metric, point.value), suffix: metric === 'revenue' ? undefined : unitLabel(series), hint: `${dateLabel(point.date)} · ${metric === 'revenue' ? `${sourceLabel(series)} · ${c.performanceEstimatedRounded}` : series.scope === 'ga4-ios' ? 'GA4 · iOS' : series.source}${point.provisional ? ` · ${c.performanceProvisional}` : ''}${delta ? ` · ${delta}` : ''}` };
 }
 function AppSummary({ app }: { app: typeof products[number] }) {
   const available = metrics.filter(metric => forApp(app.id, metric.id));
@@ -55,13 +57,13 @@ function Trends({ app }: { app: string | null }) {
   const { environment } = useHjmTheme();
   const [metric, setMetric] = useState<Metric>('dau');
   const [period, setPeriod] = useState('month');
-  const [source, setSource] = useState<string>(app ? forApp(app, 'dau')?.source ?? 'GA4' : 'Google Play');
-  const candidates = metricSeries.filter(item => item.metric === metric && (app === null ? metric === 'revenue' ? item.app === null : item.app !== null && products.some(product => product.id === item.app) : item.app === app));
-  const sources = [...new Set(candidates.filter(item => item.points.length).map(item => item.source))];
-  const activeSource = sources.includes(source as MetricSeries['source']) ? source : sources[0];
+  const [source, setSource] = useState<string>(app ? (forApp(app, 'dau') ? sourceKey(forApp(app, 'dau')!) : 'GA4') : 'Google Play');
+  const candidates = metricSeries.filter(item => item.metric === metric && (app === null ? item.app !== null && products.some(product => product.id === item.app) : item.app === app));
+  const sources = [...new Set(candidates.filter(item => item.points.length).map(sourceKey))];
+  const activeSource = sources.includes(source) ? source : sources[0];
   // GA4 active users and Play DAU have distinct definitions: source selection
   // changes the whole plot rather than joining incompatible observations.
-  const series = candidates.filter(item => item.source === activeSource && item.points.length > 0);
+  const series = candidates.filter(item => sourceKey(item) === activeSource && item.points.length > 0);
   const points = series.flatMap(item => item.points);
   const weekStart = new Date(`${periodEnd}T00:00:00Z`);
   weekStart.setUTCDate(weekStart.getUTCDate() - (period === 'week' ? 6 : 29));
@@ -73,18 +75,17 @@ function Trends({ app }: { app: string | null }) {
   const hasValues = series.some(item => valuesForDates(item, dates).some(value => value !== null));
   return <Card title={c.performanceTrend} headingLevel={2} padding="lg"><Stack gap="lg">
     <Text variant="caption" tone="muted">{c.performanceSnapshotNote}</Text>
-    <StatisticGroup label={c.performanceOverview} presentation="surface" descriptor={{ columns: 2, items: app ? [
+    <StatisticGroup label={c.performanceOverview} presentation="surface" descriptor={{ columns: app ? 2 : 1, items: app ? [
       metricSummary(app, 'dau'), metricSummary(app, 'new'),
       metricSummary(app, 'visitors'),
       metricSummary(app, 'revenue'),
     ] : [
       { id: 'coverage', label: c.performanceObservedProducts, value: `${products.filter(product => metricSeries.some(item => item.app === product.id)).length} / ${products.length}`, hint: c.performanceCoverageHint },
-      { id: 'revenue', label: c.performanceAccountRevenue, value: money.format(accountRevenueTotal.value), hint: `${dateLabel(accountRevenueTotal.start)} — ${dateLabel(accountRevenueTotal.end)} · ${c.performanceEstimated}` },
     ] }} />
     <Tabs id="performance-metric" label={c.performanceKeyMetrics} value={metric} onValueChange={value => setMetric(value as Metric)}
       indicator="solid" items={metrics.map(item => ({ id: item.id, label: item.label }))} renderPanels={false} />
     {sources.length > 1 && <SegmentedControl label={c.performanceSource} value={activeSource} onValueChange={setSource} presentation="pills"
-      items={sources.map(value => ({ value, label: value === 'GA4' ? c.performanceGa4Source : value === 'App Store Connect' ? c.performanceAppleSource : metric === 'visitors' ? c.performancePlayVisitorsSource : c.performancePlaySource }))} />}
+      items={sources.map(value => ({ value, label: value === 'GA4-iOS' ? c.performanceGa4IosSource : value === 'GA4' ? c.performanceGa4Source : value === 'App Store Connect' ? c.performanceAppleSource : metric === 'visitors' ? c.performancePlayVisitorsSource : c.performancePlaySource }))} />}
     <SegmentedControl label={c.performancePeriod} value={period} onValueChange={setPeriod} presentation="pills"
       items={[{ value: 'week', label: c.performanceWeek }, { value: 'month', label: c.performanceMonth }, { value: 'all', label: c.performanceAllPeriod }]} />
     <TabPanel tabsId="performance-metric" activeValue={metric} value={metric} mode="keyed" key={metric}>
@@ -97,7 +98,7 @@ function Trends({ app }: { app: string | null }) {
         <ChartLegend items={chartSeries.map(({ id, label, color }) => ({ id, label, color }))} />
         <Collapsible trigger={c.performanceCollectionNotes}><Stack gap="sm">
           {[...new Set(series.map(sourceLabel))].map(label => <Text key={label} variant="caption" tone="muted">{label}</Text>)}
-          <Text as="p" variant="caption" tone="muted">{metric === 'revenue' ? c.performanceRevenueCaveat : metric === 'visitors' ? c.performanceVisitorsCaveat : activeSource === 'GA4' ? c.performanceGa4Caveat : c.performanceUsersCaveat}</Text>
+          <Text as="p" variant="caption" tone="muted">{metric === 'revenue' ? c.performanceRevenueCaveat : metric === 'visitors' ? c.performanceVisitorsCaveat : activeSource === 'GA4-iOS' ? c.performanceGa4IosCaveat : activeSource === 'GA4' ? c.performanceGa4Caveat : c.performanceUsersCaveat}</Text>
           <Text as="p" variant="caption" tone="muted">{c.performanceGapNote}</Text>
         </Stack></Collapsible>
       </Stack> : <EmptyState density="compact" title={c.performanceMissing} description={c.performanceMissingBody} />}
@@ -127,16 +128,16 @@ function Overview() {
 }
 function Milestones({ app }: { app: string }) {
   const items = [
-    { id: 'baseballrecords', app: 'yajalal', date: '2026-10-16', title: c.evolutionBaseballrecordsTitle, description: c.performanceMilestoneData },
-    { id: 'toolbox', app: 'utilverse', date: '2026-10-01', title: c.evolutionToolboxTitle, description: c.performanceMilestoneNoBefore },
-    { id: 'expo', app: 'choose-window', date: '2026-10-18', title: c.evolutionExpoTitle, description: c.performanceMilestoneNoRevenue },
-    { id: 'handwriting', app: 'diairy', date: '2026-10-05', title: c.evolutionHandwritingTitle, description: c.performanceMilestoneNoRevenue },
-    { id: 'runnablefeed', app: 'burntok', date: '2026-09-26', title: c.evolutionRunnablefeedTitle, description: c.performanceMilestoneNoBefore },
-    { id: 'meadow', app: 'spint', date: '2026-10-13', title: c.evolutionMeadowTitle, description: c.performanceMilestoneAfter },
-    { id: 'flightlookup', app: 'unairplane', date: '2026-10-08', title: c.evolutionFlightlookupTitle, description: c.performanceMilestoneNoRevenue },
+    { id: 'baseballrecords', app: 'yajalal', date: '2026-10-16', title: c.evolutionBaseballrecordsTitle },
+    { id: 'toolbox', app: 'utilverse', date: '2026-10-01', title: c.evolutionToolboxTitle },
+    { id: 'expo', app: 'choose-window', date: '2026-10-18', title: c.evolutionExpoTitle },
+    { id: 'handwriting', app: 'diairy', date: '2026-10-05', title: c.evolutionHandwritingTitle },
+    { id: 'runnablefeed', app: 'burntok', date: '2026-09-26', title: c.evolutionRunnablefeedTitle },
+    { id: 'meadow', app: 'spint', date: '2026-10-13', title: c.evolutionMeadowTitle },
+    { id: 'flightlookup', app: 'unairplane', date: '2026-10-08', title: c.evolutionFlightlookupTitle },
   ].filter(item => item.app === app);
   return <Card title={c.performanceDevelopment} headingLevel={2} padding="lg"><Stack gap="lg">
-    {items.length ? <Timeline items={items.map(item => ({ id: item.id, label: item.title, timestamp: dateLabel(item.date), dateTime: item.date, description: item.description }))}
+    {items.length ? <Timeline items={items.map(item => ({ id: item.id, label: item.title, timestamp: dateLabel(item.date), dateTime: item.date, description: c.performanceMilestoneContext }))}
       composeAccessibleName={({ position, total, label }) => `${position}/${total} ${label}`}
       renderActions={() => <Link href="#history" variant="standalone" tone="neutral">{c.performanceHistoryLink} →</Link>} /> : <Text as="p" tone="muted">{c.performanceMilestoneMissing}</Text>}
     <Text as="p" variant="caption" tone="muted">{c.performanceNoCausality}</Text>

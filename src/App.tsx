@@ -149,7 +149,7 @@ function AppsPanel() {
     <Section id="discontinued" tabIndex={-1} title={c.pastProducts} description={c.discontinuedDescription}>
       <Collapsible trigger={c.discontinuedTitle} defaultOpen={window.location.hash === '#discontinued'}><Grid columns={{ compact: 1, medium: 2 }} gap={{ compact: 'lg' }}>{discontinuedApps.map(app => <ProductCard key={app.id} app={app} />)}</Grid></Collapsible>
     </Section>
-    <ChapterNext href="#history" label={c.historyNext} />
+    <ChapterNext href="#performance" label={c.performanceNav} />
   </Stack>;
 }
 function StructurePanel() {

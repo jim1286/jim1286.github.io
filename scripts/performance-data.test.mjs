@@ -16,7 +16,7 @@ test('GA4 and Play stay separate, and newest source is identified rather than ad
   assert.equal(forApp('burntok', 'revenue'), undefined);
 });
 test('daily comparisons use the exact preceding date and do not divide by zero', () => {
-  const series = forApp('yajalal', 'dau');
+  const series = metricSeries.find(item => item.app === 'yajalal' && item.scope === 'play-active-all');
   assert.deepEqual(comparison(series, 1), { previous: { date: '2026-10-13', value: 3 }, current: { date: '2026-10-14', value: 6 }, delta: 3, percent: 100 });
   assert.equal(comparison({ ...series, points: [{ date: '2026-10-10', value: 2 }, { date: '2026-10-12', value: 3 }] }, 1), null);
   assert.equal(comparison({ ...series, points: [{ date: '2026-10-11', value: 0 }, { date: '2026-10-12', value: 3 }] }, 1).percent, null);
@@ -55,4 +55,18 @@ test('legacy product history retains true daily users without inventing missing 
   assert.ok(today.points.length > 300);
   assert.deepEqual(valuesForDates(choice, ['2026-02-14', '2026-03-04', '2026-10-14']), [17, 21, null]);
   assert.equal(metricSeries.filter(item => item.app === 'yajalal' && item.source === 'Google Play' && item.metric === 'dau').length, 1);
+});
+
+test('iPhone users retain the iOS filter and do not replace Android observations', () => {
+  const ios = forApp('yajalal', 'dau');
+  assert.equal(ios.scope, 'ga4-ios');
+  assert.equal(ios.source, 'GA4');
+  assert.equal(ios.points.at(-1).value, 5);
+  assert.equal(forApp('yajalal', 'new').points.at(-1).value, 0);
+  assert.equal(metricSeries.find(item => item.app === 'yajalal' && item.scope === 'play-active-all').points.at(-1).value, 6);
+});
+
+test('public observations include only the seven requested products', () => {
+  const allowed = new Set(['yajalal', 'choose-window', 'burntok', 'unairplane', 'diairy', 'spint', 'utilverse']);
+  assert.ok(metricSeries.every(series => allowed.has(series.app)));
 });

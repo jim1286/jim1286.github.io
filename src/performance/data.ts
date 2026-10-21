@@ -1,5 +1,6 @@
 // Public, aggregate observations only. Provenance and revisions are documented in
 // docs/PERFORMANCE.md; account totals must never be assigned to an individual app.
+import { iosCapturedAt, iosSeries } from './iosHistory.ts';
 import { historicalSeries } from './history.ts';
 import { storeCapturedAt, storeSeries } from './storeHistory.ts';
 export type Metric = 'dau' | 'new' | 'installed' | 'revenue' | 'visitors' | 'activeDevices';
@@ -9,7 +10,7 @@ export type MetricSeries = {
   app: string | null;
   metric: Metric;
   source: 'Google Play' | 'AdMob' | 'GA4' | 'App Store Connect';
-  scope: 'android' | 'ios-kr-banner' | 'admob-account' | 'ga4-all' | 'ios-observed' | 'android-observed' | 'apple-store-all' | 'play-store-all' | 'play-installed-all' | 'play-active-all';
+  scope: 'android' | 'ios-kr-banner' | 'admob-account' | 'ga4-all' | 'ios-observed' | 'android-observed' | 'apple-store-all' | 'play-store-all' | 'play-installed-all' | 'play-active-all' | 'ga4-ios';
   timeZone: string | null;
   currency?: 'USD';
   estimated?: boolean;
@@ -21,7 +22,7 @@ export type MetricSeries = {
   testTraffic: 'not-excluded' | 'closed-test';
   points: Observation[];
 };
-export const capturedAt = storeCapturedAt;
+export const capturedAt = [storeCapturedAt, iosCapturedAt].sort((a, b) => Date.parse(b) - Date.parse(a))[0];
 export const periodEnd = '2026-10-20';
 const october = (values: [number, number][]): Observation[] => values.map(([day, value]) => ({ date: `2026-10-${String(day).padStart(2, '0')}`, value }));
 export const metricSeries: MetricSeries[] = [
@@ -30,14 +31,12 @@ export const metricSeries: MetricSeries[] = [
   { id: 'utilverse-dau', app: 'utilverse', metric: 'dau', source: 'Google Play', scope: 'android', timeZone: null, testTraffic: 'closed-test', points: october([[14, 21]]) },
   { id: 'utilverse-installed', app: 'utilverse', metric: 'installed', source: 'Google Play', scope: 'android', timeZone: null, testTraffic: 'closed-test', points: october([[16, 19], [17, 18], [18, 18], [19, 17]]) },
   { id: 'choose-revenue', app: 'choose-window', metric: 'revenue', source: 'AdMob', scope: 'ios-kr-banner', timeZone: 'Asia/Seoul', currency: 'USD', estimated: true, testTraffic: 'not-excluded', points: october([[20, 0]]) },
-  // Only the 10/20 app breakdown is known. Earlier days remain account-scoped.
-  { id: 'account-revenue', app: null, metric: 'revenue', source: 'AdMob', scope: 'admob-account', timeZone: 'Asia/Seoul', currency: 'USD', estimated: true, testTraffic: 'not-excluded',
-    points: october([[1, 0], [2, 0], [3, 0], [4, 0], [5, 0], [6, .01], [7, 0], [8, 0], [9, 0], [10, 0], [11, 0], [12, 0], [13, .01], [14, 0], [15, .01], [16, 0], [17, .01], [18, .01], [19, 0], [20, 0]]) },
   ...historicalSeries,
   ...storeSeries,
+  ...iosSeries,
 ];
-// Use the provider's period total: rounded daily labels do not reconstruct it.
-export const accountRevenueTotal = { start: '2026-09-21', end: periodEnd, value: .10, currency: 'USD', estimated: true } as const;
+// Account-wide ad totals are retained in research only: their app scope has not
+// been proven to exclude the products omitted from this public dashboard.
 
 export function datesBetween(start: string, end: string): string[] {
   const dates: string[] = [];
