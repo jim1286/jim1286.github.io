@@ -1185,7 +1185,6 @@ export const ko = {
 "designChangeUiBody": "공개 API와 설치 버전의 호환성을 확인하고 바뀐 계약을 사용하는 웹·앱의 해당 동작을 확인합니다. 공통 구현의 수정과 패키지 게시, 제품 채택은 별개 단계로 관리합니다.",
 "designChangeResultTitle": "완료는 확인한 범위로 설명",
 "designChangeResultBody": "구현·검증·배포·실제 반영을 구분합니다. 실패는 원인을 소유한 지점에서 고치고 같은 조건으로 재확인합니다. 구체적인 전달과 복구는 운영 탭, 검증 방법은 QA 탭으로 이어집니다.",
-"designStepOverall": "전체",
 "designStepClient": "앱·웹",
 "designStepServer": "서버",
 "designStepState": "공용 기반",
@@ -1904,4 +1903,10 @@ export const ko = {
 "archKindExternal": "외부 · 주체",
 "archTableLabel": "앱별 공통 요소 사용 표",
 "archTableSortColumn": "{header} 정렬",
+"archCodeCrumb": "코드 구조",
+"archCodeHint": "아래 관점을 눌러 코드 구조의 다른 면으로 이동합니다.",
+"archCodeOthers": "코드 구조의 다른 관점",
+"archOverviewCodeLabel": "코드 구조",
+"archOverviewCodeSub": "역할 · 계층 · 요청 흐름",
+"archOverviewCodeDetail": "제품 실행과 공용 기반의 경계, 앱·웹 계층, 서버 모듈, 공용 기반 내부, 요청에서 결과까지의 흐름을 봅니다.",
 } as const;

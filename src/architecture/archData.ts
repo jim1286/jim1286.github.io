@@ -11,8 +11,11 @@ export type ArchNode = { id: string; type: ArchNodeType; x: number; y: number; w
 export type ArchEdge = { from: string; to: string; label?: string; variant?: ArchEdgeVariant; path?: number[][] };
 export type ArchCard = { tone: 'primary' | 'brand' | 'neutral' | 'danger'; title: string; items: string[] };
 export type ArchTableRow = { id: string; view: string; cells: Record<'app' | 'client' | 'server' | 'host' | 'hjm' | 'release' | 'ota' | 'login', string> };
+export type ArchCodeStage = 'overall' | 'client' | 'server' | 'state' | 'change';
 export type ArchView = {
   id: string; parent: string | null; title: string; crumb: string; hint: string;
+  /** Code-structure views render the role diagrams from SystemArchitecture instead of a node map. */
+  code?: ArchCodeStage;
   nodes: ArchNode[]; edges: ArchEdge[]; boundaries: { label: string; wraps: string[] }[]; cards: ArchCard[];
   table?: { title: string; rows: ArchTableRow[] };
 };
@@ -1281,3 +1284,28 @@ export const ARCH_VIEWS: Record<string, ArchView> = {
     ],
   },
 };
+
+// Code-structure layer (moved from the design tab's former five-step list, 2026-10-21).
+// Each view reuses the role diagrams, role cards and contracts in SystemArchitecture.
+const codeView = (id: string, code: ArchCodeStage, title: string, crumb: string, parent: string | null): ArchView =>
+  ({ id, code, parent, title, crumb, hint: c.archCodeHint, nodes: [], edges: [], boundaries: [], cards: [] });
+Object.assign(ARCH_VIEWS, {
+  'code-overall': codeView('code-overall', 'overall', c.systemArch15, c.archCodeCrumb, 'overview'),
+  'code-client': codeView('code-client', 'client', c.systemArch43, c.designStepClient, 'code-overall'),
+  'code-server': codeView('code-server', 'server', c.systemArch71, c.designStepServer, 'code-overall'),
+  'code-state': codeView('code-state', 'state', c.systemArch115, c.designStepState, 'code-overall'),
+  'code-change': codeView('code-change', 'change', c.systemArch143, c.designStepChange, 'code-overall'),
+});
+export const CODE_VIEWS = ['code-overall', 'code-client', 'code-server', 'code-state', 'code-change'] as const;
+
+// Entry points into the code layer: the overview gets its own node, app clients and API
+// servers open the matching layer, and the HJM module opens the shared-base layer.
+ARCH_VIEWS.overview.nodes.push({ id: 'code', type: 'frontend', x: 1010, y: 40, w: 160, label: c.archOverviewCodeLabel, sub: c.archOverviewCodeSub, detail: c.archOverviewCodeDetail, drill: 'code-overall' });
+for (const view of Object.values(ARCH_VIEWS)) {
+  if (!view.id.startsWith('app-')) continue;
+  for (const node of view.nodes) {
+    if (node.id === 'mobile' || node.id === 'web') node.drill = 'code-client';
+    if (node.id === 'server' && node.type === 'backend') node.drill = 'code-server';
+  }
+}
+ARCH_VIEWS.std.nodes.find(node => node.id === 'hjm')!.drill = 'code-state';

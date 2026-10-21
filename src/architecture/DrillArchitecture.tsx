@@ -6,7 +6,11 @@ import { Card } from '@hjmds/react/display';
 import { Grid, Section, Stack, Text } from '@hjmds/react/layout';
 import { SidePanel } from '@hjmds/react/side-panel';
 import { getCopy } from '../i18n';
-import { ARCH_VIEWS, type ArchEdge, type ArchNode, type ArchNodeType, type ArchView } from './archData';
+import { ClientContracts } from '../ClientContracts';
+import { ServerContracts } from '../ServerContracts';
+import { SystemArchitecture } from '../SystemArchitecture';
+import { Collapsible } from '@hjmds/react/collapsible';
+import { ARCH_VIEWS, CODE_VIEWS, type ArchEdge, type ArchNode, type ArchNodeType, type ArchView } from './archData';
 
 const c = getCopy();
 const H = 62;
@@ -203,9 +207,21 @@ export function DrillArchitecture() {
   const linkText = (e: ArchEdge, other: string) => `${byId[other].label}${e.label ? ` · ${e.label}` : ''}`;
   const table = view.table;
 
+  const crumbs = <Breadcrumb label={c.archBreadcrumbLabel} items={chain.map((v, i) => i === chain.length - 1 ? { id: v.id, label: v.crumb } : { id: v.id, label: v.crumb, destination: { kind: 'internal', href: archHref(v.id) } })} />;
+  if (view.code) return <Section title={c.archSectionTitle} description={c.archSectionIntro}><Stack gap="lg">
+    {crumbs}
+    <SystemArchitecture stage={view.code} />
+    {view.code === 'client' && <Collapsible trigger={c.archExpandClients}><ClientContracts /></Collapsible>}
+    {view.code === 'server' && <Collapsible trigger={c.archExpandServer}><ServerContracts /></Collapsible>}
+    <Stack gap="xs">
+      <Text emphasis="strong">{c.archCodeOthers}</Text>
+      <div className="arch-code-links">{CODE_VIEWS.filter(id => id !== view.id).map(id => <Link key={id} href={archHref(id)} variant="standalone" tone="neutral">{ARCH_VIEWS[id].crumb}</Link>)}</div>
+    </Stack>
+  </Stack></Section>;
+
   return <Section title={c.archSectionTitle} description={c.archSectionIntro}><Stack gap="lg">
     <Card title={view.title} headingLevel={3} padding="lg"><Stack gap="md">
-      <Breadcrumb label={c.archBreadcrumbLabel} items={chain.map((v, i) => i === chain.length - 1 ? { id: v.id, label: v.crumb } : { id: v.id, label: v.crumb, destination: { kind: 'internal', href: archHref(v.id) } })} />
+      {crumbs}
       <ArchCanvas view={view} onDetail={setDetail} />
       <Text as="p" variant="caption" tone="muted">{view.hint}</Text>
       <div className="arch-legend" aria-label={c.archLegendTitle}>

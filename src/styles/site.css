@@ -97,3 +97,4 @@ path.arch-edge-dashed { stroke-dasharray: 3 4; }
 .arch-legend i { display: inline-block; width: 16px; height: 10px; border-radius: 3px; border: 1.5px solid var(--arch-stroke); background: color-mix(in srgb, var(--arch-stroke) 12%, transparent); }
 .arch-legend [data-drill] i { border-style: dashed; border-color: var(--hjm-color-text-muted); background: transparent; }
 .arch-list { margin: 0; padding-inline-start: 1.1em; display: grid; gap: var(--hjm-space-xs); }
+.arch-code-links { display: flex; flex-wrap: wrap; gap: var(--hjm-space-xs) var(--hjm-space-lg); }

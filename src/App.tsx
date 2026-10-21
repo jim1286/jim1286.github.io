@@ -20,9 +20,6 @@ import { apps, discontinuedApps, legalDocuments, portfolioSummary, storybookUrl,
 import './styles/site.css';
 import { EvolutionHistory } from './EvolutionHistory';
 import { DevelopmentFlow, WorkflowMap } from './WorkflowMap';
-import { ClientContracts } from './ClientContracts';
-import { ServerContracts } from './ServerContracts';
-import { SystemArchitecture } from './SystemArchitecture';
 import { ModuleGuides } from './ModuleGuides';
 import { AreaFlow, MarketingFlow } from './FlowDiagram';
 import { DrillArchitecture } from './architecture/DrillArchitecture';
@@ -182,11 +179,7 @@ function StructurePanel() {
     <ChapterNext href="#design" label={c.nextDesign} />
   </Stack>;
 }
-const designReadingSteps = [
-  {id:'overall',label:c.designStepOverall}, {id:'client',label:c.designStepClient},
-  {id:'server',label:c.designStepServer}, {id:'state',label:c.designStepState}, {id:'change',label:c.designStepChange},
-];
-function ReadingSteps({ current, onChange, steps = designReadingSteps }: { current:string; onChange:(id:string)=>void; steps?:{id:string;label:string}[] }) {
+function ReadingSteps({ current, onChange, steps }: { current:string; onChange:(id:string)=>void; steps:{id:string;label:string}[] }) {
   // This cursor locates an explanation, not task completion or measured reading progress.
   return <Steps descriptor={{steps,currentStepId:current,navigationMode:"free"}} onStepPress={onChange}
     statusLabels={{pending:c.designStepPending,current:c.designStepCurrent,complete:c.designStepComplete,error:c.designStepError}}
@@ -205,14 +198,11 @@ function ReadingFlow({ title, flow, caption }: { title:string; flow:string; capt
     boxes={steps.map((step,i)=>({id:String(i),title:step,detail:''}))} />;
 }
 function DesignPanel() {
-  const [current,setCurrent] = useState("overall");
+  // 2026-10-21: the code-structure stages moved into the drill-down (code-* views) so the
+  // tab has one way to navigate; the former five-step list duplicated it.
   return <Stack gap="xl">
     <Intro eyebrow="02 / SYSTEM ARCHITECTURE" title={c.designTopTitle} description={c.designTopIntro} />
     <div className="chapter-block"><DrillArchitecture /></div>
-    <ReadingSteps current={current} onChange={setCurrent} />
-    <div className="chapter-block"><SystemArchitecture stage={current} /></div>
-    {current === 'client' && <Collapsible trigger={c.archExpandClients}><ClientContracts /></Collapsible>}
-    {current === 'server' && <Collapsible trigger={c.archExpandServer}><ServerContracts /></Collapsible>}
     <ChapterNext href="#operations" label={c.nextOperations} />
   </Stack>;
 }
