@@ -25,12 +25,6 @@ img { display: block; max-width: 100%; }
 @media (max-width: 399px) { .header-role { display: none; } }
 @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
 
-/* SVG is the process content; public HJM tokens follow the product theme. */
-.process-diagram { overflow-x: auto; max-width: 100%; }
-.process-diagram svg { display: block; width: 100%; min-width: 640px; max-width: 740px; margin-inline: auto; height: auto; font-family: inherit; }
-
-.area-flow { display: block; width: 100%; max-width: 360px; height: auto; margin-inline: auto; font-family: inherit; }
-
 /* Chapter spacing is editorial placement; HJM owns every component's internals. */
 .chapter-block { padding-block: var(--hjm-space-lg); }
 .chapter-next { padding-block: var(--hjm-space-xl); }
@@ -44,9 +38,6 @@ img { display: block; max-width: 100%; }
 .workspace-tree { max-width: 100%; overflow-x: auto; margin: 0; padding-block: var(--hjm-space-md); color: var(--hjm-color-text); line-height: 1.85; font-size: 14px; tab-size: 4; }
 .workspace-tree code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
 
-/* Architecture labels keep a readable size; overflow belongs to each diagram. */
-.architecture-scroll { max-width: 100%; overflow-x: auto; overscroll-behavior-inline: contain; }
-.architecture-map { display: block; width: 100%; min-width: 760px; max-width: 1000px; height: auto; margin-inline: auto; font-family: inherit; }
 
 /* Drill-down architecture (src/architecture). Node roles map to public HJM color tokens so the
    map follows the site theme; the SVG geometry and drill navigation are product-owned. */

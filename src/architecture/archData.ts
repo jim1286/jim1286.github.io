@@ -1,4 +1,5 @@
 import { getCopy } from '../i18n';
+import { buildLegacyViews } from './legacyViews';
 
 const c = getCopy();
 
@@ -8,16 +9,14 @@ const c = getCopy();
 export type ArchNodeType = 'frontend' | 'backend' | 'database' | 'cloud' | 'security' | 'external';
 export type ArchEdgeVariant = 'emphasis' | 'security' | 'dashed';
 export type ArchNode = { id: string; type: ArchNodeType; x: number; y: number; w: number; label: string; sub: string; tag?: string; detail?: string; drill?: string };
-export type ArchEdge = { from: string; to: string; label?: string; variant?: ArchEdgeVariant; path?: number[][] };
+export type ArchEdge = { from: string; to: string; label?: string; variant?: ArchEdgeVariant; path?: number[][]; labelAt?: [number, number] };
 export type ArchCard = { tone: 'primary' | 'brand' | 'neutral' | 'danger'; title: string; items: string[] };
 export type ArchTableRow = { id: string; view: string; cells: Record<'app' | 'client' | 'server' | 'host' | 'hjm' | 'release' | 'ota' | 'login', string> };
-export type ArchCodeStage = 'overall' | 'client' | 'server' | 'state' | 'change';
 export type ArchView = {
   id: string; parent: string | null; title: string; crumb: string; hint: string;
-  /** Code-structure views render the role diagrams from SystemArchitecture instead of a node map. */
-  code?: ArchCodeStage;
-  /** Page views carry content moved from the former operations and QA tabs. */
-  section?: 'guide' | 'marketing' | 'qa';
+  /** Node height for views that keep the fixed geometry of a moved diagram (default 62). */
+  h?: number;
+  links?: { label: string; href: string }[];
   nodes: ArchNode[]; edges: ArchEdge[]; boundaries: { label: string; wraps: string[] }[]; cards: ArchCard[];
   table?: { title: string; rows: ArchTableRow[] };
 };
@@ -1287,18 +1286,9 @@ export const ARCH_VIEWS: Record<string, ArchView> = {
   },
 };
 
-// Code-structure layer (moved from the design tab's former five-step list, 2026-10-21).
-// Each view reuses the role diagrams, role cards and contracts in SystemArchitecture.
-const codeView = (id: string, code: ArchCodeStage, title: string, crumb: string, parent: string | null): ArchView =>
-  ({ id, code, parent, title, crumb, hint: c.archCodeHint, nodes: [], edges: [], boundaries: [], cards: [] });
-Object.assign(ARCH_VIEWS, {
-  'code-overall': codeView('code-overall', 'overall', c.systemArch15, c.archCodeCrumb, 'overview'),
-  'code-client': codeView('code-client', 'client', c.systemArch43, c.designStepClient, 'code-overall'),
-  'code-server': codeView('code-server', 'server', c.systemArch71, c.designStepServer, 'code-overall'),
-  'code-state': codeView('code-state', 'state', c.systemArch115, c.designStepState, 'code-overall'),
-  'code-change': codeView('code-change', 'change', c.systemArch143, c.designStepChange, 'code-overall'),
-});
-export const CODE_VIEWS = ['code-overall', 'code-client', 'code-server', 'code-state', 'code-change'] as const;
+// Code structure, work guides, QA and marketing (moved from the former design stages and
+// operations/QA tabs, 2026-10-21) are drawn as node maps from their original diagram data.
+Object.assign(ARCH_VIEWS, buildLegacyViews());
 
 // Entry points into the code layer: the overview gets its own node, app clients and API
 // servers open the matching layer, and the HJM module opens the shared-base layer.
@@ -1310,17 +1300,8 @@ for (const view of Object.values(ARCH_VIEWS)) {
     if (node.id === 'server' && node.type === 'backend') node.drill = 'code-server';
   }
 }
-ARCH_VIEWS.std.nodes.find(node => node.id === 'hjm')!.drill = 'code-state';
+ARCH_VIEWS.std.nodes.find(node => node.id === 'hjm')!.drill = 'code-hjm';
 
-// Former operations and QA tabs (removed 2026-10-21). Guides and QA hang under the dev Mac,
-// where that work happens; marketing hangs under the overview.
-const pageView = (id: string, section: 'guide' | 'marketing' | 'qa', title: string, crumb: string, parent: string): ArchView =>
-  ({ id, section, parent, title, crumb, hint: c.archPageHint, nodes: [], edges: [], boundaries: [], cards: [] });
-Object.assign(ARCH_VIEWS, {
-  guide: pageView('guide', 'guide', c.operationsGuide, c.archGuideCrumb, 'dev'),
-  qa: pageView('qa', 'qa', c.qaTitle, c.navQa, 'dev'),
-  marketing: pageView('marketing', 'marketing', c.operationsMarketing, c.archMarketingCrumb, 'overview'),
-});
 ARCH_VIEWS.overview.nodes.push({ id: 'marketing', type: 'external', x: 40, y: 40, w: 190, label: c.archOverviewMarketingLabel, sub: c.archOverviewMarketingSub, detail: c.archOverviewMarketingDetail, drill: 'marketing' });
 ARCH_VIEWS.dev.nodes.push({ id: 'guide', type: 'frontend', x: 900, y: 400, w: 200, label: c.archDevGuideLabel, sub: c.archDevGuideSub, drill: 'guide' });
 ARCH_VIEWS.dev.nodes.find(node => node.id === 'checks')!.drill = 'qa';

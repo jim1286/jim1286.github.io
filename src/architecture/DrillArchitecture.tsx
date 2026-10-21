@@ -6,15 +6,10 @@ import { Card } from '@hjmds/react/display';
 import { Grid, Section, Stack, Text } from '@hjmds/react/layout';
 import { SidePanel } from '@hjmds/react/side-panel';
 import { getCopy } from '../i18n';
-import { ClientContracts } from '../ClientContracts';
-import { ServerContracts } from '../ServerContracts';
-import { SystemArchitecture } from '../SystemArchitecture';
-import { Collapsible } from '@hjmds/react/collapsible';
-import { GuideSection, MarketingSection, QaSection } from './sections';
-import { ARCH_VIEWS, CODE_VIEWS, type ArchEdge, type ArchNode, type ArchNodeType, type ArchView } from './archData';
+import { ARCH_VIEWS, type ArchEdge, type ArchNode, type ArchNodeType, type ArchView } from './archData';
 
 const c = getCopy();
-const H = 62;
+const DEFAULT_H = 62;
 const PAD = 36;
 const ROUTE_PREFIX = '#design/arch/';
 const KINDS: Record<ArchNodeType, string> = {
@@ -35,7 +30,7 @@ function viewFromHash(hash: string) {
 // animation is handed across that remount through module state.
 let pendingEntry = false;
 
-function autoPath(a: ArchNode, b: ArchNode): number[][] {
+function autoPath(a: ArchNode, b: ArchNode, H: number): number[][] {
   const lo = Math.max(a.x, b.x), hi = Math.min(a.x + a.w, b.x + b.w);
   if (hi - lo > 12) { const x = (lo + hi) / 2; return a.y < b.y ? [[x, a.y + H], [x, b.y]] : [[x, a.y], [x, b.y + H]]; }
   const ylo = Math.max(a.y, b.y), yhi = Math.min(a.y + H, b.y + H);
@@ -74,6 +69,7 @@ function useTextWidth() {
 }
 
 function viewBoxOf(view: ArchView): Box {
+  const H = view.h ?? DEFAULT_H;
   const xs = view.nodes.flatMap(n => [n.x - 10, n.x + n.w + 10]);
   const ys = view.nodes.flatMap(n => [n.y - 16, n.y + H + 10]);
   for (const e of view.edges) for (const p of e.path ?? []) { xs.push(p[0]); ys.push(p[1] - 10); }
@@ -111,6 +107,7 @@ function ArchCanvas({ view, onDetail }: { view: ArchView; onDetail: (node: ArchN
   const [hover, setHover] = useState<string | null>(null);
   const busy = useRef(false);
   const byId = useMemo(() => Object.fromEntries(view.nodes.map(n => [n.id, n])), [view]);
+  const H = view.h ?? DEFAULT_H;
 
   useEffect(() => {
     if (!pendingEntry) return;
@@ -140,7 +137,7 @@ function ArchCanvas({ view, onDetail }: { view: ArchView; onDetail: (node: ArchN
     if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); onDetail(node); }
   };
 
-  const edgeShape = (e: ArchEdge) => e.path ?? autoPath(byId[e.from], byId[e.to]);
+  const edgeShape = (e: ArchEdge) => e.path ?? autoPath(byId[e.from], byId[e.to], H);
   const dimEdge = (e: ArchEdge) => related !== null && e.from !== hover && e.to !== hover;
 
   return <div className="arch-scroll" role="region" aria-label={view.title} tabIndex={0}>
@@ -170,8 +167,8 @@ function ArchCanvas({ view, onDetail }: { view: ArchView; onDetail: (node: ArchN
           <rect className="arch-body" x={n.x} y={n.y} width={n.w} height={H} rx="10" />
           {n.drill && <rect className="arch-ring" x={n.x - 5} y={n.y - 5} width={n.w + 10} height={H + 10} rx="13" />}
           <NodeIcon type={n.type} x={n.x + 9} y={n.y + 8} />
-          <text className="arch-label" x={n.x + n.w / 2} y={n.y + 30} textAnchor="middle">{n.label}</text>
-          <text className="arch-sub" x={n.x + n.w / 2} y={n.y + 47} textAnchor="middle">{n.sub}</text>
+          <text className="arch-label" x={n.x + n.w / 2} y={n.y + H / 2 - 1} textAnchor="middle">{n.label}</text>
+          <text className="arch-sub" x={n.x + n.w / 2} y={n.y + H / 2 + 16} textAnchor="middle">{n.sub}</text>
           {n.tag && <g className="arch-tag">
             <rect x={n.x + 8} y={n.y - 9} width={textWidth(n.tag, 9.5, 600) + 12} height="17" rx="5" />
             <text x={n.x + 14} y={n.y + 3}>{n.tag}</text>
@@ -189,7 +186,7 @@ function ArchCanvas({ view, onDetail }: { view: ArchView; onDetail: (node: ArchN
       })}
       {view.edges.map((e, i) => {
         if (!e.label) return null;
-        const [x, y] = labelPoint(edgeShape(e)), w = textWidth(e.label, 10) + 16;
+        const [x, y] = e.labelAt ?? labelPoint(edgeShape(e)), w = textWidth(e.label, 10) + 16;
         return <g key={i} className={`arch-pill${dimEdge(e) ? ' is-dim' : ''}`}>
           <rect x={x - w / 2} y={y - 9} width={w} height="18" rx="9" />
           <text x={x} y={y + 3.5} textAnchor="middle">{e.label}</text>
@@ -211,28 +208,12 @@ export function DrillArchitecture() {
   const table = view.table;
 
   const crumbs = <Breadcrumb label={c.archBreadcrumbLabel} items={chain.map((v, i) => i === chain.length - 1 ? { id: v.id, label: v.crumb } : { id: v.id, label: v.crumb, destination: { kind: 'internal', href: archHref(v.id) } })} />;
-  if (view.section) return <Section title={c.archSectionTitle} description={c.archSectionIntro}><Stack gap="lg">
-    {crumbs}
-    <Card title={view.title} headingLevel={3} padding="lg">
-      {view.section === 'guide' ? <GuideSection /> : view.section === 'marketing' ? <MarketingSection /> : <QaSection />}
-    </Card>
-  </Stack></Section>;
-  if (view.code) return <Section title={c.archSectionTitle} description={c.archSectionIntro}><Stack gap="lg">
-    {crumbs}
-    <SystemArchitecture stage={view.code} />
-    {view.code === 'client' && <Collapsible trigger={c.archExpandClients}><ClientContracts /></Collapsible>}
-    {view.code === 'server' && <Collapsible trigger={c.archExpandServer}><ServerContracts /></Collapsible>}
-    <Stack gap="xs">
-      <Text emphasis="strong">{c.archCodeOthers}</Text>
-      <div className="arch-code-links">{CODE_VIEWS.filter(id => id !== view.id).map(id => <Link key={id} href={archHref(id)} variant="standalone" tone="neutral">{ARCH_VIEWS[id].crumb}</Link>)}</div>
-    </Stack>
-  </Stack></Section>;
-
   return <Section title={c.archSectionTitle} description={c.archSectionIntro}><Stack gap="lg">
     <Card title={view.title} headingLevel={3} padding="lg"><Stack gap="md">
       {crumbs}
       <ArchCanvas view={view} onDetail={setDetail} />
       <Text as="p" variant="caption" tone="muted">{view.hint}</Text>
+      {view.links && <div className="arch-code-links">{view.links.map(link => <Link key={link.href} href={link.href} target="_blank" rel="noreferrer noopener" variant="standalone" tone="neutral">{link.label} ↗</Link>)}</div>}
       <div className="arch-legend" aria-label={c.archLegendTitle}>
         {kinds.map(kind => <span key={kind} data-type={kind}><i aria-hidden />{KINDS[kind]}</span>)}
         <span data-drill><i aria-hidden />{c.archLegendDrill}</span>
