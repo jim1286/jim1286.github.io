@@ -89,12 +89,12 @@ function Trends({ app }: { app: string | null }) {
   const [source, setSource] = useState<string>(metricSeries.some(item => item.scope === 'ga4-ios-app' && (!app || item.app === app)) ? 'GA4-iOS-app' : app ? (forApp(app, 'dau') ? sourceKey(forApp(app, 'dau')!) : 'GA4') : 'GA4-iOS');
   const candidates = metricSeries.filter(item => item.metric === metric && (app === null ? item.app !== null && products.some(product => product.id === item.app) : item.app === app));
   const allSources = [...new Set(candidates.filter(item => item.points.length).map(sourceKey))];
-  // Native app populations are the primary user comparison. Keep older OS/web
-  // aggregates in provenance rather than offering overlapping definitions as peers.
+  // Compare native platforms alongside the explicitly separate combined report.
+  // The broader OS=iOS snapshots remain provenance when native app data exists.
   const nativeSources = allSources.filter(value => value === 'GA4-iOS-app' || value === 'GA4-Android-app');
   const platformSources = allSources.filter(value => value === 'GA4-iOS' || value === 'Google Play');
   const sources = metric === 'dau' || metric === 'new'
-    ? nativeSources.length ? nativeSources : platformSources.length ? platformSources : allSources
+    ? nativeSources.length ? [...allSources.filter(value => value === 'GA4'), ...nativeSources] : platformSources.length ? [...allSources.filter(value => value === 'GA4'), ...platformSources] : allSources
     : allSources;
   const activeSource = sources.includes(source) ? source : sources[0];
   // GA4 active users and Play DAU have distinct definitions: source selection
@@ -120,12 +120,13 @@ function Trends({ app }: { app: string | null }) {
     {sources.length > 1 && <Select accessibilityLabel={c.performanceSource} selectedKey={activeSource} onSelectionChange={value => { if (value) setSource(value); }}
       placeholder={c.performanceSource} emptySelectionLabel={c.performanceSource} disallowEmptySelection
       items={sources.map(value => {
-        const label = value === 'GA4-iOS-app' ? c.performanceGa4NativeIosSource : value === 'GA4-Android-app' ? c.performanceGa4NativeAndroidSource : value === 'GA4-iOS' ? c.performanceGa4IosSource : value === 'GA4' ? c.performanceGa4Source : value === 'App Store Connect' ? c.performanceAppleSource : metric === 'visitors' ? c.performancePlayVisitorsSource : c.performancePlaySource;
+        const label = value === 'GA4-iOS-app' ? c.performanceGa4NativeIosSource : value === 'GA4-Android-app' ? c.performanceGa4NativeAndroidSource : value === 'GA4-iOS' ? c.performanceGa4IosSource : value === 'GA4' ? c.performanceGa4CombinedSource : value === 'App Store Connect' ? c.performanceAppleSource : metric === 'visitors' ? c.performancePlayVisitorsSource : c.performancePlaySource;
         return { id: value, label, textValue: label };
       })} />}
     <Tabs id="performance-period" panelMode="dynamic" label={c.performancePeriod} value={period} onValueChange={setPeriod} indicator="solid" renderPanels={false}
       items={[{ id: 'week', label: c.performanceWeek }, { id: 'month', label: c.performanceMonth }, { id: 'all', label: c.performanceAllPeriod }]} />
     </Stack>
+    {activeSource === 'GA4' && <Text as="p" variant="caption" tone="muted">{c.performanceCombinedScopeNote} {series.flatMap(item => item.points.map(point => point.date)).sort().at(-1)?.replaceAll('-', '.')}</Text>}
     <TabPanel tabsId="performance-metric" activeValue={metric} value={metric} mode="keyed" key={metric}><TabPanel tabsId="performance-period" activeValue={period} mode="dynamic"><Stack gap="md">
       {hasValues ? <Stack gap="md">
         <Text variant="caption" tone="muted">{dateLabel(start)} — {dateLabel(periodEnd)} · {metric === 'revenue' ? c.performanceRevenueUnit : unitLabel(series[0])}</Text>

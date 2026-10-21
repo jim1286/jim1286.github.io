@@ -1943,4 +1943,6 @@ export const ko = {
   "performanceChartGuide": "실선·점은 실제 관측값, 옅은 점선은 미수집 구간의 연결 안내입니다.",
   "performanceChartSelectionHint": "범례에서 앱을 누르면 해당 앱만 표시합니다. 다시 누르면 전체를 봅니다. 숫자는 확보한 날짜 수입니다.",
   "performanceDaysUnit": "일",
+  "performanceGa4CombinedSource": "통합 · GA4",
+  "performanceCombinedScopeNote": "GA4 통합 집계 · 앱·웹 및 운영체제 미분리. 최신 확보일:",
 } as const;
