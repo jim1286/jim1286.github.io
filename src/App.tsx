@@ -25,6 +25,7 @@ import { ServerContracts } from './ServerContracts';
 import { SystemArchitecture } from './SystemArchitecture';
 import { ModuleGuides } from './ModuleGuides';
 import { AreaFlow, MarketingFlow } from './FlowDiagram';
+import { DrillArchitecture } from './architecture/DrillArchitecture';
 
 const c = getCopy();
 const developerEmail = 'jimin1286@gmail.com';
@@ -37,7 +38,8 @@ const tabItems = [
 // Preserve links already shared by the single-page portfolio. Hash changes also
 // restore the right panel on browser Back/Forward and locale direct entry.
 function tabForHash(hash: string) {
-  const id = hash.slice(1);
+  // Sub-routes such as #design/arch/ci keep their topic; the panel reads the rest of the path.
+  const id = hash.slice(1).split('/')[0];
   const aliases: Record<string, string> = { top: 'about', main: 'about', developer: 'about', discontinued: 'apps', workflow: 'operations', strategy: 'operations', legal: 'support', guidelines: 'design', marketing: 'operations', guidance: 'operations' };
   return aliases[id] ?? (tabItems.some(item => item.id === id) ? id : 'about');
 }
@@ -206,6 +208,7 @@ function DesignPanel() {
   const [current,setCurrent] = useState("overall");
   return <Stack gap="xl">
     <Intro eyebrow="02 / SYSTEM ARCHITECTURE" title={c.designTopTitle} description={c.designTopIntro} />
+    <div className="chapter-block"><DrillArchitecture /></div>
     <ReadingSteps current={current} onChange={setCurrent} />
     <div className="chapter-block"><SystemArchitecture stage={current} /></div>
     {current === 'client' && <Collapsible trigger={c.archExpandClients}><ClientContracts /></Collapsible>}

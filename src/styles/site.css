@@ -47,3 +47,53 @@ img { display: block; max-width: 100%; }
 /* Architecture labels keep a readable size; overflow belongs to each diagram. */
 .architecture-scroll { max-width: 100%; overflow-x: auto; overscroll-behavior-inline: contain; }
 .architecture-map { display: block; width: 100%; min-width: 760px; max-width: 1000px; height: auto; margin-inline: auto; font-family: inherit; }
+
+/* Drill-down architecture (src/architecture). Node roles map to public HJM color tokens so the
+   map follows the site theme; the SVG geometry and drill navigation are product-owned. */
+.arch-scroll { max-width: 100%; overflow-x: auto; overscroll-behavior-inline: contain; border-radius: var(--hjm-radius-md);
+  background-color: var(--hjm-color-surface-alt); background-image: radial-gradient(color-mix(in srgb, var(--hjm-color-border) 80%, transparent) 1px, transparent 1.2px); background-size: 18px 18px; }
+.arch-map { display: block; width: 100%; min-width: 820px; height: auto; font-family: inherit; }
+.arch-node, .arch-legend [data-type] { --arch-stroke: var(--hjm-color-text-sub); }
+[data-type="frontend"] { --arch-stroke: var(--hjm-color-primary); }
+[data-type="backend"] { --arch-stroke: var(--hjm-color-text-sub); }
+[data-type="database"] { --arch-stroke: var(--hjm-color-content-brand); }
+[data-type="cloud"] { --arch-stroke: var(--hjm-color-text-muted); }
+[data-type="security"] { --arch-stroke: var(--hjm-color-danger); }
+[data-type="external"] { --arch-stroke: var(--hjm-color-border-control); }
+.arch-node { cursor: pointer; outline: none; transition: opacity .2s; }
+.arch-mask { fill: var(--hjm-color-surface); }
+.arch-body { fill: color-mix(in srgb, var(--arch-stroke) 9%, var(--hjm-color-surface)); stroke: var(--arch-stroke); stroke-width: 1.5; transition: stroke-width .15s; }
+.arch-node[data-type="cloud"] .arch-body { stroke-dasharray: 5 3; }
+.arch-node:hover .arch-body, .arch-node:focus-visible .arch-body { stroke-width: 2.6; }
+.arch-node:focus-visible .arch-body { stroke: var(--hjm-color-focus); }
+.arch-ring { fill: none; stroke: var(--arch-stroke); stroke-dasharray: 4 3; opacity: .6; }
+.arch-icon { fill: none; stroke: var(--arch-stroke); stroke-width: 1.4; stroke-linecap: round; stroke-linejoin: round; }
+.arch-label { font-size: 13px; font-weight: 700; fill: var(--hjm-color-text); }
+.arch-sub { font-size: 10.5px; fill: var(--hjm-color-text-muted); }
+.arch-tag rect { fill: var(--hjm-color-surface); stroke: var(--arch-stroke); stroke-opacity: .6; }
+.arch-tag text { font-size: 9.5px; font-weight: 600; fill: var(--arch-stroke); }
+.arch-open rect { fill: var(--arch-stroke); }
+.arch-open text { font-size: 9.5px; font-weight: 700; fill: var(--hjm-color-surface); }
+.arch-boundary rect { fill: color-mix(in srgb, var(--hjm-color-surface) 55%, transparent); stroke: var(--hjm-color-border); }
+.arch-boundary text { font-size: 10.5px; font-weight: 600; fill: var(--hjm-color-text-muted); }
+.arch-edge { fill: none; stroke-width: 1.6; transition: opacity .2s; }
+.arch-edge-default { stroke: var(--hjm-color-text-muted); fill: var(--hjm-color-text-muted); }
+.arch-edge-emphasis { stroke: var(--hjm-color-primary); fill: var(--hjm-color-primary); }
+.arch-edge-security { stroke: var(--hjm-color-danger); fill: var(--hjm-color-danger); }
+.arch-edge-dashed { stroke: var(--hjm-color-text-weak); fill: var(--hjm-color-text-weak); }
+path.arch-edge { fill: none; }
+path.arch-edge-emphasis { stroke-width: 1.9; stroke-dasharray: 8 6; animation: arch-flow 1.1s linear infinite; }
+path.arch-edge-security { stroke-dasharray: 5 4; }
+path.arch-edge-dashed { stroke-dasharray: 3 4; }
+.arch-arrowhead { stroke: none; }
+.arch-pill rect { fill: var(--hjm-color-surface); stroke: var(--hjm-color-border); }
+.arch-pill text { font-size: 10px; fill: var(--hjm-color-text-muted); }
+.arch-pill, .arch-edge { transition: opacity .2s; }
+.arch-map .is-dim { opacity: .18; }
+@keyframes arch-flow { to { stroke-dashoffset: -14; } }
+@media (prefers-reduced-motion: reduce) { path.arch-edge-emphasis { animation: none; } }
+.arch-legend { display: flex; flex-wrap: wrap; gap: var(--hjm-space-xs) var(--hjm-space-lg); font-size: 12px; color: var(--hjm-color-text-muted); }
+.arch-legend span { display: inline-flex; align-items: center; gap: 6px; }
+.arch-legend i { display: inline-block; width: 16px; height: 10px; border-radius: 3px; border: 1.5px solid var(--arch-stroke); background: color-mix(in srgb, var(--arch-stroke) 12%, transparent); }
+.arch-legend [data-drill] i { border-style: dashed; border-color: var(--hjm-color-text-muted); background: transparent; }
+.arch-list { margin: 0; padding-inline-start: 1.1em; display: grid; gap: var(--hjm-space-xs); }
