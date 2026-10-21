@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { MarketingPanel } from './MarketingPanel';
 import { marketingObservations } from './performance/marketing';
-import { StatisticGroup, Timeline } from '@hjmds/react';
+import { Select, StatisticGroup, Timeline } from '@hjmds/react';
 import { Link } from '@hjmds/react/actions';
 import { Badge, Card, Tag } from '@hjmds/react/display';
 import { EmptyState } from '@hjmds/react/feedback';
@@ -106,8 +106,14 @@ function Trends({ app }: { app: string | null }) {
     <Tabs id="performance-metric" label={c.performanceKeyMetrics} value={metric} onValueChange={value => setMetric(value as Metric)}
       indicator="solid" items={metrics.map(item => ({ id: item.id, label: item.label }))} renderPanels={false} />
     <Stack axis="inline" gap="md" wrap>
-    {sources.length > 1 && <SegmentedControl label={c.performanceSource} value={activeSource} onValueChange={setSource} presentation="pills"
-      items={sources.map(value => ({ value, label: value === 'GA4-iOS-app' ? c.performanceGa4NativeIosSource : value === 'GA4-Android-app' ? c.performanceGa4NativeAndroidSource : value === 'GA4-iOS' ? c.performanceGa4IosSource : value === 'GA4' ? c.performanceGa4Source : value === 'App Store Connect' ? c.performanceAppleSource : metric === 'visitors' ? c.performancePlayVisitorsSource : c.performancePlaySource }))} />}
+    {/* Source options grow as native and web populations are verified; a Select
+        keeps that choice from pushing the daily chart below several button rows. */}
+    {sources.length > 1 && <Select accessibilityLabel={c.performanceSource} selectedKey={activeSource} onSelectionChange={value => { if (value) setSource(value); }}
+      placeholder={c.performanceSource} emptySelectionLabel={c.performanceSource} disallowEmptySelection
+      items={sources.map(value => {
+        const label = value === 'GA4-iOS-app' ? c.performanceGa4NativeIosSource : value === 'GA4-Android-app' ? c.performanceGa4NativeAndroidSource : value === 'GA4-iOS' ? c.performanceGa4IosSource : value === 'GA4' ? c.performanceGa4Source : value === 'App Store Connect' ? c.performanceAppleSource : metric === 'visitors' ? c.performancePlayVisitorsSource : c.performancePlaySource;
+        return { id: value, label, textValue: label };
+      })} />}
     <SegmentedControl label={c.performancePeriod} value={period} onValueChange={setPeriod} presentation="pills"
       items={[{ value: 'week', label: c.performanceWeek }, { value: 'month', label: c.performanceMonth }, { value: 'all', label: c.performanceAllPeriod }]} />
     </Stack>

@@ -5,7 +5,7 @@
 
 ## 화면과 데이터
 
-- `src/PerformancePanel.tsx`: `#performance` 및 `#performance/<app-id>`. HJM Tabs, SegmentedControl, StatisticGroup,
+- `src/PerformancePanel.tsx`: `#performance` 및 `#performance/<app-id>`. HJM Tabs, Select, SegmentedControl, StatisticGroup,
   Card, LineChart, ChartLegend, Timeline, DataTable, Collapsible을 사용한다. 제품 전용 차트 renderer·CSS는 없다.
 - 기본 지표는 활성 사용자·신규 사용자·스토어 방문·예상 광고 수익이다. 설치 사용자와 수집 현황은 펼침에서만 읽는다.
 - `src/performance/data.ts`: 최신 확보 관측, 날짜 축, 최신 출처 선택과 같은 날짜 정의의 증감 계산.
@@ -99,3 +99,5 @@ API 활성화·계정/분석 설정은 변경하지 않았다. 현재 접근 가
 최초 반영은 계정 `posli.makes`가 명시된 10/15·17·18·20 집계 11건이다. 게시물별 수집 시점 누적 조회·좋아요·댓글·프로필 방문 및 제공된 저장·공유를 보여 준다. 공개일을 일별 신규 조회일로 바꾸지 않으며, 게시물 표본을 계정 전체 성과나 정확한 24시간 성과로 표현하지 않는다. 도달과 조회한 사람을 바꾸어 쓰지 않는다. 앱별 설치·사용·수익으로 귀속하지 않으며 계정 전체 일별 추이·팔로워·링크 클릭은 실제 제공 범위를 추가 확인한다.
 
 2026-10-21 Date × Platform 임시 보고서의 실제 내보내기에서 선택의창·다에리·Spint·비행중의 iOS/Android 앱 관측을 추가했다(`platformHistory.ts`). 웹 플랫폼을 제외한 앱 자료이며 Production/Development 스트림은 미분리다. 기존 OS=iOS 자료를 그대로 보존하되 앱 요약은 확보된 native iOS 계열을 우선하며 서로의 시계열을 이어 붙이지 않는다. Android는 GA4 앱·Play DAU를 별도 출처로 선택한다. 선택의창은 2021-10-21–2026-10-20을 조회해 반환된 iOS122일·Android43일만 기록했다. 보고서 기본28일만 확보된 앱은 전체 역사로 표현하지 않는다.
+
+출처 종류가 늘어나면 여러 줄 버튼이 차트를 밀어내므로 출처 선택은 HJM Select로 표시한다. 기간은 짧은 7일·30일·전체 기간 선택을 유지하며 본문·차트는 문서 스크롤에서 끝까지 볼 수 있다.
