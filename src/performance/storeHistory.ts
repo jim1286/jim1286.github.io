@@ -1,7 +1,7 @@
 // Public aggregate store exports. Installed audience and DAU are separate metrics.
 // Exported zero padding is preserved; coverage and firstPositive do not assert an app launch date.
 import type { MetricSeries } from './data.ts';
-export const storeCapturedAt = "2026-10-22T08:48:10+09:00";
+export const storeCapturedAt = "2026-10-22T09:49:53+09:00";
 export const storeSeries: MetricSeries[] = [
   {
     "id": "store-yajalal-apple-store-all-visitors",
@@ -2529,11 +2529,16 @@ export const storeSeries: MetricSeries[] = [
       {
         "date": "2026-10-19",
         "value": 0
+      },
+      {
+        "date": "2026-10-20",
+        "value": 1,
+        "observedOn": "2026-10-22"
       }
     ],
     "coverage": {
       "start": "2026-07-22",
-      "end": "2026-10-19"
+      "end": "2026-10-20"
     },
     "firstPositive": "2026-09-29"
   },
@@ -2907,11 +2912,16 @@ export const storeSeries: MetricSeries[] = [
       {
         "date": "2026-10-19",
         "value": 0
+      },
+      {
+        "date": "2026-10-20",
+        "value": 1,
+        "observedOn": "2026-10-22"
       }
     ],
     "coverage": {
       "start": "2026-07-22",
-      "end": "2026-10-19"
+      "end": "2026-10-20"
     },
     "firstPositive": "2026-09-29"
   },
@@ -4306,7 +4316,7 @@ export const storeSeries: MetricSeries[] = [
     "timeZone": "UTC",
     "testTraffic": "closed-test",
     "points": [],
-    "missingReason": "App Store Connect reported App Analytics unavailable for this app; no date rows/export accessible."
+    "missingReason": "App Store Connect says this app is not currently available for App Analytics and directs a user with the management role to review analytics access. No daily values were available."
   },
   {
     "id": "store-utilverse-play-store-all-visitors",
