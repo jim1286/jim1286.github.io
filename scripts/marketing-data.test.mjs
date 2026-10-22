@@ -24,7 +24,11 @@ test('public marketing observations preserve actual dates, units and public post
 
 test('account summaries preserve unknown period boundaries and actual daily points', () => {
   for (const account of marketingAccounts) {
-    assert.equal(account.periodDates, null);
+    if (account.periodDates) {
+      assert.ok(account.periodDates.start <= account.periodDates.end);
+      assert.ok(account.periodDates.end <= account.observedAt.slice(0, 10));
+    }
+    assert.ok(Date.parse(account.dailyObservedAt) <= Date.parse(account.observedAt));
     assert.ok(Number.isFinite(Date.parse(account.observedAt)));
     for (const points of Object.values(account.daily)) {
       assert.equal(new Set(points.map(point => point.date)).size, points.length);

@@ -38,7 +38,7 @@ function AccountPerformance({ platform }: { platform: MarketingPlatform }) {
     ...(account.netFollowers === null ? [] : [{ id: 'net', label: c.performanceMarketingNetFollowers, value: count.format(account.netFollowers) }]),
   ];
   return <Card title={c.performanceMarketingAccount} headingLevel={2} padding="lg"><Stack gap="md">
-    <Text variant="caption" tone="muted">{account.windowLabel} · {c.performanceMarketingObserved} {time(account.observedAt)} KST</Text>
+    <Text variant="caption" tone="muted">{account.windowLabel}{account.periodDates ? ` · ${account.periodDates.start} — ${account.periodDates.end}` : ` · ${c.performanceMarketingUnknownDates}`} · {c.performanceMarketingObserved} {time(account.observedAt)} KST</Text>
     {dates.length > 0 && <>
       <Tabs id="marketing-account-metric" label={c.performanceMarketingDaily} value={metric} onValueChange={value => setMetric(value as AccountMarketingMetric)} items={options} renderPanels={false} />
       <LineChart categories={dates.map(date => date.slice(5).replace('-', '.'))}
@@ -48,7 +48,7 @@ function AccountPerformance({ platform }: { platform: MarketingPlatform }) {
       <Text as="p" variant="caption" tone="muted">{c.performanceChartGuide}</Text>
     </>}
     <StatisticGroup label={c.performanceMarketingAccount} density="compact" descriptor={{ columns: 2, items }} />
-    <Text as="p" variant="caption" tone="muted">{account.chartRange ? `${account.chartRange.start} — ${account.chartRange.end} · ${dates.length}일. ${c.performanceMarketingThreadsRange}` : c.performanceMarketingNoDaily}</Text>
+    <Text as="p" variant="caption" tone="muted">{account.chartRange ? `${account.chartRange.start} — ${account.chartRange.end} · ${dates.length}일 · ${c.performanceMarketingObserved} ${time(account.dailyObservedAt)} KST. ${c.performanceMarketingThreadsRange}` : c.performanceMarketingNoDaily}</Text>
     <Collapsible trigger={c.performanceMarketingNotes}><Text as="p" variant="caption" tone="muted">{c.performanceMarketingWindowNote}</Text></Collapsible>
   </Stack></Card>;
 }

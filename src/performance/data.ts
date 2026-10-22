@@ -7,7 +7,7 @@ import { iosCapturedAt, iosSeries } from './iosHistory.ts';
 import { historicalSeries } from './history.ts';
 import { storeCapturedAt, storeSeries } from './storeHistory.ts';
 export type Metric = 'dau' | 'new' | 'installed' | 'revenue' | 'visitors' | 'activeDevices';
-export type Observation = { date: string; value: number; observedOn?: string; provisional?: boolean };
+export type Observation = { date: string; value: number; observedOn?: string; provisional?: boolean; timeZone?: string | null };
 export type MetricSeries = {
   id: string;
   app: string | null;

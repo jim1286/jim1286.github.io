@@ -1,7 +1,7 @@
 // Public aggregate store exports. Installed audience and DAU are separate metrics.
 // Exported zero padding is preserved; coverage and firstPositive do not assert an app launch date.
 import type { MetricSeries } from './data.ts';
-export const storeCapturedAt = "2026-10-21T15:03:43+09:00";
+export const storeCapturedAt = "2026-10-22T08:48:10+09:00";
 export const storeSeries: MetricSeries[] = [
   {
     "id": "store-yajalal-apple-store-all-visitors",
@@ -15794,26 +15794,36 @@ export const storeSeries: MetricSeries[] = [
       },
       {
         "date": "2026-10-15",
-        "value": 2
+        "value": 2,
+        "observedOn": "2026-10-22"
       },
       {
         "date": "2026-10-16",
-        "value": 7
+        "value": 7,
+        "observedOn": "2026-10-22"
       },
       {
         "date": "2026-10-17",
-        "value": 6
+        "value": 6,
+        "observedOn": "2026-10-22"
       },
       {
         "date": "2026-10-18",
-        "value": 8
+        "value": 8,
+        "observedOn": "2026-10-22"
+      },
+      {
+        "date": "2026-10-19",
+        "value": 3,
+        "observedOn": "2026-10-22"
       }
     ],
     "coverage": {
       "start": "2021-10-22",
-      "end": "2026-10-19"
+      "end": "2026-10-21"
     },
-    "firstPositive": "2026-05-15"
+    "firstPositive": "2026-05-15",
+    "missingReason": "스토어 등록정보 방문자(설치되지 않은 사용자) 보고서에서 10/15~19 수치 제공. 10/20~21은 행 없음, 0으로 간주하지 않음."
   },
   {
     "id": "store-choose-window-play-active-all-dau",
@@ -18657,13 +18667,19 @@ export const storeSeries: MetricSeries[] = [
       {
         "date": "2026-10-14",
         "value": 6
+      },
+      {
+        "date": "2026-10-15",
+        "value": 4,
+        "observedOn": "2026-10-22"
       }
     ],
     "coverage": {
       "start": "2021-10-22",
-      "end": "2026-10-14"
+      "end": "2026-10-21"
     },
-    "firstPositive": "2025-08-10"
+    "firstPositive": "2025-08-10",
+    "missingReason": "DAU 보고서에서 10/15는 4. 10/16~19 UI에 대시(숫자 미제공), 10/20~21 행 미제공; 0으로 간주하지 않음."
   },
   {
     "id": "store-burntok-play-store-all-visitors",
@@ -22844,7 +22860,8 @@ export const storeSeries: MetricSeries[] = [
       },
       {
         "date": "2026-10-16",
-        "value": 1
+        "value": 1,
+        "observedOn": "2026-10-22"
       },
       {
         "date": "2026-10-17",
@@ -22857,9 +22874,32 @@ export const storeSeries: MetricSeries[] = [
     ],
     "coverage": {
       "start": "2025-11-08",
-      "end": "2026-10-18"
+      "end": "2026-10-21"
     },
     "firstPositive": "2026-09-02",
-    "missingReason": "345 numeric rows from 2025-11-08 through 2026-10-18; 339 explicit zeroes and 6 positive values. No numeric visitor values returned before 2025-11-08. The final export row (2026-10-19) is a dash for all-countries visitors; 2026-10-20 was not returned."
+    "missingReason": "2026-10-15~21 방문자(설치) 목표 보고서에서 10/16 전체 1, 일본 1 확인. 다른 날짜는 표에 행 미제공; 0으로 간주하지 않음."
+  },
+  {
+    "id": "store-utilverse-play-active-all-dau",
+    "app": "utilverse",
+    "metric": "dau",
+    "source": "Google Play",
+    "scope": "play-active-all",
+    "timeZone": null,
+    "unit": "users",
+    "unique": true,
+    "testTraffic": "closed-test",
+    "coverage": {
+      "start": "2026-10-15",
+      "end": "2026-10-21"
+    },
+    "points": [
+      {
+        "date": "2026-10-15",
+        "value": 21,
+        "observedOn": "2026-10-22"
+      }
+    ],
+    "missingReason": "실제 일일 활성 사용자(DAU) 보고서에서 10/15 값 21. 그 외 날짜 행 미제공; 0으로 간주하지 않음."
   }
 ];

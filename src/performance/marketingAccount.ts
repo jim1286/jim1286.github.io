@@ -1,44 +1,48 @@
 // Account Insights are separate from post-level cumulative snapshots.
-// A 30-day UI label does not prove exact report boundaries or daily availability.
+// Summary windows and retained daily observations have independent provenance.
 import type { MarketingPlatform } from './marketing';
 export type AccountMarketingMetric = 'views' | 'viewers' | 'interactions';
-export type MarketingAccount = { platform: MarketingPlatform; observedAt: string; windowLabel: string; periodDates: null; chartRange: { start: string; end: string } | null; views: number; viewers: number; interactions: number; profileActivity: number | null; followers: number; followersAsOf: string; netFollowers: number | null; daily: Record<AccountMarketingMetric, {date: string; value: number}[]> };
+export type MarketingAccount = { platform: MarketingPlatform; observedAt: string; windowLabel: string; periodDates: { start: string; end: string } | null; dailyObservedAt: string; chartRange: { start: string; end: string } | null; views: number; viewers: number; interactions: number; profileActivity: number | null; followers: number; followersAsOf: string; netFollowers: number | null; daily: Record<AccountMarketingMetric, {date: string; value: number}[]> };
 export const marketingAccounts: MarketingAccount[] = [
   {
     "platform": "instagram",
-    "observedAt": "2026-10-21T16:03:18+09:00",
-    "windowLabel": "최근 30일",
+    "observedAt": "2026-10-22T08:48:10+09:00",
+    "windowLabel": "최근 7일",
     "periodDates": null,
     "chartRange": null,
-    "views": 2219,
-    "viewers": 1400,
+    "views": 665,
+    "viewers": 41,
     "interactions": 131,
-    "profileActivity": 168,
-    "followers": 51,
-    "followersAsOf": "2026-10-21",
+    "profileActivity": 144,
+    "followers": 52,
+    "followersAsOf": "2026-10-22",
     "netFollowers": null,
     "daily": {
       "views": [],
       "viewers": [],
       "interactions": []
-    }
+    },
+    "dailyObservedAt": "2026-10-21T16:03:18+09:00"
   },
   {
     "platform": "threads",
-    "observedAt": "2026-10-21T16:03:18+09:00",
-    "windowLabel": "최근 30일",
-    "periodDates": null,
+    "observedAt": "2026-10-22T08:48:10+09:00",
+    "windowLabel": "최근 7일",
+    "periodDates": {
+      "start": "2026-10-14",
+      "end": "2026-10-20"
+    },
     "chartRange": {
       "start": "2026-09-26",
       "end": "2026-10-20"
     },
-    "views": 2571,
-    "viewers": 1098,
-    "interactions": 254,
+    "views": 1015,
+    "viewers": 295,
+    "interactions": 164,
     "profileActivity": null,
-    "followers": 24,
-    "followersAsOf": "2026-10-21",
-    "netFollowers": 21,
+    "followers": 25,
+    "followersAsOf": "2026-10-22",
+    "netFollowers": 14,
     "daily": {
       "views": [
         {
@@ -302,6 +306,7 @@ export const marketingAccounts: MarketingAccount[] = [
           "value": 2
         }
       ]
-    }
+    },
+    "dailyObservedAt": "2026-10-21T16:03:18+09:00"
   }
 ];

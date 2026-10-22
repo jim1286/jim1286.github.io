@@ -696,7 +696,7 @@ export const historicalSeries: MetricSeries[] = [
     "metric": "revenue",
     "source": "AdMob",
     "scope": "ios-observed",
-    "timeZone": "Asia/Seoul",
+    "timeZone": null,
     "currency": "USD",
     "estimated": true,
     "testTraffic": "not-excluded",
@@ -704,94 +704,119 @@ export const historicalSeries: MetricSeries[] = [
       {
         "date": "2026-10-01",
         "value": 0.0,
-        "observedOn": "2026-10-13"
+        "observedOn": "2026-10-13",
+        "timeZone": "Asia/Seoul"
       },
       {
         "date": "2026-10-02",
         "value": 0.0,
-        "observedOn": "2026-10-13"
+        "observedOn": "2026-10-13",
+        "timeZone": "Asia/Seoul"
       },
       {
         "date": "2026-10-03",
         "value": 0.0,
-        "observedOn": "2026-10-13"
+        "observedOn": "2026-10-13",
+        "timeZone": "Asia/Seoul"
       },
       {
         "date": "2026-10-04",
         "value": 0.0,
-        "observedOn": "2026-10-13"
+        "observedOn": "2026-10-13",
+        "timeZone": "Asia/Seoul"
       },
       {
         "date": "2026-10-05",
         "value": 0.0,
-        "observedOn": "2026-10-13"
+        "observedOn": "2026-10-13",
+        "timeZone": "Asia/Seoul"
       },
       {
         "date": "2026-10-06",
         "value": 0.0,
-        "observedOn": "2026-10-13"
+        "observedOn": "2026-10-13",
+        "timeZone": "Asia/Seoul"
       },
       {
         "date": "2026-10-07",
         "value": 0.0,
-        "observedOn": "2026-10-13"
+        "observedOn": "2026-10-13",
+        "timeZone": "Asia/Seoul"
       },
       {
         "date": "2026-10-08",
         "value": 0.0,
-        "observedOn": "2026-10-13"
+        "observedOn": "2026-10-13",
+        "timeZone": "Asia/Seoul"
       },
       {
         "date": "2026-10-09",
         "value": 0.0,
-        "observedOn": "2026-10-13"
+        "observedOn": "2026-10-13",
+        "timeZone": "Asia/Seoul"
       },
       {
         "date": "2026-10-10",
         "value": 0.0,
-        "observedOn": "2026-10-13"
+        "observedOn": "2026-10-13",
+        "timeZone": "Asia/Seoul"
       },
       {
         "date": "2026-10-11",
         "value": 0.0,
-        "observedOn": "2026-10-13"
+        "observedOn": "2026-10-13",
+        "timeZone": "Asia/Seoul"
       },
       {
         "date": "2026-10-12",
         "value": 0.0,
-        "observedOn": "2026-10-13"
+        "observedOn": "2026-10-13",
+        "timeZone": "Asia/Seoul"
       },
       {
         "date": "2026-10-13",
         "value": 0.01,
-        "observedOn": "2026-10-19"
+        "observedOn": "2026-10-19",
+        "timeZone": "Asia/Seoul"
       },
       {
         "date": "2026-10-14",
         "value": 0,
-        "observedOn": "2026-10-19"
+        "observedOn": "2026-10-19",
+        "timeZone": "Asia/Seoul"
       },
       {
         "date": "2026-10-15",
         "value": 0,
-        "observedOn": "2026-10-19"
+        "observedOn": "2026-10-22",
+        "timeZone": null
       },
       {
         "date": "2026-10-16",
         "value": 0,
-        "observedOn": "2026-10-19"
+        "observedOn": "2026-10-22",
+        "timeZone": null
       },
       {
         "date": "2026-10-17",
         "value": 0,
-        "observedOn": "2026-10-19"
+        "observedOn": "2026-10-22",
+        "timeZone": null
       },
       {
         "date": "2026-10-18",
         "value": 0,
-        "observedOn": "2026-10-19"
+        "observedOn": "2026-10-22",
+        "timeZone": null
+      },
+      {
+        "date": "2026-10-19",
+        "value": 0,
+        "observedOn": "2026-10-22",
+        "timeZone": null
       }
-    ]
+    ],
+    "missingReason": "20~21일 행 미제공. USD, 센트 단위 반올림."
   },
   {
     "id": "yajalal-admob-Android",
@@ -799,7 +824,7 @@ export const historicalSeries: MetricSeries[] = [
     "metric": "revenue",
     "source": "AdMob",
     "scope": "android-observed",
-    "timeZone": "Asia/Seoul",
+    "timeZone": null,
     "currency": "USD",
     "estimated": true,
     "testTraffic": "not-excluded",
@@ -807,64 +832,101 @@ export const historicalSeries: MetricSeries[] = [
       {
         "date": "2026-10-01",
         "value": 0.0,
-        "observedOn": "2026-10-13"
+        "observedOn": "2026-10-13",
+        "timeZone": "Asia/Seoul"
       },
       {
         "date": "2026-10-02",
         "value": 0.0,
-        "observedOn": "2026-10-13"
+        "observedOn": "2026-10-13",
+        "timeZone": "Asia/Seoul"
       },
       {
         "date": "2026-10-03",
         "value": 0.0,
-        "observedOn": "2026-10-13"
+        "observedOn": "2026-10-13",
+        "timeZone": "Asia/Seoul"
       },
       {
         "date": "2026-10-04",
         "value": 0.0,
-        "observedOn": "2026-10-13"
+        "observedOn": "2026-10-13",
+        "timeZone": "Asia/Seoul"
       },
       {
         "date": "2026-10-05",
         "value": 0.0,
-        "observedOn": "2026-10-13"
+        "observedOn": "2026-10-13",
+        "timeZone": "Asia/Seoul"
       },
       {
         "date": "2026-10-06",
         "value": 0.0,
-        "observedOn": "2026-10-13"
+        "observedOn": "2026-10-13",
+        "timeZone": "Asia/Seoul"
       },
       {
         "date": "2026-10-07",
         "value": 0.0,
-        "observedOn": "2026-10-13"
+        "observedOn": "2026-10-13",
+        "timeZone": "Asia/Seoul"
       },
       {
         "date": "2026-10-08",
         "value": 0.0,
-        "observedOn": "2026-10-13"
+        "observedOn": "2026-10-13",
+        "timeZone": "Asia/Seoul"
       },
       {
         "date": "2026-10-09",
         "value": 0.0,
-        "observedOn": "2026-10-13"
+        "observedOn": "2026-10-13",
+        "timeZone": "Asia/Seoul"
       },
       {
         "date": "2026-10-10",
         "value": 0.0,
-        "observedOn": "2026-10-13"
+        "observedOn": "2026-10-13",
+        "timeZone": "Asia/Seoul"
       },
       {
         "date": "2026-10-11",
         "value": 0.0,
-        "observedOn": "2026-10-13"
+        "observedOn": "2026-10-13",
+        "timeZone": "Asia/Seoul"
       },
       {
         "date": "2026-10-12",
         "value": 0.0,
-        "observedOn": "2026-10-13"
+        "observedOn": "2026-10-13",
+        "timeZone": "Asia/Seoul"
+      },
+      {
+        "date": "2026-10-15",
+        "value": 0,
+        "observedOn": "2026-10-22",
+        "timeZone": null
+      },
+      {
+        "date": "2026-10-16",
+        "value": 0,
+        "observedOn": "2026-10-22",
+        "timeZone": null
+      },
+      {
+        "date": "2026-10-17",
+        "value": 0,
+        "observedOn": "2026-10-22",
+        "timeZone": null
+      },
+      {
+        "date": "2026-10-18",
+        "value": 0,
+        "observedOn": "2026-10-22",
+        "timeZone": null
       }
-    ]
+    ],
+    "missingReason": "19~21일 행 미제공. USD, 센트 단위 반올림."
   },
   {
     "id": "choose-window-admob-iOS",
@@ -872,7 +934,7 @@ export const historicalSeries: MetricSeries[] = [
     "metric": "revenue",
     "source": "AdMob",
     "scope": "ios-observed",
-    "timeZone": "Asia/Seoul",
+    "timeZone": null,
     "currency": "USD",
     "estimated": true,
     "testTraffic": "not-excluded",
@@ -880,64 +942,89 @@ export const historicalSeries: MetricSeries[] = [
       {
         "date": "2026-10-01",
         "value": 0.0,
-        "observedOn": "2026-10-13"
+        "observedOn": "2026-10-13",
+        "timeZone": "Asia/Seoul"
       },
       {
         "date": "2026-10-02",
         "value": 0.0,
-        "observedOn": "2026-10-13"
+        "observedOn": "2026-10-13",
+        "timeZone": "Asia/Seoul"
       },
       {
         "date": "2026-10-04",
         "value": 0.0,
-        "observedOn": "2026-10-13"
+        "observedOn": "2026-10-13",
+        "timeZone": "Asia/Seoul"
       },
       {
         "date": "2026-10-05",
         "value": 0.0,
-        "observedOn": "2026-10-13"
+        "observedOn": "2026-10-13",
+        "timeZone": "Asia/Seoul"
       },
       {
         "date": "2026-10-06",
         "value": 0.0,
-        "observedOn": "2026-10-13"
+        "observedOn": "2026-10-13",
+        "timeZone": "Asia/Seoul"
       },
       {
         "date": "2026-10-07",
         "value": 0.0,
-        "observedOn": "2026-10-13"
+        "observedOn": "2026-10-13",
+        "timeZone": "Asia/Seoul"
       },
       {
         "date": "2026-10-08",
         "value": 0.0,
-        "observedOn": "2026-10-13"
+        "observedOn": "2026-10-13",
+        "timeZone": "Asia/Seoul"
       },
       {
         "date": "2026-10-09",
         "value": 0.0,
-        "observedOn": "2026-10-13"
+        "observedOn": "2026-10-13",
+        "timeZone": "Asia/Seoul"
       },
       {
         "date": "2026-10-11",
         "value": 0.0,
-        "observedOn": "2026-10-13"
+        "observedOn": "2026-10-13",
+        "timeZone": "Asia/Seoul"
       },
       {
         "date": "2026-10-13",
         "value": 0.01,
-        "observedOn": "2026-10-19"
+        "observedOn": "2026-10-19",
+        "timeZone": "Asia/Seoul"
       },
       {
         "date": "2026-10-15",
         "value": 0.01,
-        "observedOn": "2026-10-19"
+        "observedOn": "2026-10-22",
+        "timeZone": null
       },
       {
         "date": "2026-10-18",
         "value": 0.01,
-        "observedOn": "2026-10-19"
+        "observedOn": "2026-10-22",
+        "timeZone": null
+      },
+      {
+        "date": "2026-10-20",
+        "value": 0,
+        "observedOn": "2026-10-22",
+        "timeZone": null
+      },
+      {
+        "date": "2026-10-21",
+        "value": 0,
+        "observedOn": "2026-10-22",
+        "timeZone": null
       }
-    ]
+    ],
+    "missingReason": "16~17,19일 행은 미제공. USD, 센트 단위 반올림."
   },
   {
     "id": "choose-window-admob-Android",
@@ -963,7 +1050,7 @@ export const historicalSeries: MetricSeries[] = [
     "metric": "revenue",
     "source": "AdMob",
     "scope": "ios-observed",
-    "timeZone": "Asia/Seoul",
+    "timeZone": null,
     "currency": "USD",
     "estimated": true,
     "testTraffic": "not-excluded",
@@ -971,23 +1058,28 @@ export const historicalSeries: MetricSeries[] = [
       {
         "date": "2026-10-10",
         "value": 0.0,
-        "observedOn": "2026-10-13"
+        "observedOn": "2026-10-13",
+        "timeZone": "Asia/Seoul"
       },
       {
         "date": "2026-10-15",
         "value": 0,
-        "observedOn": "2026-10-19"
+        "observedOn": "2026-10-22",
+        "timeZone": null
       },
       {
         "date": "2026-10-16",
         "value": 0,
-        "observedOn": "2026-10-19"
+        "observedOn": "2026-10-22",
+        "timeZone": null
       },
       {
         "date": "2026-10-17",
         "value": 0.01,
-        "observedOn": "2026-10-19"
+        "observedOn": "2026-10-22",
+        "timeZone": null
       }
-    ]
+    ],
+    "missingReason": "보고서에 제공된 행만 기록. 18~21일 행은 미제공. USD, US$ 표기, 센트 단위 반올림."
   }
 ];
