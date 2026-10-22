@@ -1,5 +1,11 @@
 // Page labels and product descriptions are source copy; URLs and release facts remain in siteData.
 export const ko = {
+"photoClose": "사진 닫기",
+"photoPrevious": "이전 사진",
+"photoNext": "다음 사진",
+"photoLoading": "사진을 불러오는 중",
+"photoError": "사진을 불러오지 못했어요",
+"photoRetry": "다시 시도",
 "releaseNotesNav": "출시 노트",
 "releaseNotesAppLabel": "앱별 출시 노트",
 "releaseNotesIntro": "버전별로 달라진 내용을 최신 기록부터 확인하세요.",

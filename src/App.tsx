@@ -1,3 +1,4 @@
+import { ImageViewer } from '@hjmds/react/image-viewer';
 import { useEffect, useLayoutEffect, useState, type ReactNode } from 'react';
 import { HjmProvider } from '@hjmds/react/provider';
 import { Link } from '@hjmds/react/actions';
@@ -87,6 +88,7 @@ function ProductCard({ app }: { app: PortfolioApp }) {
   </Card>;
 }
 function AboutPanel() {
+  const [photoOpen, setPhotoOpen] = useState(false);
   const journey = [[c.journey1, c.journey1Body], [c.journey2, c.journey2Body], [c.journey3, c.journey3Body], [c.journey4, c.journey4Body]];
   return <Stack gap="xl">
     <div className="chapter-block">
@@ -98,7 +100,9 @@ function AboutPanel() {
           <Stack axis="inline" gap="lg" wrap><Link href="#apps" variant="standalone" tone="neutral">{c.heroAction} →</Link><Link href="#design" variant="standalone" tone="neutral">{c.heroSecondary} →</Link></Stack>
         </Stack></Surface></BrandProvider>
         <Surface padding="lg"><Stack gap="lg">
-          <img className="profile-photo" src="/profile.jpg" alt={siteCopy.developerAlt} />
+          <button type="button" aria-label={siteCopy.developerAlt} onClick={() => setPhotoOpen(true)} style={{ padding: 0, border: 0, background: 'transparent', cursor: 'zoom-in' }}><img className="profile-photo" src="/profile.jpg" alt="" /></button>
+          <ImageViewer open={photoOpen} onClose={() => setPhotoOpen(false)} items={[{ id: 'profile', uri: '/profile.jpg', label: siteCopy.developerAlt }]}
+            closeLabel={c.photoClose} previousLabel={c.photoPrevious} nextLabel={c.photoNext} loadingLabel={c.photoLoading} errorLabel={c.photoError} retryLabel={c.photoRetry} />
           <Heading level="level2">{c.portfolioName} · {c.portfolioRole}</Heading>
           <Text as="p" tone="muted">{c.profileBody}</Text>
           <Stack axis="inline" gap="sm" wrap><Tag>React · TypeScript</Tag><Tag>{c.personalProductCount.replace('{count}', String(portfolioSummary.appCount))}</Tag></Stack>
