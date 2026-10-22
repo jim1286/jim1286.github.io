@@ -28,7 +28,7 @@ const developerEmail = 'jimin1286@gmail.com';
 const tabItems = [
   { id: 'about', label: c.navOverview }, { id: 'structure', label: c.navStructure },
   { id: 'design', label: c.navArchitecture }, { id: 'apps', label: c.navProducts },
-  { id: 'releases', label: c.releaseNotesNav }, { id: 'performance', label: c.performanceNav }, { id: 'history', label: c.historyNav }, { id: 'support', label: c.navContact },
+  { id: 'performance', label: c.performanceNav }, { id: 'history', label: c.historyNav }, { id: 'support', label: c.navContact },
 ];
 // Preserve links already shared by the single-page portfolio. Hash changes also
 // restore the right panel on browser Back/Forward and locale direct entry.
@@ -36,7 +36,7 @@ function tabForHash(hash: string) {
   // Sub-routes such as #design/arch/ci keep their topic; the panel reads the rest of the path.
   const id = hash.slice(1).split('/')[0];
   // 2026-10-21: operations and QA moved into the design drill-down; their old links open it.
-  const aliases: Record<string, string> = { top: 'about', main: 'about', developer: 'about', discontinued: 'apps', legal: 'support', guidelines: 'design', operations: 'design', workflow: 'design', strategy: 'design', marketing: 'design', guidance: 'design', qa: 'design' };
+  const aliases: Record<string, string> = { releases: 'apps', top: 'about', main: 'about', developer: 'about', discontinued: 'apps', legal: 'support', guidelines: 'design', operations: 'design', workflow: 'design', strategy: 'design', marketing: 'design', guidance: 'design', qa: 'design' };
   return aliases[id] ?? (tabItems.some(item => item.id === id) ? id : 'about');
 }
 // The panel Stack owns the gap above and below; the reading measure is a layout-only width
@@ -136,7 +136,19 @@ function WorkCases() {
   </Stack></Section>;
 }
 function AppsPanel() {
-  return <Stack gap="xl"><Intro eyebrow="03 / PRODUCTS" title={c.productsTitle} description={c.productsIntro} />
+  const route = window.location.hash.slice(1).split('/');
+  // Previously shared release links now open the same app inside Products.
+  const legacyRelease = route[0] === 'releases';
+  const selected = apps.find(app => app.id === route[1]);
+  const appId = selected?.id ?? (legacyRelease ? apps[0].id : 'all');
+  const view = legacyRelease || route[2] === 'releases' ? 'releases' : 'intro';
+  return <Stack gap="xl">
+    <Tabs id="product-apps" label={c.productsAppTabs} value={appId}
+      onValueChange={value => { window.location.hash = value === 'all' ? 'apps' : `apps/${value}/${view}`; }}
+      indicator="solid" items={[{ id: 'all', label: c.productsAll }, ...apps.map(app => ({ id: app.id, label: app.name }))]} renderPanels={false} />
+    <TabPanel tabsId="product-apps" value={appId} activeValue={appId} mode="keyed">
+      {appId === 'all' ? <Stack gap="xl">
+        <Intro eyebrow="03 / PRODUCTS" title={c.productsTitle} description={c.productsIntro} />
     <div className="chapter-block"><WorkCases /></div>
     <div className="chapter-block"><Section title={c.personalProducts} description={c.personalProductsBody}>
       <Grid columns={{ compact: 1, medium: 2 }} gap={{ compact: 'lg' }} minColumnWidth={{ compact: 280 }}>{apps.map(app => <ProductCard key={app.id} app={app} />)}</Grid>
@@ -144,7 +156,15 @@ function AppsPanel() {
     <Section id="discontinued" tabIndex={-1} title={c.pastProducts} description={c.discontinuedDescription}>
       <Collapsible trigger={c.discontinuedTitle} defaultOpen={window.location.hash === '#discontinued'}><Grid columns={{ compact: 1, medium: 2 }} gap={{ compact: 'lg' }}>{discontinuedApps.map(app => <ProductCard key={app.id} app={app} />)}</Grid></Collapsible>
     </Section>
-
+      </Stack> : <Stack gap="lg">
+        <Tabs id="product-content" label={c.productsContentTabs} value={view}
+          onValueChange={value => { window.location.hash = `apps/${appId}/${value}`; }}
+          indicator="solid" items={[{ id: 'intro', label: c.productsAppIntro }, { id: 'releases', label: c.releaseNotesNav }]} renderPanels={false} />
+        <TabPanel tabsId="product-content" value={view} activeValue={view} mode="keyed">
+          {view === 'releases' ? <ReleaseNotesPanel appId={appId} /> : <ProductCard app={apps.find(app => app.id === appId)!} />}
+        </TabPanel>
+      </Stack>}
+    </TabPanel>
   </Stack>;
 }
 function StructurePanel() {
@@ -172,7 +192,7 @@ function DesignPanel() {
   </Stack>;
 }
 function HistoryPanel() {
-  return <Stack gap="xl"><Intro eyebrow="05 / EVOLUTION LOG" title={c.historyTitle} description={c.historyIntro} />
+  return <Stack gap="xl"><Intro eyebrow="05 / IMPROVEMENTS" title={c.historyTitle} description={c.historyIntro} />
     <EvolutionHistory />
 
   </Stack>;
@@ -190,7 +210,7 @@ function SupportPanel() {
     <Text variant="caption" tone="muted">{siteCopy.legalNote}</Text>
   </Stack>;
 }
-const panels: Record<string, ReactNode> = { about: <AboutPanel />, structure: <StructurePanel />, apps: <AppsPanel />, design: <DesignPanel />, releases: <ReleaseNotesPanel />, performance: <PerformancePanel />, history: <HistoryPanel />, support: <SupportPanel /> };
+const panels: Record<string, ReactNode> = { about: <AboutPanel />, structure: <StructurePanel />, apps: <AppsPanel />, design: <DesignPanel />, performance: <PerformancePanel />, history: <HistoryPanel />, support: <SupportPanel /> };
 export default function App() {
   const [hash, setHash] = useState(() => window.location.hash);
   const active = tabForHash(hash);

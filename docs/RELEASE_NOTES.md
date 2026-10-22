@@ -1,19 +1,25 @@
 # 앱별 출시 노트
 
-2026-10-22 사용자 요청으로 제품 다음에 독립 `#releases` 탭을 두고
-`#releases/<app-id>`에서 앱별 버전 기록을 제공한다. 7개 활성 앱만 대상으로 한다.
+2026-10-22 후속 사용자 요청으로 출시 노트를 제품 내부 앱별 탭으로 옮겼다.
+`#apps`의 전체 보기를 보존하며, `#apps/<app-id>/intro`와
+`#apps/<app-id>/releases`를 제품 소개/출시 노트 탭으로 전환한다.
+기존 `#releases`·`#releases/<app-id>`는 같은 제품 내부 노트를 열어 호환한다.
+상단의 독립 출시 노트 탭은 제거했고 발전 이력 표시는 개선으로 바꿨다.
+기존 `#history` 주소와 과거 근거는 보존한다. 7개 활성 앱을 대상으로 한다.
 HJM Tabs·TabPanel·Card·Badge·Stack·Text를 사용하며 별도 카드/탭 스타일을 만들지 않는다.
 
 ## 원본과 날짜
 
-`src/releases/data.ts`는 각 제품의 실제 `app-vX.Y.Z` 또는 `app-vX.Y.Z+build` 태그에서
-`.release-hub/app.json#releaseNotes` 문자열만 추출한 공개 snapshot이다. 현재 Hub의
-current.version은 제품 버전과 다를 수 있어 버전 원천으로 사용하지 않았다. 각 버전의
-태그·정확한 commit을 데이터에 보존한다. 날짜는 해당 source commit의 기록일이며
-스토어 공개일이 아니다. 메타데이터에 출시 노트가 없는 과거 태그의 내용을 추측하지 않는다.
+`src/releases/data.ts`는 App Store Connect 과거 버전의 한국어 변경 설명, 실제
+`app-vX.Y.Z` / `app-vX.Y.Z+build` 태그의 `.release-hub/app.json#releaseNotes`,
+직접 확인한 GitHub Release 본문을 앱·버전으로 합친 공개 snapshot이다.
+`notesSource`로 원문 출처를 구분하며 태그가 없는 스토어 기록에 Git SHA를 만들지 않는다. 현재 Hub의
+current.version은 제품 버전과 다를 수 있어 버전 원천으로 사용하지 않았다. 태그 기반 항목은 태그·정확한 commit을 보존한다. 스토어 전용 항목은 원래 버전
+메타데이터 생성 시각과 조회 시각을 보존한다. 화면 기록일은 각각 source commit의
+기록일 또는 버전 메타데이터 생성일이며 스토어 공개일이 아니다. 메타데이터에 출시 노트가 없는 과거 태그의 내용을 추측하지 않는다.
 동일 버전의 Android repair/iOS rebuild 태그는 별도 제품 출시로 중복 표시하지 않는다.
 
-## 공개 상태의 근거
+## 10/21 기준 스토어 확인 기록(초기값)
 
 10/21까지 제품 docs/RELEASE.md의 실제 제출·Console/API 확인 기록을 대조했다.
 오늘야구2.2.0, 선택의창2.1.0, 다에리1.9.0은 양 스토어 심사/검토 기록이다.
@@ -25,7 +31,7 @@ Utilverse1.2.0 Android는 비공개 Alpha 검토 중이다. iOS 최신7개는 �
 선택의창2.0.0 iOS, 비행중1.1.2 iOS의 명시 기록만 연결했다.
 다른 버전의 태그/CI 완료만으로 스토어 공개를 주장하지 않는다.
 
-## 확보 범위
+## 최초 작성 당시 확보 범위(91개)
 
 - yajalal: 태그20개 확인, 출시 노트17개 확보. 원본 HEAD `ad2a0c02dcad52ae99089afea7516db6d90cecbe`. 노트 미확보 app-v1.19.5+65, app-v1.19.4+62, app-v1.19.2+59. 재빌드/repair 제외 0개.
 - choose-window: 태그12개 확인, 출시 노트11개 확보. 원본 HEAD `62f591ed3ca29f75b182431c7b019672e748e126`. 노트 미확보 app-v1.1.7+13. 재빌드/repair 제외 0개.
@@ -34,3 +40,40 @@ Utilverse1.2.0 Android는 비공개 Alpha 검토 중이다. iOS 최신7개는 �
 - diairy: 태그20개 확인, 출시 노트20개 확보. 원본 HEAD `298236a75b70841825792e583bbd2f2c4d7d0488`. 노트 미확보 없음. 재빌드/repair 제외 0개.
 - spint: 태그9개 확인, 출시 노트8개 확보. 원본 HEAD `b6300db8a23fb7443dbb42deeef054b1c2813a6d`. 노트 미확보 없음. 재빌드/repair 제외 1개.
 - utilverse: 태그6개 확인, 출시 노트4개 확보. 원본 HEAD `98b8bcab53de40cb20d80c38663ce85957999693`. 노트 미확보 없음. 재빌드/repair 제외 2개.
+
+## 10/22 과거 전체 확보 확장
+
+기존 Hub의 `readKeychain`·`appleToken` 인증 경로를 재사용해 App Store Connect의
+appStoreVersions와 appStoreVersionLocalizations를 **GET만** 조회했다. 앱 식별은 기존
+계약의 bundle로 한 건씩 확인했고 버전 목록의 next 링크를 끝까지 확인했다.
+보고서/계정/앱 ID·원시 응답·토큰은 새 snapshot에 넣지 않았다. 공개 필드는 중앙
+research/2026-10-22/release-notes-store-history-public.json에 보존한다.
+스토어의 API 응답에서 보존·조회되는 모든 과거134버전의 한국어 원문127개를 확보했다.
+태그 source의 notes가 없는 비행중1.0.1은 실제 GitHub Release 본문으로 보완했다.
+기존91개를 보존하고 중복은 앱+정확한 버전으로 합쳐75개를 추가한 총166개다.
+메타데이터 최초 버전의 whatsNew가 null이면 변경 설명 미등록으로 표시하며 추정하지 않는다.
+createdDate는 버전 메타데이터 생성 시각이다. 원래 offset을 따로 보존하고 새 항목의
+기록일은 KST 날짜로 표시하며 스토어 공개일로 바꾸지 않았다.
+
+기존 태그·기록에는 없던 날짜형 야잘알 GitHub 릴리즈와 CHANGELOG도 대조했다.
+해당 app pubspec 버전은 스토어 원문 이력에 포함돼 있어 서버 단독 변경·비교 링크·
+짧은 add 커밋을 새 앱 출시나 새로운 원문 설명으로 중복 만들지 않았다.
+원문이 있는 실제 스토어 버전으로 보완했으며 전체 commit을 출시로 분류하지 않는다.
+App Store의 과거 버전 상태가 READY_FOR_SALE인 것은 출시 이력 확인으로 표시한다.
+이번 최신 조회에서 최신 iOS6개도 READY_FOR_SALE, Utilverse1.2.0은 WAITING_FOR_REVIEW였다.
+이 현재 조회는 위10/21 심사 대기 기록의 후속이며, 기존 Android 관측은 새 조회로 덮지 않았다.
+공개 페이지 버전 기록은 제공 범위 제한이 있어 과거 전체의 유일한 원천으로 쓰지 않았다.
+스토어에서 삭제·보존하지 않은 기록과 태그/본문이 없는 외부 과거까지 복원했다고 주장하지 않는다.
+
+- yajalal: 총 78개, 첫 확보 기록일 2025-08-05, ASC 반환 버전 75개 / 변경 설명 74개.
+- choose-window: 총 21개, 첫 확보 기록일 2026-02-12, ASC 반환 버전 18개 / 변경 설명 17개.
+- burntok: 총 18개, 첫 확보 기록일 2026-09-11, ASC 반환 버전 13개 / 변경 설명 12개.
+- unairplane: 총 17개, 첫 확보 기록일 2026-08-31, ASC 반환 버전 13개 / 변경 설명 12개.
+- diairy: 총 20개, 첫 확보 기록일 2026-09-12, ASC 반환 버전 7개 / 변경 설명 6개.
+- spint: 총 8개, 첫 확보 기록일 2026-09-27, ASC 반환 버전 7개 / 변경 설명 6개.
+- utilverse: 총 4개, 첫 확보 기록일 2026-10-13, ASC 반환 버전 1개 / 변경 설명 0개.
+
+공개 버전 기록 원문78개도 Aside CLI로 교차 확인했다. Spint1.1.0의 공개 페이지 추출본에서
+버전과 문구 연결이 한 칸 어긋난 것을 원래 region 전체 텍스트로 수정했다. API/사이트 원문은
+처음부터 일치했으며 임의의 문구 대체나 미수집 구간 보간을 하지 않았다. 상대 날짜와
+연도 없는 공개 표시를 정확한 공개일로 추정하지 않고, 이 교차 확인은 근거 JSON에 남겼다.
