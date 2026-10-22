@@ -1,5 +1,18 @@
 // Page labels and product descriptions are source copy; URLs and release facts remain in siteData.
 export const ko = {
+"releaseNotesNav": "출시 노트",
+"releaseNotesAppLabel": "앱별 출시 노트",
+"releaseNotesIntro": "버전별로 달라진 내용을 최신 기록부터 확인하세요.",
+"releaseNotesCount": "확보한 버전 기록 {count}개",
+"releaseNotesScope": "기록일과 스토어 공개일은 다를 수 있습니다. 스토어 상태는 표시된 확인일 기준입니다.",
+"releaseNotesRecorded": "기록일",
+"releaseNotesChecked": "확인",
+"releaseNotesReview": "심사·검토 중",
+"releaseNotesSubmitted": "트랙 제출 기록",
+"releaseNotesInternal": "내부 테스트 제공 기록",
+"releaseNotesClosedReview": "비공개 테스트 검토 중",
+"releaseNotesAvailable": "공개 확인",
+
 "qaDirectPath": "통과 · 검증 불가 · 기록",
 "qaFailurePath": "실패한 경우",
 "qaRetryPath": "관련 범위 재확인",

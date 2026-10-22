@@ -19,6 +19,7 @@ import { apps, discontinuedApps, legalDocuments, portfolioSummary, storybookUrl,
 import './styles/site.css';
 import { EvolutionHistory } from './EvolutionHistory';
 import { PerformancePanel } from './PerformancePanel';
+import { ReleaseNotesPanel } from './ReleaseNotesPanel';
 import { DrillArchitecture } from './architecture/DrillArchitecture';
 import { ExternalLink, Notes } from './shared';
 
@@ -27,7 +28,7 @@ const developerEmail = 'jimin1286@gmail.com';
 const tabItems = [
   { id: 'about', label: c.navOverview }, { id: 'structure', label: c.navStructure },
   { id: 'design', label: c.navArchitecture }, { id: 'apps', label: c.navProducts },
-  { id: 'performance', label: c.performanceNav }, { id: 'history', label: c.historyNav }, { id: 'support', label: c.navContact },
+  { id: 'releases', label: c.releaseNotesNav }, { id: 'performance', label: c.performanceNav }, { id: 'history', label: c.historyNav }, { id: 'support', label: c.navContact },
 ];
 // Preserve links already shared by the single-page portfolio. Hash changes also
 // restore the right panel on browser Back/Forward and locale direct entry.
@@ -189,7 +190,7 @@ function SupportPanel() {
     <Text variant="caption" tone="muted">{siteCopy.legalNote}</Text>
   </Stack>;
 }
-const panels: Record<string, ReactNode> = { about: <AboutPanel />, structure: <StructurePanel />, apps: <AppsPanel />, design: <DesignPanel />, performance: <PerformancePanel />, history: <HistoryPanel />, support: <SupportPanel /> };
+const panels: Record<string, ReactNode> = { about: <AboutPanel />, structure: <StructurePanel />, apps: <AppsPanel />, design: <DesignPanel />, releases: <ReleaseNotesPanel />, performance: <PerformancePanel />, history: <HistoryPanel />, support: <SupportPanel /> };
 export default function App() {
   const [hash, setHash] = useState(() => window.location.hash);
   const active = tabForHash(hash);
