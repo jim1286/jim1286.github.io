@@ -1,7 +1,7 @@
 // Public aggregate store exports. Installed audience and DAU are separate metrics.
 // Exported zero padding is preserved; coverage and firstPositive do not assert an app launch date.
 import type { MetricSeries } from './data.ts';
-export const storeCapturedAt = "2026-10-22T09:49:53+09:00";
+export const storeCapturedAt = "2026-10-23T08:45:18.599645+09:00";
 export const storeSeries: MetricSeries[] = [
   {
     "id": "store-yajalal-apple-store-all-visitors",
@@ -1773,6 +1773,11 @@ export const storeSeries: MetricSeries[] = [
       {
         "date": "2026-10-19",
         "value": 3
+      },
+      {
+        "date": "2026-10-21",
+        "value": 2,
+        "observedOn": "2026-10-23"
       }
     ],
     "coverage": {
@@ -4316,7 +4321,7 @@ export const storeSeries: MetricSeries[] = [
     "timeZone": "UTC",
     "testTraffic": "closed-test",
     "points": [],
-    "missingReason": "App Store Connect says this app is not currently available for App Analytics and directs a user with the management role to review analytics access. No daily values were available."
+    "missingReason": "2026-10-23에 제품 페이지 조회 보고서 접근을 확인했습니다. 10/16–21은 대시로 숫자가 제공되지 않았으며 10/22는 아직 제공되지 않았습니다. 0으로 간주하지 않습니다."
   },
   {
     "id": "store-utilverse-play-store-all-visitors",

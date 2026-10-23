@@ -1,6 +1,6 @@
 // Actual Platform=web rows. An absent row is not a confirmed zero.
 import type { MetricSeries } from './data.ts';
-export const webCapturedAt = "2026-10-22T08:53:41+09:00";
+export const webCapturedAt = "2026-10-23T00:18:49.932731+00:00";
 export const webSeries: MetricSeries[] = [
   {
     "id": "web-diairy-dau",
@@ -28,6 +28,11 @@ export const webSeries: MetricSeries[] = [
       {
         "date": "2026-10-18",
         "value": 1
+      },
+      {
+        "date": "2026-10-22",
+        "value": 1,
+        "observedOn": "2026-10-23"
       }
     ]
   },
@@ -57,6 +62,11 @@ export const webSeries: MetricSeries[] = [
       {
         "date": "2026-10-18",
         "value": 1
+      },
+      {
+        "date": "2026-10-22",
+        "value": 1,
+        "observedOn": "2026-10-23"
       }
     ]
   },
@@ -72,7 +82,7 @@ export const webSeries: MetricSeries[] = [
     "testTraffic": "not-excluded",
     "coverage": {
       "start": "2026-10-15",
-      "end": "2026-10-21"
+      "end": "2026-10-22"
     },
     "points": [
       {
@@ -94,6 +104,11 @@ export const webSeries: MetricSeries[] = [
         "date": "2026-10-21",
         "value": 2,
         "observedOn": "2026-10-22"
+      },
+      {
+        "date": "2026-10-22",
+        "value": 1,
+        "observedOn": "2026-10-23"
       }
     ]
   },
@@ -109,7 +124,7 @@ export const webSeries: MetricSeries[] = [
     "testTraffic": "not-excluded",
     "coverage": {
       "start": "2026-10-15",
-      "end": "2026-10-21"
+      "end": "2026-10-22"
     },
     "points": [
       {
@@ -131,6 +146,11 @@ export const webSeries: MetricSeries[] = [
         "date": "2026-10-21",
         "value": 2,
         "observedOn": "2026-10-22"
+      },
+      {
+        "date": "2026-10-22",
+        "value": 0,
+        "observedOn": "2026-10-23"
       }
     ]
   }

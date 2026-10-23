@@ -1078,6 +1078,13 @@ export const historicalSeries: MetricSeries[] = [
         "value": 0.01,
         "observedOn": "2026-10-22",
         "timeZone": null
+      },
+      {
+        "date": "2026-10-22",
+        "value": 0,
+        "observedOn": "2026-10-23",
+        "provisional": true,
+        "timeZone": null
       }
     ],
     "missingReason": "보고서에 제공된 행만 기록. 18~21일 행은 미제공. USD, US$ 표기, 센트 단위 반올림."

@@ -5,6 +5,152 @@ export type ReleasePlatformState = { platform: 'ios' | 'android'; status: 'revie
 export type ReleaseNote = { id: string; app: string; version: string; recordedOn: string; notes: string; sourceTag?: string; sourceSha?: string; notesSource?: 'manifest' | 'app-store' | 'github-release'; originalSourceNotes?: string; storeMetadataCreatedAt?: string; storeObservedAt?: string; platforms: ReleasePlatformState[] };
 export const releaseNotes: ReleaseNote[] = [
   {
+    "id": "yajalal-2.2.1",
+    "app": "yajalal",
+    "version": "2.2.1",
+    "recordedOn": "2026-10-23",
+    "notes": "선수 사진 보기와 라인업·분석 화면의 표시 및 공통 화면 동작을 개선했습니다.",
+    "sourceTag": "app-v2.2.1",
+    "sourceSha": "21c221586964208b433e546627a16040d07bcfd2",
+    "notesSource": "app-store",
+    "platforms": [
+      {
+        "platform": "ios",
+        "status": "review",
+        "asOf": "2026-10-23"
+      }
+    ],
+    "storeMetadataCreatedAt": "2026-10-22T16:05:09-07:00",
+    "storeObservedAt": "2026-10-23T00:28:26.163Z"
+  },
+  {
+    "id": "choose-window-2.1.1",
+    "app": "choose-window",
+    "version": "2.1.1",
+    "recordedOn": "2026-10-23",
+    "notes": "홈과 저장 경로의 배치 및 공통 화면 동작을 개선했습니다.",
+    "sourceTag": "app-v2.1.1",
+    "sourceSha": "fef946b279cd80e0ff3762269fab7921e7ee5395",
+    "notesSource": "app-store",
+    "platforms": [
+      {
+        "platform": "ios",
+        "status": "review",
+        "asOf": "2026-10-23"
+      }
+    ],
+    "storeMetadataCreatedAt": "2026-10-22T16:52:40-07:00",
+    "storeObservedAt": "2026-10-23T00:28:26.163Z"
+  },
+  {
+    "id": "spint-1.3.1",
+    "app": "spint",
+    "version": "1.3.1",
+    "recordedOn": "2026-10-23",
+    "notes": "글 작성과 마크 사진 보기 및 공통 화면 동작을 개선했습니다.",
+    "sourceTag": "app-v1.3.1",
+    "sourceSha": "f234fb258f4f72d0fcf5a09a33d6eb61ee2d4153",
+    "notesSource": "app-store",
+    "platforms": [
+      {
+        "platform": "ios",
+        "status": "review",
+        "asOf": "2026-10-23"
+      }
+    ],
+    "storeMetadataCreatedAt": "2026-10-22T15:25:10-07:00",
+    "storeObservedAt": "2026-10-23T00:28:26.163Z"
+  },
+  {
+    "id": "utilverse-1.2.1",
+    "app": "utilverse",
+    "version": "1.2.1",
+    "recordedOn": "2026-10-23",
+    "notes": "홈 화면의 불필요한 세로 스크롤을 없애고 사진 보기, 글자 추출과 파일 저장의 안정성을 개선했습니다.",
+    "sourceTag": "app-v1.2.1",
+    "sourceSha": "18931f9463819f43e77844fb609278f7b39ca0d9",
+    "notesSource": "manifest",
+    "platforms": []
+  },
+  {
+    "id": "unairplane-1.1.4",
+    "app": "unairplane",
+    "version": "1.1.4",
+    "recordedOn": "2026-10-23",
+    "notes": "여정 화면 전환과 탑승권 스캔 권한 안내 및 공통 화면 동작을 개선했습니다.",
+    "sourceTag": "app-v1.1.4",
+    "sourceSha": "e22a38d0b592d061fa4d00a682852d16666ce4f5",
+    "notesSource": "app-store",
+    "platforms": [
+      {
+        "platform": "ios",
+        "status": "review",
+        "asOf": "2026-10-23"
+      }
+    ],
+    "storeMetadataCreatedAt": "2026-10-22T15:43:28-07:00",
+    "storeObservedAt": "2026-10-23T00:28:26.163Z"
+  },
+  {
+    "id": "diairy-1.9.1",
+    "app": "diairy",
+    "version": "1.9.1",
+    "recordedOn": "2026-10-22",
+    "notes": "설정에서 개인정보 보관 기간 변경 안내를 확인할 수 있습니다.",
+    "sourceTag": "app-v1.9.1",
+    "sourceSha": "a7a57ce00b58534de8b44305c97c2e7b5a9b6eb7",
+    "notesSource": "app-store",
+    "platforms": [
+      {
+        "platform": "ios",
+        "status": "available",
+        "asOf": "2026-10-23"
+      },
+      {
+        "platform": "android",
+        "status": "available",
+        "asOf": "2026-10-22"
+      }
+    ],
+    "storeMetadataCreatedAt": "2026-10-22T00:24:03-07:00",
+    "storeObservedAt": "2026-10-23T00:28:26.163Z"
+  },
+  {
+    "id": "burntok-1.7.2",
+    "app": "burntok",
+    "version": "1.7.2",
+    "recordedOn": "2026-10-22",
+    "notes": "로그인 화면의 문서 로딩 오류를 수정하고 현재 동의할 문서를 확인할 수 있도록 개선했습니다.",
+    "sourceTag": "app-v1.7.2",
+    "sourceSha": "80b61a3293155cefa7dc09e8317c572a96448e1e",
+    "notesSource": "app-store",
+    "platforms": [
+      {
+        "platform": "ios",
+        "status": "available",
+        "asOf": "2026-10-23"
+      },
+      {
+        "platform": "android",
+        "status": "review",
+        "asOf": "2026-10-22"
+      }
+    ],
+    "storeMetadataCreatedAt": "2026-10-21T23:31:41-07:00",
+    "storeObservedAt": "2026-10-23T00:28:26.163Z"
+  },
+  {
+    "id": "burntok-1.7.1",
+    "app": "burntok",
+    "version": "1.7.1",
+    "recordedOn": "2026-10-22",
+    "notes": "동의할 문서의 현재 버전과 전문을 확인할 수 있도록 동의 화면을 개선했습니다.",
+    "sourceTag": "app-v1.7.1",
+    "sourceSha": "cf6b9e4d6fd7f931f66f6f34fc52c04920e4698e",
+    "notesSource": "manifest",
+    "platforms": []
+  },
+  {
     "id": "yajalal-2.2.0",
     "app": "yajalal",
     "version": "2.2.0",
@@ -151,12 +297,12 @@ export const releaseNotes: ReleaseNote[] = [
       },
       {
         "platform": "ios",
-        "status": "review",
-        "asOf": "2026-10-22"
+        "status": "available",
+        "asOf": "2026-10-23"
       }
     ],
     "storeMetadataCreatedAt": "2026-10-12T17:18:42-07:00",
-    "storeObservedAt": "2026-10-22T01:22:53.115Z",
+    "storeObservedAt": "2026-10-23T00:28:26.163Z",
     "notesSource": "manifest"
   },
   {
@@ -469,25 +615,6 @@ export const releaseNotes: ReleaseNote[] = [
     "storeObservedAt": "2026-10-22T01:22:53.115Z"
   },
   {
-    "id": "burntok-1.6.0",
-    "app": "burntok",
-    "version": "1.6.0",
-    "recordedOn": "2026-10-08",
-    "notes": "홈과 프로필, 팔로워 목록의 화면을 더 보기 편하게 다듬었어요. 검색과 알림, 댓글의 사용성을 개선하고 뚝을 만들고 수정하는 과정의 안정성을 높였습니다.",
-    "sourceTag": "app-v1.6.0",
-    "sourceSha": "cb01599bc85343479e80c42b52800d2f9bc108a9",
-    "platforms": [
-      {
-        "platform": "ios",
-        "status": "available",
-        "asOf": "2026-10-22"
-      }
-    ],
-    "notesSource": "app-store",
-    "storeMetadataCreatedAt": "2026-10-07T21:47:15-07:00",
-    "storeObservedAt": "2026-10-22T01:22:53.115Z"
-  },
-  {
     "id": "diairy-1.6.0",
     "app": "diairy",
     "version": "1.6.0",
@@ -504,6 +631,25 @@ export const releaseNotes: ReleaseNote[] = [
     ],
     "notesSource": "app-store",
     "storeMetadataCreatedAt": "2026-10-08T04:58:18-07:00",
+    "storeObservedAt": "2026-10-22T01:22:53.115Z"
+  },
+  {
+    "id": "burntok-1.6.0",
+    "app": "burntok",
+    "version": "1.6.0",
+    "recordedOn": "2026-10-08",
+    "notes": "홈과 프로필, 팔로워 목록의 화면을 더 보기 편하게 다듬었어요. 검색과 알림, 댓글의 사용성을 개선하고 뚝을 만들고 수정하는 과정의 안정성을 높였습니다.",
+    "sourceTag": "app-v1.6.0",
+    "sourceSha": "cb01599bc85343479e80c42b52800d2f9bc108a9",
+    "platforms": [
+      {
+        "platform": "ios",
+        "status": "available",
+        "asOf": "2026-10-22"
+      }
+    ],
+    "notesSource": "app-store",
+    "storeMetadataCreatedAt": "2026-10-07T21:47:15-07:00",
     "storeObservedAt": "2026-10-22T01:22:53.115Z"
   },
   {
