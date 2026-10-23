@@ -2019,7 +2019,7 @@ export const ko = {
   "performanceMarketingNetFollowers": "기간 순 팔로워",
   "performanceMarketingProfileActivity": "프로필 활동 / 방문",
   "performanceMarketingDaily": "일별 채널 추이",
-  "performanceMarketingNoDaily": "Instagram은 최근 30일 기간 집계만 제공해 일별 추이를 표시하지 않습니다.",
+  "performanceMarketingNoDaily": "Instagram에서 확인된 자료는 기간 집계이므로 일별 추이를 표시하지 않습니다.",
   "performanceMarketingUnknownDates": "정확한 기간 경계 미확인",
   "performanceMarketingWindowNote": "요약과 보관된 일별 추이는 조회 기간과 수집 시각이 다를 수 있습니다. Instagram 최근 7일의 정확한 경계·오늘 포함 여부는 미확인입니다. 현재 팔로워는 수집 시점 값이며, 기간 순증과 구분합니다. 조회한 사람은 도달이나 앱 전환으로 바꾸지 않습니다.",
   "performanceMarketingThreadsRange": "이전 수집의 실제 일별 관측입니다. 위 7일 요약과 기간이 다르며 조회한 사람을 날짜별로 합산하지 않습니다. 미표시 날짜는 비워 둡니다.",
