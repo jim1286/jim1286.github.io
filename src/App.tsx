@@ -173,7 +173,9 @@ function StructurePanel() {
     <Intro eyebrow="01 / WORKSPACE STRUCTURE" title={c.structureTitle} description={c.structureIntro} />
     <Card title={c.structureTreeTitle} headingLevel={2} padding="lg"><Stack gap="md">
       <Text as="p" tone="muted">{c.structureTreeCaption}</Text>
-      <CodeBlock code={c.structureTree} label={c.structureTreeTitle} />
+      {/* CodeBlock shows its label as the visible head line (no language here) and as the region name, so it names
+          the format, not the Card's h2 again (2026-10-23 web check: the title appeared twice). */}
+      <CodeBlock code={c.structureTree} label={c.structureTreeLabel} />
       <span className="diagram-mobile-hint"><Text variant="caption" tone="muted">{c.structureTreeHint}</Text></span>
     </Stack></Card>
     <Section title={c.structureBoundaryTitle}><Notes items={[
