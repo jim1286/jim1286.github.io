@@ -47,4 +47,4 @@ workflow YAML/dependency 검증 통과. 전체 테스트·실제 CI 시간·배�
 원래 push 범위 receipt로 연결하고 polling을 제거했다(해당 workflow가 있는 제품만).
 8개 canonical gate dry-run drift 0, root 관련 검사 통과. 이번 변경은 로컬 미커밋이고
 원격 CI·배포·시간 절감 실측은 미실행이다. 전체 조사·제품별 실패·검증·반영 조건은
-[공통 개편 QA](../../../../docs/qa/2026-10-12-deployment-flow-redesign.md)를 따른다.
+[공통 개편 QA](https://github.com/jim1286/app-portfolio/blob/main/docs/qa/2026-10-12-deployment-flow-redesign.md)를 따른다.

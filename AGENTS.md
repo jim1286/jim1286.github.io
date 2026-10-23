@@ -2,7 +2,7 @@
 
 ## 현재 공통 작업 기준
 
-공통 작업 원칙은 [포트폴리오 AGENTS.md](../../AGENTS.md)를 따른다. 독립 checkout에서는 [중앙 정본](https://github.com/jim1286/app-portfolio/blob/main/AGENTS.md)을 확인한다.
+공통 작업 원칙은 [포트폴리오 AGENTS.md](https://github.com/jim1286/app-portfolio/blob/main/AGENTS.md)를 따른다.
 이 문서는 제품 고유 조건만 추가한다. 2026-10-15 지침 점검에서 반복된 공통 규칙을 참조로 통합했다.
 
 이 저장소는 React/Vite 기반 독립 웹 제품이며 공통 `portfolio-default-v1` 심사 대상이다.
