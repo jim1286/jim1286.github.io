@@ -11,9 +11,10 @@ import { ScreenLayout } from '@hjmds/react/screens';
 import { SkipNav } from '@hjmds/react/skip-nav';
 import { Tabs, TabPanel } from '@hjmds/react/navigation';
 import { Collapsible } from '@hjmds/react/collapsible';
+import { Top } from '@hjmds/react/top';
+import { CodeBlock } from '@hjmds/react/code-block';
 import { AndroidFilled, AppleFilled, ExportOutlined, GithubOutlined, MailOutlined } from '@ant-design/icons';
 import '@hjmds/react/styles.css';
-import { BrandProvider } from './BrandProvider';
 import { getCopy } from './i18n';
 import { siteCopy, appCopy } from './copy';
 import { apps, discontinuedApps, legalDocuments, portfolioSummary, storybookUrl, type PortfolioApp } from './siteData';
@@ -40,14 +41,10 @@ function tabForHash(hash: string) {
   const aliases: Record<string, string> = { releases: 'apps', top: 'about', main: 'about', developer: 'about', discontinued: 'apps', legal: 'support', guidelines: 'design', operations: 'design', workflow: 'design', strategy: 'design', marketing: 'design', guidance: 'design', qa: 'design' };
   return aliases[id] ?? (tabItems.some(item => item.id === id) ? id : 'about');
 }
-// The panel Stack owns the gap above and below; the reading measure is a layout-only width
-// (2026-10-18: replaced the .panel-intro wrapper's ad-hoc padding).
+// Each topic panel is mounted alone (keyed TabPanel), so its HJM Top is the page's only h1.
+// The reading measure stays a layout-only width (2026-10-18: replaced the .panel-intro wrapper).
 function Intro({ eyebrow, title, description }: { eyebrow: string; title: string; description: string }) {
-  return <Stack gap="md" layoutStyle={{ maxWidth: 760 }}>
-    <Text variant="caption" fontRole="code" tone="muted">{eyebrow}</Text>
-    <Heading level="level1">{title}</Heading>
-    <Text as="p" variant="bodyLarge" tone="muted">{description}</Text>
-  </Stack>;
+  return <Top descriptor={{ eyebrow, title, description }} layoutStyle={{ maxWidth: 760 }} />;
 }
 function Diagram({ name, title, caption }: { name: string; title: string; caption: string }) {
   return <Card title={title} headingLevel={2} padding="lg" actions={<ExternalLink href={`/diagrams/${name}.html?theme=light`}>{c.diagramOpen} <ExportOutlined aria-hidden /></ExternalLink>}>
@@ -93,14 +90,14 @@ function AboutPanel() {
   return <Stack gap="xl">
     <div className="chapter-block">
       <Grid columns={{ compact: 1, medium: 2 }} gap={{ compact: 'lg' }}>
-        <BrandProvider><Surface padding="xl" radius="lg"><Stack gap="xl">
+        <Surface padding="xl" radius="lg"><Stack gap="xl">
           <Text variant="caption" fontRole="code" tone="muted">{c.heroRole}</Text>
           <Heading level="level1"><span className="hero-title">{c.heroTitle}</span></Heading>
           <Text as="p" variant="bodyLarge" tone="muted">{c.heroBody}</Text>
           <Stack axis="inline" gap="lg" wrap><Link href="#apps" variant="standalone" tone="neutral">{c.heroAction} →</Link><Link href="#design" variant="standalone" tone="neutral">{c.heroSecondary} →</Link></Stack>
-        </Stack></Surface></BrandProvider>
+        </Stack></Surface>
         <Surface padding="lg"><Stack gap="lg">
-          <button type="button" aria-label={siteCopy.developerAlt} onClick={() => setPhotoOpen(true)} style={{ padding: 0, border: 0, background: 'transparent', cursor: 'zoom-in' }}><img className="profile-photo" src="/profile.jpg" alt="" /></button>
+          <button type="button" className="profile-photo-trigger" aria-label={siteCopy.developerAlt} onClick={() => setPhotoOpen(true)}><img className="profile-photo" src="/profile.jpg" alt="" /></button>
           <ImageViewer open={photoOpen} onClose={() => setPhotoOpen(false)} items={[{ id: 'profile', uri: '/profile.jpg', label: siteCopy.developerAlt }]}
             closeLabel={c.photoClose} previousLabel={c.photoPrevious} nextLabel={c.photoNext} loadingLabel={c.photoLoading} errorLabel={c.photoError} retryLabel={c.photoRetry} />
           <Heading level="level2">{c.portfolioName} · {c.portfolioRole}</Heading>
@@ -176,7 +173,7 @@ function StructurePanel() {
     <Intro eyebrow="01 / WORKSPACE STRUCTURE" title={c.structureTitle} description={c.structureIntro} />
     <Card title={c.structureTreeTitle} headingLevel={2} padding="lg"><Stack gap="md">
       <Text as="p" tone="muted">{c.structureTreeCaption}</Text>
-      <pre className="workspace-tree" tabIndex={0} role="region" aria-label={c.structureTreeTitle}><code>{c.structureTree}</code></pre>
+      <CodeBlock code={c.structureTree} label={c.structureTreeTitle} />
       <span className="diagram-mobile-hint"><Text variant="caption" tone="muted">{c.structureTreeHint}</Text></span>
     </Stack></Card>
     <Section title={c.structureBoundaryTitle}><Notes items={[
@@ -231,7 +228,7 @@ export default function App() {
     if (hash === '#discontinued') document.getElementById('discontinued')?.scrollIntoView({ block: 'start', behavior: 'instant' });
     else if (hash) document.getElementById('panel-start')?.scrollIntoView({ block: 'start', behavior: 'instant' });
   }, [hash]);
-  return <HjmProvider theme="system" host="contents"><BrandProvider>
+  return <HjmProvider theme="system" host="contents">
     <SkipNav targetId="main" label={siteCopy.skip} />
     <div className="portfolio-host"><ScreenLayout title={siteCopy.home} contentInset="none" layoutStyle={{ maxWidth: 'none' }} header={
       <header className="site-header"><Container size="content" gutter="none"><TopBar
@@ -250,5 +247,5 @@ export default function App() {
         <Stack axis="inline" gap="md" wrap><Link href="#support" variant="standalone" tone="neutral">{siteCopy.legalNav}</Link><Link href={`mailto:${developerEmail}`} variant="standalone" tone="neutral">{siteCopy.contact} ↗</Link></Stack>
       </Stack></Container></footer>
     </ScreenLayout></div>
-  </BrandProvider></HjmProvider>;
+  </HjmProvider>;
 }

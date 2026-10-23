@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import { MarketingPanel } from './MarketingPanel';
 import { marketingAccounts } from './performance/marketingAccount';
-import { Select, StatisticGroup, Timeline } from '@hjmds/react';
+import { Select } from '@hjmds/react/forms';
 import { Link } from '@hjmds/react/actions';
-import { Badge, Card, Tag } from '@hjmds/react/display';
+import { Badge, Card, StatisticGroup, Tag, Timeline } from '@hjmds/react/display';
 import { EmptyState } from '@hjmds/react/feedback';
 import { Heading } from '@hjmds/react/heading';
 import { Grid, Section, Stack, Text } from '@hjmds/react/layout';

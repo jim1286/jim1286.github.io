@@ -10,7 +10,7 @@ export type ArchNodeType = 'frontend' | 'backend' | 'database' | 'cloud' | 'secu
 export type ArchEdgeVariant = 'emphasis' | 'security' | 'dashed';
 export type ArchNode = { id: string; type: ArchNodeType; x: number; y: number; w: number; label: string; sub: string; tag?: string; detail?: string; drill?: string };
 export type ArchEdge = { from: string; to: string; label?: string; variant?: ArchEdgeVariant; path?: number[][]; labelAt?: [number, number] };
-export type ArchCard = { tone: 'primary' | 'brand' | 'neutral' | 'danger'; title: string; items: string[] };
+export type ArchCard = { title: string; items: string[] };
 export type ArchTableRow = { id: string; view: string; cells: Record<'app' | 'client' | 'server' | 'host' | 'hjm' | 'release' | 'ota' | 'login', string> };
 export type ArchView = {
   id: string; parent: string | null; title: string; crumb: string; hint: string;
@@ -132,9 +132,9 @@ export const ARCH_VIEWS: Record<string, ArchView> = {
     ],
     boundaries: [{ label: c.archOverviewBoundary1, wraps: ["ovh", "ec2"] }],
     cards: [
-      { tone: "primary", title: c.archOverviewEdge4, items: [c.archOverviewCard1Item1, c.archOverviewCard1Item2, c.archOverviewCard1Item3] },
-      { tone: "brand", title: c.archOverviewCard2Title, items: [c.archOverviewCard2Item1, c.archOverviewCard2Item2, c.archOverviewCard2Item3] },
-      { tone: "neutral", title: c.archOverviewCard3Title, items: [c.archOverviewCard3Item1, c.archOverviewCard3Item2, c.archOverviewCard3Item3] },
+      { title: c.archOverviewEdge4, items: [c.archOverviewCard1Item1, c.archOverviewCard1Item2, c.archOverviewCard1Item3] },
+      { title: c.archOverviewCard2Title, items: [c.archOverviewCard2Item1, c.archOverviewCard2Item2, c.archOverviewCard2Item3] },
+      { title: c.archOverviewCard3Title, items: [c.archOverviewCard3Item1, c.archOverviewCard3Item2, c.archOverviewCard3Item3] },
     ],
   },
   dev: {
@@ -189,9 +189,9 @@ export const ARCH_VIEWS: Record<string, ArchView> = {
     ],
     boundaries: [],
     cards: [
-      { tone: "brand", title: c.archDevCard1Title, items: [c.archDevCard1Item1, c.archDevCard1Item2, c.archDevCard1Item3, c.archDevCard1Item4] },
-      { tone: "danger", title: c.archDevCard2Title, items: [c.archDevCard2Item1, c.archDevCard2Item2, c.archDevCard2Item3, c.archDevCard2Item4] },
-      { tone: "neutral", title: c.archDevCard3Title, items: [c.archDevCard3Item1, c.archDevCard3Item2, c.archDevCard3Item3] },
+      { title: c.archDevCard1Title, items: [c.archDevCard1Item1, c.archDevCard1Item2, c.archDevCard1Item3, c.archDevCard1Item4] },
+      { title: c.archDevCard2Title, items: [c.archDevCard2Item1, c.archDevCard2Item2, c.archDevCard2Item3, c.archDevCard2Item4] },
+      { title: c.archDevCard3Title, items: [c.archDevCard3Item1, c.archDevCard3Item2, c.archDevCard3Item3] },
     ],
   },
   ci: {
@@ -235,9 +235,9 @@ export const ARCH_VIEWS: Record<string, ArchView> = {
     ],
     boundaries: [{ label: c.archCiOperatorTag, wraps: ["operator"] }, { label: c.archCiBoundary2, wraps: ["sched", "native", "keys", "vm", "cache"] }],
     cards: [
-      { tone: "brand", title: c.archDevCard1Title, items: [c.archCiCard1Item1, c.archCiCard1Item2, c.archCiCard1Item3, c.archCiCard1Item4] },
-      { tone: "primary", title: c.archCiCard2Title, items: [c.archCiCard2Item1, c.archCiCard2Item2, c.archCiCard2Item3] },
-      { tone: "danger", title: c.archCiCard3Title, items: [c.archCiCard3Item1, c.archCiCard3Item2, c.archCiCard3Item3] },
+      { title: c.archDevCard1Title, items: [c.archCiCard1Item1, c.archCiCard1Item2, c.archCiCard1Item3, c.archCiCard1Item4] },
+      { title: c.archCiCard2Title, items: [c.archCiCard2Item1, c.archCiCard2Item2, c.archCiCard2Item3] },
+      { title: c.archCiCard3Title, items: [c.archCiCard3Item1, c.archCiCard3Item2, c.archCiCard3Item3] },
     ],
   },
   std: {
@@ -335,9 +335,9 @@ export const ARCH_VIEWS: Record<string, ArchView> = {
     ],
     boundaries: [{ label: c.archStdBoundary1, wraps: ["policy", "impl", "tmpl"] }],
     cards: [
-      { tone: "primary", title: c.archStdCard1Title, items: [c.archStdCard1Item1, c.archStdCard1Item2, c.archStdCard1Item3, c.archStdCard1Item4] },
-      { tone: "neutral", title: c.archStdCard2Title, items: [c.archStdCard2Item1, c.archStdCard2Item2, c.archStdCard2Item3] },
-      { tone: "danger", title: c.archStdCard3Title, items: [c.archStdCard3Item1, c.archStdCard3Item2, c.archStdCard3Item3] },
+      { title: c.archStdCard1Title, items: [c.archStdCard1Item1, c.archStdCard1Item2, c.archStdCard1Item3, c.archStdCard1Item4] },
+      { title: c.archStdCard2Title, items: [c.archStdCard2Item1, c.archStdCard2Item2, c.archStdCard2Item3] },
+      { title: c.archStdCard3Title, items: [c.archStdCard3Item1, c.archStdCard3Item2, c.archStdCard3Item3] },
     ],
   },
   apps: {
@@ -433,8 +433,8 @@ export const ARCH_VIEWS: Record<string, ArchView> = {
       { label: c.archUnairplaneHost, wraps: ["unairplane"] },
     ],
     cards: [
-      { tone: "primary", title: c.archAppsCard1Title, items: [c.archAppsCard1Item1, c.archAppsCard1Item2, c.archAppsCard1Item3] },
-      { tone: "neutral", title: c.archAppsCard2Title, items: [c.archAppsCard2Item1, c.archAppsCard2Item2, c.archAppsCard2Item3] },
+      { title: c.archAppsCard1Title, items: [c.archAppsCard1Item1, c.archAppsCard1Item2, c.archAppsCard1Item3] },
+      { title: c.archAppsCard2Title, items: [c.archAppsCard2Item1, c.archAppsCard2Item2, c.archAppsCard2Item3] },
     ],
     table: {
       title: c.archTableTitle,
@@ -588,12 +588,11 @@ export const ARCH_VIEWS: Record<string, ArchView> = {
     boundaries: [{ label: c.archAppBurntokBoundary1, wraps: ["std", "hub", "deploy"] }, { label: c.archBurntokHost, wraps: ["server", "db", "cache"] }],
     cards: [
       {
-        tone: "primary",
         title: c.archAppBurntokCard1Title,
         items: [c.archAppBurntokCard1Item1, c.archAppBurntokCard1Item2, c.archAppBurntokCard1Item3, c.archAppBurntokCard1Item4],
       },
-      { tone: "brand", title: c.archAppBurntokCard2Title, items: [c.archAppBurntokCard2Item1, c.archAppBurntokCard2Item2, c.archAppBurntokCard2Item3] },
-      { tone: "neutral", title: c.archAppBurntokDeployLabel, items: [c.archAppBurntokDeploySub, c.archAppBurntokCard3Item2, c.archAppBurntokCard3Item3] },
+      { title: c.archAppBurntokCard2Title, items: [c.archAppBurntokCard2Item1, c.archAppBurntokCard2Item2, c.archAppBurntokCard2Item3] },
+      { title: c.archAppBurntokDeployLabel, items: [c.archAppBurntokDeploySub, c.archAppBurntokCard3Item2, c.archAppBurntokCard3Item3] },
     ],
   },
   "app-diairy": {
@@ -702,13 +701,11 @@ export const ARCH_VIEWS: Record<string, ArchView> = {
     boundaries: [{ label: c.archAppBurntokBoundary1, wraps: ["std", "hub", "deploy"] }, { label: c.archBurntokHost, wraps: ["server", "db", "cache"] }],
     cards: [
       {
-        tone: "primary",
         title: c.archAppBurntokCard1Title,
         items: [c.archAppBurntokCard1Item1, c.archAppBurntokCard1Item2, c.archAppBurntokCard1Item3, c.archAppDiairyCard1Item4],
       },
-      { tone: "brand", title: c.archAppBurntokCard2Title, items: [c.archAppDiairyCard2Item1, c.archAppDiairyCard2Item2, c.archAppDiairyCard2Item3] },
+      { title: c.archAppBurntokCard2Title, items: [c.archAppDiairyCard2Item1, c.archAppDiairyCard2Item2, c.archAppDiairyCard2Item3] },
       {
-        tone: "neutral",
         title: c.archAppBurntokDeployLabel,
         items: [c.archAppDiairyDeploySub, c.archAppBurntokCard3Item2, c.archAppDiairyCard3Item3, c.archAppBurntokCard3Item3],
       },
@@ -804,12 +801,11 @@ export const ARCH_VIEWS: Record<string, ArchView> = {
     boundaries: [{ label: c.archAppBurntokBoundary1, wraps: ["std", "hub", "deploy"] }, { label: c.archBurntokHost, wraps: ["server", "db", "cache"] }],
     cards: [
       {
-        tone: "primary",
         title: c.archAppBurntokCard1Title,
         items: [c.archAppSpintCard1Item1, c.archAppBurntokCard1Item2, c.archAppBurntokCard1Item3, c.archAppSpintCard1Item4],
       },
-      { tone: "brand", title: c.archAppBurntokCard2Title, items: [c.archAppSpintCard2Item1, c.archAppSpintCard2Item2, c.archAppSpintCard2Item3] },
-      { tone: "neutral", title: c.archAppBurntokDeployLabel, items: [c.archAppDiairyDeploySub, c.archAppBurntokCard3Item3] },
+      { title: c.archAppBurntokCard2Title, items: [c.archAppSpintCard2Item1, c.archAppSpintCard2Item2, c.archAppSpintCard2Item3] },
+      { title: c.archAppBurntokDeployLabel, items: [c.archAppDiairyDeploySub, c.archAppBurntokCard3Item3] },
     ],
   },
   "app-utilverse": {
@@ -898,12 +894,11 @@ export const ARCH_VIEWS: Record<string, ArchView> = {
     boundaries: [{ label: c.archAppBurntokBoundary1, wraps: ["std", "hub", "deploy"] }, { label: c.archBurntokHost, wraps: ["server", "db"] }],
     cards: [
       {
-        tone: "primary",
         title: c.archAppBurntokCard1Title,
         items: [c.archAppSpintCard1Item1, c.archAppBurntokCard1Item2, c.archAppBurntokCard1Item3, c.archAppUtilverseCard1Item4],
       },
-      { tone: "brand", title: c.archAppBurntokCard2Title, items: [c.archAppUtilverseCard2Item1, c.archAppUtilverseCard2Item2, c.archAppUtilverseCard2Item3] },
-      { tone: "neutral", title: c.archAppBurntokDeployLabel, items: [c.archAppUtilverseDeploySub, c.archAppBurntokCard3Item3] },
+      { title: c.archAppBurntokCard2Title, items: [c.archAppUtilverseCard2Item1, c.archAppUtilverseCard2Item2, c.archAppUtilverseCard2Item3] },
+      { title: c.archAppBurntokDeployLabel, items: [c.archAppUtilverseDeploySub, c.archAppBurntokCard3Item3] },
     ],
   },
   "app-choose-window": {
@@ -992,16 +987,14 @@ export const ARCH_VIEWS: Record<string, ArchView> = {
     boundaries: [{ label: c.archAppBurntokBoundary1, wraps: ["std", "hub", "deploy"] }, { label: c.archBurntokHost, wraps: ["server"] }],
     cards: [
       {
-        tone: "primary",
         title: c.archAppBurntokCard1Title,
         items: [c.archAppSpintCard1Item1, c.archAppBurntokCard1Item2, c.archAppChooseWindowCard1Item3, c.archAppChooseWindowCard1Item4],
       },
       {
-        tone: "brand",
         title: c.archAppBurntokCard2Title,
         items: [c.archAppChooseWindowCard2Item1, c.archAppChooseWindowCard2Item2, c.archAppChooseWindowCard2Item3],
       },
-      { tone: "neutral", title: c.archAppBurntokDeployLabel, items: [c.archAppUtilverseDeploySub, c.archAppBurntokCard3Item3] },
+      { title: c.archAppBurntokDeployLabel, items: [c.archAppUtilverseDeploySub, c.archAppBurntokCard3Item3] },
     ],
   },
   "app-yajalal": {
@@ -1094,12 +1087,11 @@ export const ARCH_VIEWS: Record<string, ArchView> = {
     boundaries: [{ label: c.archAppBurntokBoundary1, wraps: ["std", "hub", "deploy"] }, { label: c.archOverviewEc2Label, wraps: ["server", "db", "cache"] }],
     cards: [
       {
-        tone: "primary",
         title: c.archAppBurntokCard1Title,
         items: [c.archAppSpintCard1Item1, c.archAppBurntokCard1Item2, c.archAppBurntokCard1Item3, c.archAppYajalalCard1Item4],
       },
-      { tone: "brand", title: c.archAppBurntokCard2Title, items: [c.archAppYajalalCard2Item1, c.archAppYajalalCard2Item2, c.archNoInternalPackages] },
-      { tone: "neutral", title: c.archAppBurntokDeployLabel, items: [c.archAppYajalalDeploySub, c.archAppDiairyCard3Item3, c.archAppBurntokCard3Item3] },
+      { title: c.archAppBurntokCard2Title, items: [c.archAppYajalalCard2Item1, c.archAppYajalalCard2Item2, c.archNoInternalPackages] },
+      { title: c.archAppBurntokDeployLabel, items: [c.archAppYajalalDeploySub, c.archAppDiairyCard3Item3, c.archAppBurntokCard3Item3] },
     ],
   },
   "app-unairplane": {
@@ -1190,12 +1182,11 @@ export const ARCH_VIEWS: Record<string, ArchView> = {
     boundaries: [{ label: c.archAppBurntokBoundary1, wraps: ["std", "hub", "deploy"] }, { label: c.archUnairplaneHost, wraps: ["server", "db"] }],
     cards: [
       {
-        tone: "primary",
         title: c.archAppBurntokCard1Title,
         items: [c.archAppSpintCard1Item1, c.archAppBurntokCard1Item2, c.archAppBurntokCard1Item3, c.archAppUnairplaneCard1Item4],
       },
-      { tone: "brand", title: c.archAppBurntokCard2Title, items: [c.archAppUnairplaneCard2Item1, c.archAppUnairplaneCard2Item2, c.archAppUnairplaneCard2Item3] },
-      { tone: "neutral", title: c.archAppBurntokDeployLabel, items: [c.archAppBurntokCard3Item3, c.archAppUnairplaneCard3Item2] },
+      { title: c.archAppBurntokCard2Title, items: [c.archAppUnairplaneCard2Item1, c.archAppUnairplaneCard2Item2, c.archAppUnairplaneCard2Item3] },
+      { title: c.archAppBurntokDeployLabel, items: [c.archAppBurntokCard3Item3, c.archAppUnairplaneCard3Item2] },
     ],
   },
   "app-portfolio-site": {
@@ -1272,16 +1263,14 @@ export const ARCH_VIEWS: Record<string, ArchView> = {
     boundaries: [{ label: c.archAppBurntokBoundary1, wraps: ["std", "hub", "deploy"] }],
     cards: [
       {
-        tone: "primary",
         title: c.archAppBurntokCard1Title,
         items: [c.archAppPortfolioSiteCard1Item1, c.archAppBurntokCard1Item2, c.archAppPortfolioSiteCard1Item3, c.archAppChooseWindowCard1Item4],
       },
       {
-        tone: "brand",
         title: c.archAppBurntokCard2Title,
         items: [c.archAppPortfolioSiteCard2Item1, c.archAppPortfolioSiteCard2Item2, c.archNoInternalPackages],
       },
-      { tone: "neutral", title: c.archAppBurntokDeployLabel, items: [c.archAppPortfolioSiteDeploySub] },
+      { title: c.archAppBurntokDeployLabel, items: [c.archAppPortfolioSiteDeploySub] },
     ],
   },
 };

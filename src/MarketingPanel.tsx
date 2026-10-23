@@ -1,7 +1,6 @@
 import { useState } from 'react';
-import { StatisticGroup } from '@hjmds/react';
 import { Link } from '@hjmds/react/actions';
-import { Card } from '@hjmds/react/display';
+import { Card, StatisticGroup } from '@hjmds/react/display';
 import { BarChart, LineChart } from '@hjmds/react/chart';
 import { Collapsible } from '@hjmds/react/collapsible';
 import { Stack, Text } from '@hjmds/react/layout';

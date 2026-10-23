@@ -1,16 +1,20 @@
 /* Product-level editorial layout. HJM owns typography, tabs, card geometry,
-   controls and focus behavior; brand colors enter through BrandProvider. */
+   controls, focus behavior and the single theme provider in App. */
 html { scroll-behavior: smooth; }
-body { margin: 0; min-width: 320px; }
+/* Document-wide text rendering (formerly a nested provider's .portfolio-theme class). */
+body { margin: 0; min-width: 320px; font-synthesis: none; text-rendering: optimizeLegibility; }
 * { box-sizing: border-box; }
 img { display: block; max-width: 100%; }
 .portfolio-host { height: 100vh; height: 100dvh; }
-.portfolio-theme { font-synthesis: none; text-rendering: optimizeLegibility; }
 .site-header { background: var(--hjm-color-bg); }
 .tabs-bar { position: sticky; top: 0; z-index: 2; background: var(--hjm-color-bg); padding-block: var(--hjm-space-sm); }
 #panel-start, #discontinued { scroll-margin-block-start: 80px; }
 /* The topic body owns symmetric outer spacing (2026-10-20: mobile measured 16px above / 24px below). */
 .panel-wrap { padding-block: var(--hjm-space-xl); }
+/* HJM has no image trigger yet (extension candidate), so the photo opener stays a native
+   button; its focus ring uses the HJM focus indicator tokens. */
+.profile-photo-trigger { align-self: start; padding: 0; border: 0; background: transparent; cursor: zoom-in; border-radius: var(--hjm-radius-md); }
+.profile-photo-trigger:focus-visible { outline: var(--hjm-focus-width) solid var(--hjm-color-focus); outline-offset: var(--hjm-focus-offset); }
 /* The profile is a user-selected image. Preserve the full photo's aspect ratio. */
 .profile-photo { width: 100%; max-width: 160px; height: auto; border-radius: var(--hjm-radius-md); }
 .diagram-scroll { overflow-x: auto; max-width: 100%; }
@@ -30,12 +34,8 @@ img { display: block; max-width: 100%; }
 .hero-title { white-space: pre-line; }
 @media (min-width: 800px) {
   .panel-wrap { padding-block: 48px; }
-  .chapter-block { padding-block: 24px; }
+  .chapter-block { padding-block: var(--hjm-space-xl); }
 }
-
-/* Preserve directory branches as text; contain horizontal scrolling in the tree. */
-.workspace-tree { max-width: 100%; overflow-x: auto; margin: 0; padding-block: var(--hjm-space-md); color: var(--hjm-color-text); line-height: 1.85; font-size: 14px; tab-size: 4; }
-.workspace-tree code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
 
 
 /* Drill-down architecture (src/architecture). Node roles map to public HJM color tokens so the

@@ -218,7 +218,7 @@ export function DrillArchitecture() {
         }} />
     </Card>}
     <Grid columns={{ compact: 1, expanded: view.cards.length }} gap={{ compact: 'lg' }}>
-      {view.cards.map(card => <Card key={card.title} title={card.title} headingLevel={4} padding="lg" className="arch-card" data-tone={card.tone}>
+      {view.cards.map(card => <Card key={card.title} title={card.title} headingLevel={4} padding="lg">
         <ul className="arch-list">{card.items.map(item => <li key={item}><Text as="span" tone="muted">{item}</Text></li>)}</ul>
       </Card>)}
     </Grid>

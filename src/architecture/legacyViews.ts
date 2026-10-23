@@ -249,11 +249,11 @@ const fromStage = (stage: (typeof stages)[number], index: number, key: string) =
     edges: layout.edges.map(e => ({ d: e.path, label: e.label, at: e.label ? [e.x, e.y - 4] as [number, number] : undefined, dashed: e.dashed })),
     regions: layout.regions, caption: diagram.caption, title: diagram.title };
 };
-const roleCards = (roles: { name: string; role: string; contract: string; reason: string }[]): ArchCard[] => roles.map((r, i) => ({
-  tone: (['primary', 'brand', 'neutral'] as const)[i % 3], title: r.name,
+const roleCards = (roles: { name: string; role: string; contract: string; reason: string }[]): ArchCard[] => roles.map(r => ({
+  title: r.name,
   items: [`${c.systemRole}: ${r.role}`, `${c.systemContract}: ${r.contract}`, `${c.systemReason}: ${r.reason}`] }));
 const canvasEdges = (paths: string[], optional: string[] = []) => [...paths.map(d => ({ d })), ...optional.map(d => ({ d, dashed: true }))];
-const listCard = (tone: ArchCard['tone'], title: string, rows: string[][]): ArchCard => ({ tone, title, items: rows.map(([t, b]) => `${t}: ${b}`) });
+const listCard = (title: string, rows: string[][]): ArchCard => ({ title, items: rows.map(([t, b]) => `${t}: ${b}`) });
 
 export function buildLegacyViews(): Record<string, ArchView> {
   const [overallStage, clientStage, serverStage, stateStage, changeStage] = stages;
@@ -281,41 +281,41 @@ export function buildLegacyViews(): Record<string, ArchView> {
   for (const native of [false, true]) {
     const d = clientDiagram(native);
     views.push(geometryView({ id: native ? 'code-client-app' : 'code-client-web', parent: 'code-client', title: d.title, crumb: native ? c.archCrumbApp : c.archCrumbWeb, hint: d.caption,
-      w: 210, h: 78, boxes: d.boxes, edges: canvasEdges(d.paths), cards: [listCard('primary', c.clientTitle, clientContracts)] }));
+      w: 210, h: 78, boxes: d.boxes, edges: canvasEdges(d.paths), cards: [listCard(c.clientTitle, clientContracts)] }));
   }
   views.push(geometryView({ id: 'code-server-flow', parent: 'code-server', title: serverCanvas.title, crumb: c.archCrumbServerFlow, hint: serverCanvas.caption,
     w: 210, h: 78, boxes: serverCanvas.boxes, edges: canvasEdges(serverCanvas.paths, serverCanvas.optionalPaths),
-    cards: [listCard('primary', c.serverTitle, serverContracts.map(([t, b]) => [t, b])), { tone: 'neutral', title: c.serverExamples, items: [c.serverExamplesBody] }] }));
+    cards: [listCard(c.serverTitle, serverContracts.map(([t, b]) => [t, b])), { title: c.serverExamples, items: [c.serverExamplesBody] }] }));
 
   const guide = overallFlow();
   views.push(geometryView({ id: 'guide', parent: 'dev', title: c.operationsGuide, crumb: c.archGuideCrumb, hint: `${c.operationsGuideBody} ${guide.caption}`, w: 210, h: 78,
     boxes: guide.boxes, edges: canvasEdges(guide.paths), drills: { branch0: 'guide-modules' },
-    cards: [listCard('primary', c.flowStepsTitle, flowSteps.map(([t, b], i) => [`${String(i + 1).padStart(2, '0')} · ${t}`, b])),
-      listCard('neutral', c.workMapTitle, workAreas.map(([t, f]) => [t, f])),
-      listCard('brand', c.workMapCasesTitle, [[c.workMapCaseHjmTitle, c.workMapCaseHjmBody], [c.workMapCaseBurnTitle, c.workMapCaseBurnBody], [c.workMapCaseLegacyTitle, c.workMapCaseLegacyBody]])] }));
+    cards: [listCard(c.flowStepsTitle, flowSteps.map(([t, b], i) => [`${String(i + 1).padStart(2, '0')} · ${t}`, b])),
+      listCard(c.workMapTitle, workAreas.map(([t, f]) => [t, f])),
+      listCard(c.workMapCasesTitle, [[c.workMapCaseHjmTitle, c.workMapCaseHjmBody], [c.workMapCaseBurnTitle, c.workMapCaseBurnBody], [c.workMapCaseLegacyTitle, c.workMapCaseLegacyBody]])] }));
   views.push({ id: 'guide-modules', parent: 'guide', title: c.moduleGuidesTitle, crumb: c.moduleGuidesTitle, hint: c.moduleGuidesIntro, edges: [], boundaries: [],
     nodes: moduleGuides.map((m, i) => ({ id: `m${i}`, type: 'frontend' as const, x: 40 + i * 300, y: 60, w: 260, label: m.title, sub: m.kind, drill: `guide-module-${i}` })),
-    cards: [{ tone: 'neutral', title: c.moduleGuidesTitle, items: [c.moduleGuidesIntro, c.moduleGuidesBasis] }] });
+    cards: [{ title: c.moduleGuidesTitle, items: [c.moduleGuidesIntro, c.moduleGuidesBasis] }] });
   moduleGuides.forEach((m, i) => views.push(chainView(`guide-module-${i}`, 'guide-modules', m.title, m.title, m.kind, m.flow,
-    [{ tone: 'primary', title: c.moduleRoleLabel, items: [m.role] }, { tone: 'neutral', title: c.moduleBoundaryLabel, items: [m.boundary] }, { tone: 'brand', title: c.moduleCheckLabel, items: [m.check] }],
+    [{ title: c.moduleRoleLabel, items: [m.role] }, { title: c.moduleBoundaryLabel, items: [m.boundary] }, { title: c.moduleCheckLabel, items: [m.check] }],
     m.publicDocs ? [{ label: c.moduleEntryLink, href: `${m.repository}/blob/main/${m.entry}` }, { label: c.moduleContractLink, href: `${m.repository}/blob/main/module.contract.json` }] : undefined)));
 
   const qa = qaFlow();
   views.push(geometryView({ id: 'qa', parent: 'dev', title: c.qaTitle, crumb: c.navQa, hint: `${c.qaIntro} ${c.qaFlowCaption}`, w: 240, h: 86,
     boxes: qa.boxes.map((b, i) => ({ ...b, x: qa.layout.points[i][0], y: qa.layout.points[i][1] })),
     edges: qa.layout.edges.map(e => ({ d: e.path, label: e.label, at: e.label ? [e.x, e.y - 4] as [number, number] : undefined, dashed: e.dashed })),
-    cards: [listCard('primary', c.qaScopeTitle, [[c.qaUiTitle, c.qaUiBody], [c.qaLogicTitle, c.qaLogicBody], [c.qaJourneyTitle, c.qaJourneyBody], [c.qaNativeTitle, c.qaNativeBody]]),
-      { tone: 'brand', title: c.qaExploreTitle, items: [c.qaExploreBody] }, { tone: 'neutral', title: c.workflowQaTitle, items: [c.workflowQaBody] }, { tone: 'neutral', title: c.qaEvidenceTitle, items: [c.qaEvidenceBody] }] }));
+    cards: [listCard(c.qaScopeTitle, [[c.qaUiTitle, c.qaUiBody], [c.qaLogicTitle, c.qaLogicBody], [c.qaJourneyTitle, c.qaJourneyBody], [c.qaNativeTitle, c.qaNativeBody]]),
+      { title: c.qaExploreTitle, items: [c.qaExploreBody] }, { title: c.workflowQaTitle, items: [c.workflowQaBody] }, { title: c.qaEvidenceTitle, items: [c.qaEvidenceBody] }] }));
 
   const mf = marketingFlow();
   views.push(geometryView({ id: 'marketing', parent: 'overview', title: c.operationsMarketing, crumb: c.archMarketingCrumb, hint: `${c.operationsMarketingBody} ${mf.caption}`, w: 210, h: 78,
     boxes: mf.boxes, edges: canvasEdges(mf.paths), drills: { improvement: 'marketing-dots' },
-    cards: [listCard('primary', c.operationsMarketing, [[c.marketingSearchTitle, c.marketingSearchBody], [c.marketingDiscoveryTitle, c.marketingDiscoveryBody]]),
-      { tone: 'brand', title: c.marketingPosliTitle, items: [c.marketingPosliBody, c.marketingPosliBoundary] },
-      listCard('neutral', c.marketingImproveTitle, [[c.marketingStoryTitle, c.marketingStoryBody], [c.marketingMeasureTitle, c.marketingMeasureBody], [c.marketingImproveTitle, c.marketingImproveBody]])],
+    cards: [listCard(c.operationsMarketing, [[c.marketingSearchTitle, c.marketingSearchBody], [c.marketingDiscoveryTitle, c.marketingDiscoveryBody]]),
+      { title: c.marketingPosliTitle, items: [c.marketingPosliBody, c.marketingPosliBoundary] },
+      listCard(c.marketingImproveTitle, [[c.marketingStoryTitle, c.marketingStoryBody], [c.marketingMeasureTitle, c.marketingMeasureBody], [c.marketingImproveTitle, c.marketingImproveBody]])],
     links: [{ label: c.marketingInstagram, href: 'https://www.instagram.com/posli.makes/' }, { label: c.marketingThreads, href: 'https://www.threads.net/@posli.makes' }] }));
   views.push(chainView('marketing-dots', 'marketing', c.dotsTitle, c.dotsLabel, c.dotsIntro, c.dotsFlow,
-    [listCard('primary', c.dotsTitle, [[c.dotsResearchTitle, c.dotsResearchBody], [c.dotsPlanTitle, c.dotsPlanBody], [c.dotsLearnTitle, c.dotsLearnBody]]), { tone: 'neutral', title: c.dotsLabel, items: [c.dotsBoundary] }],
+    [listCard(c.dotsTitle, [[c.dotsResearchTitle, c.dotsResearchBody], [c.dotsPlanTitle, c.dotsPlanBody], [c.dotsLearnTitle, c.dotsLearnBody]]), { title: c.dotsLabel, items: [c.dotsBoundary] }],
     [{ label: c.dotsSource, href: 'https://learn.chatgpt.com/docs/dots' }]));
 
   return Object.fromEntries(views.map(v => [v.id, v]));
