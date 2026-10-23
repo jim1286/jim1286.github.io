@@ -1,12 +1,12 @@
 {
-  "$id": "hjm.catalog-snapshot/1.41.2",
-  "designSystemVersion": "1.41.2",
+  "$id": "hjm.catalog-snapshot/1.45.0",
+  "designSystemVersion": "1.45.0",
   "source": {
     "repository": "https://github.com/jim1286/hjm-design-system.git",
-    "tag": "v1.41.2",
-    "commit": "a5098236dd9bc46f6159481e74635f8f4c272687",
+    "tag": "v1.45.0",
+    "commit": "d16975a29c2d1951c3e33da5ed6e645391038db7",
     "sourcePath": "packages/design-contracts/dist/catalog.js",
-    "contentSha256": "709a25a2401305af575b5d352ae78b3c791b6428cd4532c1d66ce428f30964f6"
+    "contentSha256": "b44e93ef1042a404288e05c07bbfd61e2c95b8a07256e36edbc0b5e9c9d7329e"
   },
   "components": [
     {
@@ -31,7 +31,9 @@
       "id": "alert-dialog",
       "status": "stable",
       "name": "AlertDialog",
-      "companions": []
+      "companions": [
+        "AlertDialogQueueProvider"
+      ]
     },
     {
       "id": "anchor",
@@ -364,7 +366,8 @@
       "status": "stable",
       "name": "IconButton",
       "companions": [
-        "ClipboardIconButton"
+        "ClipboardIconButton",
+        "IconButtonLink"
       ]
     },
     {
@@ -594,7 +597,10 @@
       "id": "screen-layout",
       "status": "stable",
       "name": "ScreenLayout",
-      "companions": []
+      "companions": [
+        "ScreenHost",
+        "ScreenRefreshControl"
+      ]
     },
     {
       "id": "search-field",
