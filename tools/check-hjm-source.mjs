@@ -611,12 +611,15 @@ function verifyLockedDependency(lock, importerRoot, name, requirement, { mode = 
   }
 }
 
-function componentIdFromSymbol(symbol) {
+function componentIdFromSymbol(symbol, components = []) {
+  const owner = components.find(entry => entry.name === symbol || entry.companions?.includes(symbol));
+  if (owner) return owner.id;
   if (symbol === 'HjmProvider' || symbol === 'HjmNativeProvider') return 'design-system-provider';
-  // The native renderer exports TextField for the catalog's shared Field recipe.
-  if (symbol === 'TextField') return 'field';
-  if (symbol === 'TabPanel') return 'tabs';
-  if (symbol === 'ToastProvider' || symbol === 'ToastRegion') return 'toast';
+  if (!components.some(entry => entry.name)) {
+    if (symbol === 'TextField') return 'field';
+    if (symbol === 'TabPanel') return 'tabs';
+    if (symbol === 'ToastProvider' || symbol === 'ToastRegion') return 'toast';
+  }
   return symbol
     .replace(/([a-z0-9])([A-Z])/g, '$1-$2')
     .replace(/([A-Z])([A-Z][a-z])/g, '$1-$2')
@@ -1212,7 +1215,7 @@ function sourceAnalysis(runtime, runtimeRoot, codeSources, rendererPackage, prov
   });
 }
 
-async function verifyFrontendSources(contract, catalogMaturity) {
+async function verifyFrontendSources(contract, catalogMaturity, catalogComponents) {
     for (const runtime of contract.runtimes || []) {
       if (!['mobile', 'web'].includes(runtime.kind)) continue;
       const runtimeRoot = resolve(appRoot, runtime.root);
@@ -1300,7 +1303,7 @@ async function verifyFrontendSources(contract, catalogMaturity) {
           // Renderer hooks and ID helpers are functions, not catalog components.
           // An alias rendered as JSX still goes through inspectRenderedTags below.
           if (/^[a-z]/.test(exportedSymbol)) continue;
-          const componentId = componentIdFromSymbol(exportedSymbol);
+          const componentId = componentIdFromSymbol(exportedSymbol, catalogComponents);
           const maturity = catalogMaturity.get(componentId);
           const runtimeSupport = {
             'bottom-cta': ['mobile'],
@@ -1320,7 +1323,7 @@ async function verifyFrontendSources(contract, catalogMaturity) {
         }
         const inspectRenderedTags = (localSymbol, exportedSymbol, renderedTags) => {
           if (renderedTags.length > 0) {
-            const componentId = componentIdFromSymbol(exportedSymbol);
+            const componentId = componentIdFromSymbol(exportedSymbol, catalogComponents);
             const maturity = catalogMaturity.get(componentId);
             const runtimeSupport = {
               'bottom-cta': ['mobile'],
@@ -1395,7 +1398,7 @@ try {
 if (contract && runtimeBindings) {
   try {
     const catalog = JSON.parse(await readFile(resolve(appRoot, contract.designSystem.catalog.snapshotPath), 'utf8'));
-    await verifyFrontendSources(contract, new Map(catalog.components.map(({ id, status }) => [id, status])));
+    await verifyFrontendSources(contract, new Map(catalog.components.map(({ id, status }) => [id, status])), catalog.components);
   } catch (error) { add('runtime source inspection', error.message); }
 } else if (contract) {
   const frontendRuntimes = (contract.runtimes || []).filter((runtime) => ['mobile', 'web'].includes(runtime.kind));
@@ -1431,7 +1434,9 @@ if (contract && runtimeBindings) {
           add(runtime.root + '/package.json.dependencies.' + frameworkPackage, 'implementation-conformant runtime must directly install its framework inside the ' + trainLabel(runtimeFrameworkFloors[runtime.kind]) + ' train; "' + manifest.dependencies?.[frameworkPackage] + '" ' + frameworkViolation);
         }
         await verifyServerRuntime(runtime, manifest);
-        for (const scriptName of ['dev', 'typecheck', 'test', 'test:e2e', 'build']) {
+        // Native device QA is separate. Do not force file-existence or duplicate
+      // unit suites to masquerade as mobile e2e merely to fill a script key.
+      for (const scriptName of ['dev', 'typecheck', 'test', ...(runtime.kind === 'mobile' ? [] : ['test:e2e']), 'build']) {
           if (isNoopScript(manifest.scripts?.[scriptName])) add(runtime.root + '/package.json.scripts.' + scriptName, 'implementation-conformant runtime requires a non-noop ' + scriptName + ' command');
         }
       }
@@ -1521,13 +1526,15 @@ if (contract && runtimeBindings) {
 
   if (contract.designSystem?.adoptionPolicy !== 'stable-default') add('contract.designSystem.adoptionPolicy', 'must be stable-default');
   let catalogMaturity = new Map();
+  let catalogComponents = [];
   try {
     const catalogSource = await readFile(resolve(appRoot, contract.designSystem.catalog.snapshotPath), 'utf8');
     const catalogDigest = createHash('sha256').update(catalogSource).digest('hex');
     if (catalogDigest !== contract.designSystem.catalog.sha256) add('contract.designSystem.catalog.sha256', 'catalog snapshot bytes do not match the pinned SHA-256');
     const catalog = JSON.parse(catalogSource);
     if (catalog.designSystemVersion !== contract.designSystem.catalog.train) add('contract.designSystem.catalog.train', 'catalog snapshot train mismatch');
-    catalogMaturity = new Map((catalog.components || []).map((component) => [component.id, component.status]));
+    catalogComponents = catalog.components || [];
+    catalogMaturity = new Map(catalogComponents.map((component) => [component.id, component.status]));
   } catch (error) {
     add('contract.designSystem.catalog.snapshotPath', error.message);
   }
@@ -1537,8 +1544,9 @@ if (contract && runtimeBindings) {
     const prefix = 'contract.designSystem.maturityAdoptions[' + index + ']';
     if (!/^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$/.test(adoption.componentId || '')) add(prefix + '.componentId', 'must be a catalog lowercase kebab-case ID');
     if (catalogMaturity.get(adoption.componentId) !== 'beta') add(prefix + '.componentId', 'must resolve to beta in the pinned HJM catalog snapshot');
-    if (adoption.adrPath) {
-      try { await access(resolve(appRoot, adoption.adrPath)); } catch { add(prefix + '.adrPath', 'optional beta adoption ADR is missing'); }
+    const recordPath = adoption.recordPath || adoption.adrPath;
+    if (recordPath) {
+      try { await access(resolve(appRoot, recordPath)); } catch { add(prefix + '.recordPath', 'optional beta adoption record is missing'); }
     }
     if (!Array.isArray(adoption.evidenceIds) || adoption.evidenceIds.length === 0) {
       add(prefix + '.evidenceIds', 'beta adoption requires app evidence');
@@ -1568,13 +1576,15 @@ if (contract && runtimeBindings) {
         add(runtime.root + '/package.json.dependencies.' + frameworkPackage, 'implementation-conformant runtime must directly install its framework inside the ' + trainLabel(runtimeFrameworkFloors[runtime.kind]) + ' train; "' + manifest.dependencies?.[frameworkPackage] + '" ' + frameworkViolation);
       }
       await verifyServerRuntime(runtime, manifest);
-      for (const scriptName of ['dev', 'typecheck', 'test', 'test:e2e', 'build']) {
+      // Native device QA is separate. Do not force file-existence or duplicate
+      // unit suites to masquerade as mobile e2e merely to fill a script key.
+      for (const scriptName of ['dev', 'typecheck', 'test', ...(runtime.kind === 'mobile' ? [] : ['test:e2e']), 'build']) {
         if (isNoopScript(manifest.scripts?.[scriptName])) {
           add(runtime.root + '/package.json.scripts.' + scriptName, 'implementation-conformant runtime requires a non-noop ' + scriptName + ' command');
         }
       }
     }
-    await verifyFrontendSources(contract, catalogMaturity);
+    await verifyFrontendSources(contract, catalogMaturity, catalogComponents);
   }
   }
 }
