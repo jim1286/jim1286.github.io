@@ -5,7 +5,7 @@ app_id: "portfolio-site"
 display_name: "Portfolio Site"
 status: draft
 owner: "jimin"
-reviewed: "2026-10-09"
+reviewed: "2026-10-08"
 version: "1.1.0"
 ---
 

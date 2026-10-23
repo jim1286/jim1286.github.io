@@ -22,7 +22,7 @@
       "id": "web",
       "kind": "web",
       "framework": "vite",
-      "frameworkVersion": "7.3.6",
+      "frameworkVersion": "8.3.4",
       "root": ".",
       "binding": {
         "manifest": "package.json",
@@ -30,7 +30,7 @@
         "entryPoints": [
           "src/main.tsx"
         ],
-        "frameworkSpecifier": "^7.0.4",
+        "frameworkSpecifier": "^8.3.4",
         "checks": {
           "typecheck": [
             "pnpm",
