@@ -1,6 +1,6 @@
 // Actual Platform=web rows. An absent row is not a confirmed zero.
 import type { MetricSeries } from './data.ts';
-export const webCapturedAt = "2026-10-23T00:18:49.932731+00:00";
+export const webCapturedAt = "2026-10-23T23:50:13.804Z";
 export const webSeries: MetricSeries[] = [
   {
     "id": "web-diairy-dau",

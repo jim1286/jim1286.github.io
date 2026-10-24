@@ -211,6 +211,82 @@ export const marketingObservations: MarketingObservation[] = [
       "reach": null
     },
     "sourceFile": "control-plane/app-release-hub/marketing/operations/2026-10/2026-10-20-insights.json"
+  },
+  {
+    "content": "내 쪽은 끝났어! 🧺",
+    "platform": "instagram",
+    "url": "https://www.instagram.com/p/DewMpt0AZHv/",
+    "publishedAt": "2026-10-21T10:31:42Z",
+    "observedAt": "2026-10-23T00:06:23.961Z",
+    "metrics": {
+      "views": 16,
+      "likes": 3,
+      "comments": 0,
+      "saves": 0,
+      "shares": 0,
+      "follows": 0,
+      "profileVisits": 0,
+      "viewers": null,
+      "reach": 5
+    },
+    "sourceFile": "control-plane/app-release-hub/marketing/operations/2026-10/2026-10-23-insights.json"
+  },
+  {
+    "content": "내 쪽은 끝났어! 🧺",
+    "platform": "threads",
+    "url": "https://www.threads.com/@posli.makes/post/DevZTXpgfBj",
+    "publishedAt": "2026-10-21T03:03:00Z",
+    "observedAt": "2026-10-23T00:06:37.157Z",
+    "metrics": {
+      "views": 8,
+      "likes": 1,
+      "comments": 0,
+      "saves": null,
+      "shares": null,
+      "follows": 0,
+      "profileVisits": 0,
+      "viewers": null,
+      "reach": null
+    },
+    "sourceFile": "control-plane/app-release-hub/marketing/operations/2026-10/2026-10-23-insights.json"
+  },
+  {
+    "content": "너부터였구나 🍵",
+    "platform": "instagram",
+    "url": "https://www.instagram.com/p/DewW92agcn2/",
+    "publishedAt": "2026-10-21T12:00:48Z",
+    "observedAt": "2026-10-23T00:06:52.080Z",
+    "metrics": {
+      "views": 22,
+      "likes": 4,
+      "comments": 0,
+      "saves": 0,
+      "shares": 0,
+      "follows": 0,
+      "profileVisits": 1,
+      "viewers": null,
+      "reach": 6
+    },
+    "sourceFile": "control-plane/app-release-hub/marketing/operations/2026-10/2026-10-23-insights.json"
+  },
+  {
+    "content": "너부터였구나 🍵",
+    "platform": "threads",
+    "url": "https://www.threads.com/@posli.makes/post/DewXGh_AWxa",
+    "publishedAt": "2026-10-21T12:03:02Z",
+    "observedAt": "2026-10-23T00:08:09.213Z",
+    "metrics": {
+      "views": 7,
+      "likes": 2,
+      "comments": 0,
+      "saves": null,
+      "shares": null,
+      "follows": 0,
+      "profileVisits": 0,
+      "viewers": null,
+      "reach": null
+    },
+    "sourceFile": "control-plane/app-release-hub/marketing/operations/2026-10/2026-10-23-insights.json"
   }
 ];
 // Replace the same post's earlier cumulative snapshot rather than adding it.
