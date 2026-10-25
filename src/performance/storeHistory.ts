@@ -1,7 +1,7 @@
 // Public aggregate store exports. Installed audience and DAU are separate metrics.
 // Exported zero padding is preserved; coverage and firstPositive do not assert an app launch date.
 import type { MetricSeries } from './data.ts';
-export const storeCapturedAt = "2026-10-23T23:56:30.137975+00:00";
+export const storeCapturedAt = "2026-10-24T23:52:13.601Z";
 export const storeSeries: MetricSeries[] = [
   {
     "id": "store-yajalal-apple-store-all-visitors",
@@ -1778,11 +1778,16 @@ export const storeSeries: MetricSeries[] = [
         "date": "2026-10-21",
         "value": 2,
         "observedOn": "2026-10-23"
+      },
+      {
+        "date": "2026-10-23",
+        "value": 6,
+        "observedOn": "2026-10-25"
       }
     ],
     "coverage": {
       "start": "2025-08-06",
-      "end": "2026-10-19"
+      "end": "2026-10-23"
     },
     "firstPositive": "2025-08-06"
   },
@@ -2539,11 +2544,16 @@ export const storeSeries: MetricSeries[] = [
         "date": "2026-10-20",
         "value": 1,
         "observedOn": "2026-10-22"
+      },
+      {
+        "date": "2026-10-23",
+        "value": 1,
+        "observedOn": "2026-10-25"
       }
     ],
     "coverage": {
       "start": "2026-07-22",
-      "end": "2026-10-20"
+      "end": "2026-10-23"
     },
     "firstPositive": "2026-09-29"
   },
@@ -5718,11 +5728,16 @@ export const storeSeries: MetricSeries[] = [
         "date": "2026-10-20",
         "value": 1,
         "observedOn": "2026-10-24"
+      },
+      {
+        "date": "2026-10-21",
+        "value": 1,
+        "observedOn": "2026-10-25"
       }
     ],
     "coverage": {
       "start": "2021-10-22",
-      "end": "2026-10-20"
+      "end": "2026-10-21"
     }
   },
   {
@@ -15841,6 +15856,11 @@ export const storeSeries: MetricSeries[] = [
         "date": "2026-10-20",
         "value": 6,
         "observedOn": "2026-10-24"
+      },
+      {
+        "date": "2026-10-21",
+        "value": 8,
+        "observedOn": "2026-10-25"
       }
     ],
     "coverage": {

@@ -5,6 +5,25 @@ export type ReleasePlatformState = { platform: 'ios' | 'android'; status: 'revie
 export type ReleaseNote = { id: string; app: string; version: string; recordedOn: string; notes: string; sourceTag?: string; sourceSha?: string; notesSource?: 'manifest' | 'app-store' | 'github-release'; originalSourceNotes?: string; storeMetadataCreatedAt?: string; storeObservedAt?: string; platforms: ReleasePlatformState[] };
 export const releaseNotes: ReleaseNote[] = [
   {
+    "id": "yajalal-2.2.2",
+    "app": "yajalal",
+    "version": "2.2.2",
+    "sourceTag": "app-v2.2.2",
+    "sourceSha": "00f2fe79e164da37b84daaa881323ab054e65660",
+    "recordedOn": "2026-10-24",
+    "notes": "선수 사진 보기와 라인업·분석 화면의 표시 및 공통 화면 동작을 개선했습니다.",
+    "notesSource": "app-store",
+    "platforms": [
+      {
+        "platform": "ios",
+        "status": "available",
+        "asOf": "2026-10-25"
+      }
+    ],
+    "storeMetadataCreatedAt": "2026-10-23T17:54:44-07:00",
+    "storeObservedAt": "2026-10-25T00:01:04.992Z"
+  },
+  {
     "id": "choose-window-2.1.2",
     "app": "choose-window",
     "version": "2.1.2",
@@ -14,12 +33,33 @@ export const releaseNotes: ReleaseNote[] = [
     "platforms": [
       {
         "platform": "ios",
-        "status": "review",
-        "asOf": "2026-10-24"
+        "status": "available",
+        "asOf": "2026-10-25"
       }
     ],
     "storeMetadataCreatedAt": "2026-10-23T15:28:43-07:00",
-    "storeObservedAt": "2026-10-24T00:09:03.770Z"
+    "storeObservedAt": "2026-10-25T00:01:04.992Z",
+    "sourceTag": "app-v2.1.2",
+    "sourceSha": "aee58a1039bd1c758f94d2775cdc22c9c7b9544a"
+  },
+  {
+    "id": "diairy-1.9.3",
+    "app": "diairy",
+    "version": "1.9.3",
+    "sourceTag": "app-v1.9.3",
+    "sourceSha": "1e8c654530a6bca06c6024a29b1eca1da2a986a4",
+    "recordedOn": "2026-10-24",
+    "notes": "손글씨 미리보기와 공통 화면 동작을 개선했습니다.",
+    "notesSource": "app-store",
+    "platforms": [
+      {
+        "platform": "ios",
+        "status": "available",
+        "asOf": "2026-10-25"
+      }
+    ],
+    "storeMetadataCreatedAt": "2026-10-23T19:03:29-07:00",
+    "storeObservedAt": "2026-10-25T00:01:04.992Z"
   },
   {
     "id": "burntok-1.7.4",
@@ -31,12 +71,50 @@ export const releaseNotes: ReleaseNote[] = [
     "platforms": [
       {
         "platform": "ios",
-        "status": "review",
-        "asOf": "2026-10-24"
+        "status": "available",
+        "asOf": "2026-10-25"
       }
     ],
     "storeMetadataCreatedAt": "2026-10-23T16:54:32-07:00",
-    "storeObservedAt": "2026-10-24T00:09:03.770Z"
+    "storeObservedAt": "2026-10-25T00:01:04.992Z",
+    "sourceTag": "app-v1.7.4",
+    "sourceSha": "28bc5ab7afcd5d0d24e4d23623a71494ee00cf63"
+  },
+  {
+    "id": "spint-1.3.2",
+    "app": "spint",
+    "version": "1.3.2",
+    "sourceTag": "app-v1.3.2",
+    "sourceSha": "a4b53609c4052df7d616dea3735d1c3d4ccc3e32",
+    "recordedOn": "2026-10-24",
+    "notes": "글 작성과 마크 사진 보기 및 공통 화면 동작을 개선했습니다.",
+    "notesSource": "app-store",
+    "platforms": [
+      {
+        "platform": "ios",
+        "status": "available",
+        "asOf": "2026-10-25"
+      }
+    ],
+    "storeMetadataCreatedAt": "2026-10-23T17:16:28-07:00",
+    "storeObservedAt": "2026-10-25T00:01:04.992Z"
+  },
+  {
+    "id": "utilverse-1.2.2",
+    "app": "utilverse",
+    "version": "1.2.2",
+    "recordedOn": "2026-10-24",
+    "notes": "홈 화면의 불필요한 세로 스크롤을 없애고 사진 보기, 글자 추출과 파일 저장의 안정성을 개선했습니다.",
+    "notesSource": "app-store",
+    "platforms": [
+      {
+        "platform": "ios",
+        "status": "available",
+        "asOf": "2026-10-25"
+      }
+    ],
+    "storeMetadataCreatedAt": "2026-10-23T18:13:20-07:00",
+    "storeObservedAt": "2026-10-25T00:01:04.992Z"
   },
   {
     "id": "unairplane-1.1.5",
@@ -49,11 +127,13 @@ export const releaseNotes: ReleaseNote[] = [
       {
         "platform": "ios",
         "status": "available",
-        "asOf": "2026-10-24"
+        "asOf": "2026-10-25"
       }
     ],
     "storeMetadataCreatedAt": "2026-10-23T14:57:29-07:00",
-    "storeObservedAt": "2026-10-24T00:09:03.770Z"
+    "storeObservedAt": "2026-10-25T00:01:04.992Z",
+    "sourceTag": "app-v1.1.5",
+    "sourceSha": "8b9f3109fc0d541de1c36495108a23e6be812062"
   },
   {
     "id": "yajalal-2.2.1",
@@ -68,11 +148,11 @@ export const releaseNotes: ReleaseNote[] = [
       {
         "platform": "ios",
         "status": "available",
-        "asOf": "2026-10-24"
+        "asOf": "2026-10-25"
       }
     ],
     "storeMetadataCreatedAt": "2026-10-22T16:05:09-07:00",
-    "storeObservedAt": "2026-10-24T00:09:03.770Z"
+    "storeObservedAt": "2026-10-25T00:01:04.992Z"
   },
   {
     "id": "choose-window-2.1.1",
@@ -87,11 +167,11 @@ export const releaseNotes: ReleaseNote[] = [
       {
         "platform": "ios",
         "status": "available",
-        "asOf": "2026-10-24"
+        "asOf": "2026-10-25"
       }
     ],
     "storeMetadataCreatedAt": "2026-10-22T16:52:40-07:00",
-    "storeObservedAt": "2026-10-24T00:09:03.770Z"
+    "storeObservedAt": "2026-10-25T00:01:04.992Z"
   },
   {
     "id": "diairy-1.9.2",
@@ -100,7 +180,7 @@ export const releaseNotes: ReleaseNote[] = [
       {
         "platform": "ios",
         "status": "available",
-        "asOf": "2026-10-24"
+        "asOf": "2026-10-25"
       }
     ],
     "app": "diairy",
@@ -110,7 +190,7 @@ export const releaseNotes: ReleaseNote[] = [
     "recordedOn": "2026-10-23",
     "notes": "손글씨 미리보기와 공통 화면 동작을 개선했습니다.",
     "storeMetadataCreatedAt": "2026-10-22T17:29:04-07:00",
-    "storeObservedAt": "2026-10-24T00:09:03.770Z"
+    "storeObservedAt": "2026-10-25T00:01:04.992Z"
   },
   {
     "id": "burntok-1.7.3",
@@ -119,7 +199,7 @@ export const releaseNotes: ReleaseNote[] = [
       {
         "platform": "ios",
         "status": "available",
-        "asOf": "2026-10-24"
+        "asOf": "2026-10-25"
       }
     ],
     "app": "burntok",
@@ -129,7 +209,7 @@ export const releaseNotes: ReleaseNote[] = [
     "recordedOn": "2026-10-23",
     "notes": "약관 동의와 사진 보기 흐름을 개선하고 프로필 아바타 생성 및 공통 화면 동작을 안정화했습니다.",
     "storeMetadataCreatedAt": "2026-10-22T17:52:00-07:00",
-    "storeObservedAt": "2026-10-24T00:09:03.770Z"
+    "storeObservedAt": "2026-10-25T00:01:04.992Z"
   },
   {
     "id": "spint-1.3.1",
@@ -144,11 +224,11 @@ export const releaseNotes: ReleaseNote[] = [
       {
         "platform": "ios",
         "status": "available",
-        "asOf": "2026-10-24"
+        "asOf": "2026-10-25"
       }
     ],
     "storeMetadataCreatedAt": "2026-10-22T15:25:10-07:00",
-    "storeObservedAt": "2026-10-24T00:09:03.770Z"
+    "storeObservedAt": "2026-10-25T00:01:04.992Z"
   },
   {
     "id": "utilverse-1.2.1",
@@ -163,11 +243,11 @@ export const releaseNotes: ReleaseNote[] = [
       {
         "platform": "ios",
         "status": "available",
-        "asOf": "2026-10-24"
+        "asOf": "2026-10-25"
       }
     ],
     "storeMetadataCreatedAt": "2026-10-22T18:10:26-07:00",
-    "storeObservedAt": "2026-10-24T00:09:03.770Z"
+    "storeObservedAt": "2026-10-25T00:01:04.992Z"
   },
   {
     "id": "unairplane-1.1.4",
@@ -182,11 +262,11 @@ export const releaseNotes: ReleaseNote[] = [
       {
         "platform": "ios",
         "status": "available",
-        "asOf": "2026-10-24"
+        "asOf": "2026-10-25"
       }
     ],
     "storeMetadataCreatedAt": "2026-10-22T15:43:28-07:00",
-    "storeObservedAt": "2026-10-24T00:09:03.770Z"
+    "storeObservedAt": "2026-10-25T00:01:04.992Z"
   },
   {
     "id": "diairy-1.9.1",
@@ -199,18 +279,18 @@ export const releaseNotes: ReleaseNote[] = [
     "notesSource": "app-store",
     "platforms": [
       {
+        "platform": "ios",
+        "status": "available",
+        "asOf": "2026-10-25"
+      },
+      {
         "platform": "android",
         "status": "available",
         "asOf": "2026-10-22"
-      },
-      {
-        "platform": "ios",
-        "status": "available",
-        "asOf": "2026-10-24"
       }
     ],
     "storeMetadataCreatedAt": "2026-10-22T00:24:03-07:00",
-    "storeObservedAt": "2026-10-24T00:09:03.770Z"
+    "storeObservedAt": "2026-10-25T00:01:04.992Z"
   },
   {
     "id": "burntok-1.7.2",
@@ -223,18 +303,18 @@ export const releaseNotes: ReleaseNote[] = [
     "notesSource": "app-store",
     "platforms": [
       {
+        "platform": "ios",
+        "status": "available",
+        "asOf": "2026-10-25"
+      },
+      {
         "platform": "android",
         "status": "review",
         "asOf": "2026-10-22"
-      },
-      {
-        "platform": "ios",
-        "status": "available",
-        "asOf": "2026-10-24"
       }
     ],
     "storeMetadataCreatedAt": "2026-10-21T23:31:41-07:00",
-    "storeObservedAt": "2026-10-24T00:09:03.770Z"
+    "storeObservedAt": "2026-10-25T00:01:04.992Z"
   },
   {
     "id": "burntok-1.7.1",
@@ -257,19 +337,19 @@ export const releaseNotes: ReleaseNote[] = [
     "sourceSha": "a9cc779d8b77fe8996ca59507dc62dbc3cc5722c",
     "platforms": [
       {
+        "platform": "ios",
+        "status": "available",
+        "asOf": "2026-10-25"
+      },
+      {
         "platform": "android",
         "status": "review",
         "asOf": "2026-10-21"
-      },
-      {
-        "platform": "ios",
-        "status": "available",
-        "asOf": "2026-10-24"
       }
     ],
     "notesSource": "app-store",
     "storeMetadataCreatedAt": "2026-10-20T22:31:46-07:00",
-    "storeObservedAt": "2026-10-24T00:09:03.770Z"
+    "storeObservedAt": "2026-10-25T00:01:04.992Z"
   },
   {
     "id": "choose-window-2.1.0",
@@ -281,19 +361,19 @@ export const releaseNotes: ReleaseNote[] = [
     "sourceSha": "a0931857df5863060fac39d952f2f7c39293c80f",
     "platforms": [
       {
+        "platform": "ios",
+        "status": "available",
+        "asOf": "2026-10-25"
+      },
+      {
         "platform": "android",
         "status": "review",
         "asOf": "2026-10-21"
-      },
-      {
-        "platform": "ios",
-        "status": "available",
-        "asOf": "2026-10-24"
       }
     ],
     "notesSource": "app-store",
     "storeMetadataCreatedAt": "2026-10-20T08:58:42-07:00",
-    "storeObservedAt": "2026-10-24T00:09:03.770Z"
+    "storeObservedAt": "2026-10-25T00:01:04.992Z"
   },
   {
     "id": "choose-window-2.0.1",
@@ -364,19 +444,19 @@ export const releaseNotes: ReleaseNote[] = [
     "sourceSha": "86d9f942c3d3aa3d898461a1919025d10d595254",
     "platforms": [
       {
+        "platform": "ios",
+        "status": "available",
+        "asOf": "2026-10-25"
+      },
+      {
         "platform": "android",
         "status": "internal",
         "asOf": "2026-10-21"
-      },
-      {
-        "platform": "ios",
-        "status": "available",
-        "asOf": "2026-10-24"
       }
     ],
     "notesSource": "app-store",
     "storeMetadataCreatedAt": "2026-10-20T21:06:44-07:00",
-    "storeObservedAt": "2026-10-24T00:09:03.770Z"
+    "storeObservedAt": "2026-10-25T00:01:04.992Z"
   },
   {
     "id": "utilverse-1.2.0",
@@ -388,18 +468,18 @@ export const releaseNotes: ReleaseNote[] = [
     "sourceSha": "5e339aee4843d7ddcb67f86b14ec73ee9ad5b004",
     "platforms": [
       {
+        "platform": "ios",
+        "status": "available",
+        "asOf": "2026-10-25"
+      },
+      {
         "platform": "android",
         "status": "closed-review",
         "asOf": "2026-10-21"
-      },
-      {
-        "platform": "ios",
-        "status": "available",
-        "asOf": "2026-10-24"
       }
     ],
     "storeMetadataCreatedAt": "2026-10-12T17:18:42-07:00",
-    "storeObservedAt": "2026-10-24T00:09:03.770Z",
+    "storeObservedAt": "2026-10-25T00:01:04.992Z",
     "notesSource": "manifest"
   },
   {
@@ -431,19 +511,19 @@ export const releaseNotes: ReleaseNote[] = [
     "sourceSha": "4d626b8ac63808e91a9c0abfccaaf9e6960a1514",
     "platforms": [
       {
+        "platform": "ios",
+        "status": "available",
+        "asOf": "2026-10-25"
+      },
+      {
         "platform": "android",
         "status": "submitted",
         "asOf": "2026-10-21"
-      },
-      {
-        "platform": "ios",
-        "status": "available",
-        "asOf": "2026-10-24"
       }
     ],
     "notesSource": "app-store",
     "storeMetadataCreatedAt": "2026-10-20T07:59:16-07:00",
-    "storeObservedAt": "2026-10-24T00:09:03.770Z"
+    "storeObservedAt": "2026-10-25T00:01:04.992Z"
   },
   {
     "id": "utilverse-1.1.0",
@@ -1084,6 +1164,36 @@ export const releaseNotes: ReleaseNote[] = [
     "notesSource": "manifest"
   },
   {
+    "id": "yajalal-1.21.8",
+    "app": "yajalal",
+    "version": "1.21.8",
+    "recordedOn": "2026-09-27",
+    "notes": "앱 아이콘을 새로 바꾸고, 랭킹 필터와 스탯 버튼을 이전의 익숙한 모양으로 되돌렸습니다. 필터 조건은 버튼 하나로 정리했습니다.",
+    "sourceTag": "app-v1.21.8+84",
+    "sourceSha": "d4f41a65892d43e399f3cd72f51f069d2db8d971",
+    "platforms": [
+      {
+        "platform": "ios",
+        "status": "available",
+        "asOf": "2026-10-22"
+      }
+    ],
+    "notesSource": "app-store",
+    "storeMetadataCreatedAt": "2026-09-26T08:47:09-07:00",
+    "storeObservedAt": "2026-10-22T01:22:53.115Z"
+  },
+  {
+    "id": "yajalal-1.21.7",
+    "app": "yajalal",
+    "version": "1.21.7",
+    "recordedOn": "2026-09-27",
+    "notes": "랭킹 필터와 스탯 버튼을 이전의 익숙한 모양으로 되돌리고, 필터 조건을 버튼 하나로 정리했습니다.",
+    "sourceTag": "app-v1.21.7+82",
+    "sourceSha": "9db78590119039be5401957411211befbd00c133",
+    "platforms": [],
+    "notesSource": "manifest"
+  },
+  {
     "id": "choose-window-1.3.2",
     "app": "choose-window",
     "version": "1.3.2",
@@ -1131,36 +1241,6 @@ export const releaseNotes: ReleaseNote[] = [
     "notesSource": "app-store",
     "storeMetadataCreatedAt": "2026-09-26T12:02:55-07:00",
     "storeObservedAt": "2026-10-22T01:22:53.115Z"
-  },
-  {
-    "id": "yajalal-1.21.8",
-    "app": "yajalal",
-    "version": "1.21.8",
-    "recordedOn": "2026-09-27",
-    "notes": "앱 아이콘을 새로 바꾸고, 랭킹 필터와 스탯 버튼을 이전의 익숙한 모양으로 되돌렸습니다. 필터 조건은 버튼 하나로 정리했습니다.",
-    "sourceTag": "app-v1.21.8+84",
-    "sourceSha": "d4f41a65892d43e399f3cd72f51f069d2db8d971",
-    "platforms": [
-      {
-        "platform": "ios",
-        "status": "available",
-        "asOf": "2026-10-22"
-      }
-    ],
-    "notesSource": "app-store",
-    "storeMetadataCreatedAt": "2026-09-26T08:47:09-07:00",
-    "storeObservedAt": "2026-10-22T01:22:53.115Z"
-  },
-  {
-    "id": "yajalal-1.21.7",
-    "app": "yajalal",
-    "version": "1.21.7",
-    "recordedOn": "2026-09-27",
-    "notes": "랭킹 필터와 스탯 버튼을 이전의 익숙한 모양으로 되돌리고, 필터 조건을 버튼 하나로 정리했습니다.",
-    "sourceTag": "app-v1.21.7+82",
-    "sourceSha": "9db78590119039be5401957411211befbd00c133",
-    "platforms": [],
-    "notesSource": "manifest"
   },
   {
     "id": "burntok-1.2.0",
@@ -1389,6 +1469,25 @@ export const releaseNotes: ReleaseNote[] = [
     "storeObservedAt": "2026-10-22T01:22:53.115Z"
   },
   {
+    "id": "unairplane-1.0.10",
+    "app": "unairplane",
+    "version": "1.0.10",
+    "recordedOn": "2026-09-20",
+    "notes": "iOS 27에서 앱이 실행되지 않던 문제를 고쳤습니다.",
+    "sourceTag": "app-v1.0.10",
+    "sourceSha": "e009279bac4a20544902b03d5230a10dc6c0c8da",
+    "platforms": [
+      {
+        "platform": "ios",
+        "status": "available",
+        "asOf": "2026-10-22"
+      }
+    ],
+    "notesSource": "app-store",
+    "storeMetadataCreatedAt": "2026-09-19T18:31:46-07:00",
+    "storeObservedAt": "2026-10-22T01:22:53.115Z"
+  },
+  {
     "id": "unairplane-1.0.9",
     "app": "unairplane",
     "version": "1.0.9",
@@ -1416,25 +1515,6 @@ export const releaseNotes: ReleaseNote[] = [
     ],
     "notesSource": "app-store",
     "storeMetadataCreatedAt": "2026-09-19T19:06:06-07:00",
-    "storeObservedAt": "2026-10-22T01:22:53.115Z"
-  },
-  {
-    "id": "unairplane-1.0.10",
-    "app": "unairplane",
-    "version": "1.0.10",
-    "recordedOn": "2026-09-20",
-    "notes": "iOS 27에서 앱이 실행되지 않던 문제를 고쳤습니다.",
-    "sourceTag": "app-v1.0.10",
-    "sourceSha": "e009279bac4a20544902b03d5230a10dc6c0c8da",
-    "platforms": [
-      {
-        "platform": "ios",
-        "status": "available",
-        "asOf": "2026-10-22"
-      }
-    ],
-    "notesSource": "app-store",
-    "storeMetadataCreatedAt": "2026-09-19T18:31:46-07:00",
     "storeObservedAt": "2026-10-22T01:22:53.115Z"
   },
   {

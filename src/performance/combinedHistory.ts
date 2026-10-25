@@ -2,7 +2,7 @@
 // Older verified observations are retained; omitted report rows remain unobserved.
 // Source and query boundaries: docs/PERFORMANCE.md.
 import type { MetricSeries } from './data';
-export const combinedCapturedAt = "2026-10-23T23:50:13.804Z";
+export const combinedCapturedAt = "2026-10-24T23:44:41.622Z";
 export const combinedSeries: MetricSeries[] = [
   {
     "id": "yajalal-ga4-dau",
@@ -15,7 +15,7 @@ export const combinedSeries: MetricSeries[] = [
     "unique": true,
     "coverage": {
       "start": "2021-10-21",
-      "end": "2026-10-23"
+      "end": "2026-10-24"
     },
     "testTraffic": "not-excluded",
     "points": [
@@ -2228,6 +2228,11 @@ export const combinedSeries: MetricSeries[] = [
         "date": "2026-10-23",
         "value": 14,
         "observedOn": "2026-10-24"
+      },
+      {
+        "date": "2026-10-24",
+        "value": 15,
+        "observedOn": "2026-10-25"
       }
     ]
   },
@@ -2242,7 +2247,7 @@ export const combinedSeries: MetricSeries[] = [
     "unique": true,
     "coverage": {
       "start": "2021-10-21",
-      "end": "2026-10-23"
+      "end": "2026-10-24"
     },
     "testTraffic": "not-excluded",
     "points": [
@@ -4455,6 +4460,11 @@ export const combinedSeries: MetricSeries[] = [
         "date": "2026-10-23",
         "value": 8,
         "observedOn": "2026-10-24"
+      },
+      {
+        "date": "2026-10-24",
+        "value": 7,
+        "observedOn": "2026-10-25"
       }
     ]
   },
@@ -4469,7 +4479,7 @@ export const combinedSeries: MetricSeries[] = [
     "unique": true,
     "coverage": {
       "start": "2021-10-21",
-      "end": "2026-10-23"
+      "end": "2026-10-24"
     },
     "testTraffic": "not-excluded",
     "points": [
@@ -5153,6 +5163,11 @@ export const combinedSeries: MetricSeries[] = [
         "date": "2026-10-23",
         "value": 9,
         "observedOn": "2026-10-24"
+      },
+      {
+        "date": "2026-10-24",
+        "value": 9,
+        "observedOn": "2026-10-25"
       }
     ]
   },
@@ -5167,7 +5182,7 @@ export const combinedSeries: MetricSeries[] = [
     "unique": true,
     "coverage": {
       "start": "2021-10-21",
-      "end": "2026-10-23"
+      "end": "2026-10-24"
     },
     "testTraffic": "not-excluded",
     "points": [
@@ -5851,6 +5866,11 @@ export const combinedSeries: MetricSeries[] = [
         "date": "2026-10-23",
         "value": 8,
         "observedOn": "2026-10-24"
+      },
+      {
+        "date": "2026-10-24",
+        "value": 9,
+        "observedOn": "2026-10-25"
       }
     ]
   },
@@ -5865,7 +5885,7 @@ export const combinedSeries: MetricSeries[] = [
     "unique": true,
     "coverage": {
       "start": "2021-10-21",
-      "end": "2026-10-23"
+      "end": "2026-10-24"
     },
     "testTraffic": "not-excluded",
     "points": [
@@ -5960,6 +5980,11 @@ export const combinedSeries: MetricSeries[] = [
         "date": "2026-10-23",
         "value": 8,
         "observedOn": "2026-10-24"
+      },
+      {
+        "date": "2026-10-24",
+        "value": 10,
+        "observedOn": "2026-10-25"
       }
     ]
   },
@@ -5974,7 +5999,7 @@ export const combinedSeries: MetricSeries[] = [
     "unique": true,
     "coverage": {
       "start": "2021-10-21",
-      "end": "2026-10-23"
+      "end": "2026-10-24"
     },
     "testTraffic": "not-excluded",
     "points": [
@@ -6069,6 +6094,11 @@ export const combinedSeries: MetricSeries[] = [
         "date": "2026-10-23",
         "value": 7,
         "observedOn": "2026-10-24"
+      },
+      {
+        "date": "2026-10-24",
+        "value": 9,
+        "observedOn": "2026-10-25"
       }
     ]
   },
@@ -6083,7 +6113,7 @@ export const combinedSeries: MetricSeries[] = [
     "unique": true,
     "coverage": {
       "start": "2021-10-21",
-      "end": "2026-10-23"
+      "end": "2026-10-24"
     },
     "testTraffic": "not-excluded",
     "points": [
@@ -6164,6 +6194,11 @@ export const combinedSeries: MetricSeries[] = [
         "date": "2026-10-23",
         "value": 10,
         "observedOn": "2026-10-24"
+      },
+      {
+        "date": "2026-10-24",
+        "value": 7,
+        "observedOn": "2026-10-25"
       }
     ]
   },
@@ -6178,7 +6213,7 @@ export const combinedSeries: MetricSeries[] = [
     "unique": true,
     "coverage": {
       "start": "2021-10-21",
-      "end": "2026-10-23"
+      "end": "2026-10-24"
     },
     "testTraffic": "not-excluded",
     "points": [
@@ -6259,6 +6294,11 @@ export const combinedSeries: MetricSeries[] = [
         "date": "2026-10-23",
         "value": 9,
         "observedOn": "2026-10-24"
+      },
+      {
+        "date": "2026-10-24",
+        "value": 7,
+        "observedOn": "2026-10-25"
       }
     ]
   },
@@ -6273,7 +6313,7 @@ export const combinedSeries: MetricSeries[] = [
     "unique": true,
     "coverage": {
       "start": "2021-10-21",
-      "end": "2026-10-23"
+      "end": "2026-10-24"
     },
     "testTraffic": "not-excluded",
     "points": [
@@ -6376,6 +6416,11 @@ export const combinedSeries: MetricSeries[] = [
         "date": "2026-10-23",
         "value": 9,
         "observedOn": "2026-10-24"
+      },
+      {
+        "date": "2026-10-24",
+        "value": 11,
+        "observedOn": "2026-10-25"
       }
     ]
   },
@@ -6390,7 +6435,7 @@ export const combinedSeries: MetricSeries[] = [
     "unique": true,
     "coverage": {
       "start": "2021-10-21",
-      "end": "2026-10-23"
+      "end": "2026-10-24"
     },
     "testTraffic": "not-excluded",
     "points": [
@@ -6493,6 +6538,11 @@ export const combinedSeries: MetricSeries[] = [
         "date": "2026-10-23",
         "value": 8,
         "observedOn": "2026-10-24"
+      },
+      {
+        "date": "2026-10-24",
+        "value": 11,
+        "observedOn": "2026-10-25"
       }
     ]
   },
@@ -6507,7 +6557,7 @@ export const combinedSeries: MetricSeries[] = [
     "unique": true,
     "coverage": {
       "start": "2021-10-21",
-      "end": "2026-10-23"
+      "end": "2026-10-24"
     },
     "testTraffic": "closed-test",
     "points": [
@@ -6597,6 +6647,11 @@ export const combinedSeries: MetricSeries[] = [
         "date": "2026-10-23",
         "value": 11,
         "observedOn": "2026-10-24"
+      },
+      {
+        "date": "2026-10-24",
+        "value": 8,
+        "observedOn": "2026-10-25"
       }
     ]
   },
@@ -6611,7 +6666,7 @@ export const combinedSeries: MetricSeries[] = [
     "unique": true,
     "coverage": {
       "start": "2021-10-21",
-      "end": "2026-10-23"
+      "end": "2026-10-24"
     },
     "testTraffic": "closed-test",
     "points": [
@@ -6701,6 +6756,11 @@ export const combinedSeries: MetricSeries[] = [
         "date": "2026-10-23",
         "value": 10,
         "observedOn": "2026-10-24"
+      },
+      {
+        "date": "2026-10-24",
+        "value": 8,
+        "observedOn": "2026-10-25"
       }
     ]
   },
@@ -6715,7 +6775,7 @@ export const combinedSeries: MetricSeries[] = [
     "unique": true,
     "coverage": {
       "start": "2021-10-21",
-      "end": "2026-10-23"
+      "end": "2026-10-24"
     },
     "testTraffic": "closed-test",
     "points": [
@@ -6811,6 +6871,11 @@ export const combinedSeries: MetricSeries[] = [
         "date": "2026-10-23",
         "value": 27,
         "observedOn": "2026-10-24"
+      },
+      {
+        "date": "2026-10-24",
+        "value": 23,
+        "observedOn": "2026-10-25"
       }
     ]
   },
@@ -6825,7 +6890,7 @@ export const combinedSeries: MetricSeries[] = [
     "unique": true,
     "coverage": {
       "start": "2021-10-21",
-      "end": "2026-10-23"
+      "end": "2026-10-24"
     },
     "testTraffic": "closed-test",
     "points": [
@@ -6921,6 +6986,11 @@ export const combinedSeries: MetricSeries[] = [
         "date": "2026-10-23",
         "value": 10,
         "observedOn": "2026-10-24"
+      },
+      {
+        "date": "2026-10-24",
+        "value": 7,
+        "observedOn": "2026-10-25"
       }
     ]
   }

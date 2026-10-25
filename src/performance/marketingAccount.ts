@@ -6,16 +6,16 @@ export type MarketingAccount = { platform: MarketingPlatform; observedAt: string
 export const marketingAccounts: MarketingAccount[] = [
   {
     "platform": "instagram",
-    "observedAt": "2026-10-23T23:57:50.324Z",
+    "observedAt": "2026-10-24T23:53:05.059Z",
     "windowLabel": "최근 7일",
     "periodDates": null,
     "chartRange": null,
-    "views": 535,
-    "viewers": 31,
-    "interactions": 106,
-    "profileActivity": 76,
+    "views": 415,
+    "viewers": 29,
+    "interactions": 76,
+    "profileActivity": 58,
     "followers": 54,
-    "followersAsOf": "2026-10-24",
+    "followersAsOf": "2026-10-25",
     "netFollowers": null,
     "daily": {
       "views": [],
@@ -26,23 +26,23 @@ export const marketingAccounts: MarketingAccount[] = [
   },
   {
     "platform": "threads",
-    "observedAt": "2026-10-24T00:00:18.168Z",
+    "observedAt": "2026-10-24T23:53:53.679Z",
     "windowLabel": "최근 7일",
     "periodDates": {
-      "start": "2026-10-16",
-      "end": "2026-10-22"
+      "start": "2026-10-17",
+      "end": "2026-10-23"
     },
     "chartRange": {
       "start": "2026-09-26",
       "end": "2026-10-20"
     },
-    "views": 799,
-    "viewers": 251,
-    "interactions": 102,
+    "views": 714,
+    "viewers": 244,
+    "interactions": 93,
     "profileActivity": null,
-    "followers": 25,
-    "followersAsOf": "2026-10-24",
-    "netFollowers": 8,
+    "followers": 24,
+    "followersAsOf": "2026-10-25",
+    "netFollowers": 6,
     "daily": {
       "views": [
         {
