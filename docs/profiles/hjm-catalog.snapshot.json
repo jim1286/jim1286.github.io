@@ -1,12 +1,12 @@
 {
-  "$id": "hjm.catalog-snapshot/1.46.1",
-  "designSystemVersion": "1.46.1",
+  "$id": "hjm.catalog-snapshot/1.47.0",
+  "designSystemVersion": "1.47.0",
   "source": {
     "repository": "https://github.com/jim1286/hjm-design-system.git",
-    "tag": "v1.46.1",
-    "commit": "f022ba98f5651bf2498bc82e00dd9bf60ad0cbf1",
+    "tag": "v1.47.0",
+    "commit": "a62157db4cf589ba21d098cac38aec2706ab70ba",
     "sourcePath": "packages/design-contracts/dist/catalog.js",
-    "contentSha256": "b44e93ef1042a404288e05c07bbfd61e2c95b8a07256e36edbc0b5e9c9d7329e"
+    "contentSha256": "e10cb62a8b25f9f50cad7335e0b96e03b139352ccb7a1d72abaf4b896f1436bc"
   },
   "components": [
     {
@@ -205,7 +205,9 @@
       "id": "color-picker",
       "status": "stable",
       "name": "ColorPicker",
-      "companions": []
+      "companions": [
+        "ColorSwatchPicker"
+      ]
     },
     {
       "id": "combobox",
