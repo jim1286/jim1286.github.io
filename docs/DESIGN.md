@@ -1,4 +1,6 @@
 ---
+
+2026-10-25 사용자 요청: 제품 앱·웹의 미설정 테마 기본값은 라이트다. 기존에 저장된 라이트·다크·시스템 선택과 제공 중인 테마 전환은 유지한다. HJM 라이브러리 자체의 기본값은 바꾸지 않는다.
 schema: hjm.app-document/1
 document: design
 app_id: "portfolio-site"

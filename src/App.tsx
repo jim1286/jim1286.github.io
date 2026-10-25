@@ -94,7 +94,7 @@ function AboutPanel() {
           <Text variant="caption" fontRole="code" tone="muted">{c.heroRole}</Text>
           <Heading level="level1"><span className="hero-title">{c.heroTitle}</span></Heading>
           <Text as="p" variant="bodyLarge" tone="muted">{c.heroBody}</Text>
-          <Stack axis="inline" gap="lg" wrap><Link href="#apps" variant="standalone" tone="neutral">{c.heroAction} →</Link><Link href="#design" variant="standalone" tone="neutral">{c.heroSecondary} →</Link></Stack>
+          <Stack axis="inline" gap="xs" wrap><Link href="#apps" variant="standalone" tone="neutral">{c.heroAction} →</Link><Link href="#design" variant="standalone" tone="neutral">{c.heroSecondary} →</Link></Stack>
         </Stack></Surface>
         <Surface padding="lg"><Stack gap="lg">
           <button type="button" className="profile-photo-trigger" aria-label={siteCopy.developerAlt} onClick={() => setPhotoOpen(true)}><img className="profile-photo" src="/profile.jpg" alt="" /></button>
@@ -230,7 +230,8 @@ export default function App() {
     if (hash === '#discontinued') document.getElementById('discontinued')?.scrollIntoView({ block: 'start', behavior: 'instant' });
     else if (hash) document.getElementById('panel-start')?.scrollIntoView({ block: 'start', behavior: 'instant' });
   }, [hash]);
-  return <HjmProvider theme="system" host="contents">
+  // 2026-10-25 user decision: product defaults to light.
+  return <HjmProvider theme="light" host="contents">
     <SkipNav targetId="main" label={siteCopy.skip} />
     <div className="portfolio-host"><ScreenLayout title={siteCopy.home} contentInset="none" layoutStyle={{ maxWidth: 'none' }} header={
       <header className="site-header"><Container size="content" gutter="none"><TopBar
@@ -246,7 +247,7 @@ export default function App() {
       </div>
       <footer className="site-footer"><Container size="content" gutter="regular"><Stack axis="inline" gap="md" wrap justify="between">
         <Stack gap="xs"><Text emphasis="strong">{c.portfolioName} · {c.portfolioRole}</Text><Text variant="caption" tone="muted">{c.footerNote}</Text></Stack>
-        <Stack axis="inline" gap="md" wrap><Link href="#support" variant="standalone" tone="neutral">{siteCopy.legalNav}</Link><Link href={`mailto:${developerEmail}`} variant="standalone" tone="neutral">{siteCopy.contact} ↗</Link></Stack>
+        <Stack axis="inline" gap="xs" wrap><Link href="#support" variant="standalone" tone="neutral">{siteCopy.legalNav}</Link><Link href={`mailto:${developerEmail}`} variant="standalone" tone="neutral">{siteCopy.contact} ↗</Link></Stack>
       </Stack></Container></footer>
     </ScreenLayout></div>
   </HjmProvider>;
