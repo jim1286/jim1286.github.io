@@ -1,12 +1,12 @@
 {
-  "$id": "hjm.catalog-snapshot/1.47.0",
-  "designSystemVersion": "1.47.0",
+  "$id": "hjm.catalog-snapshot/1.48.0",
+  "designSystemVersion": "1.48.0",
   "source": {
     "repository": "https://github.com/jim1286/hjm-design-system.git",
-    "tag": "v1.47.0",
-    "commit": "a62157db4cf589ba21d098cac38aec2706ab70ba",
+    "tag": "v1.48.0",
+    "commit": "7e2e3372082fbcfe77c7ba3d7bc3df74c65197d7",
     "sourcePath": "packages/design-contracts/dist/catalog.js",
-    "contentSha256": "e10cb62a8b25f9f50cad7335e0b96e03b139352ccb7a1d72abaf4b896f1436bc"
+    "contentSha256": "cc7f624c7ac82be98ff8e7bdac4fd2ef74b5aca351efd788de49ca1615b6c9aa"
   },
   "components": [
     {
@@ -141,7 +141,7 @@
     },
     {
       "id": "chart",
-      "status": "beta",
+      "status": "stable",
       "name": "Chart",
       "companions": [
         "LineChart",
@@ -155,7 +155,7 @@
     },
     {
       "id": "chat-date-separator",
-      "status": "beta",
+      "status": "stable",
       "name": "ChatDateSeparator",
       "companions": []
     },
@@ -386,7 +386,7 @@
     },
     {
       "id": "image-choice-group",
-      "status": "beta",
+      "status": "stable",
       "name": "ImageChoiceGroup",
       "companions": []
     },
@@ -519,7 +519,7 @@
     },
     {
       "id": "page-indicator",
-      "status": "beta",
+      "status": "stable",
       "name": "PageIndicator",
       "companions": []
     },
@@ -838,7 +838,7 @@
     },
     {
       "id": "typing-indicator",
-      "status": "beta",
+      "status": "stable",
       "name": "TypingIndicator",
       "companions": []
     },
