@@ -1,7 +1,7 @@
 // Public aggregate store exports. Installed audience and DAU are separate metrics.
 // Exported zero padding is preserved; coverage and firstPositive do not assert an app launch date.
 import type { MetricSeries } from './data.ts';
-export const storeCapturedAt = "2026-10-24T23:52:13.601Z";
+export const storeCapturedAt = "2026-10-25T23:44:25.038Z";
 export const storeSeries: MetricSeries[] = [
   {
     "id": "store-yajalal-apple-store-all-visitors",
@@ -1783,11 +1783,16 @@ export const storeSeries: MetricSeries[] = [
         "date": "2026-10-23",
         "value": 6,
         "observedOn": "2026-10-25"
+      },
+      {
+        "date": "2026-10-24",
+        "value": 2,
+        "observedOn": "2026-10-26"
       }
     ],
     "coverage": {
       "start": "2025-08-06",
-      "end": "2026-10-23"
+      "end": "2026-10-24"
     },
     "firstPositive": "2025-08-06"
   },
@@ -15861,11 +15866,21 @@ export const storeSeries: MetricSeries[] = [
         "date": "2026-10-21",
         "value": 8,
         "observedOn": "2026-10-25"
+      },
+      {
+        "date": "2026-10-22",
+        "value": 1,
+        "observedOn": "2026-10-26"
+      },
+      {
+        "date": "2026-10-23",
+        "value": 1,
+        "observedOn": "2026-10-26"
       }
     ],
     "coverage": {
       "start": "2021-10-22",
-      "end": "2026-10-21"
+      "end": "2026-10-23"
     },
     "firstPositive": "2026-05-15",
     "missingReason": "스토어 등록정보 방문자(설치되지 않은 사용자) 보고서에서 10/15~19 수치 제공. 10/20~21은 행 없음, 0으로 간주하지 않음."
@@ -22915,11 +22930,16 @@ export const storeSeries: MetricSeries[] = [
       {
         "date": "2026-10-18",
         "value": 0
+      },
+      {
+        "date": "2026-10-22",
+        "value": 1,
+        "observedOn": "2026-10-26"
       }
     ],
     "coverage": {
       "start": "2025-11-08",
-      "end": "2026-10-21"
+      "end": "2026-10-22"
     },
     "firstPositive": "2026-09-02",
     "missingReason": "2026-10-15~21 방문자(설치) 목표 보고서에서 10/16 전체 1, 일본 1 확인. 다른 날짜는 표에 행 미제공; 0으로 간주하지 않음."

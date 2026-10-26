@@ -132,3 +132,9 @@ HJM 초기 계약·공개 API 확장·화면 구성 공통화, 중앙 baseline, 
 - `jobs` 보완: Diairy544f3583의 컨트롤러 일시 중지 후 실행 루프가 종료된 worker 복구 조건과 Redis 재현 테스트를 확인했다. 운영 처리량·효과는 측정하지 않았다.
 
 정확한 확인 cursor와 공개 artifact 검증은 중앙 research/2026-10-24/history-cursor.json 및 portfolio-daily-publication.json에 남긴다. 기존 기록의 당시 검증 범위는 이 실행 결과로 재사용해 확대하지 않는다.
+
+## 2026-10-26 일일 대조 — 10/25 구현
+
+- `memberprofiles`(safety, 소스 기록일10/25): Spint `5bd8c6cb`·`631fdf3`·`2fbe4a5`, 다에리 `33a2ca61`·`68ac9c87`·`cd7a7b4`. Spint의 members service/repository·차단/가입 상태 테스트, 다에리의 profile-person 권한 판정·PersonPage/PersonScreen·사진 API를 대조했다. Spint의 공개 프로필 참조와 편지 ID 기반 다에리 경로를 같은 식별 방식이라고 합치지 않는다. 사진 편집·정원 배치의 작은 후속 수정은 이 항목에 묶었다.
+- `sharedinteractions`(design, 소스 기록일10/25): HJM `1c4f4ea6`·`e8912382`·`a62157db`, 번뚝 `60194b09`, 선택의창 `54bc9d9`. 웹/네이티브 회원 행동·ProfileSummary.nameEdit·공통 설정·날짜 범위 계약과 관련 테스트 사례, 1.47.0 게시 산출물/제품 채택 커밋을 대조했다. 제품별 버전 상승·간격 보정·반복 배포를 별도 발전 항목으로 늘리지 않는다.
+- 마지막 성공 cursor 이후 접근 가능한 독립 저장소의 main/tag를 갱신해 커밋 메타데이터와 변경 경로를 확인했다. 위 선택 항목의 구현을 읽었으며 전체 패치의 모든 줄/실기기·전수 회귀를 검증했다는 뜻은 아니다. Hub 소셜 작업 기록·파이프라인 보완은 기존 contentops 흐름, 나머지 세부 수정·릴리스 기록은 기존 주제의 후속 변경으로 분류했다. 원격 없는 보관 제품은 기존 이력을 유지했다.

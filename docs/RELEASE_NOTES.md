@@ -95,3 +95,9 @@ App Store의 과거 버전 상태가 READY_FOR_SALE인 것은 출시 이력 확�
 179개 과거 노트를 보존하고 오늘야구2.2.2·다에리1.9.3·Spint1.3.2의 정식 태그 원문과 Utilverse1.2.2의 스토어 원문을 추가해183개다. 이전 스토어 전용 선택의창2.1.2·번뚝1.7.4·비행중1.1.5에는 이제 확인한 정확한 정식 태그/SHA를 연결했다. 태그 없는 Utilverse1.2.2에는 Git SHA를 만들지 않았다.
 
 기존 Hub 인증의 GET35회로7개 앱의 최신3버전씩21개와 한국어 변경 설명을 대조했다. 조회시각 기준 최신7개 iOS 버전 모두 READY_FOR_SALE이며10/25 확인일로 표시한다. createdDate는 버전 메타데이터 생성일이며 공개일이 아니다. 이전 Android 관측은 보존했고 오늘 새 Android 제공자 조회나 스토어 쓰기를 수행한 것으로 표시하지 않는다. 공개 whitelist는 중앙 research/2026-10-25/release-notes-store-latest-public.json이다.
+
+## 2026-10-26 최신 버전 대조
+
+기존183개를 보존하고 오늘야구2.2.3·선택의창2.1.3·번뚝1.7.5·다에리1.9.4·Spint1.3.3·비행중1.1.6·Utilverse1.2.3을 추가해190개다. 앞6개는 정확한 정식 태그의 releaseNotes/SHA와 대조했고, 정식 태그가 없는 Utilverse1.2.3은 스토어 원문으로 보존했다. Hub 인증 경로의 읽기 전용 GET35회로 최신3버전씩21개와 한국어 원문을 대조했다.
+
+10/26 실제 iOS 상태는 다에리·Spint·비행중 최신 버전 READY_FOR_SALE, 나머지4개 WAITING_FOR_REVIEW다. 이전 Android 확인일은 유지하며 새 Android 공개 상태를 조회한 것으로 표시하지 않는다. createdAt은 메타데이터 생성시각이며 공개일이 아니다. 공개 whitelist와 태그 연결은 중앙 research/2026-10-26/release-notes-{store-latest,update}-public.json에 보존한다.

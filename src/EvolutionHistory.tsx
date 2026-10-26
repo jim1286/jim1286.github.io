@@ -10,6 +10,8 @@ const c = getCopy();
 // Record dates are not release dates. Evidence and audit boundaries live in
 // docs/EVOLUTION_HISTORY_SOURCES.md; private repository links stay off the public page.
 const entries = [
+  { topic: 'safety', id: 'memberprofiles', date: '2026-10-25', status: c.evolutionMemberprofilesProduct, title: c.evolutionMemberprofilesTitle, why: c.evolutionMemberprofilesWhy, change: c.evolutionMemberprofilesChange, result: c.evolutionMemberprofilesResult, evidence: c.evolutionMemberprofilesEvidence },
+  { topic: 'design', id: 'sharedinteractions', date: '2026-10-25', status: c.evolutionSharedinteractionsProduct, title: c.evolutionSharedinteractionsTitle, why: c.evolutionSharedinteractionsWhy, change: c.evolutionSharedinteractionsChange, result: c.evolutionSharedinteractionsResult, evidence: c.evolutionSharedinteractionsEvidence },
   { topic: 'clients', id: 'privateroom', date: '2026-10-23', status: c.evolutionPrivateroomProduct, title: c.evolutionPrivateroomTitle, why: c.evolutionPrivateroomWhy, change: c.evolutionPrivateroomChange, result: c.evolutionPrivateroomResult, evidence: c.evolutionPrivateroomEvidence },
   { topic: 'design', id: 'stepsrail', date: '2026-10-23', status: c.evolutionStepsrailProduct, title: c.evolutionStepsrailTitle, why: c.evolutionStepsrailWhy, change: c.evolutionStepsrailChange, result: c.evolutionStepsrailResult, evidence: c.evolutionStepsrailEvidence },
   { topic: 'clients', id: 'imageflow', date: '2026-10-23', status: c.evolutionImageflowProduct, title: c.evolutionImageflowTitle, why: c.evolutionImageflowWhy, change: c.evolutionImageflowChange, result: c.evolutionImageflowResult, evidence: c.evolutionImageflowEvidence },
