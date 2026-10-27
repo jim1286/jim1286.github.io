@@ -73,9 +73,10 @@ function run(command, args, root) {
   if (result.status !== 0) throw new Error(`${command} ${args.join(' ')} failed; pinned preparation is retained for --resume`);
 }
 
-export async function prepareHjmRelease({ root = process.cwd(), write = false, resume = false,
+export async function prepareHjmRelease({ root = process.cwd(), write = false, resume = false, expectedVersion,
   metadata = registryMetadata, loadRelease = publishedRelease, execute = run, pnpmVersion = toolVersion } = {}) {
   root = await realpath(resolve(root));
+  if (expectedVersion !== undefined && !stable.test(expectedVersion)) throw new Error('Expected HJM version must be exact stable semver');
   if (git(root, ['branch', '--show-current']) !== 'main') throw new Error('Prepare HJM on the existing main checkout');
   if (git(root, ['rev-parse', '--show-toplevel']) !== root) throw new Error('Run from the product repository root');
   const manifest = JSON.parse(await readFile(join(root, 'package.json'), 'utf8'));
@@ -106,6 +107,7 @@ export async function prepareHjmRelease({ root = process.cwd(), write = false, r
   let state;
   if (resume) {
     if (!previous) throw new Error('No pinned preparation to resume');
+    if (expectedVersion !== undefined && previous.version !== expectedVersion) throw new Error('Pinned preparation does not match expected HJM version');
     if (previous.phase === 'complete') {
       if (git(root, ['rev-parse', 'HEAD']) !== previous.sourceSha || changedPaths(root).length) throw new Error('Completed preparation no longer matches the checkout');
       return { action: 'already-prepared', version: previous.version, sourceSha: previous.sourceSha };
@@ -123,6 +125,9 @@ export async function prepareHjmRelease({ root = process.cwd(), write = false, r
     if (write && changedPaths(root).length) throw new Error('Working tree must be clean before release preparation; existing changes are preserved');
     const current = JSON.parse(await readFile(join(root, releasePath), 'utf8')).version;
     const selection = selectStableVersion(current, await metadata());
+    // An operator can pin the intended train before a queued CI job starts.
+    // Do not silently prepare a newer registry result under that same request.
+    if (expectedVersion !== undefined && selection.version !== expectedVersion) throw new Error(`Selected HJM ${selection.version} differs from expected ${expectedVersion}`);
     // Import checks all three tarballs, integrity and the canonical Git tag.
     // An incomplete release fails; it never falls back to an older train.
     const bundle = await loadRelease(selection.version);
@@ -196,7 +201,8 @@ if (process.argv[1] && import.meta.url === pathToFileURL(resolve(process.argv[1]
     for (const arg of process.argv.slice(2)) {
       if (arg === '--write') options.write = true;
       else if (arg === '--resume') options.resume = true;
-      else throw new Error('Usage: node tools/prepare-hjm-release.mjs [--write] [--resume]');
+      else if (arg.startsWith('--expect-version=')) options.expectedVersion = arg.slice('--expect-version='.length);
+      else throw new Error('Usage: node tools/prepare-hjm-release.mjs [--write] [--resume] [--expect-version=x.y.z]');
     }
     console.log(json(await prepareHjmRelease(options)));
   } catch (error) { console.error(`HJM release preparation: ${error.message}`); process.exitCode = 1; }

@@ -1,0 +1,21 @@
+name: Prepare HJM release
+on:
+  workflow_dispatch:
+    inputs:
+      hjm_version:
+        description: Exact published HJM train
+        required: true
+        type: string
+permissions:
+  contents: write
+concurrency:
+  group: deployment
+  cancel-in-progress: false
+  queue: max
+jobs:
+  prepare:
+    uses: jim1286/app-release-hub/.github/workflows/hjm-release-prepare.yml@v1.4.14
+    with:
+      source_sha: ${{ github.sha }}
+      hjm_version: ${{ inputs.hjm_version }}
+      runner: ubuntu-latest
