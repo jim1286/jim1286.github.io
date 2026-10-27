@@ -14,7 +14,7 @@ concurrency:
   queue: max
 jobs:
   prepare:
-    uses: jim1286/app-release-hub/.github/workflows/hjm-release-prepare.yml@v1.4.14
+    uses: jim1286/app-release-hub/.github/workflows/hjm-release-prepare.yml@v1.4.15
     with:
       source_sha: ${{ github.sha }}
       hjm_version: ${{ inputs.hjm_version }}
