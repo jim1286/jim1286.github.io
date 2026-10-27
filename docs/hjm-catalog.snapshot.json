@@ -1,12 +1,12 @@
 {
-  "$id": "hjm.catalog-snapshot/1.48.0",
-  "designSystemVersion": "1.48.0",
+  "$id": "hjm.catalog-snapshot/1.50.0",
+  "designSystemVersion": "1.50.0",
   "source": {
     "repository": "https://github.com/jim1286/hjm-design-system.git",
-    "tag": "v1.48.0",
-    "commit": "7e2e3372082fbcfe77c7ba3d7bc3df74c65197d7",
+    "tag": "v1.50.0",
+    "commit": "425a84add3893f33fdb6aabcf56400213b7c924c",
     "sourcePath": "packages/design-contracts/dist/catalog.js",
-    "contentSha256": "cc7f624c7ac82be98ff8e7bdac4fd2ef74b5aca351efd788de49ca1615b6c9aa"
+    "contentSha256": "f4c36b002907c9886b17186f8fd1c4b5403520d4ef333d700002deab289f404d"
   },
   "components": [
     {
@@ -305,6 +305,12 @@
       "id": "divider",
       "status": "stable",
       "name": "Divider",
+      "companions": []
+    },
+    {
+      "id": "drawing-editor",
+      "status": "stable",
+      "name": "DrawingEditor",
       "companions": []
     },
     {
