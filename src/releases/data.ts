@@ -5,6 +5,23 @@ export type ReleasePlatformState = { platform: 'ios' | 'android'; status: 'revie
 export type ReleaseNote = { id: string; app: string; version: string; recordedOn: string; notes: string; sourceTag?: string; sourceSha?: string; notesSource?: 'manifest' | 'app-store' | 'github-release'; originalSourceNotes?: string; storeMetadataCreatedAt?: string; storeObservedAt?: string; platforms: ReleasePlatformState[] };
 export const releaseNotes: ReleaseNote[] = [
   {
+    "id": "yajalal-2.2.4",
+    "app": "yajalal",
+    "version": "2.2.4",
+    "recordedOn": "2026-10-26",
+    "notes": "홈 위젯과 잠금화면·Dynamic Island의 점수판을 새롭게 다듬었습니다. 앱을 닫은 뒤 홈 위젯의 경기 정보 갱신을 개선했습니다. 선수 기록에 시즌 누적 보기를 추가하고 경기별 선수 기록을 팀별 타자·투수 순서로 한눈에 볼 수 있도록 정리했습니다.",
+    "notesSource": "app-store",
+    "platforms": [
+      {
+        "platform": "ios",
+        "status": "review",
+        "asOf": "2026-10-27"
+      }
+    ],
+    "storeMetadataCreatedAt": "2026-10-25T10:55:21-07:00",
+    "storeObservedAt": "2026-10-27T03:22:06.333Z"
+  },
+  {
     "id": "utilverse-1.2.3",
     "app": "utilverse",
     "version": "1.2.3",
@@ -14,12 +31,12 @@ export const releaseNotes: ReleaseNote[] = [
     "platforms": [
       {
         "platform": "ios",
-        "status": "review",
-        "asOf": "2026-10-26"
+        "status": "available",
+        "asOf": "2026-10-27"
       }
     ],
     "storeMetadataCreatedAt": "2026-10-25T10:12:04-07:00",
-    "storeObservedAt": "2026-10-26T00:04:05.583Z"
+    "storeObservedAt": "2026-10-27T03:22:06.333Z"
   },
   {
     "id": "yajalal-2.2.3",
@@ -50,14 +67,14 @@ export const releaseNotes: ReleaseNote[] = [
     "platforms": [
       {
         "platform": "ios",
-        "status": "review",
-        "asOf": "2026-10-26"
+        "status": "available",
+        "asOf": "2026-10-27"
       }
     ],
     "sourceTag": "app-v2.1.3",
     "sourceSha": "f3b4c8e86b54523c3007fd3c03317fb976ed75c8",
     "storeMetadataCreatedAt": "2026-10-25T11:34:39-07:00",
-    "storeObservedAt": "2026-10-26T00:04:05.583Z"
+    "storeObservedAt": "2026-10-27T03:22:06.333Z"
   },
   {
     "id": "diairy-1.9.4",
@@ -88,14 +105,14 @@ export const releaseNotes: ReleaseNote[] = [
     "platforms": [
       {
         "platform": "ios",
-        "status": "review",
-        "asOf": "2026-10-26"
+        "status": "available",
+        "asOf": "2026-10-27"
       }
     ],
     "sourceTag": "app-v1.7.5",
     "sourceSha": "9897468e53958c37c0cb80f7889b29888182fd9d",
     "storeMetadataCreatedAt": "2026-10-25T10:35:13-07:00",
-    "storeObservedAt": "2026-10-26T00:04:05.583Z"
+    "storeObservedAt": "2026-10-27T03:22:06.333Z"
   },
   {
     "id": "spint-1.3.3",

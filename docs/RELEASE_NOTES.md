@@ -101,3 +101,7 @@ App Store의 과거 버전 상태가 READY_FOR_SALE인 것은 출시 이력 확�
 기존183개를 보존하고 오늘야구2.2.3·선택의창2.1.3·번뚝1.7.5·다에리1.9.4·Spint1.3.3·비행중1.1.6·Utilverse1.2.3을 추가해190개다. 앞6개는 정확한 정식 태그의 releaseNotes/SHA와 대조했고, 정식 태그가 없는 Utilverse1.2.3은 스토어 원문으로 보존했다. Hub 인증 경로의 읽기 전용 GET35회로 최신3버전씩21개와 한국어 원문을 대조했다.
 
 10/26 실제 iOS 상태는 다에리·Spint·비행중 최신 버전 READY_FOR_SALE, 나머지4개 WAITING_FOR_REVIEW다. 이전 Android 확인일은 유지하며 새 Android 공개 상태를 조회한 것으로 표시하지 않는다. createdAt은 메타데이터 생성시각이며 공개일이 아니다. 공개 whitelist와 태그 연결은 중앙 research/2026-10-26/release-notes-{store-latest,update}-public.json에 보존한다.
+
+## 2026-10-27 최신 버전 대조
+
+기존 190개 기록을 보존하고 App Store Connect에서 실제 확보한 오늘야구 2.2.4 한국어 원문을 추가해 191개다. 정식 태그가 없는 버전에 Git SHA를 만들지 않았다. 7개 앱의 최신 반환 버전과 상태를 기존 Hub 인증의 읽기 전용 GET으로 대조했다. 오늘야구 2.2.4는 iOS 심사 대기이며 선택의창 2.1.3·번뚝 1.7.5·Utilverse 1.2.3은 실제 제공 상태로 변경됐다. 이전 Android 상태는 새 조회처럼 갱신하지 않았다. 스토어 메타데이터 생성일은 공개일이 아니다. 중앙 research/2026-10-27/release-notes-store-latest-public.json에 관측 근거를 보존한다.

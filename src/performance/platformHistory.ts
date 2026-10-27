@@ -1,6 +1,6 @@
 // Date x Platform native-app exports. Production/development streams are not separated.
 import type { MetricSeries } from './data.ts';
-export const platformCapturedAt = "2026-10-25T23:39:50.374Z";
+export const platformCapturedAt = "2026-10-27T10:09:45+09:00";
 export const platformSeries: MetricSeries[] = [
   {
     "id": "platform-choose-window-ga4-ios-app-dau",
@@ -14,7 +14,7 @@ export const platformSeries: MetricSeries[] = [
     "testTraffic": "not-excluded",
     "coverage": {
       "start": "2021-10-21",
-      "end": "2026-10-25"
+      "end": "2026-10-26"
     },
     "points": [
       {
@@ -525,6 +525,11 @@ export const platformSeries: MetricSeries[] = [
         "date": "2026-10-25",
         "value": 2,
         "observedOn": "2026-10-26"
+      },
+      {
+        "date": "2026-10-26",
+        "value": 1,
+        "observedOn": "2026-10-27"
       }
     ]
   },
@@ -540,7 +545,7 @@ export const platformSeries: MetricSeries[] = [
     "testTraffic": "not-excluded",
     "coverage": {
       "start": "2021-10-21",
-      "end": "2026-10-25"
+      "end": "2026-10-26"
     },
     "points": [
       {
@@ -1051,6 +1056,11 @@ export const platformSeries: MetricSeries[] = [
         "date": "2026-10-25",
         "value": 1,
         "observedOn": "2026-10-26"
+      },
+      {
+        "date": "2026-10-26",
+        "value": 1,
+        "observedOn": "2026-10-27"
       }
     ]
   },
@@ -1066,7 +1076,7 @@ export const platformSeries: MetricSeries[] = [
     "testTraffic": "not-excluded",
     "coverage": {
       "start": "2021-10-21",
-      "end": "2026-10-24"
+      "end": "2026-10-26"
     },
     "points": [
       {
@@ -1255,6 +1265,11 @@ export const platformSeries: MetricSeries[] = [
         "date": "2026-10-24",
         "value": 7,
         "observedOn": "2026-10-25"
+      },
+      {
+        "date": "2026-10-26",
+        "value": 5,
+        "observedOn": "2026-10-27"
       }
     ]
   },
@@ -1270,7 +1285,7 @@ export const platformSeries: MetricSeries[] = [
     "testTraffic": "not-excluded",
     "coverage": {
       "start": "2021-10-21",
-      "end": "2026-10-24"
+      "end": "2026-10-26"
     },
     "points": [
       {
@@ -1459,6 +1474,11 @@ export const platformSeries: MetricSeries[] = [
         "date": "2026-10-24",
         "value": 7,
         "observedOn": "2026-10-25"
+      },
+      {
+        "date": "2026-10-26",
+        "value": 5,
+        "observedOn": "2026-10-27"
       }
     ]
   },
@@ -1474,7 +1494,7 @@ export const platformSeries: MetricSeries[] = [
     "testTraffic": "not-excluded",
     "coverage": {
       "start": "2021-10-21",
-      "end": "2026-10-25"
+      "end": "2026-10-26"
     },
     "points": [
       {
@@ -1546,6 +1566,11 @@ export const platformSeries: MetricSeries[] = [
         "date": "2026-10-25",
         "value": 1,
         "observedOn": "2026-10-26"
+      },
+      {
+        "date": "2026-10-26",
+        "value": 2,
+        "observedOn": "2026-10-27"
       }
     ]
   },
@@ -1561,7 +1586,7 @@ export const platformSeries: MetricSeries[] = [
     "testTraffic": "not-excluded",
     "coverage": {
       "start": "2021-10-21",
-      "end": "2026-10-25"
+      "end": "2026-10-26"
     },
     "points": [
       {
@@ -1633,6 +1658,11 @@ export const platformSeries: MetricSeries[] = [
         "date": "2026-10-25",
         "value": 0,
         "observedOn": "2026-10-26"
+      },
+      {
+        "date": "2026-10-26",
+        "value": 2,
+        "observedOn": "2026-10-27"
       }
     ]
   },
@@ -1648,7 +1678,7 @@ export const platformSeries: MetricSeries[] = [
     "testTraffic": "not-excluded",
     "coverage": {
       "start": "2021-10-21",
-      "end": "2026-10-24"
+      "end": "2026-10-26"
     },
     "points": [
       {
@@ -1686,6 +1716,11 @@ export const platformSeries: MetricSeries[] = [
         "date": "2026-10-24",
         "value": 7,
         "observedOn": "2026-10-25"
+      },
+      {
+        "date": "2026-10-26",
+        "value": 3,
+        "observedOn": "2026-10-27"
       }
     ]
   },
@@ -1701,7 +1736,7 @@ export const platformSeries: MetricSeries[] = [
     "testTraffic": "not-excluded",
     "coverage": {
       "start": "2021-10-21",
-      "end": "2026-10-24"
+      "end": "2026-10-26"
     },
     "points": [
       {
@@ -1739,6 +1774,11 @@ export const platformSeries: MetricSeries[] = [
         "date": "2026-10-24",
         "value": 7,
         "observedOn": "2026-10-25"
+      },
+      {
+        "date": "2026-10-26",
+        "value": 3,
+        "observedOn": "2026-10-27"
       }
     ]
   },
@@ -1918,7 +1958,7 @@ export const platformSeries: MetricSeries[] = [
     "testTraffic": "closed-test",
     "coverage": {
       "start": "2026-09-23",
-      "end": "2026-10-24"
+      "end": "2026-10-26"
     },
     "points": [
       {
@@ -1952,6 +1992,11 @@ export const platformSeries: MetricSeries[] = [
         "date": "2026-10-24",
         "value": 6,
         "observedOn": "2026-10-25"
+      },
+      {
+        "date": "2026-10-26",
+        "value": 6,
+        "observedOn": "2026-10-27"
       }
     ]
   },
@@ -1967,7 +2012,7 @@ export const platformSeries: MetricSeries[] = [
     "testTraffic": "closed-test",
     "coverage": {
       "start": "2026-09-23",
-      "end": "2026-10-24"
+      "end": "2026-10-26"
     },
     "points": [
       {
@@ -2001,6 +2046,11 @@ export const platformSeries: MetricSeries[] = [
         "date": "2026-10-24",
         "value": 6,
         "observedOn": "2026-10-25"
+      },
+      {
+        "date": "2026-10-26",
+        "value": 6,
+        "observedOn": "2026-10-27"
       }
     ]
   },
@@ -2016,7 +2066,7 @@ export const platformSeries: MetricSeries[] = [
     "testTraffic": "not-excluded",
     "coverage": {
       "start": "2021-10-21",
-      "end": "2026-10-25"
+      "end": "2026-10-26"
     },
     "points": [
       {
@@ -2059,6 +2109,11 @@ export const platformSeries: MetricSeries[] = [
         "date": "2026-10-25",
         "value": 1,
         "observedOn": "2026-10-26"
+      },
+      {
+        "date": "2026-10-26",
+        "value": 3,
+        "observedOn": "2026-10-27"
       }
     ]
   },
@@ -2074,7 +2129,7 @@ export const platformSeries: MetricSeries[] = [
     "testTraffic": "not-excluded",
     "coverage": {
       "start": "2021-10-21",
-      "end": "2026-10-25"
+      "end": "2026-10-26"
     },
     "points": [
       {
@@ -2105,8 +2160,8 @@ export const platformSeries: MetricSeries[] = [
       },
       {
         "date": "2026-10-23",
-        "value": 4,
-        "observedOn": "2026-10-24"
+        "value": 3,
+        "observedOn": "2026-10-27"
       },
       {
         "date": "2026-10-24",
@@ -2117,6 +2172,11 @@ export const platformSeries: MetricSeries[] = [
         "date": "2026-10-25",
         "value": 0,
         "observedOn": "2026-10-26"
+      },
+      {
+        "date": "2026-10-26",
+        "value": 2,
+        "observedOn": "2026-10-27"
       }
     ]
   },
@@ -2132,7 +2192,7 @@ export const platformSeries: MetricSeries[] = [
     "testTraffic": "not-excluded",
     "coverage": {
       "start": "2021-10-21",
-      "end": "2026-10-25"
+      "end": "2026-10-26"
     },
     "points": [
       {
@@ -2153,6 +2213,11 @@ export const platformSeries: MetricSeries[] = [
         "observedOn": "2026-10-22"
       },
       {
+        "date": "2026-10-22",
+        "value": 2,
+        "observedOn": "2026-10-27"
+      },
+      {
         "date": "2026-10-23",
         "value": 5,
         "observedOn": "2026-10-24"
@@ -2166,6 +2231,11 @@ export const platformSeries: MetricSeries[] = [
         "date": "2026-10-25",
         "value": 3,
         "observedOn": "2026-10-26"
+      },
+      {
+        "date": "2026-10-26",
+        "value": 2,
+        "observedOn": "2026-10-27"
       }
     ]
   },
@@ -2181,7 +2251,7 @@ export const platformSeries: MetricSeries[] = [
     "testTraffic": "not-excluded",
     "coverage": {
       "start": "2021-10-21",
-      "end": "2026-10-25"
+      "end": "2026-10-26"
     },
     "points": [
       {
@@ -2202,6 +2272,11 @@ export const platformSeries: MetricSeries[] = [
         "observedOn": "2026-10-22"
       },
       {
+        "date": "2026-10-22",
+        "value": 2,
+        "observedOn": "2026-10-27"
+      },
+      {
         "date": "2026-10-23",
         "value": 5,
         "observedOn": "2026-10-24"
@@ -2215,6 +2290,11 @@ export const platformSeries: MetricSeries[] = [
         "date": "2026-10-25",
         "value": 3,
         "observedOn": "2026-10-26"
+      },
+      {
+        "date": "2026-10-26",
+        "value": 2,
+        "observedOn": "2026-10-27"
       }
     ]
   },
@@ -2230,7 +2310,7 @@ export const platformSeries: MetricSeries[] = [
     "testTraffic": "closed-test",
     "coverage": {
       "start": "2026-10-15",
-      "end": "2026-10-25"
+      "end": "2026-10-26"
     },
     "points": [
       {
@@ -2287,6 +2367,11 @@ export const platformSeries: MetricSeries[] = [
         "date": "2026-10-25",
         "value": 16,
         "observedOn": "2026-10-26"
+      },
+      {
+        "date": "2026-10-26",
+        "value": 21,
+        "observedOn": "2026-10-27"
       }
     ]
   },
@@ -2302,7 +2387,7 @@ export const platformSeries: MetricSeries[] = [
     "testTraffic": "closed-test",
     "coverage": {
       "start": "2026-10-15",
-      "end": "2026-10-25"
+      "end": "2026-10-26"
     },
     "points": [
       {
@@ -2359,6 +2444,11 @@ export const platformSeries: MetricSeries[] = [
         "date": "2026-10-25",
         "value": 0,
         "observedOn": "2026-10-26"
+      },
+      {
+        "date": "2026-10-26",
+        "value": 5,
+        "observedOn": "2026-10-27"
       }
     ]
   },
@@ -2374,7 +2464,7 @@ export const platformSeries: MetricSeries[] = [
     "testTraffic": "closed-test",
     "coverage": {
       "start": "2026-10-15",
-      "end": "2026-10-24"
+      "end": "2026-10-26"
     },
     "points": [
       {
@@ -2416,6 +2506,11 @@ export const platformSeries: MetricSeries[] = [
         "date": "2026-10-24",
         "value": 2,
         "observedOn": "2026-10-25"
+      },
+      {
+        "date": "2026-10-26",
+        "value": 4,
+        "observedOn": "2026-10-27"
       }
     ]
   },
@@ -2431,7 +2526,7 @@ export const platformSeries: MetricSeries[] = [
     "testTraffic": "closed-test",
     "coverage": {
       "start": "2026-10-15",
-      "end": "2026-10-24"
+      "end": "2026-10-26"
     },
     "points": [
       {
@@ -2473,6 +2568,11 @@ export const platformSeries: MetricSeries[] = [
         "date": "2026-10-24",
         "value": 2,
         "observedOn": "2026-10-25"
+      },
+      {
+        "date": "2026-10-26",
+        "value": 4,
+        "observedOn": "2026-10-27"
       }
     ]
   },
@@ -2488,7 +2588,7 @@ export const platformSeries: MetricSeries[] = [
     "testTraffic": "not-excluded",
     "coverage": {
       "start": "2026-10-15",
-      "end": "2026-10-25"
+      "end": "2026-10-26"
     },
     "points": [
       {
@@ -2545,6 +2645,11 @@ export const platformSeries: MetricSeries[] = [
         "date": "2026-10-25",
         "value": 4,
         "observedOn": "2026-10-26"
+      },
+      {
+        "date": "2026-10-26",
+        "value": 7,
+        "observedOn": "2026-10-27"
       }
     ]
   },
@@ -2560,7 +2665,7 @@ export const platformSeries: MetricSeries[] = [
     "testTraffic": "not-excluded",
     "coverage": {
       "start": "2026-10-15",
-      "end": "2026-10-25"
+      "end": "2026-10-26"
     },
     "points": [
       {
@@ -2617,6 +2722,11 @@ export const platformSeries: MetricSeries[] = [
         "date": "2026-10-25",
         "value": 0,
         "observedOn": "2026-10-26"
+      },
+      {
+        "date": "2026-10-26",
+        "value": 6,
+        "observedOn": "2026-10-27"
       }
     ]
   },
@@ -2632,7 +2742,7 @@ export const platformSeries: MetricSeries[] = [
     "testTraffic": "not-excluded",
     "coverage": {
       "start": "2026-10-15",
-      "end": "2026-10-25"
+      "end": "2026-10-26"
     },
     "points": [
       {
@@ -2689,6 +2799,11 @@ export const platformSeries: MetricSeries[] = [
         "date": "2026-10-25",
         "value": 3,
         "observedOn": "2026-10-26"
+      },
+      {
+        "date": "2026-10-26",
+        "value": 11,
+        "observedOn": "2026-10-27"
       }
     ]
   },
@@ -2704,7 +2819,7 @@ export const platformSeries: MetricSeries[] = [
     "testTraffic": "not-excluded",
     "coverage": {
       "start": "2026-10-15",
-      "end": "2026-10-25"
+      "end": "2026-10-26"
     },
     "points": [
       {
@@ -2761,6 +2876,11 @@ export const platformSeries: MetricSeries[] = [
         "date": "2026-10-25",
         "value": 0,
         "observedOn": "2026-10-26"
+      },
+      {
+        "date": "2026-10-26",
+        "value": 4,
+        "observedOn": "2026-10-27"
       }
     ]
   },
@@ -2776,7 +2896,7 @@ export const platformSeries: MetricSeries[] = [
     "testTraffic": "not-excluded",
     "coverage": {
       "start": "2026-10-15",
-      "end": "2026-10-25"
+      "end": "2026-10-26"
     },
     "points": [
       {
@@ -2818,6 +2938,11 @@ export const platformSeries: MetricSeries[] = [
         "date": "2026-10-25",
         "value": 1,
         "observedOn": "2026-10-26"
+      },
+      {
+        "date": "2026-10-26",
+        "value": 4,
+        "observedOn": "2026-10-27"
       }
     ]
   },
@@ -2833,7 +2958,7 @@ export const platformSeries: MetricSeries[] = [
     "testTraffic": "not-excluded",
     "coverage": {
       "start": "2026-10-15",
-      "end": "2026-10-25"
+      "end": "2026-10-26"
     },
     "points": [
       {
@@ -2875,6 +3000,11 @@ export const platformSeries: MetricSeries[] = [
         "date": "2026-10-25",
         "value": 0,
         "observedOn": "2026-10-26"
+      },
+      {
+        "date": "2026-10-26",
+        "value": 3,
+        "observedOn": "2026-10-27"
       }
     ]
   },
@@ -2890,7 +3020,7 @@ export const platformSeries: MetricSeries[] = [
     "testTraffic": "not-excluded",
     "coverage": {
       "start": "2026-10-15",
-      "end": "2026-10-24"
+      "end": "2026-10-26"
     },
     "points": [
       {
@@ -2912,6 +3042,11 @@ export const platformSeries: MetricSeries[] = [
         "date": "2026-10-24",
         "value": 6,
         "observedOn": "2026-10-25"
+      },
+      {
+        "date": "2026-10-26",
+        "value": 5,
+        "observedOn": "2026-10-27"
       }
     ]
   },
@@ -2927,7 +3062,7 @@ export const platformSeries: MetricSeries[] = [
     "testTraffic": "not-excluded",
     "coverage": {
       "start": "2026-10-15",
-      "end": "2026-10-24"
+      "end": "2026-10-26"
     },
     "points": [
       {
@@ -2949,6 +3084,11 @@ export const platformSeries: MetricSeries[] = [
         "date": "2026-10-24",
         "value": 6,
         "observedOn": "2026-10-25"
+      },
+      {
+        "date": "2026-10-26",
+        "value": 5,
+        "observedOn": "2026-10-27"
       }
     ]
   }

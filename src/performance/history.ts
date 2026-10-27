@@ -1042,6 +1042,11 @@ export const historicalSeries: MetricSeries[] = [
         "date": "2026-10-25",
         "value": 0.0,
         "observedOn": "2026-10-26"
+      },
+      {
+        "date": "2026-10-26",
+        "value": 0.03,
+        "observedOn": "2026-10-27"
       }
     ],
     "missingReason": "16~17,19일 행은 미제공. USD, 센트 단위 반올림."
@@ -1120,6 +1125,11 @@ export const historicalSeries: MetricSeries[] = [
         "date": "2026-10-25",
         "value": 0.0,
         "observedOn": "2026-10-26"
+      },
+      {
+        "date": "2026-10-26",
+        "value": 0.0,
+        "observedOn": "2026-10-27"
       }
     ],
     "missingReason": "보고서에 제공된 행만 기록. 18~21일 행은 미제공. USD, US$ 표기, 센트 단위 반올림."
