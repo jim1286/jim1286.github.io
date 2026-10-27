@@ -14,8 +14,41 @@ concurrency:
   queue: max
 jobs:
   prepare:
-    uses: jim1286/app-release-hub/.github/workflows/hjm-release-prepare.yml@v1.4.15
-    with:
-      source_sha: ${{ github.sha }}
-      hjm_version: ${{ inputs.hjm_version }}
-      runner: ubuntu-latest
+    # Public repositories cannot call a private reusable workflow. Keep the same
+    # pinned preparation in this existing public caller rather than expose Hub.
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - name: Checkout requested main
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          ref: main
+          fetch-depth: 0
+      - name: Verify source
+        env:
+          REQUESTED_SHA: ${{ github.sha }}
+        run: |
+          [[ "$REQUESTED_SHA" =~ ^[0-9a-f]{40}$ ]]
+          test "$(git rev-parse HEAD)" = "$REQUESTED_SHA"
+      - name: Setup pnpm
+        uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413
+        with:
+          version: 11.24.0
+          run_install: false
+      - name: Setup Node
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020
+        with:
+          node-version-file: .nvmrc
+      - name: Prepare pinned published train
+        env:
+          HJM_VERSION: ${{ inputs.hjm_version }}
+          HJM_LOCAL_SOURCE: '0'
+        run: |
+          [[ "$HJM_VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          node tools/prepare-hjm-release.mjs --write "--expect-version=$HJM_VERSION"
+      - name: Push prepared source
+        run: |
+          git push origin HEAD:main
+          echo "Prepared source: $(git rev-parse HEAD)"
