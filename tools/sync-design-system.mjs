@@ -22,26 +22,13 @@ const sha256 = (value) => createHash('sha256').update(value).digest('hex');
 const json = (value) => `${JSON.stringify(value, null, 2)}\n`;
 
 function catalogDeclarations(source) {
-  // HJM 1.8 hoists these imports above the data declarations. Their bindings are
-  // used only by recipeRegistry; importing or stubbing recipes would widen the evaluator.
-  // HJM 1.9 adds the Web-only Affix, Watermark and ColorPicker recipes the same way (2026-09-30).
-  const recipeImports = new Map([
-    // HJM 1.35 adds this exact recipe import before catalog data.
-    ['timePickerRecipe', './time-picker.js'],
-    ['affixRecipe', './affix.js'],
-    ['watermarkRecipe', './watermark.js'],
-    ['colorPickerRecipe', './color-picker.js'],
-    ['masonryRecipe', './masonry.js'],
-    // HJM 1.27 hoists the ImageChoiceGroup recipe import the same way (2026-10-17).
-    ['imageChoiceRecipe', './image-choice.js'],
-    ['virtualListRecipe', './virtual-list.js'],
-    ['qrCodeRecipe', './qr-code-recipe.js'],
-    ['thinkingOrbRecipe', './thinking-orb-recipe.js'],
-  ]);
+  // Catalog data does not use the hoisted recipe imports; the later registry does.
+  // Skip only named local recipe imports without executing them, so a new recipe
+  // cannot break every consumer's importer (DrawingEditor, 2026-10-27).
   let declarations = source;
   while (/^\s*import\b/u.test(declarations)) {
-    const imported = declarations.match(/^\s*import\s+\{\s*(\w+)\s*\}\s+from\s+(["'])([^"']+)\2\s*;\s*/u);
-    if (!imported || recipeImports.get(imported[1]) !== imported[3]) {
+    const imported = declarations.match(/^\s*import\s+\{\s*([A-Za-z_$][\w$]*Recipe)\s*\}\s+from\s+(["'])(\.\/[a-z0-9-]+\.js)\2\s*;\s*/u);
+    if (!imported) {
       throw new Error('Published HJM catalog has an unsupported leading import');
     }
     declarations = declarations.slice(imported[0].length);
@@ -208,8 +195,6 @@ export async function syncDesignSystem({ root = resolve(import.meta.dirname, '..
   const example = JSON.parse(before.get(contractPath));
   if (!example?.designSystem?.contracts) throw new Error('Target has no HJM contract');
   example.designSystem.contracts.version = release.version;
-  // Flutter consumers pin the same semantic contract/catalog without declaring
-  // React renderer packages (designSystem.applicability = native-adapter).
   for (const renderer of example.designSystem.renderers ?? []) renderer.version = release.version;
   example.designSystem.catalog = { train: release.version, snapshotPath: release.catalog.generatedPath, sha256: release.catalog.sha256 };
   if (release.consumerPolicy) example.designSystem.companionPolicy.version = release.consumerPolicy.version;
