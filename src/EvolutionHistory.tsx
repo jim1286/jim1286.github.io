@@ -10,6 +10,8 @@ const c = getCopy();
 // Record dates are not release dates. Evidence and audit boundaries live in
 // docs/EVOLUTION_HISTORY_SOURCES.md; private repository links stay off the public page.
 const entries = [
+  { topic: 'design', id: 'shareddrawing', date: '2026-10-27', status: c.evolutionShareddrawingProduct, title: c.evolutionShareddrawingTitle, why: c.evolutionShareddrawingWhy, change: c.evolutionShareddrawingChange, result: c.evolutionShareddrawingResult, evidence: c.evolutionShareddrawingEvidence },
+  { topic: 'clients', id: 'moonphase', date: '2026-10-27', status: c.evolutionMoonphaseProduct, title: c.evolutionMoonphaseTitle, why: c.evolutionMoonphaseWhy, change: c.evolutionMoonphaseChange, result: c.evolutionMoonphaseResult, evidence: c.evolutionMoonphaseEvidence },
   { topic: 'clients', id: 'baseballwidgetrefresh', date: '2026-10-26', status: c.evolutionBaseballwidgetrefreshProduct, title: c.evolutionBaseballwidgetrefreshTitle, why: c.evolutionBaseballwidgetrefreshWhy, change: c.evolutionBaseballwidgetrefreshChange, result: c.evolutionBaseballwidgetrefreshResult, evidence: c.evolutionBaseballwidgetrefreshEvidence },
   { topic: 'design', id: 'sharedsharesheet', date: '2026-10-26', status: c.evolutionSharedsharesheetProduct, title: c.evolutionSharedsharesheetTitle, why: c.evolutionSharedsharesheetWhy, change: c.evolutionSharedsharesheetChange, result: c.evolutionSharedsharesheetResult, evidence: c.evolutionSharedsharesheetEvidence },
   { topic: 'safety', id: 'memberprofiles', date: '2026-10-25', status: c.evolutionMemberprofilesProduct, title: c.evolutionMemberprofilesTitle, why: c.evolutionMemberprofilesWhy, change: c.evolutionMemberprofilesChange, result: c.evolutionMemberprofilesResult, evidence: c.evolutionMemberprofilesEvidence },

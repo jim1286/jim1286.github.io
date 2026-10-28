@@ -14,8 +14,8 @@ export const marketingAccounts: MarketingAccount[] = [
     "viewers": 23,
     "interactions": 46,
     "profileActivity": 29,
-    "followers": 56,
-    "followersAsOf": "2026-10-27",
+    "followers": 58,
+    "followersAsOf": "2026-10-28",
     "netFollowers": null,
     "daily": {
       "views": [],

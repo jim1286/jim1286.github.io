@@ -5,6 +5,116 @@ export type ReleasePlatformState = { platform: 'ios' | 'android'; status: 'revie
 export type ReleaseNote = { id: string; app: string; version: string; recordedOn: string; notes: string; sourceTag?: string; sourceSha?: string; notesSource?: 'manifest' | 'app-store' | 'github-release'; originalSourceNotes?: string; storeMetadataCreatedAt?: string; storeObservedAt?: string; platforms: ReleasePlatformState[] };
 export const releaseNotes: ReleaseNote[] = [
   {
+    "id": "yajalal-2.2.5",
+    "app": "yajalal",
+    "version": "2.2.5",
+    "recordedOn": "2026-10-28",
+    "notes": "선수 기록의 기간과 지표 선택, 팀 선수단 필터와 정렬을 개선하고 최근 경기 보기를 정리했습니다.",
+    "notesSource": "app-store",
+    "platforms": [
+      {
+        "platform": "ios",
+        "status": "available",
+        "asOf": "2026-10-28"
+      }
+    ],
+    "storeMetadataCreatedAt": "2026-10-27T13:41:44-07:00",
+    "storeObservedAt": "2026-10-28T00:03:10.861Z",
+    "sourceTag": "app-v2.2.5",
+    "sourceSha": "84f737f0815323502d86eb73879f282f6fb6beb7"
+  },
+  {
+    "id": "choose-window-2.1.4",
+    "app": "choose-window",
+    "version": "2.1.4",
+    "recordedOn": "2026-10-28",
+    "notes": "홈과 저장 경로의 배치 및 공통 화면 동작을 개선했습니다.",
+    "notesSource": "app-store",
+    "platforms": [
+      {
+        "platform": "ios",
+        "status": "available",
+        "asOf": "2026-10-28"
+      }
+    ],
+    "storeMetadataCreatedAt": "2026-10-27T13:03:20-07:00",
+    "storeObservedAt": "2026-10-28T00:03:10.861Z",
+    "sourceTag": "app-v2.1.4",
+    "sourceSha": "04d8da683bd290b01fd2b347f35ca0553372a05e"
+  },
+  {
+    "id": "burntok-1.7.6",
+    "app": "burntok",
+    "version": "1.7.6",
+    "recordedOn": "2026-10-28",
+    "notes": "약관 동의와 사진 보기 흐름을 개선하고 프로필 아바타 생성 및 공통 화면 동작을 안정화했습니다.",
+    "notesSource": "app-store",
+    "platforms": [
+      {
+        "platform": "ios",
+        "status": "available",
+        "asOf": "2026-10-28"
+      }
+    ],
+    "storeMetadataCreatedAt": "2026-10-27T09:34:06-07:00",
+    "storeObservedAt": "2026-10-28T00:03:10.861Z"
+  },
+  {
+    "id": "unairplane-1.1.7",
+    "app": "unairplane",
+    "version": "1.1.7",
+    "recordedOn": "2026-10-28",
+    "notes": "여정 화면 전환과 탑승권 스캔 권한 안내 및 공통 화면 동작을 개선했습니다.",
+    "notesSource": "app-store",
+    "platforms": [
+      {
+        "platform": "ios",
+        "status": "available",
+        "asOf": "2026-10-28"
+      }
+    ],
+    "storeMetadataCreatedAt": "2026-10-27T12:21:18-07:00",
+    "storeObservedAt": "2026-10-28T00:03:10.861Z"
+  },
+  {
+    "id": "diairy-1.9.5",
+    "app": "diairy",
+    "version": "1.9.5",
+    "recordedOn": "2026-10-28",
+    "notes": "손글씨 미리보기와 공통 화면 동작을 개선했습니다.",
+    "notesSource": "app-store",
+    "platforms": [
+      {
+        "platform": "ios",
+        "status": "available",
+        "asOf": "2026-10-28"
+      }
+    ],
+    "storeMetadataCreatedAt": "2026-10-27T11:05:44-07:00",
+    "storeObservedAt": "2026-10-28T00:03:10.861Z",
+    "sourceTag": "app-v1.9.5",
+    "sourceSha": "61528ae30d2c867259eb9b4e5ed19d16052862cd"
+  },
+  {
+    "id": "spint-1.3.4",
+    "app": "spint",
+    "version": "1.3.4",
+    "recordedOn": "2026-10-28",
+    "notes": "글 작성과 마크 사진 보기 및 공통 화면 동작을 개선했습니다.",
+    "notesSource": "app-store",
+    "platforms": [
+      {
+        "platform": "ios",
+        "status": "available",
+        "asOf": "2026-10-28"
+      }
+    ],
+    "storeMetadataCreatedAt": "2026-10-27T10:21:14-07:00",
+    "storeObservedAt": "2026-10-28T00:03:10.861Z",
+    "sourceTag": "app-v1.3.4",
+    "sourceSha": "baf929ae2d3b8adca647880ec08c576a680e8e13"
+  },
+  {
     "id": "yajalal-2.2.4",
     "app": "yajalal",
     "version": "2.2.4",
@@ -14,12 +124,14 @@ export const releaseNotes: ReleaseNote[] = [
     "platforms": [
       {
         "platform": "ios",
-        "status": "review",
-        "asOf": "2026-10-27"
+        "status": "available",
+        "asOf": "2026-10-28"
       }
     ],
     "storeMetadataCreatedAt": "2026-10-25T10:55:21-07:00",
-    "storeObservedAt": "2026-10-27T03:22:06.333Z"
+    "storeObservedAt": "2026-10-28T00:03:10.861Z",
+    "sourceTag": "app-v2.2.4",
+    "sourceSha": "368f6cbb972a61fd5ccc7c06b67ffa203996b1bd"
   },
   {
     "id": "utilverse-1.2.3",
