@@ -5,6 +5,28 @@ export type ReleasePlatformState = { platform: 'ios' | 'android'; status: 'revie
 export type ReleaseNote = { id: string; app: string; version: string; recordedOn: string; notes: string; sourceTag?: string; sourceSha?: string; notesSource?: 'manifest' | 'app-store' | 'github-release'; originalSourceNotes?: string; storeMetadataCreatedAt?: string; storeObservedAt?: string; platforms: ReleasePlatformState[] };
 export const releaseNotes: ReleaseNote[] = [
   {
+    "id": "yajalal-2.2.7",
+    "app": "yajalal",
+    "version": "2.2.7",
+    "recordedOn": "2026-10-30",
+    "notes": "선수 기록의 기간과 지표 선택, 팀 선수단 필터와 정렬을 개선하고 최근 경기 보기를 정리했습니다.",
+    "notesSource": "manifest",
+    "sourceTag": "app-v2.2.7",
+    "sourceSha": "16097b8f48e94666cd41e254b55a1558e41e1558",
+    "platforms": []
+  },
+  {
+    "id": "diairy-1.9.7",
+    "app": "diairy",
+    "version": "1.9.7",
+    "recordedOn": "2026-10-30",
+    "notes": "손글씨 미리보기와 공통 화면 동작을 개선했습니다.",
+    "notesSource": "manifest",
+    "sourceTag": "app-v1.9.7",
+    "sourceSha": "9a2019d7e275e8c58d7f7797c4e0af81c191775c",
+    "platforms": []
+  },
+  {
     "id": "yajalal-2.2.5",
     "app": "yajalal",
     "version": "2.2.5",

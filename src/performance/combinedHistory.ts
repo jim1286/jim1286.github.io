@@ -2,7 +2,7 @@
 // Older verified observations are retained; omitted report rows remain unobserved.
 // Source and query boundaries: docs/PERFORMANCE.md.
 import type { MetricSeries } from './data';
-export const combinedCapturedAt = "2026-10-28T08:51:36+09:00";
+export const combinedCapturedAt = "2026-10-30T08:32:00+09:00";
 export const combinedSeries: MetricSeries[] = [
   {
     "id": "yajalal-ga4-dau",
@@ -6521,6 +6521,12 @@ export const combinedSeries: MetricSeries[] = [
         "date": "2026-10-26",
         "value": 5,
         "observedOn": "2026-10-27"
+      },
+      {
+        "date": "2026-10-29",
+        "value": 3,
+        "observedOn": "2026-10-30",
+        "provisional": true
       }
     ]
   },
@@ -6653,6 +6659,12 @@ export const combinedSeries: MetricSeries[] = [
         "date": "2026-10-26",
         "value": 5,
         "observedOn": "2026-10-27"
+      },
+      {
+        "date": "2026-10-29",
+        "value": 1,
+        "observedOn": "2026-10-30",
+        "provisional": true
       }
     ]
   },

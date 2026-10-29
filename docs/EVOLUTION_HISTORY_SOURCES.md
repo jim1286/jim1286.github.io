@@ -163,3 +163,6 @@ HJM 초기 계약·공개 API 확장·화면 구성 공통화, 중앙 baseline, 
 - `nestrecords`: 다에리 `6bd9a1d`·`e67a243`·`58b7ea1`·`ccf896d`. 둥지 기록 경로·공통 발송 장면·웹/앱 구현과 디자인 문서의 개발 미리보기 기록을 확인했다.
 - `sendrecovery`: 번뚝 `210eb036`, Spint `59f54c4`, Utilverse `6011661`. 미전송 입력과 제출 후 불확실 결과의 복구를 구분하는 구현·테스트 소스를 확인했다. 각 제품의 저장 범위는 동일하다고 단정하지 않는다.
 - `reconciledrelease`: App Release Hub `0b0c495`·`a0a2dac`·`73e8aad`. 지정 버전·소스의 격리 준비와 제공자·기존 intent 확인 후 심사 단계만 재개하는 경계를 대조했다.
+
+
+2026-10-30 추가 확인: `meadowperiod`는 Spint `bf6a5df39847b52b8387dfb8837a37e65a27bc43`·`04dde1e99dcc1d638b0f24b4c5f764c6b8e60776`의 기간 선택 및 서버 재구성·관련 테스트 기록이다. `analysisreport`는 오늘야구 `826fc2c0f90fc711d4b551854688876d8acd991c`·`da3ada5978a9039534c17f2d47e0391eeaa866d0`의 분석 계약·화면 변경이다. 운영 공개 상태와 사용자 효과는 이 소스만으로 확정하지 않는다.

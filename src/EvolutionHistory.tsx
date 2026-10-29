@@ -10,6 +10,8 @@ const c = getCopy();
 // Record dates are not release dates. Evidence and audit boundaries live in
 // docs/EVOLUTION_HISTORY_SOURCES.md; private repository links stay off the public page.
 const entries = [
+  { topic: 'clients', id: 'meadowperiod', date: '2026-10-30', status: c.evolutionMeadowperiodProduct, title: c.evolutionMeadowperiodTitle, why: c.evolutionMeadowperiodWhy, change: c.evolutionMeadowperiodChange, result: c.evolutionMeadowperiodResult, evidence: c.evolutionMeadowperiodEvidence },
+  { topic: 'ai', id: 'analysisreport', date: '2026-10-29', status: c.evolutionAnalysisreportProduct, title: c.evolutionAnalysisreportTitle, why: c.evolutionAnalysisreportWhy, change: c.evolutionAnalysisreportChange, result: c.evolutionAnalysisreportResult, evidence: c.evolutionAnalysisreportEvidence },
   { topic: 'design', id: 'periodselection', date: '2026-10-28', status: c.evolutionPeriodselectionProduct, title: c.evolutionPeriodselectionTitle, why: c.evolutionPeriodselectionWhy, change: c.evolutionPeriodselectionChange, result: c.evolutionPeriodselectionResult, evidence: c.evolutionPeriodselectionEvidence },
   { topic: 'clients', id: 'seasontrends', date: '2026-10-28', status: c.evolutionSeasontrendsProduct, title: c.evolutionSeasontrendsTitle, why: c.evolutionSeasontrendsWhy, change: c.evolutionSeasontrendsChange, result: c.evolutionSeasontrendsResult, evidence: c.evolutionSeasontrendsEvidence },
   { topic: 'clients', id: 'nestrecords', date: '2026-10-28', status: c.evolutionNestrecordsProduct, title: c.evolutionNestrecordsTitle, why: c.evolutionNestrecordsWhy, change: c.evolutionNestrecordsChange, result: c.evolutionNestrecordsResult, evidence: c.evolutionNestrecordsEvidence },
