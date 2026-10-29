@@ -115,6 +115,63 @@ export const releaseNotes: ReleaseNote[] = [
     "sourceSha": "baf929ae2d3b8adca647880ec08c576a680e8e13"
   },
   {
+    "id": "yajalal-2.2.6",
+    "app": "yajalal",
+    "version": "2.2.6",
+    "recordedOn": "2026-10-28",
+    "notes": "경기 일정과 날짜 선택 화면을 개선했습니다.",
+    "notesSource": "app-store",
+    "platforms": [
+      {
+        "platform": "ios",
+        "status": "available",
+        "asOf": "2026-10-29"
+      }
+    ],
+    "storeMetadataCreatedAt": "2026-10-28T04:04:12-07:00",
+    "storeObservedAt": "2026-10-29T01:13:26.502Z",
+    "sourceTag": "app-v2.2.6",
+    "sourceSha": "6d4aa26dc28166e41f30a88645a589325b6d070a"
+  },
+  {
+    "id": "diairy-1.9.6",
+    "app": "diairy",
+    "version": "1.9.6",
+    "recordedOn": "2026-10-28",
+    "notes": "둥지 기록과 편지 목록을 개선하고 로그인 유지 방식을 정리했습니다.",
+    "notesSource": "app-store",
+    "platforms": [
+      {
+        "platform": "ios",
+        "status": "available",
+        "asOf": "2026-10-29"
+      }
+    ],
+    "storeMetadataCreatedAt": "2026-10-28T04:43:28-07:00",
+    "storeObservedAt": "2026-10-29T01:13:26.502Z",
+    "sourceTag": "app-v1.9.6",
+    "sourceSha": "c1ae5c379ffffb85d96624e6626d4ca79123ee84"
+  },
+  {
+    "id": "spint-1.3.5",
+    "app": "spint",
+    "version": "1.3.5",
+    "recordedOn": "2026-10-28",
+    "notes": "꽃 기록과 로그인 유지 방식을 개선했습니다.",
+    "notesSource": "app-store",
+    "platforms": [
+      {
+        "platform": "ios",
+        "status": "available",
+        "asOf": "2026-10-29"
+      }
+    ],
+    "storeMetadataCreatedAt": "2026-10-28T05:54:08-07:00",
+    "storeObservedAt": "2026-10-29T01:13:26.502Z",
+    "sourceTag": "app-v1.3.5",
+    "sourceSha": "7801cc6d5316c843aff3eefdbba29eedd8bd3706"
+  },
+  {
     "id": "yajalal-2.2.4",
     "app": "yajalal",
     "version": "2.2.4",
