@@ -60,13 +60,52 @@ GitHub 응답은 HTTP 200 안내(알 수 없는 경로는 404 안내)이며 서�
 과거 .published 산출물·main의 Git 이력은 유지하며 운영용 branch를 새로 만들지 않는다.
 결과: [QA 리포트](../../docs/qa/2026-10-09-owned-domain-deployment.md).
 
-## 개발 Mac 자격증명으로 mac-ci 게시 (2026-10-21)
+## 무인 게시 — 비공개 Hub와 격리 runner (2026-10-30)
 
-관리 키 정본은 개발 Mac의 `HJM-Credentials/apps/diairy/ovh/ovh_airy_ed25519`이며,
-이 키로 위 VPS와 `/srv/portfolio-site` 접근을 실제 확인했다. mac-ci에 비밀키를 복제하지 않는다.
-mac-ci의 깨끗한 main checkout을 정확한 source SHA로 fast-forward하여 빌드·artifact 준비를 수행한다.
-개발 Mac의 작업 전용 ssh-agent에 기존 키를 추가하고 `ssh -A mac-ci`로 해당 실행에만 전달한다.
-mac-ci에는 대응하는 **공개키만** 임시 파일로 전달해 기존 publisher의 key-file 인수로 지정한다.
-OpenSSH는 공개키와 일치하는 전달 agent로 서명하므로 기존 SSH 게시 경로와 artifact 검사를 유지한다.
-작업 완료 뒤 전용 agent와 본 작업의 임시 공개키·artifact만 정리한다. 중앙 자격증명 원문은
-소스·로그·작업 기록에 넣지 않는다. 이 절은 일별 오전9시 성과·발전 이력 게시에도 적용한다.
+사용자가 개발 Mac 없이 키 등록부터 일별 예약 실행까지 완료하도록 요청해 기존 publisher를 비공개
+`jim1286/app-release-hub`의 `.github/workflows/portfolio-site-deploy.yml`에 연결했다. 공개 사이트 저장소에는
+self-hosted runner를 등록하지 않는다. Hub의 기존 `[self-hosted, linux-vm]` runner가 mac-ci의 기존
+admission/slot과 호스트 전환을 거쳐 실행하며, 진행 중인 native 배포를 중단하지 않는다.
+
+키 원본은 mac-dev의 `HJM-Credentials/apps/diairy/ovh/ovh_airy_ed25519`다. 파일 MANIFEST의 `hosts`는
+`mac-dev`로 유지하고 소비자에 Hub의 `portfolio-site` 환경 secret을 등록한다. mac-dev에서 다음 두 secret을
+파일/stdin으로 직접 등록하며 값은 출력하지 않는다. operator 홈이나 LLM을 거쳐 전달하지 않는다.
+
+- `PORTFOLIO_SITE_SSH_KEY`: 원본 SSH 개인키
+- `PORTFOLIO_SITE_KNOWN_HOSTS`: 기존 접속에서 검증한 서버의 known_hosts 행. keyscan 결과를 자동 신뢰하지 않는다.
+
+Actions는 게시 단계에만 이 비밀을 주입한다. 개인키와 pinned known_hosts는 격리 runner의
+`$RUNNER_TEMP/portfolio-ssh-<run-id>-<attempt>/`에 0700 디렉터리·0600 파일로 쓰고 성공·실패 모두 정리한다.
+호스트의 `ci-runner`와 operator 분리는 유지하며, 실제 Linux job 계정은 실행 로그의 `runner-user`로 확인한다.
+이 방식은 사용자 터미널의 sudo 인증이나 개발 Mac의 SSH agent·온라인 상태에 의존하지 않는다.
+
+```sh
+gh workflow run portfolio-site-deploy.yml --repo jim1286/app-release-hub --ref main -f source_sha=<exact-site-main-sha>
+```
+
+동일 source의 기존 실행이 있는지 먼저 확인한다. run 제목은 `Portfolio site <source-sha>`이며
+반환/조회한 정확한 run ID를 추적한다. dispatch 결과가 불명확하면 생성된 run을 조회하고 중복 제출하지 않는다.
+workflow는 사이트의 정확한 40자리 SHA를 checkout하고 `origin/main`에 포함되는지 확인한 뒤 lockfile 고정 설치와
+기존 build·artifact 준비·검증을 실행한다. 앱 버전은 올리지 않는다. manifest와 public을 Actions artifact로 30일
+보존하고 ID·digest·source·manifest SHA를 실행 요약에 남긴다. 공개에는 public 파일만 올린다.
+
+기존 publisher가 동일 SHA·manifest·파일 bytes의 artifact가 current인지 읽기 전용으로 먼저 확인한다.
+일치하면 재업로드·재전환을 생략하고 공개 검증을 재개한다. 같은 release가 존재하지만 current가 다르면 자동
+재게시하지 않고 상태 확인을 요구한다. 다른 artifact면 기존 VPS lock·후보 검증·원자 교체·previous 보존을 따른다.
+SSH는 `BatchMode=yes`, `IdentitiesOnly=yes`, `StrictHostKeyChecking=yes`와 전용 `UserKnownHostsFile`을 사용한다.
+
+`node scripts/verify-static-site-public.mjs ARTIFACT SOURCE_SHA`는 모든 공개 파일의 HTTPS status·bytes·hash,
+www의 경로/query 보존 308, 비공개·누락 경로 404를 확인한다. workflow 성공과 공개 확인은 이 단계가 끝나야
+완료다. timeout이나 부분 성공 뒤에는 기존 run·artifact·provider 상태를 확인한 다음 미완료 단계만 진행한다.
+
+일별 09:00 heartbeat는 operator의 기존 main에서 데이터·문서를 수정하고 해당 source를 push한 뒤 위 workflow를
+명시 dispatch하고 정확한 run ID와 결과를 기록한다. 운영 키를 읽거나 sudo를 실행하지 않는다. 08:30 수집은
+로컬 Aside CLI와 승인된 계정 Insights를 사용하며, 실제 계정 전환·복원은 공유 브라우저 담당과 조율한다.
+
+## 이전 인증 방식의 이력
+
+2026-10-21에는 개발 Mac의 전용 SSH agent를 `ssh -A mac-ci`로 전달하고 공개키만 publisher의 key-file 인수로
+지정했다. 10/30 사용자의 전체 자격증명 이전 후 operator의 읽기 전용 접속은 성공했지만, MANIFEST의 키 허용
+호스트가 `mac-dev`여서 색인 기반 정리 시 operator 사본과 빈 디렉터리가 제거됐다. 원인은 파일의 분실이 아니라
+등록된 소비자/호스트와 실제 사용 경로의 불일치였다. 현재 경로는 위 Actions 환경 비밀 주입이며, operator로
+키를 재복사하거나 전역 passwordless sudo를 추가해 해결하지 않는다. 과거 접속 성공은 현재 공개 배포 증거가 아니다.

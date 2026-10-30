@@ -14,16 +14,43 @@ git diff --quiet "$source_sha" -- package.json pnpm-lock.yaml index.html vite.co
 node scripts/static-site-artifact.mjs verify "$artifact" "$source_sha"
 # Read-only preflight preserves pinned host keys and avoids packaging on bad access.
 test -r "$identity"
-ssh -i "$identity" -o IdentitiesOnly=yes -o BatchMode=yes -o StrictHostKeyChecking=yes -o ConnectTimeout=10 "$target" 'test -d /srv && test -w /tmp'
+ssh_options=(-i "$identity" -o IdentitiesOnly=yes -o BatchMode=yes -o StrictHostKeyChecking=yes -o ConnectTimeout=10)
+# CI supplies its pinned trust file per job; manual callers retain their existing known_hosts.
+if test -n "${PORTFOLIO_KNOWN_HOSTS:-}"; then
+  [[ "$PORTFOLIO_KNOWN_HOSTS" = /* ]] && test -r "$PORTFOLIO_KNOWN_HOSTS"
+  ssh_options+=(-o "UserKnownHostsFile=$PORTFOLIO_KNOWN_HOSTS")
+fi
+ssh "${ssh_options[@]}" "$target" 'test -d /srv && test -w /tmp'
 manifest_sha=$(shasum -a 256 "$artifact/manifest.json" | awk '{print $1}')
 release_id="$source_sha-${manifest_sha:0:12}"
+# Resume an uncertain submission by checking the exact installed artifact, never by version or latest.
+installed=$(ssh "${ssh_options[@]}" "$target" "python3 - '$release_id' '$manifest_sha'" <<'CHECK'
+import hashlib,json,pathlib,sys
+release_id,expected=sys.argv[1:]
+base=pathlib.Path('/srv/portfolio-site');release=base/'releases'/release_id
+if not release.exists():
+ print('new');sys.exit(0)
+assert (base/'current').resolve()==release.resolve(), 'Existing artifact is not current; inspect provider state before promotion'
+assert hashlib.sha256((release/'manifest.json').read_bytes()).hexdigest()==expected, 'Installed manifest differs'
+m=json.loads((release/'manifest.json').read_text());public=release/'public'
+assert m['sourceSha']==release_id[:40]
+assert {p.relative_to(public).as_posix() for p in public.rglob('*') if p.is_file()}=={f['file'] for f in m['files']}
+for f in m['files']:
+ p=public/f['file'];assert not p.is_symlink() and p.stat().st_size==f['bytes'] and hashlib.sha256(p.read_bytes()).hexdigest()==f['sha256']
+print('current')
+CHECK
+)
+if test "$installed" = current; then
+  printf 'Exact source/artifact already current: %s\n' "$release_id"
+  exit 0
+fi
+test "$installed" = new
 scratch=$(mktemp -d "${TMPDIR:-/tmp}/portfolio-publish.XXXXXX")
 trap 'rm -rf "$scratch"' EXIT
 node scripts/static-site-artifact.mjs caddy "$artifact" /srv/portfolio-site/current/public > "$scratch/production.caddy"
 node scripts/static-site-artifact.mjs caddy "$artifact" "/srv/portfolio-site/releases/$release_id/public" --preview > "$scratch/preview.caddy"
 COPYFILE_DISABLE=1 tar -czf "$scratch/artifact.tgz" -C "$artifact" public manifest.json
 archive_sha=$(shasum -a 256 "$scratch/artifact.tgz" | awk '{print $1}')
-ssh_options=(-i "$identity" -o IdentitiesOnly=yes -o BatchMode=yes -o StrictHostKeyChecking=yes -o ConnectTimeout=10)
 remote_stage="/tmp/portfolio-publish-$release_id"
 ssh "${ssh_options[@]}" "$target" "mkdir -m 700 '$remote_stage'"
 scp "${ssh_options[@]}" "$scratch/artifact.tgz" "$scratch/production.caddy" "$scratch/preview.caddy" "$target:$remote_stage/"
