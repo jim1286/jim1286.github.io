@@ -35,8 +35,8 @@
     "@ant-design/icons": "^6.3.4",
     "react": "^19.3.1",
     "react-dom": "^19.3.1",
-    "@hjmds/design-contracts": "2.1.0",
-    "@hjmds/react": "2.1.0"
+    "@hjmds/design-contracts": "2.2.0",
+    "@hjmds/react": "2.2.0"
   },
   "devDependencies": {
     "@types/react": "^19.3.0",
