@@ -1,6 +1,8 @@
 // Public aggregate projection from the historical evidence listed in docs/PERFORMANCE.md.
 // Original console links, property IDs and evidence rows are deliberately not imported.
 import type { MetricSeries } from './data';
+// Includes the latest independently observed AdMob Network report.
+export const historicalCapturedAt = "2026-10-31T08:54:03+09:00";
 export const historicalSeries: MetricSeries[] = [
   {
     "id": "choose-window-ga4-dau",
@@ -1061,6 +1063,13 @@ export const historicalSeries: MetricSeries[] = [
         "observedOn": "2026-10-30",
         "provisional": true,
         "timeZone": null
+      },
+      {
+        "date": "2026-10-30",
+        "value": 0.0,
+        "observedOn": "2026-10-31",
+        "provisional": true,
+        "timeZone": null
       }
     ],
     "missingReason": "16~17,19일 행은 미제공. USD, 센트 단위 반올림."
@@ -1085,6 +1094,13 @@ export const historicalSeries: MetricSeries[] = [
         "date": "2026-10-27",
         "value": 0,
         "observedOn": "2026-10-30",
+        "provisional": true,
+        "timeZone": null
+      },
+      {
+        "date": "2026-10-30",
+        "value": 0.0,
+        "observedOn": "2026-10-31",
         "provisional": true,
         "timeZone": null
       }
@@ -1163,6 +1179,13 @@ export const historicalSeries: MetricSeries[] = [
         "date": "2026-10-28",
         "value": 0,
         "observedOn": "2026-10-30",
+        "provisional": true,
+        "timeZone": null
+      },
+      {
+        "date": "2026-10-30",
+        "value": 0.0,
+        "observedOn": "2026-10-31",
         "provisional": true,
         "timeZone": null
       }

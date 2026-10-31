@@ -1,7 +1,7 @@
 // Public aggregate store exports. Installed audience and DAU are separate metrics.
 // Exported zero padding is preserved; coverage and firstPositive do not assert an app launch date.
 import type { MetricSeries } from './data.ts';
-export const storeCapturedAt = "2026-10-28T08:54:57+09:00";
+export const storeCapturedAt = "2026-10-31T08:46:00+09:00";
 export const storeSeries: MetricSeries[] = [
   {
     "id": "store-yajalal-apple-store-all-visitors",
@@ -1798,11 +1798,32 @@ export const storeSeries: MetricSeries[] = [
         "date": "2026-10-26",
         "value": 6,
         "observedOn": "2026-10-28"
+      },
+      {
+        "date": "2026-10-27",
+        "value": 1,
+        "observedOn": "2026-10-31",
+        "provisional": false,
+        "timeZone": "UTC"
+      },
+      {
+        "date": "2026-10-28",
+        "value": 4,
+        "observedOn": "2026-10-31",
+        "provisional": false,
+        "timeZone": "UTC"
+      },
+      {
+        "date": "2026-10-29",
+        "value": 2,
+        "observedOn": "2026-10-31",
+        "provisional": false,
+        "timeZone": "UTC"
       }
     ],
     "coverage": {
       "start": "2025-08-06",
-      "end": "2026-10-26"
+      "end": "2026-10-29"
     },
     "firstPositive": "2025-08-06"
   },
@@ -2564,11 +2585,25 @@ export const storeSeries: MetricSeries[] = [
         "date": "2026-10-23",
         "value": 1,
         "observedOn": "2026-10-25"
+      },
+      {
+        "date": "2026-10-26",
+        "value": 1,
+        "observedOn": "2026-10-31",
+        "provisional": false,
+        "timeZone": "UTC"
+      },
+      {
+        "date": "2026-10-27",
+        "value": 6,
+        "observedOn": "2026-10-31",
+        "provisional": false,
+        "timeZone": "UTC"
       }
     ],
     "coverage": {
       "start": "2026-07-22",
-      "end": "2026-10-23"
+      "end": "2026-10-27"
     },
     "firstPositive": "2026-09-29"
   },
@@ -2947,11 +2982,25 @@ export const storeSeries: MetricSeries[] = [
         "date": "2026-10-20",
         "value": 1,
         "observedOn": "2026-10-22"
+      },
+      {
+        "date": "2026-10-27",
+        "value": 4,
+        "observedOn": "2026-10-31",
+        "provisional": false,
+        "timeZone": "UTC"
+      },
+      {
+        "date": "2026-10-29",
+        "value": 1,
+        "observedOn": "2026-10-31",
+        "provisional": false,
+        "timeZone": "UTC"
       }
     ],
     "coverage": {
       "start": "2026-07-22",
-      "end": "2026-10-20"
+      "end": "2026-10-29"
     },
     "firstPositive": "2026-09-29"
   },
@@ -15894,8 +15943,10 @@ export const storeSeries: MetricSeries[] = [
       },
       {
         "date": "2026-10-24",
-        "value": 2,
-        "observedOn": "2026-10-27"
+        "value": 3,
+        "observedOn": "2026-10-31",
+        "provisional": false,
+        "timeZone": null
       },
       {
         "date": "2026-10-25",
@@ -20155,7 +20206,10 @@ export const storeSeries: MetricSeries[] = [
       },
       {
         "date": "2026-10-18",
-        "value": 0
+        "value": 1,
+        "observedOn": "2026-10-31",
+        "provisional": false,
+        "timeZone": null
       }
     ],
     "coverage": {

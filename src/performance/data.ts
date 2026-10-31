@@ -4,7 +4,7 @@ import { webCapturedAt, webSeries } from './webHistory.ts';
 import { combinedCapturedAt, combinedSeries } from './combinedHistory.ts';
 import { platformCapturedAt, platformSeries } from './platformHistory.ts';
 import { iosCapturedAt, iosSeries } from './iosHistory.ts';
-import { historicalSeries } from './history.ts';
+import { historicalCapturedAt, historicalSeries } from './history.ts';
 import { storeCapturedAt, storeSeries } from './storeHistory.ts';
 export type Metric = 'dau' | 'new' | 'installed' | 'revenue' | 'visitors' | 'activeDevices';
 export type Observation = { date: string; value: number; observedOn?: string; provisional?: boolean; timeZone?: string | null };
@@ -25,7 +25,7 @@ export type MetricSeries = {
   testTraffic: 'not-excluded' | 'closed-test';
   points: Observation[];
 };
-export const capturedAt = [storeCapturedAt, iosCapturedAt, platformCapturedAt, webCapturedAt, combinedCapturedAt].sort((a, b) => Date.parse(b) - Date.parse(a))[0];
+export const capturedAt = [storeCapturedAt, iosCapturedAt, platformCapturedAt, webCapturedAt, combinedCapturedAt, historicalCapturedAt].sort((a, b) => Date.parse(b) - Date.parse(a))[0];
 const october = (values: [number, number][]): Observation[] => values.map(([day, value]) => ({ date: `2026-10-${String(day).padStart(2, '0')}`, value }));
 export const metricSeries: MetricSeries[] = [
   { id: 'yajalal-installed', app: 'yajalal', metric: 'installed', source: 'Google Play', scope: 'android', timeZone: null, testTraffic: 'not-excluded',
