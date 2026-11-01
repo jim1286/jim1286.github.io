@@ -1,6 +1,6 @@
 // Date x Platform native-app exports. Production/development streams are not separated.
 import type { MetricSeries } from './data.ts';
-export const platformCapturedAt = "2026-10-31T08:51:00+09:00";
+export const platformCapturedAt = "2026-11-01T08:51:57+09:00";
 export const platformSeries: MetricSeries[] = [
   {
     "id": "platform-choose-window-ga4-ios-app-dau",
@@ -1100,7 +1100,7 @@ export const platformSeries: MetricSeries[] = [
     "testTraffic": "not-excluded",
     "coverage": {
       "start": "2021-10-21",
-      "end": "2026-10-30"
+      "end": "2026-10-31"
     },
     "points": [
       {
@@ -1301,6 +1301,13 @@ export const platformSeries: MetricSeries[] = [
         "observedOn": "2026-10-31",
         "provisional": true,
         "timeZone": null
+      },
+      {
+        "date": "2026-10-31",
+        "value": 1,
+        "observedOn": "2026-11-01",
+        "provisional": true,
+        "timeZone": null
       }
     ]
   },
@@ -1316,7 +1323,7 @@ export const platformSeries: MetricSeries[] = [
     "testTraffic": "not-excluded",
     "coverage": {
       "start": "2021-10-21",
-      "end": "2026-10-30"
+      "end": "2026-10-31"
     },
     "points": [
       {
@@ -1517,6 +1524,13 @@ export const platformSeries: MetricSeries[] = [
         "observedOn": "2026-10-31",
         "provisional": true,
         "timeZone": null
+      },
+      {
+        "date": "2026-10-31",
+        "value": 1,
+        "observedOn": "2026-11-01",
+        "provisional": true,
+        "timeZone": null
       }
     ]
   },
@@ -1532,7 +1546,7 @@ export const platformSeries: MetricSeries[] = [
     "testTraffic": "not-excluded",
     "coverage": {
       "start": "2021-10-21",
-      "end": "2026-10-30"
+      "end": "2026-10-31"
     },
     "points": [
       {
@@ -1619,6 +1633,13 @@ export const platformSeries: MetricSeries[] = [
         "date": "2026-10-30",
         "value": 6,
         "observedOn": "2026-10-31",
+        "provisional": true,
+        "timeZone": null
+      },
+      {
+        "date": "2026-10-31",
+        "value": 2,
+        "observedOn": "2026-11-01",
         "provisional": true,
         "timeZone": null
       }
@@ -1636,7 +1657,7 @@ export const platformSeries: MetricSeries[] = [
     "testTraffic": "not-excluded",
     "coverage": {
       "start": "2021-10-21",
-      "end": "2026-10-30"
+      "end": "2026-10-31"
     },
     "points": [
       {
@@ -1725,6 +1746,13 @@ export const platformSeries: MetricSeries[] = [
         "observedOn": "2026-10-31",
         "provisional": true,
         "timeZone": null
+      },
+      {
+        "date": "2026-10-31",
+        "value": 1,
+        "observedOn": "2026-11-01",
+        "provisional": true,
+        "timeZone": null
       }
     ]
   },
@@ -1740,7 +1768,7 @@ export const platformSeries: MetricSeries[] = [
     "testTraffic": "not-excluded",
     "coverage": {
       "start": "2021-10-21",
-      "end": "2026-10-30"
+      "end": "2026-10-31"
     },
     "points": [
       {
@@ -1788,6 +1816,13 @@ export const platformSeries: MetricSeries[] = [
         "date": "2026-10-30",
         "value": 10,
         "observedOn": "2026-10-31",
+        "provisional": true,
+        "timeZone": null
+      },
+      {
+        "date": "2026-10-31",
+        "value": 1,
+        "observedOn": "2026-11-01",
         "provisional": true,
         "timeZone": null
       }
@@ -1805,7 +1840,7 @@ export const platformSeries: MetricSeries[] = [
     "testTraffic": "not-excluded",
     "coverage": {
       "start": "2021-10-21",
-      "end": "2026-10-30"
+      "end": "2026-10-31"
     },
     "points": [
       {
@@ -1855,6 +1890,13 @@ export const platformSeries: MetricSeries[] = [
         "observedOn": "2026-10-31",
         "provisional": true,
         "timeZone": null
+      },
+      {
+        "date": "2026-10-31",
+        "value": 0,
+        "observedOn": "2026-11-01",
+        "provisional": true,
+        "timeZone": null
       }
     ]
   },
@@ -1870,7 +1912,7 @@ export const platformSeries: MetricSeries[] = [
     "testTraffic": "closed-test",
     "coverage": {
       "start": "2026-09-23",
-      "end": "2026-10-30"
+      "end": "2026-10-31"
     },
     "points": [
       {
@@ -1944,6 +1986,13 @@ export const platformSeries: MetricSeries[] = [
         "observedOn": "2026-10-31",
         "provisional": true,
         "timeZone": null
+      },
+      {
+        "date": "2026-10-31",
+        "value": 1,
+        "observedOn": "2026-11-01",
+        "provisional": true,
+        "timeZone": null
       }
     ]
   },
@@ -1959,7 +2008,7 @@ export const platformSeries: MetricSeries[] = [
     "testTraffic": "closed-test",
     "coverage": {
       "start": "2026-09-23",
-      "end": "2026-10-30"
+      "end": "2026-10-31"
     },
     "points": [
       {
@@ -2031,6 +2080,13 @@ export const platformSeries: MetricSeries[] = [
         "date": "2026-10-30",
         "value": 5,
         "observedOn": "2026-10-31",
+        "provisional": true,
+        "timeZone": null
+      },
+      {
+        "date": "2026-10-31",
+        "value": 0,
+        "observedOn": "2026-11-01",
         "provisional": true,
         "timeZone": null
       }
@@ -2170,7 +2226,7 @@ export const platformSeries: MetricSeries[] = [
     "testTraffic": "not-excluded",
     "coverage": {
       "start": "2021-10-21",
-      "end": "2026-10-30"
+      "end": "2026-10-31"
     },
     "points": [
       {
@@ -2225,6 +2281,13 @@ export const platformSeries: MetricSeries[] = [
         "observedOn": "2026-10-31",
         "provisional": true,
         "timeZone": null
+      },
+      {
+        "date": "2026-10-31",
+        "value": 2,
+        "observedOn": "2026-11-01",
+        "provisional": true,
+        "timeZone": null
       }
     ]
   },
@@ -2240,7 +2303,7 @@ export const platformSeries: MetricSeries[] = [
     "testTraffic": "not-excluded",
     "coverage": {
       "start": "2021-10-21",
-      "end": "2026-10-30"
+      "end": "2026-10-31"
     },
     "points": [
       {
@@ -2293,6 +2356,13 @@ export const platformSeries: MetricSeries[] = [
         "date": "2026-10-30",
         "value": 2,
         "observedOn": "2026-10-31",
+        "provisional": true,
+        "timeZone": null
+      },
+      {
+        "date": "2026-10-31",
+        "value": 1,
+        "observedOn": "2026-11-01",
         "provisional": true,
         "timeZone": null
       }
@@ -2610,7 +2680,7 @@ export const platformSeries: MetricSeries[] = [
     "testTraffic": "closed-test",
     "coverage": {
       "start": "2026-10-15",
-      "end": "2026-10-30"
+      "end": "2026-10-31"
     },
     "points": [
       {
@@ -2662,6 +2732,13 @@ export const platformSeries: MetricSeries[] = [
         "date": "2026-10-30",
         "value": 1,
         "observedOn": "2026-10-31",
+        "provisional": true,
+        "timeZone": null
+      },
+      {
+        "date": "2026-10-31",
+        "value": 1,
+        "observedOn": "2026-11-01",
         "provisional": true,
         "timeZone": null
       }
@@ -2679,7 +2756,7 @@ export const platformSeries: MetricSeries[] = [
     "testTraffic": "closed-test",
     "coverage": {
       "start": "2026-10-15",
-      "end": "2026-10-30"
+      "end": "2026-10-31"
     },
     "points": [
       {
@@ -2733,6 +2810,13 @@ export const platformSeries: MetricSeries[] = [
         "observedOn": "2026-10-31",
         "provisional": true,
         "timeZone": null
+      },
+      {
+        "date": "2026-10-31",
+        "value": 1,
+        "observedOn": "2026-11-01",
+        "provisional": true,
+        "timeZone": null
       }
     ]
   },
@@ -2748,7 +2832,7 @@ export const platformSeries: MetricSeries[] = [
     "testTraffic": "not-excluded",
     "coverage": {
       "start": "2026-10-15",
-      "end": "2026-10-30"
+      "end": "2026-10-31"
     },
     "points": [
       {
@@ -2822,6 +2906,13 @@ export const platformSeries: MetricSeries[] = [
         "observedOn": "2026-10-31",
         "provisional": true,
         "timeZone": null
+      },
+      {
+        "date": "2026-10-31",
+        "value": 8,
+        "observedOn": "2026-11-01",
+        "provisional": true,
+        "timeZone": null
       }
     ]
   },
@@ -2837,7 +2928,7 @@ export const platformSeries: MetricSeries[] = [
     "testTraffic": "not-excluded",
     "coverage": {
       "start": "2026-10-15",
-      "end": "2026-10-30"
+      "end": "2026-10-31"
     },
     "points": [
       {
@@ -2909,6 +3000,13 @@ export const platformSeries: MetricSeries[] = [
         "date": "2026-10-30",
         "value": 11,
         "observedOn": "2026-10-31",
+        "provisional": true,
+        "timeZone": null
+      },
+      {
+        "date": "2026-10-31",
+        "value": 5,
+        "observedOn": "2026-11-01",
         "provisional": true,
         "timeZone": null
       }
@@ -2926,7 +3024,7 @@ export const platformSeries: MetricSeries[] = [
     "testTraffic": "not-excluded",
     "coverage": {
       "start": "2026-10-15",
-      "end": "2026-10-30"
+      "end": "2026-10-31"
     },
     "points": [
       {
@@ -3000,6 +3098,13 @@ export const platformSeries: MetricSeries[] = [
         "observedOn": "2026-10-31",
         "provisional": true,
         "timeZone": null
+      },
+      {
+        "date": "2026-10-31",
+        "value": 11,
+        "observedOn": "2026-11-01",
+        "provisional": true,
+        "timeZone": null
       }
     ]
   },
@@ -3015,7 +3120,7 @@ export const platformSeries: MetricSeries[] = [
     "testTraffic": "not-excluded",
     "coverage": {
       "start": "2026-10-15",
-      "end": "2026-10-30"
+      "end": "2026-10-31"
     },
     "points": [
       {
@@ -3087,6 +3192,13 @@ export const platformSeries: MetricSeries[] = [
         "date": "2026-10-30",
         "value": 5,
         "observedOn": "2026-10-31",
+        "provisional": true,
+        "timeZone": null
+      },
+      {
+        "date": "2026-10-31",
+        "value": 4,
+        "observedOn": "2026-11-01",
         "provisional": true,
         "timeZone": null
       }

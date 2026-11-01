@@ -124,3 +124,7 @@ App Store의 과거 버전 상태가 READY_FOR_SALE인 것은 출시 이력 확�
 7개 앱의 최신 App Store 버전 3개씩을 기존 인증 경로의 GET 35회로 확인했다. 중앙 research/2026-10-31/release-notes-store-latest-public.json에 버전·한국어 원문·메타데이터 생성시각·상태·관측시각만 보존했다. 반환된 21개 버전의 iOS READY_FOR_SALE 관측은 10/31 현재 확인으로 갱신했다. Android 상태는 새로 확인하지 않아 이전 확인일을 유지했다. 다에리 1.9.7은 이번 최신 3개 반환에 없으므로 공개 상태를 추정하지 않았다.
 
 새 정식 app-v2.3.0(오늘야구), app-v2.1.5(선택의창), app-v1.9.8(다에리)의 고정 태그 manifest 원문과 SHA를 대조했다. 총 210개 노트이며 스토어 전용 버전에는 임의의 Git 태그/SHA를 만들지 않았다. 태그와 스토어 문구가 다르면 태그 원문도 별도 보존했다. 최신 태그 근거는 release-notes-tags-public.json이다. 생성일·소스 기록일은 공개일과 다르며 기존 과거 전체를 재수집하지 않았다.
+
+## 2026-11-01 최신 상태 대조
+
+오늘야구 2.3.1의 실제 한국어 스토어 원문을 추가해 총 211개다. 정식 태그가 없는 스토어 버전이므로 Git SHA를 만들지 않았다. App Store Connect GET으로 확인한 기존 공개 버전 15개의 iOS 상태·확인일을 갱신했으며 Android 상태는 새로 조회하지 않았다. 6개 제품의 PREPARE_FOR_SUBMISSION 버전은 정식 태그·whatsNew 원문이 없어 공개 출시 이력에 추가하지 않았다. 생성일은 공개일로 취급하지 않는다. 근거는 중앙 research/2026-11-01/release-notes-store-latest-public.json 및 release-notes-update-public.json이다.

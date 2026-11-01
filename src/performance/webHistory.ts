@@ -1,6 +1,6 @@
 // Actual Platform=web rows. An absent row is not a confirmed zero.
 import type { MetricSeries } from './data.ts';
-export const webCapturedAt = "2026-10-31T08:51:00+09:00";
+export const webCapturedAt = "2026-11-01T08:51:57+09:00";
 export const webSeries: MetricSeries[] = [
   {
     "id": "web-diairy-dau",
@@ -43,6 +43,13 @@ export const webSeries: MetricSeries[] = [
         "date": "2026-10-30",
         "value": 1,
         "observedOn": "2026-10-31",
+        "provisional": true,
+        "timeZone": null
+      },
+      {
+        "date": "2026-10-31",
+        "value": 2,
+        "observedOn": "2026-11-01",
         "provisional": true,
         "timeZone": null
       }
@@ -91,6 +98,13 @@ export const webSeries: MetricSeries[] = [
         "observedOn": "2026-10-31",
         "provisional": true,
         "timeZone": null
+      },
+      {
+        "date": "2026-10-31",
+        "value": 1,
+        "observedOn": "2026-11-01",
+        "provisional": true,
+        "timeZone": null
       }
     ]
   },
@@ -106,7 +120,7 @@ export const webSeries: MetricSeries[] = [
     "testTraffic": "not-excluded",
     "coverage": {
       "start": "2026-10-15",
-      "end": "2026-10-30"
+      "end": "2026-10-31"
     },
     "points": [
       {
@@ -150,6 +164,13 @@ export const webSeries: MetricSeries[] = [
         "observedOn": "2026-10-31",
         "provisional": true,
         "timeZone": null
+      },
+      {
+        "date": "2026-10-31",
+        "value": 1,
+        "observedOn": "2026-11-01",
+        "provisional": true,
+        "timeZone": null
       }
     ]
   },
@@ -165,7 +186,7 @@ export const webSeries: MetricSeries[] = [
     "testTraffic": "not-excluded",
     "coverage": {
       "start": "2026-10-15",
-      "end": "2026-10-30"
+      "end": "2026-10-31"
     },
     "points": [
       {
@@ -207,6 +228,13 @@ export const webSeries: MetricSeries[] = [
         "date": "2026-10-30",
         "value": 1,
         "observedOn": "2026-10-31",
+        "provisional": true,
+        "timeZone": null
+      },
+      {
+        "date": "2026-10-31",
+        "value": 1,
+        "observedOn": "2026-11-01",
         "provisional": true,
         "timeZone": null
       }

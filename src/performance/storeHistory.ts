@@ -1,7 +1,7 @@
 // Public aggregate store exports. Installed audience and DAU are separate metrics.
 // Exported zero padding is preserved; coverage and firstPositive do not assert an app launch date.
 import type { MetricSeries } from './data.ts';
-export const storeCapturedAt = "2026-10-31T08:46:00+09:00";
+export const storeCapturedAt = "2026-11-01T08:59:43+09:00";
 export const storeSeries: MetricSeries[] = [
   {
     "id": "store-yajalal-apple-store-all-visitors",
@@ -1819,11 +1819,18 @@ export const storeSeries: MetricSeries[] = [
         "observedOn": "2026-10-31",
         "provisional": false,
         "timeZone": "UTC"
+      },
+      {
+        "date": "2026-10-30",
+        "value": 1,
+        "observedOn": "2026-11-01",
+        "provisional": false,
+        "timeZone": "UTC"
       }
     ],
     "coverage": {
       "start": "2025-08-06",
-      "end": "2026-10-29"
+      "end": "2026-10-30"
     },
     "firstPositive": "2025-08-06"
   },
@@ -4399,8 +4406,17 @@ export const storeSeries: MetricSeries[] = [
     "unique": false,
     "timeZone": "UTC",
     "testTraffic": "closed-test",
-    "points": [],
-    "missingReason": "2026-10-23에 제품 페이지 조회 보고서 접근을 확인했습니다. 10/16–21은 대시로 숫자가 제공되지 않았으며 10/22는 아직 제공되지 않았습니다. 0으로 간주하지 않습니다."
+    "points": [
+      {
+        "date": "2026-10-27",
+        "value": 1,
+        "observedOn": "2026-11-01",
+        "provisional": false,
+        "timeZone": "UTC"
+      }
+    ],
+    "missingReason": "2026-11-01 실제 날짜별 보고서에서 10/27 제품 페이지 조회 1회를 확인했습니다. 최신 제공일 10/30은 대시이며 미관측 날짜를 0으로 만들지 않습니다.",
+    "firstPositive": "2026-10-27"
   },
   {
     "id": "store-utilverse-play-store-all-visitors",

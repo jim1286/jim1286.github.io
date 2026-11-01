@@ -10,6 +10,8 @@ const c = getCopy();
 // Record dates are not release dates. Evidence and audit boundaries live in
 // docs/EVOLUTION_HISTORY_SOURCES.md; private repository links stay off the public page.
 const entries = [
+  { topic: 'clients', id: 'careerrankings', date: '2026-10-31', status: c.evolutionCareerrankingsProduct, title: c.evolutionCareerrankingsTitle, why: c.evolutionCareerrankingsWhy, change: c.evolutionCareerrankingsChange, result: c.evolutionCareerrankingsResult, evidence: c.evolutionCareerrankingsEvidence },
+  { topic: 'ops', id: 'storeicons', date: '2026-10-31', status: c.evolutionStoreiconsProduct, title: c.evolutionStoreiconsTitle, why: c.evolutionStoreiconsWhy, change: c.evolutionStoreiconsChange, result: c.evolutionStoreiconsResult, evidence: c.evolutionStoreiconsEvidence },
   { topic: 'data', id: 'filephotos', date: '2026-10-30', status: c.evolutionFilephotosProduct, title: c.evolutionFilephotosTitle, why: c.evolutionFilephotosWhy, change: c.evolutionFilephotosChange, result: c.evolutionFilephotosResult, evidence: c.evolutionFilephotosEvidence },
   { topic: 'design', id: 'desktopweb', date: '2026-10-30', status: c.evolutionDesktopwebProduct, title: c.evolutionDesktopwebTitle, why: c.evolutionDesktopwebWhy, change: c.evolutionDesktopwebChange, result: c.evolutionDesktopwebResult, evidence: c.evolutionDesktopwebEvidence },
   { topic: 'clients', id: 'ondemandtranslation', date: '2026-10-29', status: c.evolutionOndemandtranslationProduct, title: c.evolutionOndemandtranslationTitle, why: c.evolutionOndemandtranslationWhy, change: c.evolutionOndemandtranslationChange, result: c.evolutionOndemandtranslationResult, evidence: c.evolutionOndemandtranslationEvidence },

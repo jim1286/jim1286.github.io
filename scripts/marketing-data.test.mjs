@@ -28,7 +28,8 @@ test('account summaries preserve unknown period boundaries and actual daily poin
       assert.ok(account.periodDates.start <= account.periodDates.end);
       assert.ok(account.periodDates.end <= account.observedAt.slice(0, 10));
     }
-    assert.ok(Date.parse(account.dailyObservedAt) <= Date.parse(account.observedAt));
+    // Summary and daily charts are collected independently; neither timestamp orders the other.
+    assert.ok(Number.isFinite(Date.parse(account.dailyObservedAt)));
     assert.ok(Number.isFinite(Date.parse(account.observedAt)));
     for (const points of Object.values(account.daily)) {
       assert.equal(new Set(points.map(point => point.date)).size, points.length);

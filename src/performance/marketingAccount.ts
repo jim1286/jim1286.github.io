@@ -6,16 +6,16 @@ export type MarketingAccount = { platform: MarketingPlatform; observedAt: string
 export const marketingAccounts: MarketingAccount[] = [
   {
     "platform": "instagram",
-    "observedAt": "2026-10-30T08:31:04+09:00",
+    "observedAt": "2026-10-31T23:45:29.372442+00:00",
     "windowLabel": "최근 30일",
     "periodDates": null,
     "chartRange": null,
-    "views": 2111,
-    "viewers": 975,
-    "interactions": 197,
-    "profileActivity": 188,
-    "followers": 65,
-    "followersAsOf": "2026-10-30",
+    "views": 2050,
+    "viewers": 834,
+    "interactions": 227,
+    "profileActivity": 218,
+    "followers": 77,
+    "followersAsOf": "2026-11-01",
     "netFollowers": null,
     "daily": {
       "views": [],
@@ -26,23 +26,23 @@ export const marketingAccounts: MarketingAccount[] = [
   },
   {
     "platform": "threads",
-    "observedAt": "2026-10-30T08:31:04+09:00",
+    "observedAt": "2026-10-31T23:45:29.372442+00:00",
     "windowLabel": "최근 30일",
     "periodDates": {
-      "start": "2026-09-29",
-      "end": "2026-10-28"
+      "start": "2026-10-01",
+      "end": "2026-10-30"
     },
     "chartRange": {
       "start": "2026-09-26",
-      "end": "2026-10-20"
+      "end": "2026-10-30"
     },
-    "views": 2409,
-    "viewers": 914,
-    "interactions": 265,
+    "views": 2021,
+    "viewers": 660,
+    "interactions": 276,
     "profileActivity": null,
-    "followers": 25,
-    "followersAsOf": "2026-10-30",
-    "netFollowers": 23,
+    "followers": 40,
+    "followersAsOf": "2026-11-01",
+    "netFollowers": 33,
     "daily": {
       "views": [
         {
@@ -144,6 +144,46 @@ export const marketingAccounts: MarketingAccount[] = [
         {
           "date": "2026-10-20",
           "value": 13
+        },
+        {
+          "date": "2026-10-21",
+          "value": 17
+        },
+        {
+          "date": "2026-10-22",
+          "value": 12
+        },
+        {
+          "date": "2026-10-23",
+          "value": 13
+        },
+        {
+          "date": "2026-10-24",
+          "value": 9
+        },
+        {
+          "date": "2026-10-25",
+          "value": 27
+        },
+        {
+          "date": "2026-10-26",
+          "value": 16
+        },
+        {
+          "date": "2026-10-27",
+          "value": 32
+        },
+        {
+          "date": "2026-10-28",
+          "value": 22
+        },
+        {
+          "date": "2026-10-29",
+          "value": 26
+        },
+        {
+          "date": "2026-10-30",
+          "value": 312
         }
       ],
       "viewers": [
@@ -246,6 +286,46 @@ export const marketingAccounts: MarketingAccount[] = [
         {
           "date": "2026-10-20",
           "value": 7
+        },
+        {
+          "date": "2026-10-21",
+          "value": 11
+        },
+        {
+          "date": "2026-10-22",
+          "value": 8
+        },
+        {
+          "date": "2026-10-23",
+          "value": 8
+        },
+        {
+          "date": "2026-10-24",
+          "value": 7
+        },
+        {
+          "date": "2026-10-25",
+          "value": 11
+        },
+        {
+          "date": "2026-10-26",
+          "value": 11
+        },
+        {
+          "date": "2026-10-27",
+          "value": 8
+        },
+        {
+          "date": "2026-10-28",
+          "value": 7
+        },
+        {
+          "date": "2026-10-29",
+          "value": 14
+        },
+        {
+          "date": "2026-10-30",
+          "value": 108
         }
       ],
       "interactions": [
@@ -304,9 +384,41 @@ export const marketingAccounts: MarketingAccount[] = [
         {
           "date": "2026-10-20",
           "value": 2
+        },
+        {
+          "date": "2026-10-21",
+          "value": 3
+        },
+        {
+          "date": "2026-10-22",
+          "value": 1
+        },
+        {
+          "date": "2026-10-23",
+          "value": 3
+        },
+        {
+          "date": "2026-10-24",
+          "value": 1
+        },
+        {
+          "date": "2026-10-27",
+          "value": 7
+        },
+        {
+          "date": "2026-10-28",
+          "value": 4
+        },
+        {
+          "date": "2026-10-29",
+          "value": 3
+        },
+        {
+          "date": "2026-10-30",
+          "value": 51
         }
       ]
     },
-    "dailyObservedAt": "2026-10-21T16:03:18+09:00"
+    "dailyObservedAt": "2026-10-31T23:48:09.432340+00:00"
   }
 ];
