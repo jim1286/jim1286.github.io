@@ -1,7 +1,7 @@
 // Public aggregate store exports. Installed audience and DAU are separate metrics.
 // Exported zero padding is preserved; coverage and firstPositive do not assert an app launch date.
 import type { MetricSeries } from './data.ts';
-export const storeCapturedAt = "2026-11-01T08:59:43+09:00";
+export const storeCapturedAt = "2026-11-01T23:48:27.203Z";
 export const storeSeries: MetricSeries[] = [
   {
     "id": "store-yajalal-apple-store-all-visitors",
@@ -1826,11 +1826,18 @@ export const storeSeries: MetricSeries[] = [
         "observedOn": "2026-11-01",
         "provisional": false,
         "timeZone": "UTC"
+      },
+      {
+        "date": "2026-10-31",
+        "value": 2,
+        "observedOn": "2026-11-02",
+        "provisional": false,
+        "timeZone": "UTC"
       }
     ],
     "coverage": {
       "start": "2025-08-06",
-      "end": "2026-10-30"
+      "end": "2026-10-31"
     },
     "firstPositive": "2025-08-06"
   },
@@ -3003,11 +3010,18 @@ export const storeSeries: MetricSeries[] = [
         "observedOn": "2026-10-31",
         "provisional": false,
         "timeZone": "UTC"
+      },
+      {
+        "date": "2026-10-31",
+        "value": 1,
+        "observedOn": "2026-11-02",
+        "provisional": false,
+        "timeZone": "UTC"
       }
     ],
     "coverage": {
       "start": "2026-07-22",
-      "end": "2026-10-29"
+      "end": "2026-10-31"
     },
     "firstPositive": "2026-09-29"
   },

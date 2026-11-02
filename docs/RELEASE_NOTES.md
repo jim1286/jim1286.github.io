@@ -1,5 +1,9 @@
 # 앱별 출시 노트
 
+## 2026-11-02 최신 원문·상태
+
+오늘야구 2.4.0, 선택의창 2.2.0, 번뚝 1.9.0, 비행중 1.2.0, 다에리 1.10.0, Spint 1.4.0의 실제 한국어 스토어 원문을 추가해 217개다. 최신 3개씩 GET으로 확인한 20개 버전의 iOS READY_FOR_SALE 상태·확인일을 갱신했다. Utilverse 1.3.0은 제출 준비 상태라 공개 노트에 추가하지 않았다. 새 정식 app-v 태그는 없으며 스토어 전용 버전에 SHA를 만들지 않았다. 기존 원문과 Android 상태는 보존했다. 메타데이터 생성일은 공개일이 아니다. 중앙 research/2026-11-02/release-notes-store-latest-public.json 및 release-notes-update-public.json이 근거다.
+
 2026-10-22 후속 사용자 요청으로 출시 노트를 제품 내부 앱별 탭으로 옮겼다.
 `#apps`의 전체 보기를 보존하며, `#apps/<app-id>/intro`와
 `#apps/<app-id>/releases`를 제품 소개/출시 노트 탭으로 전환한다.

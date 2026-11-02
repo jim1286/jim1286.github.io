@@ -10,6 +10,8 @@ const c = getCopy();
 // Record dates are not release dates. Evidence and audit boundaries live in
 // docs/EVOLUTION_HISTORY_SOURCES.md; private repository links stay off the public page.
 const entries = [
+  { topic: 'clients', id: 'rankingcounts', date: '2026-11-01', status: c.evolutionRankingcountsProduct, title: c.evolutionRankingcountsTitle, why: c.evolutionRankingcountsWhy, change: c.evolutionRankingcountsChange, result: c.evolutionRankingcountsResult, evidence: c.evolutionRankingcountsEvidence },
+  { topic: 'clients', id: 'letterthreads', date: '2026-11-01', status: c.evolutionLetterthreadsProduct, title: c.evolutionLetterthreadsTitle, why: c.evolutionLetterthreadsWhy, change: c.evolutionLetterthreadsChange, result: c.evolutionLetterthreadsResult, evidence: c.evolutionLetterthreadsEvidence },
   { topic: 'clients', id: 'careerrankings', date: '2026-10-31', status: c.evolutionCareerrankingsProduct, title: c.evolutionCareerrankingsTitle, why: c.evolutionCareerrankingsWhy, change: c.evolutionCareerrankingsChange, result: c.evolutionCareerrankingsResult, evidence: c.evolutionCareerrankingsEvidence },
   { topic: 'ops', id: 'storeicons', date: '2026-10-31', status: c.evolutionStoreiconsProduct, title: c.evolutionStoreiconsTitle, why: c.evolutionStoreiconsWhy, change: c.evolutionStoreiconsChange, result: c.evolutionStoreiconsResult, evidence: c.evolutionStoreiconsEvidence },
   { topic: 'data', id: 'filephotos', date: '2026-10-30', status: c.evolutionFilephotosProduct, title: c.evolutionFilephotosTitle, why: c.evolutionFilephotosWhy, change: c.evolutionFilephotosChange, result: c.evolutionFilephotosResult, evidence: c.evolutionFilephotosEvidence },

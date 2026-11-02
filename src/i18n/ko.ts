@@ -1,5 +1,17 @@
 // Page labels and product descriptions are source copy; URLs and release facts remain in siteData.
 export const ko = {
+"evolutionRankingcountsProduct": "오늘야구",
+"evolutionRankingcountsTitle": "성공률 옆에 실제 시도·성공 기록을 함께 표시",
+"evolutionRankingcountsWhy": "백분율만 보면 몇 번의 시도에서 나온 기록인지 판단하기 어렵고 반올림된 비율로 원래 횟수를 되살릴 수 없었습니다.",
+"evolutionRankingcountsChange": "서버 원본 기록에서 도루 시도·성공과 상대 도루 시도·저지 등 해당 지표의 분모·분자를 함께 전달합니다. 순위와 기록 표는 조회 범위에 맞는 실제 횟수를 표시하고 원본이 없는 값은 비워 둡니다.",
+"evolutionRankingcountsResult": "원본 횟수 조회·API 응답·화면 열 구성과 0·누락을 구분하는 테스트 소스를 대조했습니다. 비율에서 횟수를 역산하지 않으며 실기기 표시와 이용 효과를 새로 측정하지 않았습니다.",
+"evolutionRankingcountsEvidence": "오늘야구 c94efe17 · ranking-record-counts · rankingCountFields 및 관련 테스트.",
+"evolutionLetterthreadsProduct": "다에리 · Web / Native",
+"evolutionLetterthreadsTitle": "받은 편지와 답장을 나누고 원문으로 연결",
+"evolutionLetterthreadsWhy": "원본 편지와 받은 답장이 한 목록에 섞여 있고 답장을 읽은 뒤 연결된 편지로 돌아가는 흐름이 부족했습니다.",
+"evolutionLetterthreadsChange": "받은 편지를 편지·답장 탭으로 나누고 검색·개수·페이지 처리 전에 서버에서 분류합니다. 웹과 앱에서 답장과 원문을 오갈 수 있게 하되 기존 읽기 권한과 차단 상태가 허용하는 연결만 반환합니다.",
+"evolutionLetterthreadsResult": "서버 분류·관련 답장 권한·기존 주소 호환과 웹·앱 이동 구현 및 테스트 사례를 대조했습니다. 이번 조사에서 제품 테스트를 재실행하거나 실기기 사용성을 확인하지 않았습니다.",
+"evolutionLetterthreadsEvidence": "다에리 1074068b · letters.service · sentLetters · LetterScreen / LetterPage 및 관련 테스트.",
 "evolutionCareerrankingsProduct": "오늘야구",
 "evolutionCareerrankingsTitle": "통산 순위와 FA 탐색의 지표·팀·시즌 선택을 정리",
 "evolutionCareerrankingsWhy": "통산 기록의 선택 지표가 좁고 화면마다 팀 선택 방식이 달라 같은 기준으로 기록을 찾아보기 어려웠습니다.",

@@ -1,5 +1,11 @@
 # 발전 이력의 근거와 조사 범위
 
+## 2026-11-02 일일 대조
+
+- `rankingcounts`: 오늘야구 c94efe17. ranking-record-counts의 원본 계수 선택·0/누락 처리와 테스트, team-ranking의 정확한 분모 결합, 앱 rankingCountFields·RankingScreen 및 관련 테스트 소스를 대조했다. 반올림 비율을 역산하지 않는다. 같은 커밋의 작은 배치 수정·fixture 이동·FA 후속 정리는 별도 항목으로 늘리지 않았다.
+- `letterthreads`: 다에리 1074068b. nestPage의 검색/개수/페이지 처리 전 받은 편지·답장 분류, 기존 읽기/차단 판정에 따른 relatedReplyId, 공통 sentLetters와 웹 LetterPage·앱 LetterScreen 및 관련 테스트 소스를 확인했다. 제품 테스트 재실행·실기기·운영 공개를 새로 검증한 것은 아니다.
+- HJM 2.2.1 및 제품 채택·Expo 호환·반복 릴리스 준비·스토어 이미지 자료 갱신은 기존 주제의 후속 변경으로 묶었다. 중앙 research/2026-11-02/history-audit.json은 원격 SHA·범위 커밋 메타데이터·변경 경로와 선택 검토를 기록한다. 모펀은 기존 보관 SHA와 같고 태그라운드 원격404 및 비공개 준비 제품 상세 검토는 이전 cursor를 유지한다.
+
 ## 2026-10-22 일일 갱신 — 기존 주제 보강
 
 새 항목을 늘리지 않고 복구·공용 데이터 표현 항목을10/21 근거로 보강했다.
