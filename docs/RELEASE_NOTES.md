@@ -1,5 +1,9 @@
 # 앱별 출시 노트
 
+## 2026-11-04 일일 대조
+
+7개 앱의 App Store Connect 최신 3개 버전씩을 읽기 전용으로 확인했다. 기존 14개 버전의 iOS 공개 상태와 원문을 재확인했으며 217개 출시 노트와 Android 이전 관측을 보존했다. 최신 7개 초안은 PREPARE_FOR_SUBMISSION이며 원문이 없으므로 출시나 공개로 추가하지 않았다. 새 정식 태그는 없으며 기존 과거 원문을 바꾸지 않았다. 근거는 중앙 research/2026-11-04/release-notes-store-latest-public.json과 release-notes-tags-public.json이다.
+
 ## 2026-11-03 최신 대조
 
 7개 앱의 최신 반환 3개 버전씩을 GET 35회로 확인했다. 기존 217개 노트와 원문을 보존했으며 새 정식 태그·새 공개 노트는 없다. 기존 공개 노트에 해당하는 20개 iOS 버전의 제공 상태 확인일을 11/3으로 갱신했다. Utilverse 1.3.0은 여전히 제출 준비 상태로 공개 노트에 추가하지 않았다. Android 상태와 과거 확인일은 유지했다. 스토어 메타데이터 생성일은 공개일이 아니며 중앙 research/2026-11-03/release-notes-store-latest-public.json이 이번 관측의 근거다.

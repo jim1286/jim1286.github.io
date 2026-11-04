@@ -1,6 +1,6 @@
 // Actual Platform=web rows. An absent row is not a confirmed zero.
 import type { MetricSeries } from './data.ts';
-export const webCapturedAt = "2026-11-02T23:36:00.089Z";
+export const webCapturedAt = "2026-11-03T23:39:28.723Z";
 export const webSeries: MetricSeries[] = [
   {
     "id": "web-diairy-dau",
@@ -132,7 +132,7 @@ export const webSeries: MetricSeries[] = [
     "testTraffic": "not-excluded",
     "coverage": {
       "start": "2026-10-15",
-      "end": "2026-10-31"
+      "end": "2026-11-03"
     },
     "points": [
       {
@@ -183,6 +183,12 @@ export const webSeries: MetricSeries[] = [
         "observedOn": "2026-11-01",
         "provisional": true,
         "timeZone": null
+      },
+      {
+        "date": "2026-11-03",
+        "value": 1,
+        "observedOn": "2026-11-04",
+        "provisional": true
       }
     ]
   },
@@ -198,7 +204,7 @@ export const webSeries: MetricSeries[] = [
     "testTraffic": "not-excluded",
     "coverage": {
       "start": "2026-10-15",
-      "end": "2026-10-31"
+      "end": "2026-11-03"
     },
     "points": [
       {
@@ -249,6 +255,12 @@ export const webSeries: MetricSeries[] = [
         "observedOn": "2026-11-01",
         "provisional": true,
         "timeZone": null
+      },
+      {
+        "date": "2026-11-03",
+        "value": 1,
+        "observedOn": "2026-11-04",
+        "provisional": true
       }
     ]
   }

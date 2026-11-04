@@ -1,5 +1,12 @@
 # 발전 이력의 근거와 조사 범위
 
+## 2026-11-04 일일 대조
+
+- letterphotos: 다에리 f81085b8. LETTER_PHOTOS의 범위·공개 준비 잔여, 서버 letter-photos의 연결/열람/정리, 웹·앱 작성 경로와 테스트 소스를 대조했다. 미게시 HJM와 정책 고지 선행 조건을 남기고 운영 공개를 주장하지 않는다.
+- postcarddecoration: 다에리 4173ecac. COLLECTIBLE_LETTER_DECORATION의 11/3 결정, Postcard·정규화 위치·장식 계약과 decoration-version.spec의 기존/신규 응답 분리 사례를 확인했다. 제품 테스트·기기·공개 상태를 재검증하지 않았다.
+- managedstoremetadata: Release Hub c39d31d6. upload-ios-review-metadata.sh와 resume-ios-review.mjs의 실제 설정 소비 및 전송 연결과 테스트 소스를 대조했다. 스토어 쓰기는 하지 않았다.
+- 앱별 Hub v1.4.20 채택·작은 배치 수정·별칭 정리는 기존 주제에 묶었다. 중앙 history-audit.json에 원격 SHA와 선택 범위를 남기며 비공개 준비 제품과 접근 불가 저장소의 완료 기준은 진행시키지 않는다.
+
 ## 2026-11-02 일일 대조
 
 - `rankingcounts`: 오늘야구 c94efe17. ranking-record-counts의 원본 계수 선택·0/누락 처리와 테스트, team-ranking의 정확한 분모 결합, 앱 rankingCountFields·RankingScreen 및 관련 테스트 소스를 대조했다. 반올림 비율을 역산하지 않는다. 같은 커밋의 작은 배치 수정·fixture 이동·FA 후속 정리는 별도 항목으로 늘리지 않았다.

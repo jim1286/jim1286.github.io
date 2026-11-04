@@ -2,7 +2,7 @@
 // Original console links, property IDs and evidence rows are deliberately not imported.
 import type { MetricSeries } from './data';
 // Includes the latest independently observed AdMob Network report.
-export const historicalCapturedAt = "2026-11-02T23:41:38.683Z";
+export const historicalCapturedAt = "2026-11-03T23:41:25.577Z";
 export const historicalSeries: MetricSeries[] = [
   {
     "id": "choose-window-ga4-dau",
@@ -1083,6 +1083,12 @@ export const historicalSeries: MetricSeries[] = [
         "value": 0.0,
         "observedOn": "2026-11-03",
         "provisional": true
+      },
+      {
+        "date": "2026-11-03",
+        "value": 0.01,
+        "observedOn": "2026-11-04",
+        "provisional": true
       }
     ],
     "missingReason": "16~17,19일 행은 미제공. USD, 센트 단위 반올림."
@@ -1218,5 +1224,25 @@ export const historicalSeries: MetricSeries[] = [
       }
     ],
     "missingReason": "보고서에 제공된 행만 기록. 18~21일 행은 미제공. USD, US$ 표기, 센트 단위 반올림."
+  },
+  {
+    "id": "unairplane-admob-Android",
+    "app": "unairplane",
+    "metric": "revenue",
+    "source": "AdMob",
+    "scope": "android-observed",
+    "timeZone": null,
+    "currency": "USD",
+    "estimated": true,
+    "testTraffic": "not-excluded",
+    "missingReason": "실제 제공된 앱·날짜 행만 기록. USD 센트 단위 반올림 잠정 수익이며 미제공 날짜는 0이 아닙니다.",
+    "points": [
+      {
+        "date": "2026-11-03",
+        "value": 0.0,
+        "observedOn": "2026-11-04",
+        "provisional": true
+      }
+    ]
   }
 ];

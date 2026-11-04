@@ -6,16 +6,16 @@ export type MarketingAccount = { platform: MarketingPlatform; observedAt: string
 export const marketingAccounts: MarketingAccount[] = [
   {
     "platform": "instagram",
-    "observedAt": "2026-11-02T23:39:35.617Z",
+    "observedAt": "2026-11-03T23:34:32.756Z",
     "windowLabel": "최근 30일",
     "periodDates": null,
     "chartRange": null,
-    "views": 1642,
-    "viewers": 180,
-    "interactions": 360,
-    "profileActivity": 277,
-    "followers": 143,
-    "followersAsOf": "2026-11-03",
+    "views": 1821,
+    "viewers": 190,
+    "interactions": 516,
+    "profileActivity": 304,
+    "followers": 162,
+    "followersAsOf": "2026-11-04",
     "netFollowers": null,
     "daily": {
       "views": [],
@@ -26,22 +26,22 @@ export const marketingAccounts: MarketingAccount[] = [
   },
   {
     "platform": "threads",
-    "observedAt": "2026-11-02T23:40:03.845Z",
+    "observedAt": "2026-11-03T23:34:47.304Z",
     "windowLabel": "최근 30일",
     "periodDates": {
-      "start": "2026-10-03",
-      "end": "2026-11-01"
+      "start": "2026-10-04",
+      "end": "2026-11-02"
     },
     "chartRange": {
       "start": "2026-09-26",
-      "end": "2026-11-01"
+      "end": "2026-11-02"
     },
-    "views": 2696,
-    "viewers": 720,
-    "interactions": 406,
+    "views": 4302,
+    "viewers": 2056,
+    "interactions": 476,
     "profileActivity": null,
-    "followers": 69,
-    "followersAsOf": "2026-11-03",
+    "followers": 74,
+    "followersAsOf": "2026-11-04",
     "netFollowers": 62,
     "daily": {
       "views": [
@@ -192,6 +192,10 @@ export const marketingAccounts: MarketingAccount[] = [
         {
           "date": "2026-11-01",
           "value": 518
+        },
+        {
+          "date": "2026-11-02",
+          "value": 1644
         }
       ],
       "viewers": [
@@ -342,6 +346,10 @@ export const marketingAccounts: MarketingAccount[] = [
         {
           "date": "2026-11-01",
           "value": 199
+        },
+        {
+          "date": "2026-11-02",
+          "value": 1330
         }
       ],
       "interactions": [
@@ -440,9 +448,13 @@ export const marketingAccounts: MarketingAccount[] = [
         {
           "date": "2026-11-01",
           "value": 81
+        },
+        {
+          "date": "2026-11-02",
+          "value": 70
         }
       ]
     },
-    "dailyObservedAt": "2026-11-02T23:40:29.285Z"
+    "dailyObservedAt": "2026-11-03T23:35:04.831Z"
   }
 ];
