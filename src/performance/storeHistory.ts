@@ -1,7 +1,7 @@
 // Public aggregate store exports. Installed audience and DAU are separate metrics.
 // Exported zero padding is preserved; coverage and firstPositive do not assert an app launch date.
 import type { MetricSeries } from './data.ts';
-export const storeCapturedAt = "2026-11-03T23:44:17.842Z";
+export const storeCapturedAt = "2026-11-04T23:50:40.096622+00:00";
 export const storeSeries: MetricSeries[] = [
   {
     "id": "store-yajalal-apple-store-all-visitors",
@@ -1845,11 +1845,17 @@ export const storeSeries: MetricSeries[] = [
         "value": 4,
         "observedOn": "2026-11-04",
         "provisional": true
+      },
+      {
+        "date": "2026-11-03",
+        "value": 1,
+        "observedOn": "2026-11-05",
+        "provisional": true
       }
     ],
     "coverage": {
       "start": "2025-08-06",
-      "end": "2026-11-02"
+      "end": "2026-11-03"
     },
     "firstPositive": "2025-08-06"
   },
@@ -2631,11 +2637,17 @@ export const storeSeries: MetricSeries[] = [
         "value": 1,
         "observedOn": "2026-11-04",
         "provisional": true
+      },
+      {
+        "date": "2026-11-03",
+        "value": 1,
+        "observedOn": "2026-11-05",
+        "provisional": true
       }
     ],
     "coverage": {
       "start": "2026-07-22",
-      "end": "2026-11-02"
+      "end": "2026-11-03"
     },
     "firstPositive": "2026-09-29"
   },
@@ -3035,11 +3047,17 @@ export const storeSeries: MetricSeries[] = [
         "observedOn": "2026-11-02",
         "provisional": false,
         "timeZone": "UTC"
+      },
+      {
+        "date": "2026-11-03",
+        "value": 2,
+        "observedOn": "2026-11-05",
+        "provisional": true
       }
     ],
     "coverage": {
       "start": "2026-07-22",
-      "end": "2026-10-31"
+      "end": "2026-11-03"
     },
     "firstPositive": "2026-09-29"
   },
@@ -16007,11 +16025,23 @@ export const storeSeries: MetricSeries[] = [
         "value": 8,
         "observedOn": "2026-11-03",
         "provisional": true
+      },
+      {
+        "date": "2026-10-28",
+        "value": 5,
+        "observedOn": "2026-11-05",
+        "provisional": true
+      },
+      {
+        "date": "2026-10-29",
+        "value": 5,
+        "observedOn": "2026-11-05",
+        "provisional": true
       }
     ],
     "coverage": {
       "start": "2021-10-22",
-      "end": "2026-10-26"
+      "end": "2026-10-29"
     },
     "firstPositive": "2026-05-15",
     "missingReason": "스토어 등록정보 방문자(설치되지 않은 사용자) 보고서에서 10/15~19 수치 제공. 10/20~21은 행 없음, 0으로 간주하지 않음."
@@ -21623,7 +21653,9 @@ export const storeSeries: MetricSeries[] = [
       },
       {
         "date": "2026-10-08",
-        "value": 3
+        "value": 2,
+        "observedOn": "2026-11-05",
+        "provisional": true
       },
       {
         "date": "2026-10-09",
@@ -21643,11 +21675,15 @@ export const storeSeries: MetricSeries[] = [
       },
       {
         "date": "2026-10-13",
-        "value": 2
+        "value": 1,
+        "observedOn": "2026-11-05",
+        "provisional": true
       },
       {
         "date": "2026-10-14",
-        "value": 2
+        "value": 3,
+        "observedOn": "2026-11-05",
+        "provisional": true
       },
       {
         "date": "2026-10-15",
@@ -21669,11 +21705,17 @@ export const storeSeries: MetricSeries[] = [
         "date": "2026-10-24",
         "value": 2,
         "observedOn": "2026-10-27"
+      },
+      {
+        "date": "2026-10-29",
+        "value": 1,
+        "observedOn": "2026-11-05",
+        "provisional": true
       }
     ],
     "coverage": {
       "start": "2025-11-08",
-      "end": "2026-10-24"
+      "end": "2026-10-29"
     },
     "firstPositive": "2026-09-21",
     "missingReason": "345 numeric rows from 2025-11-08 through 2026-10-18; 337 explicit zeroes and 8 positive values. No numeric visitor values returned before 2025-11-08. The final export row (2026-10-19) is a dash for all-countries visitors; 2026-10-20 was not returned."

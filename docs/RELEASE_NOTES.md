@@ -1,5 +1,9 @@
 # 앱별 출시 노트
 
+## 2026-11-05 일일 대조
+
+App Store Connect 최신 3개 버전씩 21개를 GET으로 확인했다. 오늘야구 2.5.0·다에리 1.11.0·Spint 1.5.0의 한국어 원문과 실제 iOS 공개 상태를 추가해 총 220개가 됐다. 스토어만 확인한 버전에 정식 태그나 Git SHA를 만들지 않았다. 메타데이터 생성일은 공개일이 아니며 공개 확인일은 11/5다. 나머지 4개 최신 초안은 미공개이며 Android 이전 관측은 보존했다. 근거는 중앙 research/2026-11-05의 release-notes-store-latest-public.json과 release-notes-tags-public.json이다.
+
 ## 2026-11-04 일일 대조
 
 7개 앱의 App Store Connect 최신 3개 버전씩을 읽기 전용으로 확인했다. 기존 14개 버전의 iOS 공개 상태와 원문을 재확인했으며 217개 출시 노트와 Android 이전 관측을 보존했다. 최신 7개 초안은 PREPARE_FOR_SUBMISSION이며 원문이 없으므로 출시나 공개로 추가하지 않았다. 새 정식 태그는 없으며 기존 과거 원문을 바꾸지 않았다. 근거는 중앙 research/2026-11-04/release-notes-store-latest-public.json과 release-notes-tags-public.json이다.

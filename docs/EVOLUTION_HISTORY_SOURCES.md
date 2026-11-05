@@ -1,5 +1,13 @@
 # 발전 이력의 근거와 조사 범위
 
+## 2026-11-05 일일 대조
+
+- attendancefacts: 오늘야구 cdc99f3b4122b26e6c03dca27d8490d78bd69174. 서버 team-matching-attendance-facts와 앱 attendance-badges·관련 테스트를 대조했다. 끝내기·연장·역전·경기 구분은 서버 사실이 있는 직관 경기만 사용한다.
+- foldedcontrols: HJM 8731cd89905a65f8d83f5e17dd02394fe2bb7f72의 calendar 계약·양 renderer·calendar.test와 Select multiple 사용 지침, 오늘야구 ScheduleScreen·PlayerRecordsScreen 소비 코드를 대조했다. 게시 59d9536b·4eba4b2f와 제품 채택 소스를 구분한다.
+- 기존 imageflow와 letterphotos에 HJM 사진 구성 게시·다에리 d823ace3 및 Spint 3375349a 채택 근거를 보강했다. 이전의 미게시 공통 UI 조건은 최신 게시·채택 소스로 정정했다.
+- 기존 restore에 다에리 3701e4c4c37048eaa56363684123ba3766a46aac의 편지 사진·스티커 참조 백업/격리 복원 검사와 누락 사진 테스트를 추가했다. 실제 복원은 재실행하지 않았다.
+- 작은 배치·아이콘 경계·반복 HJM 채택·배포 준비는 기존 주제에 묶었다. 소스·테스트 사례 대조이며 제품 테스트·실기기·운영 기능 적용은 새로 검증하지 않았다. 저장소별 원격 SHA와 미확인 경계는 중앙 history-audit.json에 남긴다.
+
 ## 2026-11-04 일일 대조
 
 - letterphotos: 다에리 f81085b8. LETTER_PHOTOS의 범위·공개 준비 잔여, 서버 letter-photos의 연결/열람/정리, 웹·앱 작성 경로와 테스트 소스를 대조했다. 미게시 HJM와 정책 고지 선행 조건을 남기고 운영 공개를 주장하지 않는다.
