@@ -1,12 +1,12 @@
 {
-  "$id": "hjm.catalog-snapshot/2.7.0",
-  "designSystemVersion": "2.7.0",
+  "$id": "hjm.catalog-snapshot/2.8.0",
+  "designSystemVersion": "2.8.0",
   "source": {
     "repository": "https://github.com/jim1286/hjm-design-system.git",
-    "tag": "v2.7.0",
-    "commit": "5b41cf1d59c8c64dc664d6c0bf3314dcc549b8b1",
+    "tag": "v2.8.0",
+    "commit": "6fcb640bdaaa502dc826ad907d034e55c7de4c5c",
     "sourcePath": "packages/design-contracts/dist/catalog.js",
-    "contentSha256": "07b22064a66846e4c1044312a935ca5d83c4831f7d2b64273eea68019935c979"
+    "contentSha256": "1d3b1d008535c0d39ad3fcb6b02bf4fbd26b5e6966dde1462461f2c4091bfd0a"
   },
   "components": [
     {
@@ -652,7 +652,9 @@
       "id": "sheet",
       "status": "stable",
       "name": "Sheet",
-      "companions": []
+      "companions": [
+        "SheetScrollView"
+      ]
     },
     {
       "id": "side-panel",
