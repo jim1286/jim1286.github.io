@@ -5,6 +5,74 @@ export type ReleasePlatformState = { platform: 'ios' | 'android'; status: 'revie
 export type ReleaseNote = { id: string; app: string; version: string; recordedOn: string; notes: string; sourceTag?: string; sourceSha?: string; notesSource?: 'manifest' | 'app-store' | 'github-release'; originalSourceNotes?: string; storeMetadataCreatedAt?: string; storeObservedAt?: string; platforms: ReleasePlatformState[] };
 export const releaseNotes: ReleaseNote[] = [
   {
+    "id": "spint-1.6.0",
+    "app": "spint",
+    "version": "1.6.0",
+    "recordedOn": "2026-11-05",
+    "notes": "전 세계와 원하는 도시의 꽃밭을 둘러보도록 탐색과 지도 화면을 개선했습니다.",
+    "notesSource": "app-store",
+    "storeMetadataCreatedAt": "2026-11-05T03:54:23-08:00",
+    "platforms": [
+      {
+        "platform": "ios",
+        "status": "available",
+        "asOf": "2026-11-06"
+      }
+    ],
+    "storeObservedAt": "2026-11-06T00:06:19.948Z"
+  },
+  {
+    "id": "unairplane-1.3.0",
+    "app": "unairplane",
+    "version": "1.3.0",
+    "recordedOn": "2026-11-02",
+    "notes": "항공편 조회와 여정 화면을 개선하고 지도 경로 표시를 다듬었습니다.",
+    "notesSource": "app-store",
+    "storeMetadataCreatedAt": "2026-11-02T23:10:25-08:00",
+    "platforms": [
+      {
+        "platform": "ios",
+        "status": "available",
+        "asOf": "2026-11-06"
+      }
+    ],
+    "storeObservedAt": "2026-11-06T00:06:12.638Z"
+  },
+  {
+    "id": "choose-window-2.2.1",
+    "app": "choose-window",
+    "version": "2.2.1",
+    "recordedOn": "2026-11-02",
+    "notes": "홈과 저장 경로의 배치 및 공통 화면 동작을 개선했습니다.",
+    "notesSource": "app-store",
+    "storeMetadataCreatedAt": "2026-11-02T23:09:37-08:00",
+    "platforms": [
+      {
+        "platform": "ios",
+        "status": "available",
+        "asOf": "2026-11-06"
+      }
+    ],
+    "storeObservedAt": "2026-11-06T00:06:09.419Z"
+  },
+  {
+    "id": "yajalal-2.6.0",
+    "app": "yajalal",
+    "version": "2.6.0",
+    "recordedOn": "2026-11-04",
+    "notes": "경기 결과 분석 화면을 개선하고 선발 투수의 시즌과 최근 경기 기록을 추가했습니다.",
+    "notesSource": "app-store",
+    "storeMetadataCreatedAt": "2026-11-04T22:07:07-08:00",
+    "platforms": [
+      {
+        "platform": "ios",
+        "status": "available",
+        "asOf": "2026-11-06"
+      }
+    ],
+    "storeObservedAt": "2026-11-06T00:06:07.939Z"
+  },
+  {
     "id": "yajalal-2.5.0",
     "app": "yajalal",
     "version": "2.5.0",
@@ -12,12 +80,12 @@ export const releaseNotes: ReleaseNote[] = [
     "notes": "선수 기록의 기간과 지표 선택, 팀 선수단 필터와 정렬을 개선하고 최근 경기 보기를 정리했습니다.",
     "notesSource": "app-store",
     "storeMetadataCreatedAt": "2026-11-02T23:09:25-08:00",
-    "storeObservedAt": "2026-11-05T00:05:36.852Z",
+    "storeObservedAt": "2026-11-06T00:06:08.299Z",
     "platforms": [
       {
         "platform": "ios",
         "status": "available",
-        "asOf": "2026-11-05"
+        "asOf": "2026-11-06"
       }
     ]
   },
@@ -29,12 +97,12 @@ export const releaseNotes: ReleaseNote[] = [
     "notes": "손글씨 미리보기와 공통 화면 동작을 개선했습니다.",
     "notesSource": "app-store",
     "storeMetadataCreatedAt": "2026-11-02T23:09:55-08:00",
-    "storeObservedAt": "2026-11-05T00:05:43.253Z",
+    "storeObservedAt": "2026-11-06T00:06:14.911Z",
     "platforms": [
       {
         "platform": "ios",
         "status": "available",
-        "asOf": "2026-11-05"
+        "asOf": "2026-11-06"
       }
     ]
   },
@@ -46,12 +114,12 @@ export const releaseNotes: ReleaseNote[] = [
     "notes": "글 작성과 마크 사진 보기 및 공통 화면 동작을 개선했습니다.",
     "notesSource": "app-store",
     "storeMetadataCreatedAt": "2026-11-02T23:09:46-08:00",
-    "storeObservedAt": "2026-11-05T00:05:45.378Z",
+    "storeObservedAt": "2026-11-06T00:06:20.340Z",
     "platforms": [
       {
         "platform": "ios",
         "status": "available",
-        "asOf": "2026-11-05"
+        "asOf": "2026-11-06"
       }
     ]
   },
@@ -66,11 +134,11 @@ export const releaseNotes: ReleaseNote[] = [
       {
         "platform": "ios",
         "status": "available",
-        "asOf": "2026-11-05"
+        "asOf": "2026-11-06"
       }
     ],
     "storeMetadataCreatedAt": "2026-10-31T10:10:34-07:00",
-    "storeObservedAt": "2026-11-05T00:05:45.939Z"
+    "storeObservedAt": "2026-11-06T00:06:20.644Z"
   },
   {
     "id": "diairy-1.10.0",
@@ -83,11 +151,11 @@ export const releaseNotes: ReleaseNote[] = [
       {
         "platform": "ios",
         "status": "available",
-        "asOf": "2026-11-05"
+        "asOf": "2026-11-06"
       }
     ],
     "storeMetadataCreatedAt": "2026-10-31T10:10:30-07:00",
-    "storeObservedAt": "2026-11-05T00:05:43.900Z"
+    "storeObservedAt": "2026-11-06T00:06:18.558Z"
   },
   {
     "id": "unairplane-1.2.0",
@@ -100,11 +168,11 @@ export const releaseNotes: ReleaseNote[] = [
       {
         "platform": "ios",
         "status": "available",
-        "asOf": "2026-11-05"
+        "asOf": "2026-11-06"
       }
     ],
     "storeMetadataCreatedAt": "2026-10-31T10:10:38-07:00",
-    "storeObservedAt": "2026-11-05T00:05:41.877Z"
+    "storeObservedAt": "2026-11-06T00:06:13.203Z"
   },
   {
     "id": "burntok-1.9.0",
@@ -117,11 +185,11 @@ export const releaseNotes: ReleaseNote[] = [
       {
         "platform": "ios",
         "status": "available",
-        "asOf": "2026-11-05"
+        "asOf": "2026-11-06"
       }
     ],
     "storeMetadataCreatedAt": "2026-10-31T10:10:17-07:00",
-    "storeObservedAt": "2026-11-05T00:05:40.530Z"
+    "storeObservedAt": "2026-11-06T00:06:11.433Z"
   },
   {
     "id": "choose-window-2.2.0",
@@ -134,11 +202,11 @@ export const releaseNotes: ReleaseNote[] = [
       {
         "platform": "ios",
         "status": "available",
-        "asOf": "2026-11-05"
+        "asOf": "2026-11-06"
       }
     ],
     "storeMetadataCreatedAt": "2026-10-31T10:10:24-07:00",
-    "storeObservedAt": "2026-11-05T00:05:39.131Z"
+    "storeObservedAt": "2026-11-06T00:06:09.766Z"
   },
   {
     "id": "yajalal-2.4.0",
@@ -151,11 +219,11 @@ export const releaseNotes: ReleaseNote[] = [
       {
         "platform": "ios",
         "status": "available",
-        "asOf": "2026-11-05"
+        "asOf": "2026-11-06"
       }
     ],
     "storeMetadataCreatedAt": "2026-10-31T21:52:06-07:00",
-    "storeObservedAt": "2026-11-05T00:05:37.425Z"
+    "storeObservedAt": "2026-11-06T00:06:08.583Z"
   },
   {
     "id": "yajalal-2.3.1",
@@ -185,13 +253,13 @@ export const releaseNotes: ReleaseNote[] = [
       {
         "platform": "ios",
         "status": "available",
-        "asOf": "2026-11-05"
+        "asOf": "2026-11-06"
       }
     ],
     "sourceTag": "app-v1.9.8",
     "sourceSha": "97a4ff52112fc149167e9fea1add2ca52b3bf4ae",
     "storeMetadataCreatedAt": "2026-10-29T13:36:15-07:00",
-    "storeObservedAt": "2026-11-05T00:05:44.517Z"
+    "storeObservedAt": "2026-11-06T00:06:19.236Z"
   },
   {
     "id": "choose-window-2.1.5",
@@ -204,13 +272,13 @@ export const releaseNotes: ReleaseNote[] = [
       {
         "platform": "ios",
         "status": "available",
-        "asOf": "2026-11-05"
+        "asOf": "2026-11-06"
       }
     ],
     "sourceTag": "app-v2.1.5",
     "sourceSha": "6cf79724b93fbb4dc7147632d29209dae7bebb8d",
     "storeMetadataCreatedAt": "2026-10-29T19:26:01-07:00",
-    "storeObservedAt": "2026-11-05T00:05:39.480Z"
+    "storeObservedAt": "2026-11-06T00:06:10.078Z"
   },
   {
     "id": "yajalal-2.3.0",
@@ -306,11 +374,11 @@ export const releaseNotes: ReleaseNote[] = [
       {
         "platform": "ios",
         "status": "available",
-        "asOf": "2026-11-05"
+        "asOf": "2026-11-06"
       }
     ],
     "storeMetadataCreatedAt": "2026-10-29T19:46:09-07:00",
-    "storeObservedAt": "2026-11-05T00:05:42.164Z"
+    "storeObservedAt": "2026-11-06T00:06:13.598Z"
   },
   {
     "id": "burntok-1.8.0",
@@ -323,11 +391,11 @@ export const releaseNotes: ReleaseNote[] = [
       {
         "platform": "ios",
         "status": "available",
-        "asOf": "2026-11-05"
+        "asOf": "2026-11-06"
       }
     ],
     "storeMetadataCreatedAt": "2026-10-29T23:43:06-07:00",
-    "storeObservedAt": "2026-11-05T00:05:40.844Z"
+    "storeObservedAt": "2026-11-06T00:06:11.776Z"
   },
   {
     "id": "utilverse-1.2.4",
@@ -340,11 +408,11 @@ export const releaseNotes: ReleaseNote[] = [
       {
         "platform": "ios",
         "status": "available",
-        "asOf": "2026-11-05"
+        "asOf": "2026-11-06"
       }
     ],
     "storeMetadataCreatedAt": "2026-10-28T19:08:35-07:00",
-    "storeObservedAt": "2026-11-05T00:05:47.578Z"
+    "storeObservedAt": "2026-11-06T00:06:22.024Z"
   },
   {
     "id": "yajalal-2.2.5",
@@ -543,11 +611,11 @@ export const releaseNotes: ReleaseNote[] = [
       {
         "platform": "ios",
         "status": "available",
-        "asOf": "2026-11-05"
+        "asOf": "2026-11-06"
       }
     ],
     "storeMetadataCreatedAt": "2026-10-25T10:12:04-07:00",
-    "storeObservedAt": "2026-11-05T00:05:47.904Z"
+    "storeObservedAt": "2026-11-06T00:06:22.308Z"
   },
   {
     "id": "yajalal-2.2.3",
