@@ -1,7 +1,7 @@
 // Public aggregate store exports. Installed audience and DAU are separate metrics.
 // Exported zero padding is preserved; coverage and firstPositive do not assert an app launch date.
 import type { MetricSeries } from './data.ts';
-export const storeCapturedAt = "2026-11-04T23:50:40.096622+00:00";
+export const storeCapturedAt = "2026-11-05T23:41:40.494Z";
 export const storeSeries: MetricSeries[] = [
   {
     "id": "store-yajalal-apple-store-all-visitors",
@@ -1851,11 +1851,17 @@ export const storeSeries: MetricSeries[] = [
         "value": 1,
         "observedOn": "2026-11-05",
         "provisional": true
+      },
+      {
+        "date": "2026-11-04",
+        "value": 3,
+        "observedOn": "2026-11-06",
+        "provisional": true
       }
     ],
     "coverage": {
       "start": "2025-08-06",
-      "end": "2026-11-03"
+      "end": "2026-11-04"
     },
     "firstPositive": "2025-08-06"
   },
@@ -16027,6 +16033,12 @@ export const storeSeries: MetricSeries[] = [
         "provisional": true
       },
       {
+        "date": "2026-10-27",
+        "value": 9,
+        "observedOn": "2026-11-06",
+        "provisional": true
+      },
+      {
         "date": "2026-10-28",
         "value": 5,
         "observedOn": "2026-11-05",
@@ -16037,11 +16049,17 @@ export const storeSeries: MetricSeries[] = [
         "value": 5,
         "observedOn": "2026-11-05",
         "provisional": true
+      },
+      {
+        "date": "2026-10-30",
+        "value": 5,
+        "observedOn": "2026-11-06",
+        "provisional": true
       }
     ],
     "coverage": {
       "start": "2021-10-22",
-      "end": "2026-10-29"
+      "end": "2026-10-30"
     },
     "firstPositive": "2026-05-15",
     "missingReason": "스토어 등록정보 방문자(설치되지 않은 사용자) 보고서에서 10/15~19 수치 제공. 10/20~21은 행 없음, 0으로 간주하지 않음."
@@ -23116,11 +23134,17 @@ export const storeSeries: MetricSeries[] = [
         "date": "2026-10-22",
         "value": 1,
         "observedOn": "2026-10-26"
+      },
+      {
+        "date": "2026-10-27",
+        "value": 1,
+        "observedOn": "2026-11-06",
+        "provisional": true
       }
     ],
     "coverage": {
       "start": "2025-11-08",
-      "end": "2026-10-22"
+      "end": "2026-10-27"
     },
     "firstPositive": "2026-09-02",
     "missingReason": "2026-10-15~21 방문자(설치) 목표 보고서에서 10/16 전체 1, 일본 1 확인. 다른 날짜는 표에 행 미제공; 0으로 간주하지 않음."
