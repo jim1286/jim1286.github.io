@@ -2,7 +2,7 @@
 // Older verified observations are retained; omitted report rows remain unobserved.
 // Source and query boundaries: docs/PERFORMANCE.md.
 import type { MetricSeries } from './data';
-export const combinedCapturedAt = "2026-11-05T23:33:36.753Z";
+export const combinedCapturedAt = "2026-11-06T23:40:32.861Z";
 export const combinedSeries: MetricSeries[] = [
   {
     "id": "yajalal-ga4-dau",
@@ -15,7 +15,7 @@ export const combinedSeries: MetricSeries[] = [
     "unique": true,
     "coverage": {
       "start": "2021-10-21",
-      "end": "2026-11-05"
+      "end": "2026-11-06"
     },
     "testTraffic": "not-excluded",
     "points": [
@@ -2293,6 +2293,12 @@ export const combinedSeries: MetricSeries[] = [
         "value": 13,
         "observedOn": "2026-11-06",
         "provisional": true
+      },
+      {
+        "date": "2026-11-06",
+        "value": 17,
+        "observedOn": "2026-11-07",
+        "provisional": true
       }
     ]
   },
@@ -2307,7 +2313,7 @@ export const combinedSeries: MetricSeries[] = [
     "unique": true,
     "coverage": {
       "start": "2021-10-21",
-      "end": "2026-11-05"
+      "end": "2026-11-06"
     },
     "testTraffic": "not-excluded",
     "points": [
@@ -4585,6 +4591,12 @@ export const combinedSeries: MetricSeries[] = [
         "value": 6,
         "observedOn": "2026-11-06",
         "provisional": true
+      },
+      {
+        "date": "2026-11-06",
+        "value": 6,
+        "observedOn": "2026-11-07",
+        "provisional": true
       }
     ]
   },
@@ -4599,7 +4611,7 @@ export const combinedSeries: MetricSeries[] = [
     "unique": true,
     "coverage": {
       "start": "2021-10-21",
-      "end": "2026-11-05"
+      "end": "2026-11-06"
     },
     "testTraffic": "not-excluded",
     "points": [
@@ -5343,6 +5355,12 @@ export const combinedSeries: MetricSeries[] = [
         "value": 3,
         "observedOn": "2026-11-06",
         "provisional": true
+      },
+      {
+        "date": "2026-11-06",
+        "value": 0,
+        "observedOn": "2026-11-07",
+        "provisional": true
       }
     ]
   },
@@ -5357,7 +5375,7 @@ export const combinedSeries: MetricSeries[] = [
     "unique": true,
     "coverage": {
       "start": "2021-10-21",
-      "end": "2026-11-05"
+      "end": "2026-11-06"
     },
     "testTraffic": "not-excluded",
     "points": [
@@ -6101,6 +6119,12 @@ export const combinedSeries: MetricSeries[] = [
         "value": 3,
         "observedOn": "2026-11-06",
         "provisional": true
+      },
+      {
+        "date": "2026-11-06",
+        "value": 0,
+        "observedOn": "2026-11-07",
+        "provisional": true
       }
     ]
   },
@@ -6115,7 +6139,7 @@ export const combinedSeries: MetricSeries[] = [
     "unique": true,
     "coverage": {
       "start": "2021-10-21",
-      "end": "2026-11-05"
+      "end": "2026-11-06"
     },
     "testTraffic": "not-excluded",
     "points": [
@@ -6270,6 +6294,12 @@ export const combinedSeries: MetricSeries[] = [
         "value": 0,
         "observedOn": "2026-11-06",
         "provisional": true
+      },
+      {
+        "date": "2026-11-06",
+        "value": 1,
+        "observedOn": "2026-11-07",
+        "provisional": true
       }
     ]
   },
@@ -6284,7 +6314,7 @@ export const combinedSeries: MetricSeries[] = [
     "unique": true,
     "coverage": {
       "start": "2021-10-21",
-      "end": "2026-11-05"
+      "end": "2026-11-06"
     },
     "testTraffic": "not-excluded",
     "points": [
@@ -6439,6 +6469,12 @@ export const combinedSeries: MetricSeries[] = [
         "value": 0,
         "observedOn": "2026-11-06",
         "provisional": true
+      },
+      {
+        "date": "2026-11-06",
+        "value": 0,
+        "observedOn": "2026-11-07",
+        "provisional": true
       }
     ]
   },
@@ -6453,7 +6489,7 @@ export const combinedSeries: MetricSeries[] = [
     "unique": true,
     "coverage": {
       "start": "2021-10-21",
-      "end": "2026-11-05"
+      "end": "2026-11-06"
     },
     "testTraffic": "not-excluded",
     "points": [
@@ -6594,6 +6630,12 @@ export const combinedSeries: MetricSeries[] = [
         "value": 5,
         "observedOn": "2026-11-06",
         "provisional": true
+      },
+      {
+        "date": "2026-11-06",
+        "value": 0,
+        "observedOn": "2026-11-07",
+        "provisional": true
       }
     ]
   },
@@ -6608,7 +6650,7 @@ export const combinedSeries: MetricSeries[] = [
     "unique": true,
     "coverage": {
       "start": "2021-10-21",
-      "end": "2026-11-05"
+      "end": "2026-11-06"
     },
     "testTraffic": "not-excluded",
     "points": [
@@ -6749,6 +6791,12 @@ export const combinedSeries: MetricSeries[] = [
         "value": 5,
         "observedOn": "2026-11-06",
         "provisional": true
+      },
+      {
+        "date": "2026-11-06",
+        "value": 0,
+        "observedOn": "2026-11-07",
+        "provisional": true
       }
     ]
   },
@@ -6763,7 +6811,7 @@ export const combinedSeries: MetricSeries[] = [
     "unique": true,
     "coverage": {
       "start": "2021-10-21",
-      "end": "2026-11-05"
+      "end": "2026-11-06"
     },
     "testTraffic": "not-excluded",
     "points": [
@@ -6932,6 +6980,12 @@ export const combinedSeries: MetricSeries[] = [
         "value": 2,
         "observedOn": "2026-11-06",
         "provisional": true
+      },
+      {
+        "date": "2026-11-06",
+        "value": 1,
+        "observedOn": "2026-11-07",
+        "provisional": true
       }
     ]
   },
@@ -6946,7 +7000,7 @@ export const combinedSeries: MetricSeries[] = [
     "unique": true,
     "coverage": {
       "start": "2021-10-21",
-      "end": "2026-11-05"
+      "end": "2026-11-06"
     },
     "testTraffic": "not-excluded",
     "points": [
@@ -7115,6 +7169,12 @@ export const combinedSeries: MetricSeries[] = [
         "value": 1,
         "observedOn": "2026-11-06",
         "provisional": true
+      },
+      {
+        "date": "2026-11-06",
+        "value": 0,
+        "observedOn": "2026-11-07",
+        "provisional": true
       }
     ]
   },
@@ -7129,7 +7189,7 @@ export const combinedSeries: MetricSeries[] = [
     "unique": true,
     "coverage": {
       "start": "2021-10-21",
-      "end": "2026-11-05"
+      "end": "2026-11-06"
     },
     "testTraffic": "closed-test",
     "points": [
@@ -7279,6 +7339,12 @@ export const combinedSeries: MetricSeries[] = [
         "value": 6,
         "observedOn": "2026-11-06",
         "provisional": true
+      },
+      {
+        "date": "2026-11-06",
+        "value": 1,
+        "observedOn": "2026-11-07",
+        "provisional": true
       }
     ]
   },
@@ -7293,7 +7359,7 @@ export const combinedSeries: MetricSeries[] = [
     "unique": true,
     "coverage": {
       "start": "2021-10-21",
-      "end": "2026-11-05"
+      "end": "2026-11-06"
     },
     "testTraffic": "closed-test",
     "points": [
@@ -7443,6 +7509,12 @@ export const combinedSeries: MetricSeries[] = [
         "value": 5,
         "observedOn": "2026-11-06",
         "provisional": true
+      },
+      {
+        "date": "2026-11-06",
+        "value": 0,
+        "observedOn": "2026-11-07",
+        "provisional": true
       }
     ]
   },
@@ -7457,7 +7529,7 @@ export const combinedSeries: MetricSeries[] = [
     "unique": true,
     "coverage": {
       "start": "2021-10-21",
-      "end": "2026-11-05"
+      "end": "2026-11-06"
     },
     "testTraffic": "closed-test",
     "points": [
@@ -7613,6 +7685,12 @@ export const combinedSeries: MetricSeries[] = [
         "value": 1,
         "observedOn": "2026-11-06",
         "provisional": true
+      },
+      {
+        "date": "2026-11-06",
+        "value": 6,
+        "observedOn": "2026-11-07",
+        "provisional": true
       }
     ]
   },
@@ -7627,7 +7705,7 @@ export const combinedSeries: MetricSeries[] = [
     "unique": true,
     "coverage": {
       "start": "2021-10-21",
-      "end": "2026-11-05"
+      "end": "2026-11-06"
     },
     "testTraffic": "closed-test",
     "points": [
@@ -7782,6 +7860,12 @@ export const combinedSeries: MetricSeries[] = [
         "date": "2026-11-05",
         "value": 0,
         "observedOn": "2026-11-06",
+        "provisional": true
+      },
+      {
+        "date": "2026-11-06",
+        "value": 6,
+        "observedOn": "2026-11-07",
         "provisional": true
       }
     ]
