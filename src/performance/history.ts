@@ -2,7 +2,7 @@
 // Original console links, property IDs and evidence rows are deliberately not imported.
 import type { MetricSeries } from './data';
 // Includes the latest independently observed AdMob Network report.
-export const historicalCapturedAt = "2026-11-07T23:44:52.548Z";
+export const historicalCapturedAt = "2026-11-08T23:47:43.104Z";
 export const historicalSeries: MetricSeries[] = [
   {
     "id": "choose-window-ga4-dau",

@@ -16,10 +16,10 @@ export const releaseNotes: ReleaseNote[] = [
       {
         "platform": "ios",
         "status": "available",
-        "asOf": "2026-11-08"
+        "asOf": "2026-11-09"
       }
     ],
-    "storeObservedAt": "2026-11-08T00:07:04.900Z"
+    "storeObservedAt": "2026-11-09T00:02:43.427Z"
   },
   {
     "id": "yajalal-2.7.0",
@@ -33,10 +33,10 @@ export const releaseNotes: ReleaseNote[] = [
       {
         "platform": "ios",
         "status": "available",
-        "asOf": "2026-11-08"
+        "asOf": "2026-11-09"
       }
     ],
-    "storeObservedAt": "2026-11-08T00:06:54.316Z"
+    "storeObservedAt": "2026-11-09T00:02:33.785Z"
   },
   {
     "id": "spint-1.6.0",
@@ -50,10 +50,10 @@ export const releaseNotes: ReleaseNote[] = [
       {
         "platform": "ios",
         "status": "available",
-        "asOf": "2026-11-08"
+        "asOf": "2026-11-09"
       }
     ],
-    "storeObservedAt": "2026-11-08T00:07:03.098Z"
+    "storeObservedAt": "2026-11-09T00:02:41.918Z"
   },
   {
     "id": "unairplane-1.3.0",
@@ -67,10 +67,10 @@ export const releaseNotes: ReleaseNote[] = [
       {
         "platform": "ios",
         "status": "available",
-        "asOf": "2026-11-08"
+        "asOf": "2026-11-09"
       }
     ],
-    "storeObservedAt": "2026-11-08T00:06:58.823Z"
+    "storeObservedAt": "2026-11-09T00:02:38.274Z"
   },
   {
     "id": "choose-window-2.2.1",
@@ -84,10 +84,10 @@ export const releaseNotes: ReleaseNote[] = [
       {
         "platform": "ios",
         "status": "available",
-        "asOf": "2026-11-08"
+        "asOf": "2026-11-09"
       }
     ],
-    "storeObservedAt": "2026-11-08T00:06:55.920Z"
+    "storeObservedAt": "2026-11-09T00:02:35.482Z"
   },
   {
     "id": "yajalal-2.6.0",
@@ -101,10 +101,10 @@ export const releaseNotes: ReleaseNote[] = [
       {
         "platform": "ios",
         "status": "available",
-        "asOf": "2026-11-08"
+        "asOf": "2026-11-09"
       }
     ],
-    "storeObservedAt": "2026-11-08T00:06:54.648Z"
+    "storeObservedAt": "2026-11-09T00:02:34.246Z"
   },
   {
     "id": "yajalal-2.5.0",
@@ -114,12 +114,12 @@ export const releaseNotes: ReleaseNote[] = [
     "notes": "선수 기록의 기간과 지표 선택, 팀 선수단 필터와 정렬을 개선하고 최근 경기 보기를 정리했습니다.",
     "notesSource": "app-store",
     "storeMetadataCreatedAt": "2026-11-02T23:09:25-08:00",
-    "storeObservedAt": "2026-11-08T00:06:55.112Z",
+    "storeObservedAt": "2026-11-09T00:02:34.555Z",
     "platforms": [
       {
         "platform": "ios",
         "status": "available",
-        "asOf": "2026-11-08"
+        "asOf": "2026-11-09"
       }
     ]
   },
@@ -131,12 +131,12 @@ export const releaseNotes: ReleaseNote[] = [
     "notes": "손글씨 미리보기와 공통 화면 동작을 개선했습니다.",
     "notesSource": "app-store",
     "storeMetadataCreatedAt": "2026-11-02T23:09:55-08:00",
-    "storeObservedAt": "2026-11-08T00:07:00.851Z",
+    "storeObservedAt": "2026-11-09T00:02:39.977Z",
     "platforms": [
       {
         "platform": "ios",
         "status": "available",
-        "asOf": "2026-11-08"
+        "asOf": "2026-11-09"
       }
     ]
   },
@@ -148,12 +148,12 @@ export const releaseNotes: ReleaseNote[] = [
     "notes": "글 작성과 마크 사진 보기 및 공통 화면 동작을 개선했습니다.",
     "notesSource": "app-store",
     "storeMetadataCreatedAt": "2026-11-02T23:09:46-08:00",
-    "storeObservedAt": "2026-11-08T00:07:03.371Z",
+    "storeObservedAt": "2026-11-09T00:02:42.259Z",
     "platforms": [
       {
         "platform": "ios",
         "status": "available",
-        "asOf": "2026-11-08"
+        "asOf": "2026-11-09"
       }
     ]
   },
@@ -168,11 +168,11 @@ export const releaseNotes: ReleaseNote[] = [
       {
         "platform": "ios",
         "status": "available",
-        "asOf": "2026-11-08"
+        "asOf": "2026-11-09"
       }
     ],
     "storeMetadataCreatedAt": "2026-10-31T10:10:34-07:00",
-    "storeObservedAt": "2026-11-08T00:07:03.651Z"
+    "storeObservedAt": "2026-11-09T00:02:42.544Z"
   },
   {
     "id": "diairy-1.10.0",
@@ -185,11 +185,11 @@ export const releaseNotes: ReleaseNote[] = [
       {
         "platform": "ios",
         "status": "available",
-        "asOf": "2026-11-08"
+        "asOf": "2026-11-09"
       }
     ],
     "storeMetadataCreatedAt": "2026-10-31T10:10:30-07:00",
-    "storeObservedAt": "2026-11-08T00:07:01.612Z"
+    "storeObservedAt": "2026-11-09T00:02:40.664Z"
   },
   {
     "id": "unairplane-1.2.0",
@@ -202,11 +202,11 @@ export const releaseNotes: ReleaseNote[] = [
       {
         "platform": "ios",
         "status": "available",
-        "asOf": "2026-11-08"
+        "asOf": "2026-11-09"
       }
     ],
     "storeMetadataCreatedAt": "2026-10-31T10:10:38-07:00",
-    "storeObservedAt": "2026-11-08T00:06:59.319Z"
+    "storeObservedAt": "2026-11-09T00:02:38.641Z"
   },
   {
     "id": "burntok-1.9.0",
@@ -219,11 +219,11 @@ export const releaseNotes: ReleaseNote[] = [
       {
         "platform": "ios",
         "status": "available",
-        "asOf": "2026-11-08"
+        "asOf": "2026-11-09"
       }
     ],
     "storeMetadataCreatedAt": "2026-10-31T10:10:17-07:00",
-    "storeObservedAt": "2026-11-08T00:06:57.417Z"
+    "storeObservedAt": "2026-11-09T00:02:37.157Z"
   },
   {
     "id": "choose-window-2.2.0",
@@ -236,11 +236,11 @@ export const releaseNotes: ReleaseNote[] = [
       {
         "platform": "ios",
         "status": "available",
-        "asOf": "2026-11-08"
+        "asOf": "2026-11-09"
       }
     ],
     "storeMetadataCreatedAt": "2026-10-31T10:10:24-07:00",
-    "storeObservedAt": "2026-11-08T00:06:56.179Z"
+    "storeObservedAt": "2026-11-09T00:02:35.731Z"
   },
   {
     "id": "yajalal-2.4.0",
@@ -287,13 +287,13 @@ export const releaseNotes: ReleaseNote[] = [
       {
         "platform": "ios",
         "status": "available",
-        "asOf": "2026-11-08"
+        "asOf": "2026-11-09"
       }
     ],
     "sourceTag": "app-v1.9.8",
     "sourceSha": "97a4ff52112fc149167e9fea1add2ca52b3bf4ae",
     "storeMetadataCreatedAt": "2026-10-29T13:36:15-07:00",
-    "storeObservedAt": "2026-11-08T00:07:02.304Z"
+    "storeObservedAt": "2026-11-09T00:02:41.193Z"
   },
   {
     "id": "choose-window-2.1.5",
@@ -306,13 +306,13 @@ export const releaseNotes: ReleaseNote[] = [
       {
         "platform": "ios",
         "status": "available",
-        "asOf": "2026-11-08"
+        "asOf": "2026-11-09"
       }
     ],
     "sourceTag": "app-v2.1.5",
     "sourceSha": "6cf79724b93fbb4dc7147632d29209dae7bebb8d",
     "storeMetadataCreatedAt": "2026-10-29T19:26:01-07:00",
-    "storeObservedAt": "2026-11-08T00:06:56.436Z"
+    "storeObservedAt": "2026-11-09T00:02:36.006Z"
   },
   {
     "id": "yajalal-2.3.0",
@@ -408,11 +408,11 @@ export const releaseNotes: ReleaseNote[] = [
       {
         "platform": "ios",
         "status": "available",
-        "asOf": "2026-11-08"
+        "asOf": "2026-11-09"
       }
     ],
     "storeMetadataCreatedAt": "2026-10-29T19:46:09-07:00",
-    "storeObservedAt": "2026-11-08T00:06:59.641Z"
+    "storeObservedAt": "2026-11-09T00:02:38.907Z"
   },
   {
     "id": "burntok-1.8.0",
@@ -425,11 +425,11 @@ export const releaseNotes: ReleaseNote[] = [
       {
         "platform": "ios",
         "status": "available",
-        "asOf": "2026-11-08"
+        "asOf": "2026-11-09"
       }
     ],
     "storeMetadataCreatedAt": "2026-10-29T23:43:06-07:00",
-    "storeObservedAt": "2026-11-08T00:06:58.008Z"
+    "storeObservedAt": "2026-11-09T00:02:37.484Z"
   },
   {
     "id": "utilverse-1.2.4",
@@ -442,11 +442,11 @@ export const releaseNotes: ReleaseNote[] = [
       {
         "platform": "ios",
         "status": "available",
-        "asOf": "2026-11-08"
+        "asOf": "2026-11-09"
       }
     ],
     "storeMetadataCreatedAt": "2026-10-28T19:08:35-07:00",
-    "storeObservedAt": "2026-11-08T00:07:05.274Z"
+    "storeObservedAt": "2026-11-09T00:02:43.753Z"
   },
   {
     "id": "yajalal-2.2.5",
@@ -645,11 +645,11 @@ export const releaseNotes: ReleaseNote[] = [
       {
         "platform": "ios",
         "status": "available",
-        "asOf": "2026-11-08"
+        "asOf": "2026-11-09"
       }
     ],
     "storeMetadataCreatedAt": "2026-10-25T10:12:04-07:00",
-    "storeObservedAt": "2026-11-08T00:07:05.573Z"
+    "storeObservedAt": "2026-11-09T00:02:44.085Z"
   },
   {
     "id": "yajalal-2.2.3",

@@ -1,7 +1,7 @@
 // Public aggregate store exports. Installed audience and DAU are separate metrics.
 // Exported zero padding is preserved; coverage and firstPositive do not assert an app launch date.
 import type { MetricSeries } from './data.ts';
-export const storeCapturedAt = "2026-11-07T23:49:11.306Z";
+export const storeCapturedAt = "2026-11-08T23:51:51.618Z";
 export const storeSeries: MetricSeries[] = [
   {
     "id": "store-yajalal-apple-store-all-visitors",
@@ -1863,11 +1863,17 @@ export const storeSeries: MetricSeries[] = [
         "value": 4,
         "observedOn": "2026-11-07",
         "provisional": true
+      },
+      {
+        "date": "2026-11-07",
+        "value": 4,
+        "observedOn": "2026-11-09",
+        "provisional": true
       }
     ],
     "coverage": {
       "start": "2025-08-06",
-      "end": "2026-11-05"
+      "end": "2026-11-07"
     },
     "firstPositive": "2025-08-06"
   },
@@ -7289,11 +7295,17 @@ export const storeSeries: MetricSeries[] = [
       {
         "date": "2026-10-18",
         "value": 0
+      },
+      {
+        "date": "2026-11-04",
+        "value": 1,
+        "observedOn": "2026-11-09",
+        "provisional": true
       }
     ],
     "coverage": {
       "start": "2021-10-22",
-      "end": "2026-10-19"
+      "end": "2026-11-04"
     },
     "firstPositive": "2026-09-28"
   },
@@ -16085,11 +16097,29 @@ export const storeSeries: MetricSeries[] = [
         "value": 7,
         "observedOn": "2026-11-07",
         "provisional": true
+      },
+      {
+        "date": "2026-11-02",
+        "value": 9,
+        "observedOn": "2026-11-09",
+        "provisional": true
+      },
+      {
+        "date": "2026-11-03",
+        "value": 6,
+        "observedOn": "2026-11-09",
+        "provisional": true
+      },
+      {
+        "date": "2026-11-04",
+        "value": 8,
+        "observedOn": "2026-11-09",
+        "provisional": true
       }
     ],
     "coverage": {
       "start": "2021-10-22",
-      "end": "2026-11-01"
+      "end": "2026-11-04"
     },
     "firstPositive": "2026-05-15",
     "missingReason": "스토어 등록정보 방문자(설치되지 않은 사용자) 보고서에서 10/15~19 수치 제공. 10/20~21은 행 없음, 0으로 간주하지 않음."
