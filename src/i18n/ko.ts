@@ -1,5 +1,11 @@
 // Page labels and product descriptions are source copy; URLs and release facts remain in siteData.
 export const ko = {
+"evolutionServiceboundariesProduct": "번뚝 · 다에리",
+"evolutionServiceboundariesTitle": "서비스 종료 안내와 보존할 경로를 분리",
+"evolutionServiceboundariesWhy": "서비스 운영 범위를 정리하면서 종료 안내와 개인정보·계정 삭제 안내의 접근 경계를 구분할 필요가 있었습니다.",
+"evolutionServiceboundariesChange": "번뚝의 웹과 API는 종료 응답을 반환하도록 설정하고 법적 안내 경로는 유지했습니다. 다에리는 웹 종료 안내와 법적 안내를 분리하고 API 설정을 유지했으며 공유 서버의 포트 충돌을 피할 수 있도록 호스트 포트를 설정 가능하게 했습니다.",
+"evolutionServiceboundariesResult": "두 제품의 배포 설정 변경을 소스에서 확인했습니다. 실제 서버 반영이나 각 서비스의 현재 공개 상태는 이 기록에서 확인하지 않았습니다.",
+"evolutionServiceboundariesEvidence": "번뚝 47aa48fa · 다에리 620007d6, f8d501e0: 서버 설정과 배포 스크립트.",
 "evolutionRankingcountsProduct": "오늘야구",
 "evolutionRankingcountsTitle": "성공률 옆에 실제 시도·성공 기록을 함께 표시",
 "evolutionRankingcountsWhy": "백분율만 보면 몇 번의 시도에서 나온 기록인지 판단하기 어렵고 반올림된 비율로 원래 횟수를 되살릴 수 없었습니다.",

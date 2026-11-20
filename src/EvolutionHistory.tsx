@@ -10,6 +10,7 @@ const c = getCopy();
 // Record dates are not release dates. Evidence and audit boundaries live in
 // docs/EVOLUTION_HISTORY_SOURCES.md; private repository links stay off the public page.
 const entries = [
+  { topic: 'ops', id: 'serviceboundaries', date: '2026-11-19', status: c.evolutionServiceboundariesProduct, title: c.evolutionServiceboundariesTitle, why: c.evolutionServiceboundariesWhy, change: c.evolutionServiceboundariesChange, result: c.evolutionServiceboundariesResult, evidence: c.evolutionServiceboundariesEvidence },
   { topic: 'clients', id: 'famarket', date: '2026-11-06', status: c.evolutionFamarketProduct, title: c.evolutionFamarketTitle, why: c.evolutionFamarketWhy, change: c.evolutionFamarketChange, result: c.evolutionFamarketResult, evidence: c.evolutionFamarketEvidence },
   { topic: 'clients', id: 'fieldingrunning', date: '2026-11-06', status: c.evolutionFieldingrunningProduct, title: c.evolutionFieldingrunningTitle, why: c.evolutionFieldingrunningWhy, change: c.evolutionFieldingrunningChange, result: c.evolutionFieldingrunningResult, evidence: c.evolutionFieldingrunningEvidence },
   { topic: 'clients', id: 'teamrecords', date: '2026-11-06', status: c.evolutionTeamrecordsProduct, title: c.evolutionTeamrecordsTitle, why: c.evolutionTeamrecordsWhy, change: c.evolutionTeamrecordsChange, result: c.evolutionTeamrecordsResult, evidence: c.evolutionTeamrecordsEvidence },
