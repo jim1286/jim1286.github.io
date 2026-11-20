@@ -9,11 +9,11 @@
 
 - https://jmstudioapps.com/ 및 /ko-KR/: 정적 포트폴리오
 - https://www.jmstudioapps.com/: 메인으로 308, path/query 보존
-- OVH DNS apex/www A 51.79.240.56 TTL300
-- 서버: 기존 ubuntu@51.79.240.56, Caddy. /etc/caddy/conf.d/portfolio-site.caddy
+- OVH DNS apex/www A 15.235.193.11 TTL300
+- 서버: 기존 ubuntu@15.235.193.11, Caddy. /etc/caddy/conf.d/portfolio-site.caddy
 - 파일: /srv/portfolio-site/releases/<source-sha>-<manifest-prefix>/public, current/previous symlink
 - SSH 관리 권한 및 기존 known_hosts가 필요하다. 키 원문은 소스/로그에 넣지 않는다. 특정 ChatGPT 계정·Codex 실행은 필요 없다.
-- 정책 사이트 /srv/app-policies와 분리하며 기존 /opt/burntok/deploy.lock만 공유한다.
+- 정책 사이트 /srv/app-policies와 분리하며 기존 /var/lib/portfolio-deploy/deploy.lock만 공유한다.
 
 ## 재현과 게시
 
@@ -26,7 +26,7 @@ pnpm run policy:check
 pnpm build
 pnpm run deploy:prepare /absolute/empty/artifact <exact-main-source-sha>
 pnpm run deploy:verify /absolute/empty/artifact <exact-main-source-sha>
-pnpm run deploy /absolute/empty/artifact ubuntu@51.79.240.56 /absolute/ssh-key-file <exact-main-source-sha>
+pnpm run deploy /absolute/empty/artifact ubuntu@15.235.193.11 /absolute/ssh-key-file <exact-main-source-sha>
 ```
 
 2026-10-17 정책 대조에서 반복 배포에 전체 검사가 묶여 있어 `pnpm check`를 빌드로 교체했다.
