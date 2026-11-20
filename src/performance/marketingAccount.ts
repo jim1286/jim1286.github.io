@@ -6,16 +6,16 @@ export type MarketingAccount = { platform: MarketingPlatform; observedAt: string
 export const marketingAccounts: MarketingAccount[] = [
   {
     "platform": "instagram",
-    "observedAt": "2026-11-05T23:39:38.032Z",
+    "observedAt": "2026-11-19T23:40:31.030181+00:00",
     "windowLabel": "최근 30일",
     "periodDates": null,
     "chartRange": null,
-    "views": 2415,
-    "viewers": 243,
-    "interactions": 607,
-    "profileActivity": 466,
-    "followers": 211,
-    "followersAsOf": "2026-11-06",
+    "views": 2890,
+    "viewers": 213,
+    "interactions": 677,
+    "profileActivity": 496,
+    "followers": 252,
+    "followersAsOf": "2026-11-20",
     "netFollowers": null,
     "daily": {
       "views": [],
@@ -26,23 +26,23 @@ export const marketingAccounts: MarketingAccount[] = [
   },
   {
     "platform": "threads",
-    "observedAt": "2026-11-05T23:38:29.158Z",
+    "observedAt": "2026-11-19T23:40:31.030181+00:00",
     "windowLabel": "최근 30일",
     "periodDates": {
-      "start": "2026-10-07",
-      "end": "2026-11-05"
+      "start": "2026-10-21",
+      "end": "2026-11-19"
     },
     "chartRange": {
       "start": "2026-09-26",
-      "end": "2026-11-05"
+      "end": "2026-11-19"
     },
-    "views": 4806,
-    "viewers": 2111,
-    "interactions": 561,
+    "views": 4127,
+    "viewers": 1862,
+    "interactions": 426,
     "profileActivity": null,
-    "followers": 82,
-    "followersAsOf": "2026-11-06",
-    "netFollowers": 76,
+    "followers": 88,
+    "followersAsOf": "2026-11-20",
+    "netFollowers": 64,
     "daily": {
       "views": [
         {
@@ -208,6 +208,26 @@ export const marketingAccounts: MarketingAccount[] = [
         {
           "date": "2026-11-05",
           "value": 161
+        },
+        {
+          "date": "2026-11-06",
+          "value": 76
+        },
+        {
+          "date": "2026-11-07",
+          "value": 48
+        },
+        {
+          "date": "2026-11-08",
+          "value": 37
+        },
+        {
+          "date": "2026-11-17",
+          "value": 33
+        },
+        {
+          "date": "2026-11-19",
+          "value": 5
         }
       ],
       "viewers": [
@@ -374,6 +394,26 @@ export const marketingAccounts: MarketingAccount[] = [
         {
           "date": "2026-11-05",
           "value": 42
+        },
+        {
+          "date": "2026-11-06",
+          "value": 51
+        },
+        {
+          "date": "2026-11-07",
+          "value": 34
+        },
+        {
+          "date": "2026-11-08",
+          "value": 21
+        },
+        {
+          "date": "2026-11-17",
+          "value": 13
+        },
+        {
+          "date": "2026-11-19",
+          "value": 5
         }
       ],
       "interactions": [
@@ -488,9 +528,25 @@ export const marketingAccounts: MarketingAccount[] = [
         {
           "date": "2026-11-05",
           "value": 24
+        },
+        {
+          "date": "2026-11-06",
+          "value": 6
+        },
+        {
+          "date": "2026-11-07",
+          "value": 5
+        },
+        {
+          "date": "2026-11-08",
+          "value": 3
+        },
+        {
+          "date": "2026-11-18",
+          "value": 1
         }
       ]
     },
-    "dailyObservedAt": "2026-11-05T23:41:06.094Z"
+    "dailyObservedAt": "2026-11-19T23:40:31.030181+00:00"
   }
 ];
